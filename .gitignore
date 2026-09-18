@@ -1,0 +1,19 @@
+# 产物与大文件
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# 模型与实验产物（体积大/可重建，用 MLflow 或重新训练再生成）
+*.joblib
+*.pt
+mlflow-lab/mlflow.db
+mlflow-lab/artifacts/
+mlruns/
+
+# 数据集（均可用脚本内下载逻辑重建）
+data/
+*/data/
+ml-vision/data/
+*/.cache/
+
+# 原始比赛数据除外：kaggle-sim/raw_titanic.csv 只有44KB，保留可复现

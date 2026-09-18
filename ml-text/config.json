@@ -1,0 +1,20 @@
+{
+  "dataset": "20newsgroups",
+  "categories": ["comp.graphics", "rec.sport.baseball", "rec.sport.hockey", "sci.space"],
+  "remove": ["headers", "footers", "quotes"],
+  "random_state": 42,
+  "cv_folds": 5,
+  "vectorizer": {
+    "ngram_range": [1, 2],
+    "min_df": 1,
+    "sublinear_tf": true
+  },
+  "model": {
+    "C": 5.0,
+    "max_iter": 5000
+  },
+  "app": {
+    "port": 8503,
+    "low_confidence_note": "margin 低于该值时提示转人工，阈值取训练集折外(OOF)置信度25分位，训练时写入 report.json"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "cv_accuracy": 0.8808,
+  "test_accuracy": 0.8702,
+  "n_train": 2374,
+  "n_test": 1579,
+  "classes": [
+    "comp.graphics",
+    "rec.sport.baseball",
+    "rec.sport.hockey",
+    "sci.space"
+  ],
+  "confidence_threshold": 0.2068,
+  "note": "confidence=Top1-Top2概率差；低于阈值应用会提示转人工"
+}

@@ -1,0 +1,7 @@
+{
+  "model": "SmallCNN 2conv+fc",
+  "epochs": 120,
+  "test_acc": 0.98,
+  "preprocess": "灰度→白字黑底→裁包围盒→正方形padding→缩到8x8→除以255→[0,1]",
+  "input_shape": "(1,1,8,8) float32"
+}

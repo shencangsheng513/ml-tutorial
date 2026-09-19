@@ -5,9 +5,10 @@
 ## 架构
 ```
 build_index: md → 标题感知切块(chunker) → 嵌入(embeddings,带磁盘缓存) → 余弦向量库(store)
-ask:         问题 → 嵌入 → top-k检索 → 拼进prompt → LLM作答(带引用出处)
+ask:         问题 → 嵌入 → top-k混合检索(向量+BM25,RRF融合) → 拼进prompt → LLM作答(带引用出处)
 run_eval:    13题三层评估（见下）
 ```
+> 检索默认走 hybrid（90 题大盘 top-4 命中 87.8% vs 纯向量 81.1%）；`ask.py --vec` 回退纯向量。
 
 ## 三层评估方法（这是本项目的主角，不是能聊天就完事）
 | 层 | 指标 | 成本 |
@@ -119,6 +120,9 @@ D:/.../.venv/Scripts/python.exe evaluation/run_eval.py     # v4 双指标终评�
 D:/.../.venv/Scripts/python.exe evaluation/run_retrieval_ab.py  # v3 检索 A/B（hit@k + MRR@6）
 D:/.../.venv/Scripts/python.exe evaluation/stress_recall.py     # 90 题大盘：纯向量 vs hybrid top-4
 D:/.../.venv/Scripts/python.exe evaluation/judge_probe.py  # v3 判卷官敏感性探针
+D:/.../.venv/Scripts/python.exe evaluation/judge_probe_faithful.py  # v4 L3b 编造盲区再探针
+D:/.../.venv/Scripts/python.exe scripts/build_multihop50.py && \
+D:/.../.venv/Scripts/python.exe evaluation/run_multihop50_ab.py  # v5 多跳分解 50 题复验（含符号检验）
 D:/.../.venv/Scripts/python.exe scripts/build_multihop20.py      # v4 生成20道跨文档题（一次性）
 D:/.../.venv/Scripts/python.exe evaluation/run_multihop20_ab.py  # v4 分解检索三臂 L1 A/B
 python -m pytest && python -m ruff check src scripts tests # 离线测试+lint

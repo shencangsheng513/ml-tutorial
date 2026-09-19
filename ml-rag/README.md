@@ -50,6 +50,26 @@ v2 留下的两个疑问，v3 用数据回答（产物在 `evaluation/`，重跑
 
 **教训一句话**：无区分度的评估证明不了任何东西——hit@4 满分时以为赢了，换上 MRR 才发现三个方法在摸高同一块天花板。
 
+## v4：判卷官换两把尺子，饱和终于解除
+v3 的残留问题：配对判卷（L3a）在没有原始资料时只能核对"标准要点"，对"要点全中但顺手编了十个细节"的答案睁一只眼闭一只眼——17 题里 RAG 答案仍是大片 10 分。v4 把判卷拆成两个正交指标：
+
+- **L3a 配对分**（对称，无资料）：A/B 两组同罪同罚，先列事实清单（每条断言 ✓/✗）再锚定打分（8 起评、漏要点 −2、✗ −3）。
+- **L3b 有据性分**（只判 RAG 组）：把检索到的【原始资料】全文给判卷官，每处"资料没写但说得斩钉截铁"的断言 −2。裸考组天生要用外部知识，不参与此项——**不对称的公平才是公平**。
+
+17 题（13 单跳 + 4 多跳）双指标终评：
+
+| 指标 | RAG | 裸考 | 胜/平/负 |
+|---|---|---|---|
+| L3a 配对（RAG vs 裸考） | **8.94** | 2.41 | 16/0/1 |
+| L3b 有据性（仅 RAG） | **8.94**（无据断言共 20 处） | — | — |
+
+量表真正咬人的三处证据（不再是清一色 10）：
+1. 一道多跳题 RAG 输给裸考（4 vs 6）：两篇文档只检索到一篇，有据性也只有 4.0（7 处无据断言）——**与 v3"多跳是检索层修不动的短板"的 MRR 结论互相印证**，指标之间不打架。
+2. 一题配对满分 10、有据性当场 6.0（5 处无据断言）：要点全中但护栏细节是自己脑补的——这正是 v3 探针预警的残盲区（配对判卷抓得住改数字、抓不住编断言），L3b 把它当场抓住。
+3. 一题 RAG 判 6：覆盖了要点但把版本号写错，fact_check 里被逐条点名。
+
+结论：RAG 对裸考的优势是真的（8.94 vs 2.41，16/0/1），但 **v2 那种"13/13 全满分"是判卷饱和的假象**；换上 L3b 之后，每一分扣在哪条断言上都能指认。判卷官经过锚定量表 + 探针校验后，现在是仓库里最贵也最可信的一件仪器——但它仍是仪器，不是真理。
+
 ## 工程化要点
 - **凭证**：全从 `~/.bailian` 或环境变量读，仓库零明文（复用第9课教训）
 - **缓存**：嵌入和 judge 结果落 `index/`（已 gitignore），重建索引、重跑评估零重复计费
@@ -62,8 +82,9 @@ v2 留下的两个疑问，v3 用数据回答（产物在 `evaluation/`，重跑
 cd ml-rag
 D:/.../.venv/Scripts/python.exe scripts/build_index.py    # 建库（一次性）
 D:/.../.venv/Scripts/python.exe scripts/ask.py "房价项目地理特征改进多少？"
-D:/.../.venv/Scripts/python.exe evaluation/run_eval.py     # 三层评估
+D:/.../.venv/Scripts/python.exe evaluation/run_eval.py     # v4 双指标终评（L3a 配对 + L3b 有据性）
 D:/.../.venv/Scripts/python.exe evaluation/run_retrieval_ab.py  # v3 检索 A/B（hit@k + MRR@6）
+D:/.../.venv/Scripts/python.exe evaluation/stress_recall.py     # 90 题大盘：纯向量 vs hybrid top-4
 D:/.../.venv/Scripts/python.exe evaluation/judge_probe.py  # v3 判卷官敏感性探针
 python -m pytest && python -m ruff check src scripts tests # 离线测试+lint
 ```

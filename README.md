@@ -14,7 +14,7 @@
 | [kaggle-sim](kaggle-sim/) 比赛机制 | Titanic 887行 | 公榜0.972 私榜0.826 | submit登山=背答案实锤 |
 | [mlflow-lab](mlflow-lab/) 实验跟踪 | 8 runs 入库 | — | search_runs 一行重排历史 |
 | [ml-deploy](ml-deploy/) 模型服务 | ml-text 的 87.7% 分类器 | pytest 7/7 · 延迟~17ms | 护栏/日志/healthz+ready 前置到服务层 |
-| [ml-rag](ml-rag/) 知识库问答 | 仓库 9 篇 md → 32 块 | 检索13/13；RAG 6.69→10.0 | 检索全中也能输：提示词与判卷官都要修 |
+| [ml-rag](ml-rag/) 知识库问答 | 仓库 9 篇 md → 40 块 | v4 终评 RAG 8.94 vs 裸考 2.41 | 四轮迭代：满分是判卷饱和，双指标才见真分 |
 
 ## 跨项目方法论（踩出来的）
 

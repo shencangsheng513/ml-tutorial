@@ -28,7 +28,8 @@ def load_questions() -> list[dict]:
     for name in ("qa_eval.json", "qa_v3.json"):
         p = HERE / "evaluation" / name
         for it in json.loads(p.read_text(encoding="utf-8")):
-            it.setdefault("docs", [it["doc"]])
+            if "docs" not in it:
+                it["docs"] = [it["doc"]]
             items.append(it)
     return items
 
@@ -58,8 +59,7 @@ def main() -> None:
     for i, (item, found, _) in enumerate(rows):
         a_rag = answer_with_context(item["q"], found)
         a_bare = answer_bare(item["q"])
-        pos = "B" if i % 2 else "A"  # RAG 答案在判卷 prompt 里的位置
-        x, y = (a_bare, a_rag) if i % 2 else (a_rag, a_bare)
+        x, y = (a_bare, a_rag) if i % 2 else (a_rag, a_bare)  # 奇偶换位防位置偏置
         j = judge_pair(item["q"], item["gold"], x, y)
         s_rag, s_bare = (j["B"], j["A"]) if i % 2 else (j["A"], j["B"])
         f = judge_faithful(item["q"], item["gold"], a_rag, build_context(found))

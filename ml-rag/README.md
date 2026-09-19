@@ -50,7 +50,24 @@ v2 留下的两个疑问，v3 用数据回答（产物在 `evaluation/`，重跑
 
 **教训一句话**：无区分度的评估证明不了任何东西——hit@4 满分时以为赢了，换上 MRR 才发现三个方法在摸高同一块天花板。
 
-## v4：判卷官换两把尺子，饱和终于解除
+## v4·检索线：多跳查询分解——把 0.438 打上去，然后被打回来再想明白
+v3 遗留：多跳题全方法 MRR@6 同分 0.438，检索层修不动，指向查询分解。做法（`src/rag/decompose.py`）：LLM 把问题拆成 ≤3 个子问题 → 每个子问题走 v3 的 hybrid 检索 → **两种融合策略 A/B**：
+- reserve（槽位保证）：每个子查询的 top-1 先占一个结果槽位，剩余按 RRF 补满；
+- plain（纯多查询 RRF）：所有子查询榜单直接融合，不做保证。
+
+4 题老题集没有区分度（同方法重跑 MRR 都能从 0.438 漂到 0.500——n=4 就是抛硬币），于是用 LLM 按文档对**生成 20 道新跨文档题**（`scripts/build_multihop20.py`，题面自带数字锚点）做 L1 大盘：
+
+| 方法（n=20 多跳） | MRR@6 | 双文档全进 top-4 |
+|---|---|---|
+| 直接 hybrid（v3 冠军） | 0.401 | 16/20 |
+| **分解 + 槽位保证** | **0.439** | **17/20** |
+| 分解 + 纯多查询 RRF | 0.215 | 8/20 |
+
+三个发现：① 分解确实能把第二跳的文档从深埋里捞出来，但增幅温和（+9%），有 2 题三臂全灭（题面引用了索引里确实没有的信息，检索层无罪）；② **真正的坑是"朴素平均"**——子查询榜单直接融合时，两跳都会命中的近端块重复加分上浮，把远端块挤出 top-6，指标腰斩；③ 分解版的端到端判卷 3:1 占优（26 vs 22 分），但 n=4 仍不足为凭。产物：`evaluation/multihop20_ab_v4.json`、`decompose_ab_v4.json`（4 题 e2e 明细）。
+
+**v4 教训**：加一个"看起来正确"的组件（查询分解）时，消融它的实现变体（reserve vs plain）和样本量（4→20）比组件本身更重要——两个变体差出一倍，说明机制细节才是结论的主人。
+
+## v4·判卷线：判卷官换两把尺子，饱和终于解除
 v3 的残留问题：配对判卷（L3a）在没有原始资料时只能核对"标准要点"，对"要点全中但顺手编了十个细节"的答案睁一只眼闭一只眼——17 题里 RAG 答案仍是大片 10 分。v4 把判卷拆成两个正交指标：
 
 - **L3a 配对分**（对称，无资料）：A/B 两组同罪同罚，先列事实清单（每条断言 ✓/✗）再锚定打分（8 起评、漏要点 −2、✗ −3）。
@@ -75,7 +92,7 @@ v3 的残留问题：配对判卷（L3a）在没有原始资料时只能核对"�
 - **缓存**：嵌入和 judge 结果落 `index/`（已 gitignore），重建索引、重跑评估零重复计费
 - **切块**：按 `##` 标题切，超长段落按句边界二次切并保留 80 字重叠——避免"答案被切断"
 - **向量库**：千级块用 numpy 手写余弦即可，不引 chromadb/faiss，依赖最小化
-- **测试**：11 个离线单测（切块/存储/BM25 分词与打分/RRF 融合），不花一分钱 API
+- **测试**：12 个离线单测（切块/存储/BM25 分词与打分/RRF 融合/子问题解析），不花一分钱 API
 
 ## 跑起来
 ```bash
@@ -86,5 +103,7 @@ D:/.../.venv/Scripts/python.exe evaluation/run_eval.py     # v4 双指标终评�
 D:/.../.venv/Scripts/python.exe evaluation/run_retrieval_ab.py  # v3 检索 A/B（hit@k + MRR@6）
 D:/.../.venv/Scripts/python.exe evaluation/stress_recall.py     # 90 题大盘：纯向量 vs hybrid top-4
 D:/.../.venv/Scripts/python.exe evaluation/judge_probe.py  # v3 判卷官敏感性探针
+D:/.../.venv/Scripts/python.exe scripts/build_multihop20.py      # v4 生成20道跨文档题（一次性）
+D:/.../.venv/Scripts/python.exe evaluation/run_multihop20_ab.py  # v4 分解检索三臂 L1 A/B
 python -m pytest && python -m ruff check src scripts tests # 离线测试+lint
 ```

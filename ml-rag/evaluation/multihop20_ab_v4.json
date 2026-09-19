@@ -1,0 +1,217 @@
+{
+  "summary": {
+    "mrr6": {
+      "hybrid": 0.401,
+      "decomp_res": 0.439,
+      "decomp_pl": 0.2147
+    },
+    "all_top4": {
+      "hybrid": 16,
+      "decomp_res": 17,
+      "decomp_pl": 8
+    },
+    "n": 20
+  },
+  "per_question": [
+    {
+      "q": "甲项目用地理特征使RMSE降低0.0208，乙项目v1到v2的RAG均分提升3.",
+      "docs": [
+        "ml-car-price\\README.md",
+        "ml-rag\\README.md"
+      ],
+      "hybrid": 2,
+      "decomp_res": 2,
+      "decomp_pl": 4
+    },
+    {
+      "q": "甲用地理特征降低RMSE，乙用平移增强暴露train/serve skew，两者",
+      "docs": [
+        "ml-car-price\\README.md",
+        "ml-vision\\README.md"
+      ],
+      "hybrid": 99,
+      "decomp_res": 99,
+      "decomp_pl": 99
+    },
+    {
+      "q": "甲中TF-IDF二元词组达87.3%，乙中CNN在8×8图上为何未超MLP的98",
+      "docs": [
+        "ml-text\\README.md",
+        "ml-vision\\README.md"
+      ],
+      "hybrid": 4,
+      "decomp_res": 2,
+      "decomp_pl": 99
+    },
+    {
+      "q": "甲中Titanic私榜0.826的CV验证方式，与乙中模型加载‘lifespan",
+      "docs": [
+        "kaggle-sim\\README.md",
+        "ml-deploy\\README.md"
+      ],
+      "hybrid": 4,
+      "decomp_res": 4,
+      "decomp_pl": 99
+    },
+    {
+      "q": "甲称地理特征使RMSE从0.4437→0.4229，乙中该项目最终成绩是否与此一",
+      "docs": [
+        "ml-car-price\\README.md",
+        "项目复盘与简历写法.md"
+      ],
+      "hybrid": 2,
+      "decomp_res": 2,
+      "decomp_pl": 6
+    },
+    {
+      "q": "甲中公榜0.853私榜0.826的CV成功案例，与乙中地理特征使RMSE从0.4",
+      "docs": [
+        "kaggle-sim\\README.md",
+        "ml-car-price\\README.md"
+      ],
+      "hybrid": 6,
+      "decomp_res": 2,
+      "decomp_pl": 99
+    },
+    {
+      "q": "甲中模型加载用joblib且不随请求重复加载，乙中MLflow存储CNN sta",
+      "docs": [
+        "ml-deploy\\README.md",
+        "mlflow-lab\\README.md"
+      ],
+      "hybrid": 2,
+      "decomp_res": 2,
+      "decomp_pl": 4
+    },
+    {
+      "q": "ml-rag v1检索全中却RAG均分低于裸考，而ml-vision中SVM在8",
+      "docs": [
+        "ml-rag\\README.md",
+        "ml-vision\\README.md"
+      ],
+      "hybrid": 2,
+      "decomp_res": 2,
+      "decomp_pl": 4
+    },
+    {
+      "q": "甲中RF裸跑0.768而乙中TF-IDF达0.8702，两者数据集复杂度差异如何",
+      "docs": [
+        "kaggle-sim\\README.md",
+        "ml-text\\README.md"
+      ],
+      "hybrid": 6,
+      "decomp_res": 99,
+      "decomp_pl": 99
+    },
+    {
+      "q": "甲资料指出RAG项目v1检索全中却输裸考，乙资料揭示其根本原因是什么？",
+      "docs": [
+        "README.md",
+        "ml-rag\\README.md"
+      ],
+      "hybrid": 1,
+      "decomp_res": 1,
+      "decomp_pl": 1
+    },
+    {
+      "q": "ml-rag 的 v1 版本 RAG 均分是 6.69，而 mlflow-lab",
+      "docs": [
+        "ml-rag\\README.md",
+        "mlflow-lab\\README.md"
+      ],
+      "hybrid": 3,
+      "decomp_res": 3,
+      "decomp_pl": 4
+    },
+    {
+      "q": "甲称ml-text项目准确率87.0%，乙记载TF-IDF达87.3%、BERT",
+      "docs": [
+        "README.md",
+        "ml-text\\README.md"
+      ],
+      "hybrid": 1,
+      "decomp_res": 1,
+      "decomp_pl": 6
+    },
+    {
+      "q": "甲中CNN state_dict产物与乙中手写数字项目CNN滤镜发现，共同印证了",
+      "docs": [
+        "mlflow-lab\\README.md",
+        "项目复盘与简历写法.md"
+      ],
+      "hybrid": 99,
+      "decomp_res": 99,
+      "decomp_pl": 99
+    },
+    {
+      "q": "甲项目用pydantic拦截脏输入，乙项目用LLM-as-judge防偏置，二者",
+      "docs": [
+        "ml-deploy\\README.md",
+        "ml-rag\\README.md"
+      ],
+      "hybrid": 4,
+      "decomp_res": 2,
+      "decomp_pl": 3
+    },
+    {
+      "q": "甲中私榜纹丝不动的登山提交与乙中v1裸考胜RAG的现象，共同揭示了什么模型评估陷",
+      "docs": [
+        "kaggle-sim\\README.md",
+        "ml-rag\\README.md"
+      ],
+      "hybrid": 2,
+      "decomp_res": 2,
+      "decomp_pl": 6
+    },
+    {
+      "q": "ml-rag的v1版RAG均分6.69却输给裸考8.00，而ml-timeser",
+      "docs": [
+        "ml-rag\\README.md",
+        "ml-timeseries\\README.md"
+      ],
+      "hybrid": 3,
+      "decomp_res": 3,
+      "decomp_pl": 5
+    },
+    {
+      "q": "甲项目用TF-IDF+LR文本分类，乙项目用树模型做时序预测，两者分别如何解决模",
+      "docs": [
+        "ml-deploy\\README.md",
+        "ml-timeseries\\README.md"
+      ],
+      "hybrid": 4,
+      "decomp_res": 3,
+      "decomp_pl": 5
+    },
+    {
+      "q": "资料甲称TF-IDF bigram达87.3%，资料乙称TF-IDF达88.1%",
+      "docs": [
+        "ml-text\\README.md",
+        "项目复盘与简历写法.md"
+      ],
+      "hybrid": 2,
+      "decomp_res": 2,
+      "decomp_pl": 2
+    },
+    {
+      "q": "甲用差分目标法将CO2预测RMSE从3.99降至0.311ppm，乙中CNN在M",
+      "docs": [
+        "ml-timeseries\\README.md",
+        "ml-vision\\README.md"
+      ],
+      "hybrid": 2,
+      "decomp_res": 2,
+      "decomp_pl": 6
+    },
+    {
+      "q": "资料甲中护栏拒绝<10字符请求，资料乙指出<10词帖准确率仅52%，两者共同支撑",
+      "docs": [
+        "ml-deploy\\README.md",
+        "项目复盘与简历写法.md"
+      ],
+      "hybrid": 2,
+      "decomp_res": 2,
+      "decomp_pl": 3
+    }
+  ]
+}

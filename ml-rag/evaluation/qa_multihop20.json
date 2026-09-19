@@ -1,0 +1,142 @@
+[
+  {
+    "q": "甲项目用地理特征使RMSE降低0.0208，乙项目v1到v2的RAG均分提升3.31，两者改进幅度数值差异的绝对值是多少？",
+    "docs": [
+      "ml-car-price\\README.md",
+      "ml-rag\\README.md"
+    ]
+  },
+  {
+    "q": "甲用地理特征降低RMSE，乙用平移增强暴露train/serve skew，两者共同防范的数据风险是什么？",
+    "docs": [
+      "ml-car-price\\README.md",
+      "ml-vision\\README.md"
+    ]
+  },
+  {
+    "q": "甲中TF-IDF二元词组达87.3%，乙中CNN在8×8图上为何未超MLP的98.2%？",
+    "docs": [
+      "ml-text\\README.md",
+      "ml-vision\\README.md"
+    ]
+  },
+  {
+    "q": "甲中Titanic私榜0.826的CV验证方式，与乙中模型加载‘lifespan启动时load一次’的做法，共同规避了哪种机器学习常见风险？",
+    "docs": [
+      "kaggle-sim\\README.md",
+      "ml-deploy\\README.md"
+    ]
+  },
+  {
+    "q": "甲称地理特征使RMSE从0.4437→0.4229，乙中该项目最终成绩是否与此一致？若一致，其关键收获第三条强调了什么方法来验证该结论？",
+    "docs": [
+      "ml-car-price\\README.md",
+      "项目复盘与简历写法.md"
+    ]
+  },
+  {
+    "q": "甲中公榜0.853私榜0.826的CV成功案例，与乙中地理特征使RMSE从0.4437→0.4229的提升，哪个更体现‘结构防泄漏’原则？",
+    "docs": [
+      "kaggle-sim\\README.md",
+      "ml-car-price\\README.md"
+    ]
+  },
+  {
+    "q": "甲中模型加载用joblib且不随请求重复加载，乙中MLflow存储CNN state_dict，两者在模型工件管理上核心差异是什么？",
+    "docs": [
+      "ml-deploy\\README.md",
+      "mlflow-lab\\README.md"
+    ]
+  },
+  {
+    "q": "ml-rag v1检索全中却RAG均分低于裸考，而ml-vision中SVM在8×8图上98.0%、CNN仅98.2%，两者共同暴露了什么评估陷阱？",
+    "docs": [
+      "ml-rag\\README.md",
+      "ml-vision\\README.md"
+    ]
+  },
+  {
+    "q": "甲中RF裸跑0.768而乙中TF-IDF达0.8702，两者数据集复杂度差异如何体现？",
+    "docs": [
+      "kaggle-sim\\README.md",
+      "ml-text\\README.md"
+    ]
+  },
+  {
+    "q": "甲资料指出RAG项目v1检索全中却输裸考，乙资料揭示其根本原因是什么？",
+    "docs": [
+      "README.md",
+      "ml-rag\\README.md"
+    ]
+  },
+  {
+    "q": "ml-rag 的 v1 版本 RAG 均分是 6.69，而 mlflow-lab 记录的 SVM-rbf 最高准确率是 0.991，这两个数值量纲不同，它们分别代表什么评估维度？",
+    "docs": [
+      "ml-rag\\README.md",
+      "mlflow-lab\\README.md"
+    ]
+  },
+  {
+    "q": "甲称ml-text项目准确率87.0%，乙记载TF-IDF达87.3%、BERT微调0.8689，二者差异原因是否源于甲未区分验证集与测试集？",
+    "docs": [
+      "README.md",
+      "ml-text\\README.md"
+    ]
+  },
+  {
+    "q": "甲中CNN state_dict产物与乙中手写数字项目CNN滤镜发现，共同印证了什么模型学习特性？",
+    "docs": [
+      "mlflow-lab\\README.md",
+      "项目复盘与简历写法.md"
+    ]
+  },
+  {
+    "q": "甲项目用pydantic拦截脏输入，乙项目用LLM-as-judge防偏置，二者分别在哪个环节、以什么具体机制实现‘输入净化’？",
+    "docs": [
+      "ml-deploy\\README.md",
+      "ml-rag\\README.md"
+    ]
+  },
+  {
+    "q": "甲中私榜纹丝不动的登山提交与乙中v1裸考胜RAG的现象，共同揭示了什么模型评估陷阱？",
+    "docs": [
+      "kaggle-sim\\README.md",
+      "ml-rag\\README.md"
+    ]
+  },
+  {
+    "q": "ml-rag的v1版RAG均分6.69却输给裸考8.00，而ml-timeseries用差分目标法将CO2预测误差从3.99降至0.311ppm，两者分别通过什么关键调整解决了‘模型被误导’的问题？",
+    "docs": [
+      "ml-rag\\README.md",
+      "ml-timeseries\\README.md"
+    ]
+  },
+  {
+    "q": "甲项目用TF-IDF+LR文本分类，乙项目用树模型做时序预测，两者分别如何解决模型外推能力不足的问题？",
+    "docs": [
+      "ml-deploy\\README.md",
+      "ml-timeseries\\README.md"
+    ]
+  },
+  {
+    "q": "资料甲称TF-IDF bigram达87.3%，资料乙称TF-IDF达88.1%，二者差异原因是什么？",
+    "docs": [
+      "ml-text\\README.md",
+      "项目复盘与简历写法.md"
+    ]
+  },
+  {
+    "q": "甲用差分目标法将CO2预测RMSE从3.99降至0.311ppm，乙中CNN在MNIST正名之战的准确率提升是否也源于类似差分思想？",
+    "docs": [
+      "ml-timeseries\\README.md",
+      "ml-vision\\README.md"
+    ]
+  },
+  {
+    "q": "资料甲中护栏拒绝<10字符请求，资料乙指出<10词帖准确率仅52%，两者共同支撑的上线策略是什么？",
+    "docs": [
+      "ml-deploy\\README.md",
+      "项目复盘与简历写法.md"
+    ]
+  }
+]

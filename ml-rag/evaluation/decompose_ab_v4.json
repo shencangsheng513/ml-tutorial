@@ -1,0 +1,66 @@
+{
+  "summary": {
+    "mrr6": {
+      "hybrid": 0.5,
+      "decompose": 0.4167
+    },
+    "all_docs_top4": {
+      "hybrid4": 4,
+      "decompose4": 4
+    },
+    "n": 4
+  },
+  "per_question": [
+    {
+      "q": "ml-deploy 服务化项目设置了哪些请求护栏？它们和帖子分类项目当年的上线方",
+      "subqs": [
+        "ml-deploy 服务化项目设置了哪些请求护栏？",
+        "帖子分类项目当年的上线方案中包含了哪些请求护栏？",
+        "ml-deploy 服务化项目相比帖子分类项目，在请求护栏方面继承了哪些内容、升级了哪些内容？"
+      ],
+      "hybrid_mrr": 0.5,
+      "decompose_mrr": 0.5,
+      "decomp": 8,
+      "direct": 6,
+      "judge_reason": "A虚构上线三件套细节且遗漏2个要点；B全要点覆盖、零事实违规、有据精准"
+    },
+    {
+      "q": "Kaggle 模拟赛的公榜私榜实验和时序项目的自我审计，各自发现了什么问题？两条",
+      "subqs": [
+        "Kaggle 模拟赛的公榜私榜实验发现了什么问题？",
+        "时序项目的自我审计发现了什么问题？",
+        "Kaggle 模拟赛公榜私榜实验与时序项目自我审计所揭示问题的共同点是什么？"
+      ],
+      "hybrid_mrr": 0.5,
+      "decompose_mrr": 0.3333,
+      "decomp": 6,
+      "direct": 4,
+      "judge_reason": "A漏'诚实重跑7.09'，B编造数值+英文+机制细节；均含资料无依据断言"
+    },
+    {
+      "q": "MLflow 为什么换成 sqlite 后端？换完之后跟踪的 BERT vs T",
+      "subqs": [
+        "MLflow 为什么换成 sqlite 后端？",
+        "换成 sqlite 后端后，MLflow 跟踪的 BERT vs TF-IDF 微调对决结果如何？"
+      ],
+      "hybrid_mrr": 0.5,
+      "decompose_mrr": 0.5,
+      "decomp": 8,
+      "direct": 4,
+      "judge_reason": "A有4处violation（含2处✗+2处无据推测）；B全据原文，覆盖全部3个标准要点"
+    },
+    {
+      "q": "手绘数字识别应用跑在哪个端口、输入护栏是什么？它背后的 MNIST 对决里 CN",
+      "subqs": [
+        "手绘数字识别应用运行在哪个端口？",
+        "手绘数字识别应用的输入护栏是什么？",
+        "MNIST 数据集上 CNN 和 MLP 模型的准确率与参数量分别是多少？"
+      ],
+      "hybrid_mrr": 0.5,
+      "decompose_mrr": 0.3333,
+      "decomp": 4,
+      "direct": 8,
+      "judge_reason": "A漏3要点+2✗；B仅1✗（警告机制无据），其余全符标准要点"
+    }
+  ]
+}

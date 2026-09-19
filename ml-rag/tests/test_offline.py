@@ -4,6 +4,7 @@ import pytest
 
 from rag.bm25 import BM25, rrf_fuse, tokenize
 from rag.chunker import MAX_CHARS, Chunk, chunk_markdown
+from rag.decompose import parse_subqueries
 from rag.store import VectorStore
 
 
@@ -84,3 +85,10 @@ def test_rrf_fuse_agreement_beats_single_list_rank1():
 
 def test_rrf_fuse_empty_rankings():
     assert rrf_fuse([[], []]) == {}
+
+
+def test_parse_subqueries_strips_numbering_dedups_caps():
+    raw = "1. ml-deploy 的护栏有哪些？\n- 帖子分类的上线方案是什么？\n2. ml-deploy 的护栏有哪些？\n\n空白行\n4. a\n5. b"
+    out = parse_subqueries(raw)
+    assert out == ["ml-deploy 的护栏有哪些？", "帖子分类的上线方案是什么？", "空白行"]  # 去重+封顶3条
+    assert parse_subqueries("") == []

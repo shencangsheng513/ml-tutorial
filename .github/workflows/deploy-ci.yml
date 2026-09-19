@@ -1,0 +1,23 @@
+name: ml-deploy CI
+
+on:
+  push:
+    paths: ["ml-deploy/**", ".github/workflows/deploy-ci.yml"]
+  pull_request:
+    paths: ["ml-deploy/**"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ml-deploy
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: ruff check src tests
+      - run: pytest

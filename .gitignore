@@ -19,6 +19,11 @@ ml-vision/data/
 # 密钥与调用缓存：绝不入库
 *dashscope_key*
 llm_cache.json
+ml-rag/index/
+.venv*/
 
 # 原始比赛数据除外：kaggle-sim/raw_titanic.csv 只有44KB，保留可复现
 *.log
+
+# 构建产物
+*.egg-info/

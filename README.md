@@ -1,7 +1,7 @@
 # 机器学习实操课程作品集
 
-> 从 0 到上线：4 个完整项目 + 3 个工程实验，全部亲手实现并诚实复盘。
-> 环境：Python / scikit-learn / XGBoost / PyTorch / Streamlit / MLflow（CPU 可跑）
+> 从 0 到上线：4 个完整项目 + 5 个工程实验，全部亲手实现并诚实复盘。
+> 环境：Python / scikit-learn / XGBoost / PyTorch / Streamlit / MLflow / FastAPI / DashScope（CPU 可跑）
 
 ## 项目全景
 
@@ -13,6 +13,8 @@
 | [ml-vision](ml-vision/) 数字识别 | digits + MNIST | CNN 98.0% / MNIST 正名 | 数据增强证伪；架构要匹配挑战 |
 | [kaggle-sim](kaggle-sim/) 比赛机制 | Titanic 887行 | 公榜0.972 私榜0.826 | submit登山=背答案实锤 |
 | [mlflow-lab](mlflow-lab/) 实验跟踪 | 8 runs 入库 | — | search_runs 一行重排历史 |
+| [ml-deploy](ml-deploy/) 模型服务 | ml-text 的 87.7% 分类器 | pytest 7/7 · 延迟~17ms | 护栏/日志/healthz+ready 前置到服务层 |
+| [ml-rag](ml-rag/) 知识库问答 | 仓库 9 篇 md → 32 块 | 检索13/13；RAG 6.69→10.0 | 检索全中也能输：提示词与判卷官都要修 |
 
 ## 跨项目方法论（踩出来的）
 
@@ -21,6 +23,7 @@
 3. **误差分析决定投资方向**：分片、混淆对、置信度分层收益 > 换模型
 4. **train/serve 一致性**：一套预处理从训练用到线上（增强不对齐分布时是毒药，有实验）
 5. **上线三件套**：置信度阈值 + 输入护栏 + 拒答转人工
+6. **评估工具也是被测对象**：RAG 首轮输给裸考，查出的问题是提示词和判卷官自己；judge 全给满分是量表饱和，不是完美
 
 ## 快速开始
 

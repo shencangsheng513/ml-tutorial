@@ -1,0 +1,26 @@
+[
+  {
+    "q": "ml-deploy 服务化项目设置了哪些请求护栏？它们和帖子",
+    "rag": 10,
+    "bare": 2,
+    "ctx_both_docs": true
+  },
+  {
+    "q": "Kaggle 模拟赛的公榜私榜实验和时序项目的自我审计，各自",
+    "rag": 10,
+    "bare": 4,
+    "ctx_both_docs": true
+  },
+  {
+    "q": "MLflow 为什么换成 sqlite 后端？换完之后跟踪的",
+    "rag": 6,
+    "bare": 4,
+    "ctx_both_docs": true
+  },
+  {
+    "q": "手绘数字识别应用跑在哪个端口、输入护栏是什么？它背后的 MN",
+    "rag": 10,
+    "bare": 2,
+    "ctx_both_docs": true
+  }
+]

@@ -1,0 +1,58 @@
+{
+  "mode": "grounded(锚定+有据性)",
+  "new_calls": 13,
+  "scores": [
+    {
+      "rag": 10,
+      "bare": 0
+    },
+    {
+      "rag": 10,
+      "bare": 4
+    },
+    {
+      "rag": 10,
+      "bare": 2
+    },
+    {
+      "rag": 10,
+      "bare": 2
+    },
+    {
+      "rag": 10,
+      "bare": 2
+    },
+    {
+      "rag": 10,
+      "bare": 2
+    },
+    {
+      "rag": 10,
+      "bare": 0
+    },
+    {
+      "rag": 10,
+      "bare": 2
+    },
+    {
+      "rag": 10,
+      "bare": 4
+    },
+    {
+      "rag": 10,
+      "bare": 2
+    },
+    {
+      "rag": 10,
+      "bare": 2
+    },
+    {
+      "rag": 10,
+      "bare": 2
+    },
+    {
+      "rag": 10,
+      "bare": 4
+    }
+  ]
+}

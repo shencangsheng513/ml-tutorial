@@ -19,6 +19,14 @@ class VectorStore:
         self.chunks.extend(chunks)
         self.matrix = np.vstack([self.matrix, m]) if self.matrix.size else m
 
+    def search_all(self, qvec: list[float], k: int = 8) -> list[tuple[int, float]]:
+        """返回 (块下标, 相似度)——给混合检索做融合用。"""
+        q = np.asarray(qvec, dtype=np.float32)
+        q /= (np.linalg.norm(q) + 1e-9)
+        sims = self.matrix @ q
+        order = np.argsort(-sims)[:k]
+        return [(int(i), float(sims[i])) for i in order]
+
     def search(self, qvec: list[float], k: int = 4) -> list[tuple[Chunk, float]]:
         q = np.asarray(qvec, dtype=np.float32)
         q /= (np.linalg.norm(q) + 1e-9)

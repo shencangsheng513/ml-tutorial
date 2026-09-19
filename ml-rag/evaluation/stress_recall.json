@@ -1,0 +1,118 @@
+{
+  "qa_stress80.json": {
+    "n": 90,
+    "vec": 73,
+    "hybrid": 79,
+    "misses": [
+      {
+        "q": "Streamlit 应用部署端口是多少",
+        "vec": false,
+        "hybrid": false
+      },
+      {
+        "q": "只用female一列特征时的准确率是多少",
+        "vec": false,
+        "hybrid": true
+      },
+      {
+        "q": "特征工程加5折CV后的本地验证准确率是多少",
+        "vec": false,
+        "hybrid": false
+      },
+      {
+        "q": "训练脚本文件名是什么",
+        "vec": false,
+        "hybrid": false
+      },
+      {
+        "q": "上线 App 的文件名是什么",
+        "vec": false,
+        "hybrid": false
+      },
+      {
+        "q": "项目防止数据泄漏的关键做法是什么",
+        "vec": false,
+        "hybrid": false
+      },
+      {
+        "q": "上线 App 直接接收多少个原始字段",
+        "vec": false,
+        "hybrid": true
+      },
+      {
+        "q": "拒绝响应的字符长度阈值是多少？",
+        "vec": false,
+        "hybrid": true
+      },
+      {
+        "q": "App端口是多少",
+        "vec": false,
+        "hybrid": false
+      },
+      {
+        "q": "训练模型的命令是什么",
+        "vec": false,
+        "hybrid": false
+      },
+      {
+        "q": "App运行的端口号是多少？",
+        "vec": false,
+        "hybrid": false
+      },
+      {
+        "q": "启动App的批处理文件名是什么？",
+        "vec": false,
+        "hybrid": false
+      },
+      {
+        "q": "训练脚本的完整路径文件名是什么？",
+        "vec": false,
+        "hybrid": false
+      },
+      {
+        "q": "预处理单测通过的阈值是多少？",
+        "vec": false,
+        "hybrid": true
+      },
+      {
+        "q": "SVM-rbf 模型的准确率是多少？",
+        "vec": false,
+        "hybrid": true
+      },
+      {
+        "q": "文本类 run 的数量是多少？",
+        "vec": false,
+        "hybrid": false
+      },
+      {
+        "q": "图像类 run 的数量是多少？",
+        "vec": false,
+        "hybrid": true
+      }
+    ]
+  },
+  "qa_stress.json": {
+    "n": 6,
+    "vec": 5,
+    "hybrid": 6,
+    "misses": [
+      {
+        "q": "线上分数越调越好、真实水平却纹丝不动，这种自欺暴露了什么问题？",
+        "vec": false,
+        "hybrid": true
+      }
+    ]
+  },
+  "qa_v3.json": {
+    "n": 4,
+    "vec": 4,
+    "hybrid": 4,
+    "misses": []
+  },
+  "qa_eval.json": {
+    "n": 13,
+    "vec": 13,
+    "hybrid": 13,
+    "misses": []
+  }
+}

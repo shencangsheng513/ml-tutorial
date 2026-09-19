@@ -1,0 +1,542 @@
+[
+  {
+    "q": "房价回归项目的 RMSE 是多少",
+    "docs": [
+      "README.md"
+    ]
+  },
+  {
+    "q": "销量预测项目中朴素模型的 RMSE 是多少",
+    "docs": [
+      "README.md"
+    ]
+  },
+  {
+    "q": "新闻组分类项目的准确率是多少",
+    "docs": [
+      "README.md"
+    ]
+  },
+  {
+    "q": "数字识别项目中 CNN 在 digits 数据集上的准确率是多少",
+    "docs": [
+      "README.md"
+    ]
+  },
+  {
+    "q": "Kaggle 模拟比赛私榜得分是多少",
+    "docs": [
+      "README.md"
+    ]
+  },
+  {
+    "q": "MLflow UI 的端口是多少",
+    "docs": [
+      "README.md"
+    ]
+  },
+  {
+    "q": "文本分类 Streamlit 应用的端口是多少",
+    "docs": [
+      "README.md"
+    ]
+  },
+  {
+    "q": "RAG 项目中检索正确块数是多少",
+    "docs": [
+      "README.md"
+    ]
+  },
+  {
+    "q": "模型服务延迟约为多少毫秒",
+    "docs": [
+      "README.md"
+    ]
+  },
+  {
+    "q": "房价回归项目测试 RMSE 是多少",
+    "docs": [
+      "项目复盘与简历写法.md"
+    ]
+  },
+  {
+    "q": "销量预测项目中 CO2 预测误差是多少 ppm",
+    "docs": [
+      "项目复盘与简历写法.md"
+    ]
+  },
+  {
+    "q": "帖子归版项目测试准确率范围是什么",
+    "docs": [
+      "项目复盘与简历写法.md"
+    ]
+  },
+  {
+    "q": "手写数字项目中 MLP 模型准确率是多少",
+    "docs": [
+      "项目复盘与简历写法.md"
+    ]
+  },
+  {
+    "q": "Streamlit 应用部署端口是多少",
+    "docs": [
+      "项目复盘与简历写法.md"
+    ]
+  },
+  {
+    "q": "MLflow UI 默认端口是多少",
+    "docs": [
+      "项目复盘与简历写法.md"
+    ]
+  },
+  {
+    "q": "BERT 微调测试准确率是多少",
+    "docs": [
+      "项目复盘与简历写法.md"
+    ]
+  },
+  {
+    "q": "MNIST 正名之战中 CNN 准确率是多少",
+    "docs": [
+      "项目复盘与简历写法.md"
+    ]
+  },
+  {
+    "q": "LLM zero-shot 裸考准确率是多少",
+    "docs": [
+      "项目复盘与简历写法.md"
+    ]
+  },
+  {
+    "q": "裸RF模型在Titanic数据集上的准确率是多少",
+    "docs": [
+      "kaggle-sim\\README.md"
+    ]
+  },
+  {
+    "q": "只用female一列特征时的准确率是多少",
+    "docs": [
+      "kaggle-sim\\README.md"
+    ]
+  },
+  {
+    "q": "特征工程加5折CV后的本地验证准确率是多少",
+    "docs": [
+      "kaggle-sim\\README.md"
+    ]
+  },
+  {
+    "q": "特征工程加5折CV后的公榜准确率是多少",
+    "docs": [
+      "kaggle-sim\\README.md"
+    ]
+  },
+  {
+    "q": "特征工程加5折CV后的私榜准确率是多少",
+    "docs": [
+      "kaggle-sim\\README.md"
+    ]
+  },
+  {
+    "q": "submit登山用了多少次提交",
+    "docs": [
+      "kaggle-sim\\README.md"
+    ]
+  },
+  {
+    "q": "submit登山后公榜准确率是多少",
+    "docs": [
+      "kaggle-sim\\README.md"
+    ]
+  },
+  {
+    "q": "Kaggle API token文件应存于哪个路径",
+    "docs": [
+      "kaggle-sim\\README.md"
+    ]
+  },
+  {
+    "q": "日常提交Kaggle比赛每天最多几次",
+    "docs": [
+      "kaggle-sim\\README.md"
+    ]
+  },
+  {
+    "q": "地理特征使 RMSE 从多少降到 0.4229",
+    "docs": [
+      "ml-car-price\\README.md"
+    ]
+  },
+  {
+    "q": "地理特征使 RMSE 降为多少",
+    "docs": [
+      "ml-car-price\\README.md"
+    ]
+  },
+  {
+    "q": "训练脚本文件名是什么",
+    "docs": [
+      "ml-car-price\\README.md"
+    ]
+  },
+  {
+    "q": "上线 App 的文件名是什么",
+    "docs": [
+      "ml-car-price\\README.md"
+    ]
+  },
+  {
+    "q": "地理特征数量是多少个",
+    "docs": [
+      "ml-car-price\\README.md"
+    ]
+  },
+  {
+    "q": "地理特征带来的 RMSE 收益超过什么",
+    "docs": [
+      "ml-car-price\\README.md"
+    ]
+  },
+  {
+    "q": "误差分片裁决中哪个特征比收入重要",
+    "docs": [
+      "ml-car-price\\README.md"
+    ]
+  },
+  {
+    "q": "项目防止数据泄漏的关键做法是什么",
+    "docs": [
+      "ml-car-price\\README.md"
+    ]
+  },
+  {
+    "q": "上线 App 直接接收多少个原始字段",
+    "docs": [
+      "ml-car-price\\README.md"
+    ]
+  },
+  {
+    "q": "模型文件大小是多少MB？",
+    "docs": [
+      "ml-deploy\\README.md"
+    ]
+  },
+  {
+    "q": "文本分类测试准确率是多少？",
+    "docs": [
+      "ml-deploy\\README.md"
+    ]
+  },
+  {
+    "q": "健康检查端点路径是什么？",
+    "docs": [
+      "ml-deploy\\README.md"
+    ]
+  },
+  {
+    "q": "就绪检查端点路径是什么？",
+    "docs": [
+      "ml-deploy\\README.md"
+    ]
+  },
+  {
+    "q": "API文档端点路径是什么？",
+    "docs": [
+      "ml-deploy\\README.md"
+    ]
+  },
+  {
+    "q": "本地服务默认监听端口是多少？",
+    "docs": [
+      "ml-deploy\\README.md"
+    ]
+  },
+  {
+    "q": "pytest测试用例数量是多少个？",
+    "docs": [
+      "ml-deploy\\README.md"
+    ]
+  },
+  {
+    "q": "拒绝响应的字符长度阈值是多少？",
+    "docs": [
+      "ml-deploy\\README.md"
+    ]
+  },
+  {
+    "q": "CI配置文件的完整路径是什么？",
+    "docs": [
+      "ml-deploy\\README.md"
+    ]
+  },
+  {
+    "q": "三层评估中L1指标的计算依据是什么？",
+    "docs": [
+      "ml-rag\\README.md"
+    ]
+  },
+  {
+    "q": "v1版本RAG答题均分是多少？",
+    "docs": [
+      "ml-rag\\README.md"
+    ]
+  },
+  {
+    "q": "v2版本裸考均分是3.23，RAG均分是多少？",
+    "docs": [
+      "ml-rag\\README.md"
+    ]
+  },
+  {
+    "q": "评估共使用多少道题目？",
+    "docs": [
+      "ml-rag\\README.md"
+    ]
+  },
+  {
+    "q": "切块时超长段落二次切分保留多少字重叠？",
+    "docs": [
+      "ml-rag\\README.md"
+    ]
+  },
+  {
+    "q": "向量库实现未引入chromadb或faiss，依赖是否最小化？",
+    "docs": [
+      "ml-rag\\README.md"
+    ]
+  },
+  {
+    "q": "嵌入和judge结果缓存路径是哪个目录？",
+    "docs": [
+      "ml-rag\\README.md"
+    ]
+  },
+  {
+    "q": "奇偶交换A/B位置是为了防止什么偏置？",
+    "docs": [
+      "ml-rag\\README.md"
+    ]
+  },
+  {
+    "q": "build_index.py脚本位于哪个子目录？",
+    "docs": [
+      "ml-rag\\README.md"
+    ]
+  },
+  {
+    "q": "课程中TF-IDF使用bigram时准确率是多少",
+    "docs": [
+      "ml-text\\README.md"
+    ]
+  },
+  {
+    "q": "不删邮件头时模型准确率是多少",
+    "docs": [
+      "ml-text\\README.md"
+    ]
+  },
+  {
+    "q": "误差分析中<10词帖的准确率是多少",
+    "docs": [
+      "ml-text\\README.md"
+    ]
+  },
+  {
+    "q": "BERT微调的平局准确率是多少",
+    "docs": [
+      "ml-text\\README.md"
+    ]
+  },
+  {
+    "q": "TF-IDF的准确率是多少",
+    "docs": [
+      "ml-text\\README.md"
+    ]
+  },
+  {
+    "q": "App端口是多少",
+    "docs": [
+      "ml-text\\README.md"
+    ]
+  },
+  {
+    "q": "训练模型的命令是什么",
+    "docs": [
+      "ml-text\\README.md"
+    ]
+  },
+  {
+    "q": "BERT微调脚本的文件名是什么",
+    "docs": [
+      "ml-text\\README.md"
+    ]
+  },
+  {
+    "q": "新闻组文本共多少帖",
+    "docs": [
+      "ml-text\\README.md"
+    ]
+  },
+  {
+    "q": "销量时序预测系统使用多少个月的销量数据？",
+    "docs": [
+      "ml-timeseries\\README.md"
+    ]
+  },
+  {
+    "q": "备货预测的周期是几个月？",
+    "docs": [
+      "ml-timeseries\\README.md"
+    ]
+  },
+  {
+    "q": "树模型改预测同比变化量后RMSE从7.44降到多少？",
+    "docs": [
+      "ml-timeseries\\README.md"
+    ]
+  },
+  {
+    "q": "滚动起点验证的英文术语是什么？",
+    "docs": [
+      "ml-timeseries\\README.md"
+    ]
+  },
+  {
+    "q": "直接式多步预测重报的RMSE值是多少？",
+    "docs": [
+      "ml-timeseries\\README.md"
+    ]
+  },
+  {
+    "q": "CO2复验中差分目标法优化后精度达多少ppm？",
+    "docs": [
+      "ml-timeseries\\README.md"
+    ]
+  },
+  {
+    "q": "App运行的端口号是多少？",
+    "docs": [
+      "ml-timeseries\\README.md"
+    ]
+  },
+  {
+    "q": "启动App的批处理文件名是什么？",
+    "docs": [
+      "ml-timeseries\\README.md"
+    ]
+  },
+  {
+    "q": "训练脚本的完整路径文件名是什么？",
+    "docs": [
+      "ml-timeseries\\README.md"
+    ]
+  },
+  {
+    "q": "t-SNE 预言在课程2中落空的数字对是？",
+    "docs": [
+      "ml-vision\\README.md"
+    ]
+  },
+  {
+    "q": "8×8 图上 CNN 相比 MLP 的准确率低多少？",
+    "docs": [
+      "ml-vision\\README.md"
+    ]
+  },
+  {
+    "q": "±1px 平移导致准确率从多少降至多少？",
+    "docs": [
+      "ml-vision\\README.md"
+    ]
+  },
+  {
+    "q": "上线 App 的端口号是多少？",
+    "docs": [
+      "ml-vision\\README.md"
+    ]
+  },
+  {
+    "q": "预处理单测通过的阈值是多少？",
+    "docs": [
+      "ml-vision\\README.md"
+    ]
+  },
+  {
+    "q": "SVM 在课程2中达到的准确率是多少？",
+    "docs": [
+      "ml-vision\\README.md"
+    ]
+  },
+  {
+    "q": "课程3中亲手制造的 train/serve skew 涉及多少张图？",
+    "docs": [
+      "ml-vision\\README.md"
+    ]
+  },
+  {
+    "q": "真 MNIST 正名之战对应的脚本文件名是什么？",
+    "docs": [
+      "ml-vision\\README.md"
+    ]
+  },
+  {
+    "q": "课程1中 t-SNE 被允许进行什么类型的预言？",
+    "docs": [
+      "ml-vision\\README.md"
+    ]
+  },
+  {
+    "q": "MLflow UI 默认监听的端口号是多少？",
+    "docs": [
+      "mlflow-lab\\README.md"
+    ]
+  },
+  {
+    "q": "实验中包含多少条 run？",
+    "docs": [
+      "mlflow-lab\\README.md"
+    ]
+  },
+  {
+    "q": "SVM-rbf 模型的准确率是多少？",
+    "docs": [
+      "mlflow-lab\\README.md"
+    ]
+  },
+  {
+    "q": "MLflow 3 版本弃用的后端类型是什么？",
+    "docs": [
+      "mlflow-lab\\README.md"
+    ]
+  },
+  {
+    "q": "重跑入账的 Python 脚本文件名是什么？",
+    "docs": [
+      "mlflow-lab\\README.md"
+    ]
+  },
+  {
+    "q": "数据库文件的相对路径是什么？",
+    "docs": [
+      "mlflow-lab\\README.md"
+    ]
+  },
+  {
+    "q": "文本类 run 的数量是多少？",
+    "docs": [
+      "mlflow-lab\\README.md"
+    ]
+  },
+  {
+    "q": "图像类 run 的数量是多少？",
+    "docs": [
+      "mlflow-lab\\README.md"
+    ]
+  },
+  {
+    "q": "Windows 平台缺失的 backend 名称是什么？",
+    "docs": [
+      "mlflow-lab\\README.md"
+    ]
+  }
+]

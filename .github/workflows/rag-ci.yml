@@ -1,0 +1,23 @@
+name: ml-rag CI
+
+on:
+  push:
+    paths: ["ml-rag/**", ".github/workflows/rag-ci.yml"]
+  pull_request:
+    paths: ["ml-rag/**"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ml-rag
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: ruff check src scripts tests evaluation
+      - run: pytest   # 12 个离线单测：切块/存储/BM25/RRF/子问题解析，不碰任何 API

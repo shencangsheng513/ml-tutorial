@@ -1,0 +1,56 @@
+{
+  "levels": [
+    {
+      "concurrency": 1,
+      "batch": 1,
+      "requests": 60,
+      "ok": 60,
+      "errors": 0,
+      "rps": 98.3,
+      "p50_ms": 5.7,
+      "p95_ms": 28.3,
+      "p99_ms": 28.9,
+      "wall_s": 0.61,
+      "error_sample": []
+    },
+    {
+      "concurrency": 8,
+      "batch": 1,
+      "requests": 320,
+      "ok": 320,
+      "errors": 0,
+      "rps": 509.5,
+      "p50_ms": 10.7,
+      "p95_ms": 32.6,
+      "p99_ms": 45.2,
+      "wall_s": 0.63,
+      "error_sample": []
+    },
+    {
+      "concurrency": 32,
+      "batch": 1,
+      "requests": 800,
+      "ok": 800,
+      "errors": 0,
+      "rps": 564.7,
+      "p50_ms": 51.8,
+      "p95_ms": 77.5,
+      "p99_ms": 93.7,
+      "wall_s": 1.42,
+      "error_sample": []
+    },
+    {
+      "concurrency": 8,
+      "batch": 16,
+      "requests": 80,
+      "ok": 80,
+      "errors": 0,
+      "rps": 108.8,
+      "p50_ms": 70.2,
+      "p95_ms": 93.9,
+      "p99_ms": 101.3,
+      "wall_s": 0.74,
+      "error_sample": []
+    }
+  ]
+}

@@ -37,6 +37,23 @@ curl http://127.0.0.1:8000/v1/classify -d "{\"texts\":[\"The goalie made a glove
 ## 冒烟实测（真模型）
 三帖批测：GPU 帖→graphics 0.71 / 冰球帖→hockey 0.77 / 望远镜帖→space 0.55，端到端 17ms。
 
+## 压测（`scripts/loadtest.py`，本地回环，单 uvicorn worker，全零错误）
+
+| 并发×批大小 | 吞吐 | p50 | p99 |
+|---|---|---|---|
+| 1×1 | ~98 条/秒 | 5.7ms | 28.9ms |
+| 8×1 | 510–680 条/秒（两轮波动） | 10.7ms | 45.2ms |
+| 32×1 | ~565 条/秒 | 51.8ms | 93.7ms |
+| 8×16（批请求） | **~1741 条/秒** | 70.2ms | 101.3ms |
+
+三个结论：① 单 worker 在并发 8 附近就摸到吞吐天花板（GIL + CPU 推理），32 并发只换来排队（p50 从 10ms 涨到 52ms，RPS 不涨）——**要容量就加 worker/副本，不是加并发**；② 批处理是最便宜的扩容：客户端攒 16 条一发，同并发下吞吐比单发再 ×3（565→1741 条/秒），代价只是 p99 从 94ms 涨到 101ms；③ 两轮 8 并发差 30%（509 vs 683），本机有后台任务干扰——**单点数字不可信，要看趋势和拐点**。原始数据：`loadtest_results.json`。
+
+## 上云清单（免费层，待账号）
+1. **首选 Hugging Face Spaces（Docker SDK）**：14MB 模型可直接烤进 repo（与 CI 用替身模型的原则不冲突——那是测接口，这是发服务）；免费 CPU 0+1，健康检查映射到 `/healthz`。
+2. 备选 Render/Railway 免费档：需把模型上传到卷或对象存储，Dockerfile 的 volume 挂载方案正好复用。
+3. 上云后要改的三件事：`uvicorn --workers 2`（或平台侧多副本）、加 `Authorization` 中间件（现在裸奔，仅限本机假设）、把结构化日志接到平台日志流。
+4. 预期：免费 CPU 档性能 ≈ 本地压测的 1/3–1/5，p99 SLO 按 300ms 定，别拿本机数字对外承诺。
+
 ## CI
 `.github/workflows/deploy-ci.yml`：push 触及 `ml-deploy/**` 时自动装依赖 → ruff → pytest。
 

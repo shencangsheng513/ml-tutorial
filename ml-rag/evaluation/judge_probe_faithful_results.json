@@ -1,0 +1,45 @@
+{
+  "both_hit": 3,
+  "n": 3,
+  "digit_only": 0,
+  "rows": [
+    {
+      "q_idx": 0,
+      "clean": 10,
+      "polluted": 4,
+      "hit_digit": true,
+      "hit_fabrication": true,
+      "violations": [
+        "房价回归项目最终测试 RMSE 是 0.4329",
+        "该模型已通过国家信息安全等级保护三级认证"
+      ]
+    },
+    {
+      "q_idx": 7,
+      "clean": 6,
+      "polluted": 4,
+      "hit_digit": true,
+      "hit_fabrication": true,
+      "violations": [
+        "端口8505（资料明确写8504）",
+        "置信度阈值设在90%+区间（资料未提具体阈值）",
+        "应用后端使用Redis做会话缓存（资料未提及Redis）",
+        "前端校验强制要求jpg/png（资料未提格式限制）",
+        "preprocess.py开头做shape检查（资料未描述代码细节）",
+        "有效像素占比过低则拒答（资料未定义该规则）"
+      ]
+    },
+    {
+      "q_idx": 9,
+      "clean": 10,
+      "polluted": 4,
+      "hit_digit": true,
+      "hit_fabrication": true,
+      "violations": [
+        "CNN准确率写成0.9978，资料写0.9798",
+        "说使用NVIDIA DGX集群，资料未提",
+        "说成本约3000美元，资料未提"
+      ]
+    }
+  ]
+}

@@ -16,15 +16,27 @@ import json
 import os
 import sys
 import time
+from pathlib import Path
 
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 KEY = os.environ.get("DASHSCOPE_API_KEY") or os.environ.get("OPENAI_API_KEY")
-if not KEY:
-    sys.exit("缺少 API key：先 set DASHSCOPE_API_KEY=sk-... （阿里云百炼免费额度就够本课）")
 BASE = os.environ.get("LLM_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
+if not KEY:  # 首选百炼 CLI 官方存储（bl auth login 写入），key 不经过命令行/仓库
+    bl_cfg = Path.home() / ".bailian" / "config.json"
+    if bl_cfg.exists():
+        _c = json.loads(bl_cfg.read_text(encoding="utf-8"))
+        KEY = _c.get("api_key")
+        if _c.get("base_url"):
+            BASE = _c["base_url"].rstrip("/") + "/compatible-mode/v1"
+if not KEY:
+    kf = Path(__file__).with_name(".dashscope_key")  # 兜底：本地密钥文件（已 gitignore）
+    if kf.exists():
+        KEY = kf.read_text(encoding="utf-8").strip()
+if not KEY:
+    sys.exit("缺少 API key：运行 bl auth login --api-key sk-... 或 set DASHSCOPE_API_KEY=sk-...")
 MODEL = os.environ.get("LLM_MODEL", "qwen-plus")
 
 from openai import OpenAI
@@ -41,16 +53,29 @@ cat_names = [SHORT[c] for c in CATS]
 
 
 def ask(prompt, tries=3):
+    """带本地缓存：同一 prompt 只烧一次钱，崩了重跑不重复计费"""
+    import hashlib
+    key = hashlib.md5(prompt.encode("utf-8")).hexdigest()
+    cache_f = Path(__file__).with_name("llm_cache.json")
+    if not hasattr(ask, "_cache"):
+        ask._cache = json.loads(cache_f.read_text(encoding="utf-8")) if cache_f.exists() else {}
+    if key in ask._cache:
+        return ask._cache[key]
     for k in range(tries):
         try:
             r = client.chat.completions.create(
                 model=MODEL, messages=[{"role": "user", "content": prompt}],
                 temperature=0, max_tokens=640)
-            return r.choices[0].message.content
-        except Exception as e:
+            ans = r.choices[0].message.content
+        except Exception:
             if k == tries - 1:
                 raise
             time.sleep(2 + 3 * k)
+            continue
+        ask._cache[key] = ans
+        if len(ask._cache) % 25 == 0:
+            cache_f.write_text(json.dumps(ask._cache, ensure_ascii=False), encoding="utf-8")
+        return ans
     return ""
 
 
@@ -89,13 +114,13 @@ print("=" * 60)
 # 让 LLM 判断：是否求助帖 / 是否含代码或命令行 / 体育规则讨论 / 数学公式
 FEATS = ["asking_help", "has_snippet", "rules_chat", "has_math"]
 prompt_b = ("分析帖子，输出 JSON（只输出JSON）：" + json.dumps({f: "0或1" for f in FEATS}, ensure_ascii=False)
-            + f"\nasking_help=作者在求助; has_snippet=含代码/配置/邮件头片段; rules_chat=讨论规则赛制; has_math=含公式或数值计算\n---\n{{}}\n---")
+            + "\nasking_help=作者在求助; has_snippet=含代码/配置/邮件头片段; rules_chat=讨论规则赛制; has_math=含公式或数值计算\n---\n__TEXT__\n---")
 
 
 def llm_features(texts, n=None):
     out = []
     for t in (texts if n is None else texts[:n]):
-        raw = ask(prompt_b.format(trim(t, 900)))
+        raw = ask(prompt_b.replace("__TEXT__", trim(t, 900)))
         s = raw.find("{"); e = raw.rfind("}")
         try:
             j = json.loads(raw[s:e + 1])
@@ -154,3 +179,4 @@ if len(aug_texts) >= 100:
     print("  CV第3课教训迁移成功了吗？改写=匹配'部署时用户会换说法'的真实变化，"
           "与随机平移像素的'造假变化'本质不同——数字见真章。")
 print("\n全部完成。把输出记进复盘文档『收官四件套』之后。")
+Path("llm_cache.json").write_text(json.dumps(ask._cache, ensure_ascii=False), encoding="utf-8")

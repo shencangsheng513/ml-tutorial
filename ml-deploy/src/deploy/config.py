@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     min_text_len: int = 10
     max_text_len: int = 20000
     log_json: bool = True
+    api_token: str = ""
+    port: int = 8000
+    workers: int = 1
 
     model_config = {"env_prefix": "DEPLOY_"}
 

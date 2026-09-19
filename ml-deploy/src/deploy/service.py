@@ -1,11 +1,13 @@
-"""FastAPI 推理服务：/healthz 存活、/ready 就绪、/v1/classify 批量预测。"""
+"""FastAPI 推理服务：/healthz 存活、/ready 就绪、/v1/classify 批量预测、可选 Bearer 鉴权。"""
 
 import json
 import logging
+import secrets
 import time
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 
 from .config import get_settings
 from .inference import Classifier
@@ -40,6 +42,18 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="news-text-classifier", lifespan=lifespan)
+
+OPEN_PATHS = {"/healthz", "/ready", "/docs", "/openapi.json"}
+
+
+@app.middleware("http")
+async def bearer_auth(request: Request, call_next):
+    token = get_settings().api_token
+    if token and request.url.path not in OPEN_PATHS:
+        given = request.headers.get("authorization", "")
+        if not secrets.compare_digest(given, f"Bearer {token}"):
+            return JSONResponse(status_code=401, content={"detail": "unauthorized"})
+    return await call_next(request)
 
 
 @app.middleware("http")

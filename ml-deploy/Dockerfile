@@ -12,5 +12,6 @@ EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=3s CMD python -c "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/healthz')"
 
-# 挂载: docker run -v <绝对路径>/ml-text/models:/models:ro -p 8000:8000 ml-deploy
-CMD ["uvicorn", "deploy.service:app", "--host", "0.0.0.0", "--port", "8000"]
+# 本地: docker run -v <绝对路径>/ml-text/models:/models:ro -p 8000:8000 [-e DEPLOY_API_TOKEN=...] [-e DEPLOY_WORKERS=2] ml-deploy
+# HF Spaces: 端口改 7860（-e DEPLOY_PORT=7860），token 用 Space secrets 注入
+CMD ["deploy-serve"]

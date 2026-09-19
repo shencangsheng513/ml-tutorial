@@ -6,9 +6,11 @@
 
 ```
 POST /v1/classify          {"texts": ["..."]}  ->  每篇的类别+四类概率+置信度
-GET  /healthz /ready       存活/就绪探针（容器编排用）
+GET  /healthz /ready       存活/就绪探针（容器编排用，永不开鉴权）
 GET  /docs                 FastAPI 自动生成的 OpenAPI 文档
 ```
+
+鉴权：设 `DEPLOY_API_TOKEN` 后，除探针外的全部路径要求 `Authorization: Bearer <token>`（恒定时间比对），不设则关闭——本地开发零摩擦，上云一行开关。
 
 ## 工程化要点（相对"能跑"的 Streamlit 版升级在哪）
 
@@ -51,14 +53,24 @@ curl http://127.0.0.1:8000/v1/classify -d "{\"texts\":[\"The goalie made a glove
 ## 上云清单（免费层，待账号）
 1. **首选 Hugging Face Spaces（Docker SDK）**：14MB 模型可直接烤进 repo（与 CI 用替身模型的原则不冲突——那是测接口，这是发服务）；免费 CPU 0+1，健康检查映射到 `/healthz`。
 2. 备选 Render/Railway 免费档：需把模型上传到卷或对象存储，Dockerfile 的 volume 挂载方案正好复用。
-3. 上云后要改的三件事：`uvicorn --workers 2`（或平台侧多副本）、加 `Authorization` 中间件（现在裸奔，仅限本机假设）、把结构化日志接到平台日志流。
+3. ~~上云后要改的三件事~~ **已落进代码**（本轮）：统一入口 `deploy-serve`，端口/并发/鉴权全走环境变量——`DEPLOY_PORT=7860`（HF Spaces 约定端口）、`DEPLOY_WORKERS=2`、`DEPLOY_API_TOKEN=<你的token>`（Space secrets 注入，别写进 repo）。日志本就是 JSON stdout，平台自动收。你回去只剩：`hf auth login` → 建 Space → push。
 4. 预期：免费 CPU 档性能 ≈ 本地压测的 1/3–1/5，p99 SLO 按 300ms 定，别拿本机数字对外承诺。
+5. 注意：uvicorn 多进程在 Windows 本机有 socket 继承毛病（实测偶发 WinError 10022），**多 worker 是为 Linux 容器准备的**，本机冒烟用单 worker 即可。
 
 ## CI
 `.github/workflows/deploy-ci.yml`：push 触及 `ml-deploy/**` 时自动装依赖 → ruff → pytest。
 
 ## Docker
+> 状态如实说：本机 Docker Desktop 引擎无头起不来（无登录会话时进程自己退了），**下面的 build/run 未在本机验证**；你回来双击打开引擎后照抄即可，"验收四查"就是给那一刻准备的。`deploy-serve` 入口与鉴权逻辑本身已在 Windows 本机起服务冒烟通过（healthz 200 / 无token 401 / 带token 200）。
+
 ```bash
 docker build -t ml-deploy ml-deploy/
-docker run -v <绝对路径>/ml-tutorial/ml-text/models:/models:ro -p 8000:8000 ml-deploy
+docker run -d --name ml-deploy -v <绝对路径>/ml-tutorial/ml-text/models:/models:ro \
+  -e DEPLOY_API_TOKEN=<自己现编一个> -e DEPLOY_WORKERS=2 -p 8000:8000 ml-deploy
+# 验收四查：
+curl http://localhost:8000/healthz                                  # 200
+curl -X POST localhost:8000/v1/classify -d '{"texts":["x y z 1 2 3"]}' -H 'Content-Type: application/json'          # 401
+curl -X POST localhost:8000/v1/classify -d '{"texts":["The goalie made a glove save in overtime"]}' \
+  -H 'Content-Type: application/json' -H "Authorization: Bearer <自己现编一个>"                                      # 200 hockey
+docker logs ml-deploy   # 应看到 2 个 worker 的 JSON 访问日志（含上面那条 401）
 ```

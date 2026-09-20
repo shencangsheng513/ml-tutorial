@@ -1,0 +1,693 @@
+{
+  "mode": "v11 检索深度消融：k=4(基线走缓存) vs k=6(新调用)，同题库同提示词",
+  "summary": {
+    "全部": {
+      "n": 42,
+      "faith4": 8.904761904761905,
+      "faith6": 8.904761904761905,
+      "faith_w": 9,
+      "faith_l": 10,
+      "faith_p": 1.0,
+      "pair_w": 16,
+      "pair_l": 25,
+      "viol4": 54,
+      "viol6": 54,
+      "flags4": 28,
+      "flags6": 31,
+      "flagged_q4": 17,
+      "flagged_q6": 16
+    },
+    "双中(k4)": {
+      "n": 22,
+      "faith4": 9.454545454545455,
+      "faith6": 9.272727272727273,
+      "faith_w": 4,
+      "faith_l": 4,
+      "faith_p": 1.0,
+      "pair_w": 9,
+      "pair_l": 12,
+      "viol4": 17,
+      "viol6": 19,
+      "flags4": 19,
+      "flags6": 17,
+      "flagged_q4": 10,
+      "flagged_q6": 10
+    },
+    "缺腿(k4)": {
+      "n": 20,
+      "faith4": 8.3,
+      "faith6": 8.5,
+      "faith_w": 5,
+      "faith_l": 6,
+      "faith_p": 1.0,
+      "pair_w": 7,
+      "pair_l": 13,
+      "viol4": 37,
+      "viol6": 35,
+      "flags4": 9,
+      "flags6": 14,
+      "flagged_q4": 7,
+      "flagged_q6": 6
+    }
+  },
+  "per_question": [
+    {
+      "q": "甲中地理特征使RMSE从0.4437→0.4229，乙中RRF混合检索在90题大盘top-4命中率87.8% vs 81.1%，二者共同强调的评估教训是什么？",
+      "both4": false,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 7,
+      "pair4": 10,
+      "flags4": [
+        "0.0208"
+      ],
+      "flags6": [
+        "0.0208"
+      ]
+    },
+    {
+      "q": "甲用地理特征降低RMSE，乙用平移增强暴露train/serve skew，两者共同防范的数据风险是什么？",
+      "both4": false,
+      "both6": false,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 10.0,
+      "pair4": 8.0,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "甲中TF-IDF二元词组达87.3%，乙中CNN在8×8图上为何未超MLP的98.2%？",
+      "both4": true,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 6.0,
+      "viol4": 0,
+      "viol6": 2,
+      "pair6": 7,
+      "pair4": 8,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "甲中Titanic私榜0.826的CV验证方式，与乙中模型加载‘lifespan启动时load一次’的做法，共同规避了哪种机器学习常见风险？",
+      "both4": false,
+      "both6": true,
+      "faith4": 8.0,
+      "faith6": 8.0,
+      "viol4": 2,
+      "viol6": 5,
+      "pair6": 2,
+      "pair4": 4,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "资料甲称地理特征使RMSE从0.4437→0.4229，资料乙中该项目最终成绩是否与此一致？",
+      "both4": true,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 8,
+      "pair4": 10,
+      "flags4": [],
+      "flags6": [
+        "0.4225",
+        "0.4233",
+        "0.001"
+      ]
+    },
+    {
+      "q": "甲中公榜0.853私榜0.826的CV成功案例，与乙中地理特征使RMSE从0.4437→0.4229的提升，哪个更体现‘结构防泄漏’原则？",
+      "both4": false,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 4,
+      "pair4": 10,
+      "flags4": [],
+      "flags6": [
+        "0.027",
+        "0.146"
+      ]
+    },
+    {
+      "q": "甲中模型加载用joblib且不随请求重复加载，乙中MLflow存储CNN state_dict，两者在模型工件管理上核心差异是什么？",
+      "both4": true,
+      "both6": true,
+      "faith4": 6.0,
+      "faith6": 8.0,
+      "viol4": 5,
+      "viol6": 8,
+      "pair6": 6,
+      "pair4": 8,
+      "flags4": [
+        "0.001"
+      ],
+      "flags6": [
+        "0.001"
+      ]
+    },
+    {
+      "q": "ml-rag v1检索全中却RAG均分低于裸考，而ml-vision中SVM在8×8图上98.0%、CNN仅98.2%，两者共同暴露了什么评估陷阱？",
+      "both4": true,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 10,
+      "pair4": 8,
+      "flags4": [
+        "0.2",
+        "0.5"
+      ],
+      "flags6": []
+    },
+    {
+      "q": "甲中RF裸跑0.768与乙中邮件头捷径65.8%，二者共同揭示了什么建模风险？",
+      "both4": false,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 6.0,
+      "viol4": 0,
+      "viol6": 5,
+      "pair6": 8,
+      "pair4": 10,
+      "flags4": [],
+      "flags6": [
+        "19",
+        "25"
+      ]
+    },
+    {
+      "q": "甲资料指出RAG项目v1检索全中却输裸考，乙资料揭示其根本原因是什么？",
+      "both4": false,
+      "both6": false,
+      "faith4": 10.0,
+      "faith6": 8.0,
+      "viol4": 0,
+      "viol6": 2,
+      "pair6": 10,
+      "pair4": 8,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "ml-rag 的 v1 版本 RAG 均分是 6.69，而 mlflow-lab 记录的 SVM-rbf 最高准确率是 0.991，这两个数值量纲不同，它们分别代表什么评估维度？",
+      "both4": true,
+      "both6": true,
+      "faith4": 8.0,
+      "faith6": 10.0,
+      "viol4": 2,
+      "viol6": 0,
+      "pair6": 8,
+      "pair4": 7,
+      "flags4": [],
+      "flags6": [
+        "99.11"
+      ]
+    },
+    {
+      "q": "甲中CNN state_dict产物与乙中手写数字项目CNN滤镜发现，共同印证了什么模型学习特性？",
+      "both4": false,
+      "both6": false,
+      "faith4": 4.0,
+      "faith6": 10.0,
+      "viol4": 5,
+      "viol6": 0,
+      "pair6": 10,
+      "pair4": 2,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "甲中私榜纹丝不动的登山提交与乙中v1裸考胜RAG的现象，共同揭示了什么模型评估陷阱？",
+      "both4": true,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 6,
+      "pair4": 10,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "ml-rag的v1版RAG均分6.69却输给裸考8.00，而ml-timeseries用差分目标法将CO2预测误差从3.99降至0.311ppm，两者分别通过什么关键调整解决了‘模型被误导’的问题？",
+      "both4": true,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 10,
+      "pair4": 8,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "甲项目用TF-IDF+LR文本分类，乙项目用树模型做时序预测，两者分别如何解决模型外推能力不足的问题？",
+      "both4": true,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 8,
+      "pair4": 8,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "资料甲称TF-IDF bigram达87.3%，资料乙称TF-IDF达88.1%，二者差异原因是什么？",
+      "both4": true,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 6.0,
+      "viol4": 0,
+      "viol6": 5,
+      "pair6": 3,
+      "pair4": 8,
+      "flags4": [
+        "87.02",
+        "87.0"
+      ],
+      "flags6": [
+        "87.02",
+        "87.0",
+        "87.1"
+      ]
+    },
+    {
+      "q": "甲中CO2复验差分目标法RMSE从3.99ppm降至多少？乙中8×8图上CNN准确率是否高于MLP？",
+      "both4": true,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 8,
+      "pair4": 10,
+      "flags4": [
+        "0.002"
+      ],
+      "flags6": []
+    },
+    {
+      "q": "资料甲中三帖批测的space类置信度0.55，与资料乙中<10词帖准确率52%是否构成同一护栏依据？",
+      "both4": true,
+      "both6": true,
+      "faith4": 8.0,
+      "faith6": 10.0,
+      "viol4": 2,
+      "viol6": 0,
+      "pair6": 8,
+      "pair4": 6,
+      "flags4": [
+        "0.6",
+        "0.65"
+      ],
+      "flags6": [
+        "0.6"
+      ]
+    },
+    {
+      "q": "甲中RF模型公榜0.853私榜0.826，乙中差分目标法CO2预测RMSE从3.99降至0.311，两者共同揭示了什么建模陷阱？",
+      "both4": false,
+      "both6": true,
+      "faith4": 6.0,
+      "faith6": 4.0,
+      "viol4": 9,
+      "viol6": 5,
+      "pair6": 4,
+      "pair4": 6,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "甲中护栏拒答<10字符的依据，与乙中哪节课的实证结论完全一致？",
+      "both4": false,
+      "both6": false,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 10,
+      "pair4": 8,
+      "flags4": [
+        "53",
+        "11"
+      ],
+      "flags6": []
+    },
+    {
+      "q": "甲用地理特征提升回归性能，乙用同比变化量改进时序预测，两者共同规避了哪种建模风险？",
+      "both4": true,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 8.0,
+      "viol4": 0,
+      "viol6": 1,
+      "pair6": 4,
+      "pair4": 8,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "甲项目强调结构防泄漏，乙项目记录实验时踩了MLflow 3弃用文件后端的坑，两者在数据/模型生命周期管理上分别侧重什么？",
+      "both4": false,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 5,
+      "pair4": 8,
+      "flags4": [
+        "1.0",
+        "3.0"
+      ],
+      "flags6": []
+    },
+    {
+      "q": "ml-rag的v1版RAG答题均分6.69却输给裸考8.00，而ml-text第2课TF-IDF用bigram达87.3%，两者暴露的共同核心问题是什么？",
+      "both4": true,
+      "both6": true,
+      "faith4": 8.0,
+      "faith6": 8.0,
+      "viol4": 3,
+      "viol6": 1,
+      "pair6": 6,
+      "pair4": 8,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "资料甲称CO2复验差分目标法RMSE为0.311ppm，资料乙表中项目2的CO2成绩也写0.311ppm，二者是否均指同一指标且数值一致？",
+      "both4": true,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 10,
+      "pair4": 8,
+      "flags4": [
+        "92.2"
+      ],
+      "flags6": [
+        "0.1",
+        "0.5",
+        "40.8",
+        "92.2"
+      ]
+    },
+    {
+      "q": "甲项目用地理特征提升RMSE，乙项目发现词袋三死穴，两者在防数据泄漏上分别采取了什么关键措施？",
+      "both4": false,
+      "both6": false,
+      "faith4": 10.0,
+      "faith6": 8.0,
+      "viol4": 0,
+      "viol6": 2,
+      "pair6": 5,
+      "pair4": 8,
+      "flags4": [
+        "25"
+      ],
+      "flags6": [
+        "0.01",
+        "25"
+      ]
+    },
+    {
+      "q": "甲中Titanic公榜0.853私榜0.826，乙中项目2因标签泄漏重报RMSE 7.09，两者共同揭示的首要风险是什么？",
+      "both4": true,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 10,
+      "pair4": 8,
+      "flags4": [
+        "0.027"
+      ],
+      "flags6": [
+        "0.027"
+      ]
+    },
+    {
+      "q": "甲中TF-IDF二元组提升准确率87.3%，乙中差分目标法降低RMSE至0.311，二者共同揭示了什么建模本质？",
+      "both4": false,
+      "both6": false,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 7,
+      "pair4": 10,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "甲中CNN在8×8图上准确率0.980，乙中SVM-rbf准确率0.991，二者数据来源与评估场景有何本质差异？",
+      "both4": false,
+      "both6": false,
+      "faith4": 6.0,
+      "faith6": 10.0,
+      "viol4": 5,
+      "viol6": 0,
+      "pair6": 7,
+      "pair4": 5,
+      "flags4": [],
+      "flags6": [
+        "75",
+        "25",
+        "99.1",
+        "16",
+        "450"
+      ]
+    },
+    {
+      "q": "甲资料称时序项目RMSE为7.09，乙资料提到差分目标使RMSE从7.44→4.41，二者数值差异原因是什么？",
+      "both4": true,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 8.0,
+      "viol4": 0,
+      "viol6": 2,
+      "pair6": 6,
+      "pair4": 8,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "ml-vision项目中CNN在8×8居中图上准确率0.980，比MLP低0.002，这与资料甲‘架构要匹配挑战’的结论是否矛盾？",
+      "both4": true,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 10,
+      "pair4": 8,
+      "flags4": [
+        "2.54",
+        "0.0254",
+        "784"
+      ],
+      "flags6": [
+        "36"
+      ]
+    },
+    {
+      "q": "甲称ml-text项目准确率87.0%，乙写87.0~87.7%，二者差异原因在乙中哪条具体实践？",
+      "both4": false,
+      "both6": true,
+      "faith4": 8.0,
+      "faith6": 8.0,
+      "viol4": 2,
+      "viol6": 2,
+      "pair6": 7.0,
+      "pair4": 8.0,
+      "flags4": [
+        "0.7"
+      ],
+      "flags6": []
+    },
+    {
+      "q": "甲中公榜0.853私榜0.826的CV预言成功，乙中SVM达98.0%但t-SNE预言落空，二者对模型评估可靠性的启示有何本质差异？",
+      "both4": false,
+      "both6": false,
+      "faith4": 6.0,
+      "faith6": 10.0,
+      "viol4": 3,
+      "viol6": 0,
+      "pair6": 8,
+      "pair4": 5,
+      "flags4": [
+        "0.027"
+      ],
+      "flags6": [
+        "0.856",
+        "0.014"
+      ]
+    },
+    {
+      "q": "甲中Titanic比赛私榜0.826与乙中SVM-rbf指标0.991，二者数值差异反映的评估场景本质区别是什么？",
+      "both4": false,
+      "both6": true,
+      "faith4": 6.0,
+      "faith6": 8.0,
+      "viol4": 2,
+      "viol6": 3,
+      "pair6": 5,
+      "pair4": 8,
+      "flags4": [
+        "1797"
+      ],
+      "flags6": []
+    },
+    {
+      "q": "甲中地理特征使RMSE从0.4437→0.4229，乙中批处理吞吐达1741条/秒，两者提升方式本质区别是什么？",
+      "both4": true,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 10,
+      "pair4": 7,
+      "flags4": [
+        "3.1",
+        "7.6",
+        "200"
+      ],
+      "flags6": [
+        "3.1"
+      ]
+    },
+    {
+      "q": "ml-car-price项目中地理特征使RMSE从0.4437降至0.4229，该数值与资料甲中该项目成绩是否一致？",
+      "both4": true,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 1,
+      "viol6": 0,
+      "pair6": 8,
+      "pair4": 10,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "甲资料中mlflow-lab项目记录的实验数量与乙资料所述是否一致？具体数字各是多少？",
+      "both4": true,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 8,
+      "pair4": 6,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "甲用滚动起点验证避免K折错误，乙用MLflow跟踪实验，二者分别针对什么常见建模问题？",
+      "both4": true,
+      "both6": true,
+      "faith4": 10.0,
+      "faith6": 10.0,
+      "viol4": 0,
+      "viol6": 0,
+      "pair6": 6,
+      "pair4": 8,
+      "flags4": [
+        "2020",
+        "2023",
+        "20240915"
+      ],
+      "flags6": []
+    },
+    {
+      "q": "甲项目用地理特征使RMSE从0.4437降至0.4229，乙项目v2用LLM-as-judge判分达10.00，两者共同强调的防泄漏/防偏置措施是什么？",
+      "both4": false,
+      "both6": true,
+      "faith4": 6.0,
+      "faith6": 10.0,
+      "viol4": 4,
+      "viol6": 0,
+      "pair6": 10,
+      "pair4": 7,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "甲项目强调‘先切分再处理’防数据泄漏，乙项目通过‘±1px平移制造train/serve skew’暴露预处理缺陷，二者在流程步骤设计上对数据划分时机的处理逻辑有何根本差异？",
+      "both4": false,
+      "both6": false,
+      "faith4": 8.0,
+      "faith6": 6.0,
+      "viol4": 2,
+      "viol6": 4,
+      "pair6": 6,
+      "pair4": 10,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "甲乙两课程在‘上线’环节的流程设计差异是什么？甲含拒答机制而乙强调什么？",
+      "both4": false,
+      "both6": false,
+      "faith4": 10.0,
+      "faith6": 6.0,
+      "viol4": 0,
+      "viol6": 2,
+      "pair6": 5,
+      "pair4": 8,
+      "flags4": [],
+      "flags6": []
+    },
+    {
+      "q": "kaggle-sim强调CV验证与提交纪律，ml-deploy强调契约拦截与服务生命周期管理，二者在模型验证与部署流程上的核心方法论差异是什么？",
+      "both4": true,
+      "both6": true,
+      "faith4": 8.0,
+      "faith6": 10.0,
+      "viol4": 4,
+      "viol6": 0,
+      "pair6": 5,
+      "pair4": 8,
+      "flags4": [],
+      "flags6": [
+        "0.03"
+      ]
+    },
+    {
+      "q": "甲强调‘先切分再处理’防泄漏，乙在项目1中如何具体落实该方法论？",
+      "both4": false,
+      "both6": true,
+      "faith4": 8.0,
+      "faith6": 8.0,
+      "viol4": 3,
+      "viol6": 5,
+      "pair6": 6,
+      "pair4": 8,
+      "flags4": [],
+      "flags6": []
+    }
+  ]
+}

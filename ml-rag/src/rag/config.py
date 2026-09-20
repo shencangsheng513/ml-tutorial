@@ -6,14 +6,16 @@ from pathlib import Path
 
 def load_credentials() -> tuple[str, str]:
     key = os.environ.get("DASHSCOPE_API_KEY") or os.environ.get("OPENAI_API_KEY")
-    base = os.environ.get("LLM_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
+    base = os.environ.get("LLM_BASE_URL")          # 显式给了就以它为准，排障换端点才有效
     if not key:
         cfg = Path.home() / ".bailian" / "config.json"
         if cfg.exists():
             c = json.loads(cfg.read_text(encoding="utf-8"))
             key = c.get("api_key")
-            if c.get("base_url"):
+            if base is None and c.get("base_url"):
                 base = c["base_url"].rstrip("/") + "/compatible-mode/v1"
+    if base is None:
+        base = "https://dashscope.aliyuncs.com/compatible-mode/v1"
     if not key:
         raise SystemExit("缺少凭证：bl auth login --api-key sk-... 或设环境变量")
     return key, base

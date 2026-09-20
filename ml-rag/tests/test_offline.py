@@ -130,3 +130,26 @@ def test_ungrounded_numbers_question_echo_is_grounded():
     ans = "都强调用数字说话：RMSE 改善 0.0208，命中率 87.8%。"
     # 87.8/0.4437/0.4229 在题面（纳入依据集），0.0208 是两数之差→派生值仍会误标为可疑
     assert ungrounded_numbers(ans, hits, q) == ["0.0208"]
+
+
+def test_llm_base_url_env_beats_bailian_config(monkeypatch):
+    """v12 排障回归：换端点探测时 LLM_BASE_URL 必须说话算数（曾被 ~/.bailian 的 base_url 悄悄覆盖）。"""
+    import importlib
+
+    from rag import config
+
+    monkeypatch.setenv("DASHSCOPE_API_KEY", "sk-dummy-for-test")
+    monkeypatch.setenv("LLM_BASE_URL", "https://example.test/compatible-mode/v1")
+    importlib.reload(config)
+    assert config.load_credentials()[1] == "https://example.test/compatible-mode/v1"
+
+
+def test_default_base_is_public_dashscope(monkeypatch):
+    import importlib
+
+    from rag import config
+
+    monkeypatch.setenv("DASHSCOPE_API_KEY", "sk-dummy-for-test")
+    monkeypatch.delenv("LLM_BASE_URL", raising=False)
+    importlib.reload(config)
+    assert config.load_credentials()[1] == "https://dashscope.aliyuncs.com/compatible-mode/v1"

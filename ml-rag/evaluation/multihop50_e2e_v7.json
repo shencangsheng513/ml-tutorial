@@ -1,0 +1,504 @@
+{
+  "mode": "v7：50 题多跳 e2e，hybrid 主路径 + L3a 配对 + L3b 有据性，gold=引文式",
+  "index_chunks": 58,
+  "kept": 32,
+  "dropped": 18,
+  "summary": {
+    "all": [
+      "8.12",
+      "4.25",
+      "8.75",
+      "26/0/6"
+    ],
+    "both_hit": [
+      "8.33",
+      "4.40",
+      "9.33",
+      "13/0/2"
+    ],
+    "miss": [
+      "7.94",
+      "4.12",
+      "8.24",
+      "13/0/4"
+    ]
+  },
+  "per_question": [
+    {
+      "q": "甲用地理特征降低RMSE，乙用平移增强暴露train/serve skew，两者共同防范的数据风险是什么？",
+      "docs": [
+        "ml-car-price\\README.md",
+        "ml-vision\\README.md"
+      ],
+      "both_in_top4": false,
+      "rag": 8,
+      "bare": 2,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "A全覆盖5要点且零✗；B无一要点命中，5处编造"
+    },
+    {
+      "q": "甲中TF-IDF二元词组达87.3%，乙中CNN在8×8图上为何未超MLP的98.2%？",
+      "docs": [
+        "ml-text\\README.md",
+        "ml-vision\\README.md"
+      ],
+      "both_in_top4": true,
+      "rag": 10,
+      "bare": 5,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "B全覆盖5要点且零✗；A漏3要点+1✗+引申超纲"
+    },
+    {
+      "q": "甲中Titanic私榜0.826的CV验证方式，与乙中模型加载‘lifespan启动时load一次’的做法，共同规避了哪种机器学习常见风险？",
+      "docs": [
+        "kaggle-sim\\README.md",
+        "ml-deploy\\README.md"
+      ],
+      "both_in_top4": false,
+      "rag": 6,
+      "bare": 8,
+      "faithful": 8.0,
+      "violations": [
+        "资料未提'lifespan'字样",
+        "资料未写'FastAPI'"
+      ],
+      "reason": "A含3处✗且漏4要点；B仅漏2要点、零✗，覆盖全部可验证核心要点"
+    },
+    {
+      "q": "甲中公榜0.853私榜0.826的CV成功案例，与乙中地理特征使RMSE从0.4437→0.4229的提升，哪个更体现‘结构防泄漏’原则？",
+      "docs": [
+        "kaggle-sim\\README.md",
+        "ml-car-price\\README.md"
+      ],
+      "both_in_top4": false,
+      "rag": 10,
+      "bare": 4,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "B零✗且全覆盖三点标准要点；A有3处✗+漏要点"
+    },
+    {
+      "q": "甲中模型加载用joblib且不随请求重复加载，乙中MLflow存储CNN state_dict，两者在模型工件管理上核心差异是什么？",
+      "docs": [
+        "ml-deploy\\README.md",
+        "mlflow-lab\\README.md"
+      ],
+      "both_in_top4": true,
+      "rag": 8,
+      "bare": 4,
+      "faithful": 6.0,
+      "violations": [
+        "‘state_dict.pt’未在原始资料中出现",
+        "‘mlflow.pytorch.log_state_dict()’未在原始资料中出现",
+        "‘mlflow.pytorch.load_model()’未在原始资料中出现",
+        "‘model.pkl’未在原始资料中出现",
+        "‘@app.on_event(\"startup\")’未在原始资料中出现"
+      ],
+      "reason": "A漏3要点（−6），零✗；B全未覆盖要点且全✗，扣6"
+    },
+    {
+      "q": "ml-rag v1检索全中却RAG均分低于裸考，而ml-vision中SVM在8×8图上98.0%、CNN仅98.2%，两者共同暴露了什么评估陷阱？",
+      "docs": [
+        "ml-rag\\README.md",
+        "ml-vision\\README.md"
+      ],
+      "both_in_top4": true,
+      "rag": 10,
+      "bare": 4,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "B全覆盖5条标准要点且零事实错误；A遗漏全部4个核心实证项（t-SNE/±1px/判卷纪律/提示词改写）及MRR对比"
+    },
+    {
+      "q": "甲资料指出RAG项目v1检索全中却输裸考，乙资料揭示其根本原因是什么？",
+      "docs": [
+        "README.md",
+        "ml-rag\\README.md"
+      ],
+      "both_in_top4": false,
+      "rag": 10,
+      "bare": 2,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "A零✗且全覆盖14处要点；B虚构‘幻觉’‘失配’，漏4要点，2处✗"
+    },
+    {
+      "q": "ml-rag 的 v1 版本 RAG 均分是 6.69，而 mlflow-lab 记录的 SVM-rbf 最高准确率是 0.991，这两个数值量纲不同，它们分别代表什么评估维度？",
+      "docs": [
+        "ml-rag\\README.md",
+        "mlflow-lab\\README.md"
+      ],
+      "both_in_top4": true,
+      "rag": 8,
+      "bare": 6,
+      "faithful": 8.0,
+      "violations": [
+        "SVM-rbf 0.991 未说明是4类子集上的accuracy",
+        "RAG均分6.69未明确标注为LLM-as-judge人工量表均值"
+      ],
+      "reason": "B严格锚定标准要点，A遗漏3处核心定义"
+    },
+    {
+      "q": "甲中CNN state_dict产物与乙中手写数字项目CNN滤镜发现，共同印证了什么模型学习特性？",
+      "docs": [
+        "mlflow-lab\\README.md",
+        "项目复盘与简历写法.md"
+      ],
+      "both_in_top4": false,
+      "rag": 2,
+      "bare": 8,
+      "faithful": 4.0,
+      "violations": [
+        "资料未提'滤镜杂乱、无方向/边缘响应'",
+        "资料未写'Gabor-like滤镜'对比",
+        "资料未说'退化为带局部连接约束的MLP'",
+        "资料未定义'空间归纳偏置生效'术语",
+        "资料未提'热力图会误判'这一结论"
+      ],
+      "reason": "A全✗且漏3要点；B全覆盖✓，零✗"
+    },
+    {
+      "q": "甲中私榜纹丝不动的登山提交与乙中v1裸考胜RAG的现象，共同揭示了什么模型评估陷阱？",
+      "docs": [
+        "kaggle-sim\\README.md",
+        "ml-rag\\README.md"
+      ],
+      "both_in_top4": true,
+      "rag": 10,
+      "bare": 4,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "B严格锚定资料所有数字、原文、机制；A全为资料外虚构断言"
+    },
+    {
+      "q": "ml-rag的v1版RAG均分6.69却输给裸考8.00，而ml-timeseries用差分目标法将CO2预测误差从3.99降至0.311ppm，两者分别通过什么关键调整解决了‘模型被误导’的问题？",
+      "docs": [
+        "ml-rag\\README.md",
+        "ml-timeseries\\README.md"
+      ],
+      "both_in_top4": true,
+      "rag": 10,
+      "bare": 4,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "A全覆8要点零✗；B否认全部要点事实，含4处✗"
+    },
+    {
+      "q": "甲项目用TF-IDF+LR文本分类，乙项目用树模型做时序预测，两者分别如何解决模型外推能力不足的问题？",
+      "docs": [
+        "ml-deploy\\README.md",
+        "ml-timeseries\\README.md"
+      ],
+      "both_in_top4": true,
+      "rag": 10,
+      "bare": 4,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "B完全匹配4个标准要点，零事实错误；A全未核验到要点中的具体数字和原句，3处✗且漏3点"
+    },
+    {
+      "q": "资料甲称TF-IDF bigram达87.3%，资料乙称TF-IDF达88.1%，二者差异原因是什么？",
+      "docs": [
+        "ml-text\\README.md",
+        "项目复盘与简历写法.md"
+      ],
+      "both_in_top4": true,
+      "rag": 8,
+      "bare": 2,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "A零✗且覆盖全部4个要点；B含4处✗，全属要点外虚构数字/实体"
+    },
+    {
+      "q": "甲中RF模型公榜0.853私榜0.826，乙中差分目标法CO2预测RMSE从3.99降至0.311，两者共同揭示了什么建模陷阱？",
+      "docs": [
+        "kaggle-sim\\README.md",
+        "ml-timeseries\\README.md"
+      ],
+      "both_in_top4": false,
+      "rag": 8,
+      "bare": 6,
+      "faithful": 6.0,
+      "violations": [
+        "甲中RF模型公榜0.853私榜0.826",
+        "submit登山=背答案实锤（资料3写的是kaggle-sim项目，但未提RF模型）",
+        "用公榜标签训练（违禁）……这就是必须禁止的原因（资料未出现该句）",
+        "只喂 female 一列 0.831 反超（资料中无此数字和对比）",
+        "CV 预言成功（资料中无此术语或表述）",
+        "所有时间序列预处理……绝不能用全量数据 fit 后 transform 全集（资料未提fit/transform细节）",
+        "分母（去年同期）必须严格落在训练窗口内（资料未提‘分母’‘去年同期’等机制细节）",
+        "每次指标跃升 >10%（资料未设10%阈值）",
+        "assert not np.any(np.isin(test_index, train_index))（资料未出现代码断言）"
+      ],
+      "reason": "A有4处✗且缺4要点；B有2处✗且缺2要点"
+    },
+    {
+      "q": "甲中护栏拒答<10字符的依据，与乙中哪节课的实证结论完全一致？",
+      "docs": [
+        "ml-deploy\\README.md",
+        "ml-text\\README.md"
+      ],
+      "both_in_top4": false,
+      "rag": 10,
+      "bare": 0,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "A精准覆盖3个核验点且零错误；B全✗且违背标准要点强制性要求"
+    },
+    {
+      "q": "甲用地理特征提升回归性能，乙用同比变化量改进时序预测，两者共同规避了哪种建模风险？",
+      "docs": [
+        "ml-car-price\\README.md",
+        "ml-timeseries\\README.md"
+      ],
+      "both_in_top4": true,
+      "rag": 8,
+      "bare": 4,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "B全覆盖5要点且零✗；A无一匹配标准要点"
+    },
+    {
+      "q": "甲项目强调结构防泄漏，乙项目记录实验时踩了MLflow 3弃用文件后端的坑，两者在数据/模型生命周期管理上分别侧重什么？",
+      "docs": [
+        "ml-car-price\\README.md",
+        "mlflow-lab\\README.md"
+      ],
+      "both_in_top4": false,
+      "rag": 8,
+      "bare": 4,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "A全覆盖5要点且零事实错误；B遗漏全部5要点，且添加5处标准未提内容"
+    },
+    {
+      "q": "ml-rag的v1版RAG答题均分6.69却输给裸考8.00，而ml-text第2课TF-IDF用bigram达87.3%，两者暴露的共同核心问题是什么？",
+      "docs": [
+        "ml-rag\\README.md",
+        "ml-text\\README.md"
+      ],
+      "both_in_top4": true,
+      "rag": 10,
+      "bare": 4,
+      "faithful": 8.0,
+      "violations": [
+        "'模型能力被错误的评估方式或提示约束所压制'是概括性结论，资料未直接使用该句式",
+        "‘幻觉分数’一词资料中未出现",
+        "‘空中楼阁’为比喻性表述，资料未使用"
+      ],
+      "reason": "B全覆盖8条标准要点，零事实错误；A遗漏5要点+11处✗"
+    },
+    {
+      "q": "甲项目用地理特征提升RMSE，乙项目发现词袋三死穴，两者在防数据泄漏上分别采取了什么关键措施？",
+      "docs": [
+        "ml-car-price\\README.md",
+        "ml-text\\README.md"
+      ],
+      "both_in_top4": false,
+      "rag": 10,
+      "bare": 4,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "A完全匹配两个标准要点且无✗；B零要点命中，全为要点外臆断"
+    },
+    {
+      "q": "甲中Titanic公榜0.853私榜0.826，乙中项目2因标签泄漏重报RMSE 7.09，两者共同揭示的首要风险是什么？",
+      "docs": [
+        "kaggle-sim\\README.md",
+        "项目复盘与简历写法.md"
+      ],
+      "both_in_top4": true,
+      "rag": 10,
+      "bare": 6,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "B全覆盖4条标准要点且零✗；A漏3要点+3处虚构数字"
+    },
+    {
+      "q": "甲中TF-IDF二元组提升准确率87.3%，乙中差分目标法降低RMSE至0.311，二者共同揭示了什么建模本质？",
+      "docs": [
+        "ml-text\\README.md",
+        "ml-timeseries\\README.md"
+      ],
+      "both_in_top4": false,
+      "rag": 10,
+      "bare": 4,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "A全覆盖7要点且零✗；B无一要点被正确援引，5处事实错误"
+    },
+    {
+      "q": "甲中CNN在8×8图上准确率0.980，乙中SVM-rbf准确率0.991，二者数据来源与评估场景有何本质差异？",
+      "docs": [
+        "ml-vision\\README.md",
+        "mlflow-lab\\README.md"
+      ],
+      "both_in_top4": false,
+      "rag": 10,
+      "bare": 2,
+      "faithful": 6.0,
+      "violations": [
+        "资料未写SVM-rbf核名",
+        "资料未写5折CV评估",
+        "资料未写'标准train/test划分'",
+        "资料未写'无数据增强'",
+        "资料未写'测试集严格居中'"
+      ],
+      "reason": "B零✗且全覆盖5个标准要点；A含3处事实错误（0.991/数据源/评估差异）"
+    },
+    {
+      "q": "甲资料称时序项目RMSE为7.09，乙资料提到差分目标使RMSE从7.44→4.41，二者数值差异原因是什么？",
+      "docs": [
+        "README.md",
+        "ml-timeseries\\README.md"
+      ],
+      "both_in_top4": true,
+      "rag": 6,
+      "bare": 3,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "A覆盖全部7个标准要点，零✗；B全✗且漏4要点"
+    },
+    {
+      "q": "甲称ml-text项目准确率87.0%，乙写87.0~87.7%，二者差异原因在乙中哪条具体实践？",
+      "docs": [
+        "README.md",
+        "项目复盘与简历写法.md"
+      ],
+      "both_in_top4": false,
+      "rag": 8,
+      "bare": 4,
+      "faithful": 8.0,
+      "violations": [
+        "src/train.py 输出 baseline 是 87.0%",
+        "step5_deploy.py 或 pipeline 中启用 min_length=10 + threshold=0.7"
+      ],
+      "reason": "A全✗且漏要点；B全✓无✗，覆盖全部3标准要点"
+    },
+    {
+      "q": "甲中公榜0.853私榜0.826的CV预言成功，乙中SVM达98.0%但t-SNE预言落空，二者对模型评估可靠性的启示有何本质差异？",
+      "docs": [
+        "kaggle-sim\\README.md",
+        "ml-vision\\README.md"
+      ],
+      "both_in_top4": false,
+      "rag": 4,
+      "bare": 5,
+      "faithful": 6.0,
+      "violations": [
+        "甲的CV预言是偶然吻合的幻觉",
+        "甲没证明模型鲁棒只证明运气好",
+        "t-SNE在高维像素空间无法反映决策边界"
+      ],
+      "reason": "A漏2要点且3✗；B漏3要点且6✗，均未覆盖标准要点②③①"
+    },
+    {
+      "q": "甲中Titanic比赛私榜0.826与乙中SVM-rbf指标0.991，二者数值差异反映的评估场景本质区别是什么？",
+      "docs": [
+        "kaggle-sim\\README.md",
+        "mlflow-lab\\README.md"
+      ],
+      "both_in_top4": false,
+      "rag": 8,
+      "bare": 5,
+      "faithful": 6.0,
+      "violations": [
+        "SVM-rbf 0.9911 出自 digits 数据集",
+        "CNN 98.00% 是在 MNIST 上跑的"
+      ],
+      "reason": "A多1处✗（CV 0.812），扣3；遗漏‘一行mlflow’等要点共2个→−4；B零✗且要点全覆盖"
+    },
+    {
+      "q": "甲资料中mlflow-lab项目记录的实验数量与乙资料所述是否一致？具体数字各是多少？",
+      "docs": [
+        "README.md",
+        "mlflow-lab\\README.md"
+      ],
+      "both_in_top4": true,
+      "rag": 8,
+      "bare": 0,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "A全覆盖且零✗；B未提取标准要点中明确数字"
+    },
+    {
+      "q": "甲用滚动起点验证避免K折错误，乙用MLflow跟踪实验，二者分别针对什么常见建模问题？",
+      "docs": [
+        "ml-timeseries\\README.md",
+        "mlflow-lab\\README.md"
+      ],
+      "both_in_top4": true,
+      "rag": 4,
+      "bare": 8,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "A缺3要点扣6分，零✗；B全✗且无要点覆盖，扣6分"
+    },
+    {
+      "q": "甲项目强调‘先切分再处理’防数据泄漏，乙项目通过‘±1px平移制造train/serve skew’暴露预处理缺陷，二者在流程步骤设计上对数据划分时机的处理逻辑有何根本差异？",
+      "docs": [
+        "ml-car-price\\README.md",
+        "ml-vision\\README.md"
+      ],
+      "both_in_top4": false,
+      "rag": 5,
+      "bare": 6,
+      "faithful": 8.0,
+      "violations": [
+        "'预处理单测 0.9622 过账'无出处",
+        "‘增强策略的参数学习，如 AutoAugment 的 policy search’无出处"
+      ],
+      "reason": "AB均虚构标准要点未含的数值与短语，且均漏2个要点"
+    },
+    {
+      "q": "甲乙两课程在‘上线’环节的流程设计差异是什么？甲含拒答机制而乙强调什么？",
+      "docs": [
+        "ml-text\\README.md",
+        "ml-vision\\README.md"
+      ],
+      "both_in_top4": false,
+      "rag": 8,
+      "bare": 4,
+      "faithful": 10.0,
+      "violations": [],
+      "reason": "B准确提取标准要点中并列项‘输入护栏’，零✗；A引入要点外概念，4处✗"
+    },
+    {
+      "q": "kaggle-sim强调CV验证与提交纪律，ml-deploy强调契约拦截与服务生命周期管理，二者在模型验证与部署流程上的核心方法论差异是什么？",
+      "docs": [
+        "kaggle-sim\\README.md",
+        "ml-deploy\\README.md"
+      ],
+      "both_in_top4": true,
+      "rag": 5,
+      "bare": 8,
+      "faithful": 8.0,
+      "violations": [
+        "'每天提交≤2次'未在原始资料中出现",
+        "‘沙盒验证’一词原文未使用",
+        "‘交付验收’一词原文未使用",
+        "‘SRE的接口契约验证’原文未定义主体为SRE"
+      ],
+      "reason": "A有3处虚构事实；B未显式引用任一标准要点原文，但方法论描述更契合要点精神"
+    },
+    {
+      "q": "甲强调‘先切分再处理’防泄漏，乙在项目1中如何具体落实该方法论？",
+      "docs": [
+        "ml-car-price\\README.md",
+        "项目复盘与简历写法.md"
+      ],
+      "both_in_top4": false,
+      "rag": 10,
+      "bare": 2,
+      "faithful": 8.0,
+      "violations": [
+        "用 sklearn Pipeline 将裁剪/派生/地理特征工程结构化封装",
+        "使用 train_test_split 或时序安全的 TimeSeriesSplit",
+        "QuantileTransformer().fit(train_X)"
+      ],
+      "reason": "A零要点覆盖+5处虚构事实；B全覆盖3要点且零✗"
+    }
+  ]
+}

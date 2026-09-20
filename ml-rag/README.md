@@ -118,6 +118,26 @@ v3 的残留问题：配对判卷（L3a）在没有原始资料时只能核对"�
 - 附带揪出一条工程债：当前语料重建出 53 块，生产索引还是 40 块——README 等文档本身入库、v4/v5 之后一直在改，索引早旧了（重建零 API 成本，本轮嵌入已全进缓存；因并行会话可能正拿旧索引跑评估，暂不动，记入待办）。
 - **v6 教训**：饱和有第三层——不止判卷官会饱和、指标会饱和，**小语料对组件改动本身也会"测不动"**。测不动的组件别吹"设计正确"，要么给它找检索以外的岗位（如可归因性），要么把样本扩到能测动为止。
 
+## v7：50 题多跳端到端判卷——先给金标装上"逐字引用"闸门，再让 L3a+L3b 咬真链路
+v5 只测了检索层（L1），端到端一直没在多跳口径上过。这次补完，但先撞上一个硬前置：`qa_multihop50.json` 只有问题没有 gold，而判卷官没 gold 就无从判起。
+
+**金标不能是"LLM 复述的答案"——那等于让幻觉给幻觉背书。** `scripts/build_multihop50_gold.py` 加了引用闸门：每个要点必须是语料逐字片段（按 `…` 切开后整段做归一化子串回查），回查不过就带失败片段反馈重试一轮（"逐字复制，标点都不许动"）。50 题一轮结果：**留 18 / 废 32**（25 题引文造假 + 7 题答不了）——半数以上题源自 40 块的旧索引，语料涨到 58 块后题库腐烂 64%。重试轮救回 14/25，终盘 **留 32 / 废 18（腐烂率 36%）**：引文回查失败 11 + 答不了 7。废题率本身就是产物——**题库不是一次生成永久有效，语料动一次就要重审一遍**。
+
+**e2e**（`evaluation/run_multihop50_e2e.py`，hybrid 主路径 × L3a 配对含 parity 交换 + L3b 有据性）：
+
+| 分组（n=32） | RAG | 裸考 | 有据性 | 胜/平/负 |
+|---|---|---|---|---|
+| 全部 | **8.12** | 4.25 | 8.75 | 26/0/6（符号检验 p=0.00027） |
+| 检索双中 15 题 | 8.33 | 4.40 | 9.33 | 13/0/2 |
+| 检索缺腿 17 题 | 7.94 | 4.12 | 8.24 | 13/0/4 |
+
+- **RAG 增益在跨文档多跳上依然显著**——v3 说的"多跳是短板"限定在检索层名次，没传导到答案分：缺腿只比双中低 0.39，一篇文档半句话也够模型讲对方法论。
+- **但败题几乎全长在缺腿里**：6 负中 4 题缺腿，且有据性最惨的两题（4.0/6.0，5 处无据断言）都是缺腿——平均不掉分，尾部风险翻倍。检索层修不动的东西，端到端会以小概率惨案的形式收利息。
+- **判卷官再被抓一处自相矛盾**：一题 reason 写"裸考答案全✗且无要点覆盖"却给 8 分——仪器仍有噪声，逐题 reason 抽查必须是流程，不是可选项。
+- 产物：`qa_multihop50_gold.json`（kept 32 + dropped 18 带死因）、`multihop50_e2e_v7.json`。
+
+**v7 教训**：gold 抽取是评测链上最后一个没被审计的环节——加了逐字回查闸门后它第一件事就是证伪了自家题库 64%。评估体系的可信度等于其中最弱一环的可信度。
+
 ## 工程化要点
 - **凭证**：全从 `~/.bailian` 或环境变量读，仓库零明文（复用第9课教训）
 - **缓存**：嵌入和 judge 结果落 `index/`（已 gitignore），重建索引、重跑评估零重复计费
@@ -138,6 +158,8 @@ D:/.../.venv/Scripts/python.exe evaluation/judge_probe_faithful.py  # v4 L3b 编
 D:/.../.venv/Scripts/python.exe scripts/build_multihop50.py && \
 D:/.../.venv/Scripts/python.exe evaluation/run_multihop50_ab.py  # v5 多跳分解 50 题复验（含符号检验）
 D:/.../.venv/Scripts/python.exe evaluation/run_chunk_ab.py       # v6 分块三策略消融（双题集+符号检验，索引落 index_ab/）
+D:/.../.venv/Scripts/python.exe scripts/build_multihop50_gold.py && \
+D:/.../.venv/Scripts/python.exe evaluation/run_multihop50_e2e.py # v7 多跳金标（逐字引用闸门）+ 端到端判卷
 D:/.../.venv/Scripts/python.exe scripts/build_multihop20.py      # v4 生成20道跨文档题（一次性）
 D:/.../.venv/Scripts/python.exe evaluation/run_multihop20_ab.py  # v4 分解检索三臂 L1 A/B
 python -m pytest && python -m ruff check src scripts tests # 离线测试+lint

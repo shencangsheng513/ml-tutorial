@@ -21,6 +21,8 @@ ml-vision/data/
 llm_cache.json
 ml-rag/index/
 ml-rag/index_ab/
+ml-rag/index_expanded/
+ml-rag/index_control/
 .venv*/
 
 # 原始比赛数据除外：kaggle-sim/raw_titanic.csv 只有44KB，保留可复现

@@ -4,7 +4,7 @@ import pytest
 
 from rag.attribution import ungrounded_numbers
 from rag.bm25 import BM25, rrf_fuse, tokenize
-from rag.chunker import MAX_CHARS, Chunk, chunk_markdown
+from rag.chunker import MAX_CHARS, Chunk, chunk_code, chunk_markdown
 from rag.decompose import parse_subqueries
 from rag.store import VectorStore
 
@@ -26,6 +26,27 @@ def test_long_section_is_split_with_limit():
 
 def test_empty_doc_yields_nothing():
     assert chunk_markdown("", "x.md") == []
+
+
+def test_code_split_by_def_class_and_module_preamble():
+    py = ("import os\n\n\n"
+          "def foo(x):\n    return x + 1\n\n\n"
+          "class Bar:\n    def method(self):\n        return 2\n")
+    chunks = chunk_code(py, "m.py")
+    heads = [c.heading for c in chunks]
+    assert "(module)" in heads  # import 前导自成一块
+    assert "foo" in heads and "Bar" in heads
+    # 缩进的 method 归进 Bar 块，不另起一段
+    bar = next(c.text for c in chunks if c.heading == "Bar")
+    assert "method" in bar
+
+
+def test_code_long_block_respects_char_limit():
+    py = "def big():\n" + "".join(f"    x = {i}  # 注释填充长度\n" for i in range(200))
+    chunks = chunk_code(py, "big.py")
+    assert len(chunks) >= 2
+    assert all(len(c.text) <= MAX_CHARS + 40 for c in chunks)
+    assert chunks[0].heading == "big"
 
 
 def test_store_cosine_ranking_basic():

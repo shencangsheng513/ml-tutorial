@@ -1,6 +1,6 @@
 # ml-deploy — 生产级模型推理服务
 
-把文本分类项目（`ml-text/`，TF-IDF+LR Pipeline，测试 87.7%）包装成一个可部署、可测试、可维护的 HTTP 服务。
+把文本分类项目（`ml-text/`，TF-IDF+LR Pipeline，测试 87.0%，口径见 `ml-text/models/report.json`）包装成一个可部署、可测试、可维护的 HTTP 服务。
 
 ## 它长什么样
 
@@ -12,6 +12,8 @@ GET  /docs                 FastAPI 自动生成的 OpenAPI 文档
 
 鉴权：设 `DEPLOY_API_TOKEN` 后，除探针外的全部路径要求 `Authorization: Bearer <token>`（恒定时间比对），不设则关闭——本地开发零摩擦，上云一行开关。
 
+**confidence 口径（对接收方必读）**：同一个模型、两个入口，`confidence` 含义不同——Streamlit 应用（`ml-text/app.py`）显示的是 **Top1−Top2 差值**，`ml-text/models/report.json` 的 `confidence_threshold`（0.207）就是按这个差值定的；本服务的 `confidence` 是 **Top1 概率**。四分类下 Top1 概率恒 ≥0.25，拿 0.207 去比服务的 `confidence` 永远不会触发转人工。要在服务侧复刻"低置信转人工"，请用响应里完整的 `probabilities` 自己算差值。
+
 ## 工程化要点（相对"能跑"的 Streamlit 版升级在哪）
 
 | 维度 | 做法 | 为什么 |
@@ -21,8 +23,9 @@ GET  /docs                 FastAPI 自动生成的 OpenAPI 文档
 | 护栏 | <10字符直接 `rejected`+原因 | 第3课实证：<10词帖准确率仅52%，拒答好过自信地错 |
 | 加载 | lifespan 启动时 load 一次，进程内复用 | joblib load 14MB 要秒级，不能每请求来一遍 |
 | 日志 | JSON 结构化 + 请求中间件（path/status/latency） | 机器可解析才能进日志系统告警 |
-| 测试 | 7 个 pytest：契约/护栏/确定性；CI 用微型替身模型，**不携带14MB二进制** | 模型工件走 MLflow/卷挂载，测试测的是接口 |
+| 测试 | 14 个 pytest（鉴权 7 + 服务 7）：契约/护栏/确定性；CI 用微型替身模型，**不携带14MB二进制** | 模型工件走 MLflow/卷挂载，测试测的是接口 |
 | 打包 | Dockerfile：模型卷挂载 + HEALTHCHECK | 与真实部署一致的 artifact 管理姿势 |
+| 版本锁 | `scikit-learn==1.9.1`（原来是 `>=1.5`） | joblib 的 pickle 里带着训练版本号，运行时不一致就 `InconsistentVersionWarning`；`>=` 让镜像每次重建都可能装到更新版，等于把慢雷埋进 CI。**训练版本 = 锁版本 = 工件版本**，三者必须同源 |
 
 ## 本地跑
 
@@ -58,7 +61,7 @@ curl http://127.0.0.1:8000/v1/classify -d "{\"texts\":[\"The goalie made a glove
 3. **踩坑实录——健康检查必须配 `/healthz`**：Render 默认探 `HEAD /`，被 Bearer 中间件打 401，平台误判服务不健康触发重启。修法：Settings → Health Check Path = `/healthz`。这就是 `OPEN_PATHS` 白名单存在的实战理由
 4. 冒烟三查全绿：无钥匙 `/healthz` 200（model_loaded true）→ 无钥匙 `/v1/classify` 401 → 带钥匙 200 + 真实预测，公网延迟 ~183ms
 5. 免费档脾气：空闲 15 分钟休眠，冷启动 ~1 分钟；性能 ≈ 本地压测的 1/3–1/5，对外承诺按 p99 300ms 定
-6. 已知告警（待办）：sklearn `InconsistentVersionWarning`（模型旧版 pickle、镜像装新版），预测正常但版本漂移是慢雷，重建镜像锁版本时一并处理
+6. **已知告警 → 本机已修完，线上待重建**：`InconsistentVersionWarning` 根因是模型用 sklearn 1.9.0 pickle、镜像按 `>=1.5` 装到了 1.9.1。修法分三刀：`pyproject.toml` 锁 `==1.9.1`；用 1.9.1 重跑 `python -m src.train` 重新生成工件（指标逐位相同：CV 0.8808 / 测试 0.8702 / 阈值 0.207，说明补丁版本没动行为）；新工件换进服务仓库 `model/`。行为一致性证据：新旧工件对全部 1579 篇测试集 **0 条预测不一致、概率最大绝对差 0.0**，加载零告警，14 个离线测试在 `-W error::UserWarning` 下全绿。**线上只剩一步：push 触发 Render 重建**（会短暂重启，需现网确认）。
 7. 注意：uvicorn 多进程在 Windows 本机有 socket 继承毛病（实测偶发 WinError 10022），**多 worker 是为 Linux 容器准备的**，本机冒烟用单 worker 即可。
 
 ## CI
@@ -66,6 +69,8 @@ curl http://127.0.0.1:8000/v1/classify -d "{\"texts\":[\"The goalie made a glove
 
 ## Docker
 > 状态如实说：本机 Docker Desktop 引擎无头起不来（无登录会话时进程自己退了），**下面的 build/run 未在本机验证**；你回来双击打开引擎后照抄即可，"验收四查"就是给那一刻准备的。`deploy-serve` 入口与鉴权逻辑本身已在 Windows 本机起服务冒烟通过（healthz 200 / 无token 401 / 带token 200）。同款 Dockerfile 配方已在 Render 云端构建验证通过（见上面"上云实战"，模型改为烤进镜像），本机的卷挂载版仍未本地实测。
+>
+> 2026-09-20 用锁版后的新工件重做本机回环冒烟（单 worker，`127.0.0.1:8123`）：`/healthz` 200 且 `model_loaded: true`；无 token 打 `/v1/classify` → 401；带 token 三条真实帖子 → 200（hockey 0.9234 等），单请求 23.6ms；**进程日志零 warning**（旧工件在此必报 `InconsistentVersionWarning`），14 个离线测试 `-W error::UserWarning` 全绿。Docker 引擎当天仍没起来，下面四查照旧待你双击开引擎后执行。
 
 ```bash
 docker build -t ml-deploy ml-deploy/

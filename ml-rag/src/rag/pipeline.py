@@ -63,10 +63,14 @@ def build_context(hits, score_label: str = "相似度") -> str:
                        for i, (c, s) in enumerate(hits))
 
 
-def answer_with_context(question: str, hits, score_label: str = "相似度") -> str:
+def answer_with_context(question: str, hits, score_label: str = "相似度",
+                        system: str | None = None) -> str:
+    """system 仅供消融实验换提示词：默认路径缓存键保持历史格式，老缓存零失效。"""
     prompt = f"{build_context(hits, score_label)}\n\n问题：{question}"
-    key = hashlib.md5(("rag|" + prompt).encode("utf-8")).hexdigest()
-    return _cached_chat(key, [{"role": "system", "content": SYSTEM_RAG},
+    tag = ("rag|" if system is None
+           else "rag|" + hashlib.md5(system.encode("utf-8")).hexdigest()[:8] + "|")
+    key = hashlib.md5((tag + prompt).encode("utf-8")).hexdigest()
+    return _cached_chat(key, [{"role": "system", "content": system or SYSTEM_RAG},
                               {"role": "user", "content": prompt}])
 
 

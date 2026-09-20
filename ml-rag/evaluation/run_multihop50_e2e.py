@@ -6,6 +6,7 @@ gold 要点来自 build_multihop50_gold.py（引文式、逐片段回查语料�
 用法：python evaluation/run_multihop50_e2e.py   （先跑 scripts/build_multihop50_gold.py）
 """
 import json
+import re
 import sys
 import time
 from pathlib import Path
@@ -43,12 +44,16 @@ def main() -> None:
         x, y = (a_bare, a_rag) if i % 2 else (a_rag, a_bare)  # 奇偶换位防位置偏置
         j = judge_pair(item["q"], item["gold"], x, y)
         s_rag, s_bare = (j["B"], j["A"]) if i % 2 else (j["A"], j["B"])
+        reason = j.get("reason", "")
+        if i % 2:  # 判卷官看到的 A/B 与落库口径相反，独立字母回填成 RAG=A/裸考=B
+            reason = re.sub(r"(?<![A-Za-z0-9])[AB](?![A-Za-z0-9])",
+                            lambda m: "B" if m.group() == "A" else "A", reason)
         f = judge_faithful(item["q"], item["gold"], a_rag,
                            build_context(found, "RRF分"))
         viols = f.get("violations", []) or []
         rows.append({"q": item["q"], "docs": item["docs"], "both_in_top4": both,
                      "rag": s_rag, "bare": s_bare, "faithful": float(f["score"]),
-                     "violations": viols, "reason": j.get("reason", "")})
+                     "violations": viols, "reason": reason})
         mark = "✓" if both else "✗"
         print(f"  [{i+1:02d}] 检索{mark} 配对 RAG {s_rag:.1f} vs 裸考 {s_bare:.1f}"
               f" | 有据性 {f['score']:.1f}（无据 {len(viols)}）  {item['q'][:30]}")

@@ -1,0 +1,1251 @@
+{
+  "n_bank": 45,
+  "kept": 45,
+  "dropped": [],
+  "leaky": [
+    {
+      "q": "deploy-serve 入口支持哪几个命令行覆盖参数？",
+      "elsewhere": [
+        "ml-deploy/tests/test_auth.py"
+      ]
+    },
+    {
+      "q": "训练 pipeline 里 tfidf 之后接的是哪个分类器，为什么不用 LinearSVC？",
+      "elsewhere": [
+        "ml-text/step6_semantics.py",
+        "ml-text/step7_word2vec.py",
+        "ml-text/step9_audit_b.py",
+        "ml-text/step9_llm_annotate.py",
+        "mlflow-lab/track_projects.py"
+      ]
+    },
+    {
+      "q": "训练产出的 report.json 里除了指标还写了哪个决策参数？",
+      "elsewhere": [
+        "ml-text/app.py"
+      ]
+    },
+    {
+      "q": "第1课对照元数据泄漏时，clean 版数据删掉了哪三类内容？",
+      "elsewhere": [
+        "ml-text/step2_tfidf_classify.py",
+        "ml-text/step3_text_errors.py",
+        "ml-text/step4_model_compare.py",
+        "ml-text/step6_semantics.py",
+        "ml-text/step7_word2vec.py",
+        "ml-text/step8_bert.py",
+        "ml-text/step9_audit_b.py",
+        "ml-text/step9_llm_annotate.py",
+        "mlflow-lab/track_projects.py"
+      ]
+    },
+    {
+      "q": "第2课三种数词方法同台竞技时，用的分类器及其迭代上限是什么？",
+      "elsewhere": [
+        "ml-text/step3_text_errors.py",
+        "ml-text/step4_model_compare.py"
+      ]
+    },
+    {
+      "q": "手绘数字 App 里 SmallCNN 第一层卷积的通道数配置是多少？",
+      "elsewhere": [
+        "ml-vision/app.py",
+        "ml-vision/step3_mlp_cnn.py",
+        "ml-vision/test_pipeline.py",
+        "mlflow-lab/track_projects.py"
+      ]
+    },
+    {
+      "q": "App 加载 CNN 权重时传了 weights_only 吗，为什么？",
+      "elsewhere": [
+        "ml-vision/test_pipeline.py"
+      ]
+    },
+    {
+      "q": "时序第3课构造滞后特征时用了哪几个 lag？",
+      "elsewhere": [
+        "ml-timeseries/step2_lag_features.py"
+      ]
+    },
+    {
+      "q": "时序第3课的 Naive 基线拿哪一列当预测值？",
+      "elsewhere": [
+        "ml-timeseries/step2_lag_features.py",
+        "ml-timeseries/step5_real_co2.py"
+      ]
+    },
+    {
+      "q": "Kaggle 模拟里私有榜那一切分用的 random_state 是多少？",
+      "elsewhere": [
+        "ml-car-price/step4_predict_explain.py"
+      ]
+    },
+    {
+      "q": "MLflow 实验跟踪那篇脚本的数据划分比例和分层方式是什么？",
+      "elsewhere": [
+        "ml-vision/src/train_cnn.py",
+        "ml-vision/step2_digits_classify.py",
+        "ml-vision/step3_mlp_cnn.py",
+        "ml-vision/test_pipeline.py"
+      ]
+    }
+  ],
+  "embed_expected": 0,
+  "embed_paid": 0,
+  "arms": {
+    "扩库(+代码)": {
+      "n": 45,
+      "vec_hit4": 43,
+      "hyb_hit4": 40,
+      "vec_ctx4": 37,
+      "hyb_ctx4": 34,
+      "vec_mrr8": 0.821,
+      "hyb_mrr8": 0.773,
+      "vec_top1": 33,
+      "hyb_top1": 30
+    },
+    "对照(仅文档)": {
+      "n": 45,
+      "vec_hit4": 0,
+      "hyb_hit4": 0,
+      "vec_ctx4": 0,
+      "hyb_ctx4": 0,
+      "vec_mrr8": 0.0,
+      "hyb_mrr8": 0.0,
+      "vec_top1": 0,
+      "hyb_top1": 0
+    }
+  },
+  "per_question": {
+    "扩库(+代码)": [
+      {
+        "q": "一次 /v1/classify 请求最多允许带多少篇文本？超了会怎样？",
+        "doc": "ml-deploy/src/deploy/schemas.py",
+        "vec_rank": 8,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.125,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "服务端对单篇文本的长度上限配置成多少？",
+        "doc": "ml-deploy/src/deploy/config.py",
+        "vec_rank": 3,
+        "hyb_rank": 6,
+        "vec_hit4": true,
+        "hyb_hit4": false,
+        "vec_ctx4": true,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.3333333333333333,
+        "hyb_mrr8": 0.16666666666666666
+      },
+      {
+        "q": "推理服务的鉴权比对为什么用 secrets.compare_digest 而不是直接写 ==？",
+        "doc": "ml-deploy/src/deploy/service.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "哪些路径不需要带 Bearer 钥匙也能访问？",
+        "doc": "ml-deploy/src/deploy/service.py",
+        "vec_rank": 1,
+        "hyb_rank": 4,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 0.25
+      },
+      {
+        "q": "joblib 模型是在什么时机被载入到进程里的，不是每个请求 load 一次？",
+        "doc": "ml-deploy/src/deploy/service.py",
+        "vec_rank": 4,
+        "hyb_rank": 6,
+        "vec_hit4": true,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.25,
+        "hyb_mrr8": 0.16666666666666666
+      },
+      {
+        "q": "短文本护栏在推理侧的哪一行落地？",
+        "doc": "ml-deploy/src/deploy/inference.py",
+        "vec_rank": 3,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.3333333333333333,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "每个请求的访问日志里带了哪些字段？",
+        "doc": "ml-deploy/src/deploy/service.py",
+        "vec_rank": 1,
+        "hyb_rank": 2,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 0.5
+      },
+      {
+        "q": "deploy-serve 入口支持哪几个命令行覆盖参数？",
+        "doc": "ml-deploy/src/deploy/server.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "拒答时 Prediction 的 note 字段允许为空吗，类型怎么声明的？",
+        "doc": "ml-deploy/src/deploy/schemas.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "本地压测脚本的 p50/p99 分位数是手写的还是用了 numpy？怎么算的？",
+        "doc": "ml-deploy/scripts/loadtest.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "压测脚本默认打的目标地址是哪个？",
+        "doc": "ml-deploy/scripts/loadtest.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "训练 pipeline 里 tfidf 之后接的是哪个分类器，为什么不用 LinearSVC？",
+        "doc": "ml-text/src/train.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "转人工的置信度阈值为什么不能拿测试集来定？用了什么替代？",
+        "doc": "ml-text/src/train.py",
+        "vec_rank": 2,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": false,
+        "hyb_ctx4": true,
+        "vec_mrr8": 0.5,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "折外置信度阈值取的是哪个分位数？",
+        "doc": "ml-text/src/train.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "训练产出的 report.json 里除了指标还写了哪个决策参数？",
+        "doc": "ml-text/src/train.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "TfidfVectorizer 的 ngram_range、min_df、sublinear_tf 是从哪里取值的？",
+        "doc": "ml-text/src/train.py",
+        "vec_rank": 3,
+        "hyb_rank": 2,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 0.3333333333333333,
+        "hyb_mrr8": 0.5
+      },
+      {
+        "q": "Streamlit 应用上显示给用户的\"置信度\"到底是哪个量？",
+        "doc": "ml-text/app.py",
+        "vec_rank": 1,
+        "hyb_rank": 2,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 0.5
+      },
+      {
+        "q": "应用里提示\"证据不足、此判定基本不可信\"的词数门槛是多少？",
+        "doc": "ml-text/app.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "第1课对照元数据泄漏时，clean 版数据删掉了哪三类内容？",
+        "doc": "ml-text/step1_text_eda.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "第1课统计各类特色词时，token 的正则过滤要求至少几个字母？",
+        "doc": "ml-text/step1_text_eda.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "第2课三种数词方法同台竞技时，用的分类器及其迭代上限是什么？",
+        "doc": "ml-text/step2_tfidf_classify.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": false,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "第2课演示词袋看不见否定，用了哪三句话做探针？",
+        "doc": "ml-text/step2_tfidf_classify.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "第3课的 margin 是从哪个函数的输出算出来的，为什么不是 predict_proba？",
+        "doc": "ml-text/step3_text_errors.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "第3课按帖长分片，第一个区间的上界是几个词？",
+        "doc": "ml-text/step3_text_errors.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "BERT 那一课默认把 HF 下载指向了哪个镜像地址？",
+        "doc": "ml-text/step8_bert.py",
+        "vec_rank": 1,
+        "hyb_rank": 3,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 0.3333333333333333
+      },
+      {
+        "q": "手绘数字 App 里 SmallCNN 第一层卷积的通道数配置是多少？",
+        "doc": "ml-vision/src/train_cnn.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "画布预处理判定\"什么都没画\"的灰度阈值是多少？",
+        "doc": "ml-vision/src/preprocess.py",
+        "vec_rank": 2,
+        "hyb_rank": 2,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 0.5,
+        "hyb_mrr8": 0.5
+      },
+      {
+        "q": "App 加载 CNN 权重时传了 weights_only 吗，为什么？",
+        "doc": "ml-vision/app.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "画布转模型输入时，黑白极性是怎么翻过来的？",
+        "doc": "ml-vision/src/preprocess.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "CV 第2课四个经典模型横评里，KNN 用了几个邻居？",
+        "doc": "ml-vision/step2_digits_classify.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "CV 第2课和 t-SNE 预言对质时，检查了前几对混淆？",
+        "doc": "ml-vision/step2_digits_classify.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "第1课说 load_digits 的像素只有 17 个等级，打印里怎么描述黑白的？",
+        "doc": "ml-vision/step1_image_eda.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "时序的直接式多步预测器默认要出几个 horizon？",
+        "doc": "ml-timeseries/src/forecaster.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "时序第3课构造滞后特征时用了哪几个 lag？",
+        "doc": "ml-timeseries/step3_walkforward_diff.py",
+        "vec_rank": 4,
+        "hyb_rank": 2,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 0.25,
+        "hyb_mrr8": 0.5
+      },
+      {
+        "q": "差分目标那一列是怎么生成的？",
+        "doc": "ml-timeseries/step3_walkforward_diff.py",
+        "vec_rank": 2,
+        "hyb_rank": 3,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.5,
+        "hyb_mrr8": 0.3333333333333333
+      },
+      {
+        "q": "时序第3课的 Naive 基线拿哪一列当预测值？",
+        "doc": "ml-timeseries/step3_walkforward_diff.py",
+        "vec_rank": 2,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 0.5,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "Kaggle 模拟里私有榜那一切分用的 random_state 是多少？",
+        "doc": "kaggle-sim/compete.py",
+        "vec_rank": 1,
+        "hyb_rank": 2,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 0.5
+      },
+      {
+        "q": "Kaggle 模拟里自留 holdout 占原始数据的比例是多少？",
+        "doc": "kaggle-sim/compete.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "Officer 头衔特征把哪些称谓归到了一起？",
+        "doc": "kaggle-sim/compete.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "房价项目的稳健截断器默认的上下分位是多少？",
+        "doc": "ml-car-price/src/features.py",
+        "vec_rank": 3,
+        "hyb_rank": 5,
+        "vec_hit4": true,
+        "hyb_hit4": false,
+        "vec_ctx4": true,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.3333333333333333,
+        "hyb_mrr8": 0.2
+      },
+      {
+        "q": "经度方向换算成公里用的辅助函数叫什么名字？",
+        "doc": "ml-car-price/src/features.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "置换重要性实验重复打乱了几次？",
+        "doc": "ml-car-price/step9_permutation_importance.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "单特征打乱对照实验里，MedInc 这一列被什么替换掉了？",
+        "doc": "ml-car-price/step9_permutation_importance.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "MLflow 实验跟踪那篇脚本的数据划分比例和分层方式是什么？",
+        "doc": "mlflow-lab/track_projects.py",
+        "vec_rank": 1,
+        "hyb_rank": 1,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 1.0
+      },
+      {
+        "q": "MLflow 跟踪脚本里用的朴素贝叶斯是哪个变体？",
+        "doc": "mlflow-lab/track_projects.py",
+        "vec_rank": 1,
+        "hyb_rank": 3,
+        "vec_hit4": true,
+        "hyb_hit4": true,
+        "vec_ctx4": true,
+        "hyb_ctx4": true,
+        "vec_mrr8": 1.0,
+        "hyb_mrr8": 0.3333333333333333
+      }
+    ],
+    "对照(仅文档)": [
+      {
+        "q": "一次 /v1/classify 请求最多允许带多少篇文本？超了会怎样？",
+        "doc": "ml-deploy/src/deploy/schemas.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "服务端对单篇文本的长度上限配置成多少？",
+        "doc": "ml-deploy/src/deploy/config.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "推理服务的鉴权比对为什么用 secrets.compare_digest 而不是直接写 ==？",
+        "doc": "ml-deploy/src/deploy/service.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "哪些路径不需要带 Bearer 钥匙也能访问？",
+        "doc": "ml-deploy/src/deploy/service.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "joblib 模型是在什么时机被载入到进程里的，不是每个请求 load 一次？",
+        "doc": "ml-deploy/src/deploy/service.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "短文本护栏在推理侧的哪一行落地？",
+        "doc": "ml-deploy/src/deploy/inference.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "每个请求的访问日志里带了哪些字段？",
+        "doc": "ml-deploy/src/deploy/service.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "deploy-serve 入口支持哪几个命令行覆盖参数？",
+        "doc": "ml-deploy/src/deploy/server.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "拒答时 Prediction 的 note 字段允许为空吗，类型怎么声明的？",
+        "doc": "ml-deploy/src/deploy/schemas.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "本地压测脚本的 p50/p99 分位数是手写的还是用了 numpy？怎么算的？",
+        "doc": "ml-deploy/scripts/loadtest.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "压测脚本默认打的目标地址是哪个？",
+        "doc": "ml-deploy/scripts/loadtest.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "训练 pipeline 里 tfidf 之后接的是哪个分类器，为什么不用 LinearSVC？",
+        "doc": "ml-text/src/train.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "转人工的置信度阈值为什么不能拿测试集来定？用了什么替代？",
+        "doc": "ml-text/src/train.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "折外置信度阈值取的是哪个分位数？",
+        "doc": "ml-text/src/train.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "训练产出的 report.json 里除了指标还写了哪个决策参数？",
+        "doc": "ml-text/src/train.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "TfidfVectorizer 的 ngram_range、min_df、sublinear_tf 是从哪里取值的？",
+        "doc": "ml-text/src/train.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "Streamlit 应用上显示给用户的\"置信度\"到底是哪个量？",
+        "doc": "ml-text/app.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "应用里提示\"证据不足、此判定基本不可信\"的词数门槛是多少？",
+        "doc": "ml-text/app.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "第1课对照元数据泄漏时，clean 版数据删掉了哪三类内容？",
+        "doc": "ml-text/step1_text_eda.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "第1课统计各类特色词时，token 的正则过滤要求至少几个字母？",
+        "doc": "ml-text/step1_text_eda.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "第2课三种数词方法同台竞技时，用的分类器及其迭代上限是什么？",
+        "doc": "ml-text/step2_tfidf_classify.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "第2课演示词袋看不见否定，用了哪三句话做探针？",
+        "doc": "ml-text/step2_tfidf_classify.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "第3课的 margin 是从哪个函数的输出算出来的，为什么不是 predict_proba？",
+        "doc": "ml-text/step3_text_errors.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "第3课按帖长分片，第一个区间的上界是几个词？",
+        "doc": "ml-text/step3_text_errors.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "BERT 那一课默认把 HF 下载指向了哪个镜像地址？",
+        "doc": "ml-text/step8_bert.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "手绘数字 App 里 SmallCNN 第一层卷积的通道数配置是多少？",
+        "doc": "ml-vision/src/train_cnn.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "画布预处理判定\"什么都没画\"的灰度阈值是多少？",
+        "doc": "ml-vision/src/preprocess.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "App 加载 CNN 权重时传了 weights_only 吗，为什么？",
+        "doc": "ml-vision/app.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "画布转模型输入时，黑白极性是怎么翻过来的？",
+        "doc": "ml-vision/src/preprocess.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "CV 第2课四个经典模型横评里，KNN 用了几个邻居？",
+        "doc": "ml-vision/step2_digits_classify.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "CV 第2课和 t-SNE 预言对质时，检查了前几对混淆？",
+        "doc": "ml-vision/step2_digits_classify.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "第1课说 load_digits 的像素只有 17 个等级，打印里怎么描述黑白的？",
+        "doc": "ml-vision/step1_image_eda.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "时序的直接式多步预测器默认要出几个 horizon？",
+        "doc": "ml-timeseries/src/forecaster.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "时序第3课构造滞后特征时用了哪几个 lag？",
+        "doc": "ml-timeseries/step3_walkforward_diff.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "差分目标那一列是怎么生成的？",
+        "doc": "ml-timeseries/step3_walkforward_diff.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "时序第3课的 Naive 基线拿哪一列当预测值？",
+        "doc": "ml-timeseries/step3_walkforward_diff.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "Kaggle 模拟里私有榜那一切分用的 random_state 是多少？",
+        "doc": "kaggle-sim/compete.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "Kaggle 模拟里自留 holdout 占原始数据的比例是多少？",
+        "doc": "kaggle-sim/compete.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "Officer 头衔特征把哪些称谓归到了一起？",
+        "doc": "kaggle-sim/compete.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "房价项目的稳健截断器默认的上下分位是多少？",
+        "doc": "ml-car-price/src/features.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "经度方向换算成公里用的辅助函数叫什么名字？",
+        "doc": "ml-car-price/src/features.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "置换重要性实验重复打乱了几次？",
+        "doc": "ml-car-price/step9_permutation_importance.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "单特征打乱对照实验里，MedInc 这一列被什么替换掉了？",
+        "doc": "ml-car-price/step9_permutation_importance.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "MLflow 实验跟踪那篇脚本的数据划分比例和分层方式是什么？",
+        "doc": "mlflow-lab/track_projects.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      },
+      {
+        "q": "MLflow 跟踪脚本里用的朴素贝叶斯是哪个变体？",
+        "doc": "mlflow-lab/track_projects.py",
+        "vec_rank": null,
+        "hyb_rank": null,
+        "vec_hit4": false,
+        "hyb_hit4": false,
+        "vec_ctx4": false,
+        "hyb_ctx4": false,
+        "vec_mrr8": 0.0,
+        "hyb_mrr8": 0.0
+      }
+    ]
+  },
+  "md_gold_reference": {
+    "qa_stress80.json": {
+      "对照(仅文档)": {
+        "vec_hit4": 70,
+        "hyb_hit4": 78
+      },
+      "扩库(+代码)": {
+        "vec_hit4": 46,
+        "hyb_hit4": 66
+      }
+    },
+    "qa_stress.json": {
+      "对照(仅文档)": {
+        "vec_hit4": 5,
+        "hyb_hit4": 5
+      },
+      "扩库(+代码)": {
+        "vec_hit4": 3,
+        "hyb_hit4": 3
+      }
+    },
+    "qa_v3.json": {
+      "对照(仅文档)": {
+        "vec_hit4": 4,
+        "hyb_hit4": 4
+      },
+      "扩库(+代码)": {
+        "vec_hit4": 4,
+        "hyb_hit4": 4
+      }
+    },
+    "qa_eval.json": {
+      "对照(仅文档)": {
+        "vec_hit4": 13,
+        "hyb_hit4": 13
+      },
+      "扩库(+代码)": {
+        "vec_hit4": 9,
+        "hyb_hit4": 10
+      }
+    }
+  },
+  "index_blocks": {
+    "扩库(+代码)": 387,
+    "对照(仅文档)": 76
+  }
+}

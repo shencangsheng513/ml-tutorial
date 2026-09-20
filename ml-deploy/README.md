@@ -50,18 +50,22 @@ curl http://127.0.0.1:8000/v1/classify -d "{\"texts\":[\"The goalie made a glove
 
 三个结论：① 单 worker 在并发 8 附近就摸到吞吐天花板（GIL + CPU 推理），32 并发只换来排队（p50 从 10ms 涨到 52ms，RPS 不涨）——**要容量就加 worker/副本，不是加并发**；② 批处理是最便宜的扩容：客户端攒 16 条一发，同并发下吞吐比单发再 ×3（565→1741 条/秒），代价只是 p99 从 94ms 涨到 101ms；③ 两轮 8 并发差 30%（509 vs 683），本机有后台任务干扰——**单点数字不可信，要看趋势和拐点**。原始数据：`loadtest_results.json`。
 
-## 上云清单（免费层，待账号）
-1. **首选 Hugging Face Spaces（Docker SDK）**：14MB 模型可直接烤进 repo（与 CI 用替身模型的原则不冲突——那是测接口，这是发服务）；免费 CPU 0+1，健康检查映射到 `/healthz`。
-2. 备选 Render/Railway 免费档：需把模型上传到卷或对象存储，Dockerfile 的 volume 挂载方案正好复用。
-3. ~~上云后要改的三件事~~ **已落进代码**（本轮）：统一入口 `deploy-serve`，端口/并发/鉴权全走环境变量——`DEPLOY_PORT=7860`（HF Spaces 约定端口）、`DEPLOY_WORKERS=2`、`DEPLOY_API_TOKEN=<你的token>`（Space secrets 注入，别写进 repo）。日志本就是 JSON stdout，平台自动收。你回去只剩：`hf auth login` → 建 Space → push。
-4. 预期：免费 CPU 档性能 ≈ 本地压测的 1/3–1/5，p99 SLO 按 300ms 定，别拿本机数字对外承诺。
-5. 注意：uvicorn 多进程在 Windows 本机有 socket 继承毛病（实测偶发 WinError 10022），**多 worker 是为 Linux 容器准备的**，本机冒烟用单 worker 即可。
+## 上云实战（2026-09-20 已完成 ✅）
+**Live：https://news-classifier-service-jsfq.onrender.com**（Render 免费档，Docker 部署，独立仓库 [news-classifier-service](https://github.com/shencangsheng513/news-classifier-service)：模型烤进镜像，自包含 Dockerfile）
+
+1. ~~首选 HF Spaces~~ **改道记录**：2026 起 HF 对 Docker/Gradio Space 免费档收费（402，需 $9/月 PRO，公开的也不行），只有 Static 免费 → 转 Render 免费档，首建 2m01s 上线
+2. 鉴权/入口按设计生效：`DEPLOY_API_TOKEN` 走 Render 环境变量注入（不落 repo），`deploy-serve` 读 `DEPLOY_PORT` 监听 7860
+3. **踩坑实录——健康检查必须配 `/healthz`**：Render 默认探 `HEAD /`，被 Bearer 中间件打 401，平台误判服务不健康触发重启。修法：Settings → Health Check Path = `/healthz`。这就是 `OPEN_PATHS` 白名单存在的实战理由
+4. 冒烟三查全绿：无钥匙 `/healthz` 200（model_loaded true）→ 无钥匙 `/v1/classify` 401 → 带钥匙 200 + 真实预测，公网延迟 ~183ms
+5. 免费档脾气：空闲 15 分钟休眠，冷启动 ~1 分钟；性能 ≈ 本地压测的 1/3–1/5，对外承诺按 p99 300ms 定
+6. 已知告警（待办）：sklearn `InconsistentVersionWarning`（模型旧版 pickle、镜像装新版），预测正常但版本漂移是慢雷，重建镜像锁版本时一并处理
+7. 注意：uvicorn 多进程在 Windows 本机有 socket 继承毛病（实测偶发 WinError 10022），**多 worker 是为 Linux 容器准备的**，本机冒烟用单 worker 即可。
 
 ## CI
 `.github/workflows/deploy-ci.yml`：push 触及 `ml-deploy/**` 时自动装依赖 → ruff → pytest。
 
 ## Docker
-> 状态如实说：本机 Docker Desktop 引擎无头起不来（无登录会话时进程自己退了），**下面的 build/run 未在本机验证**；你回来双击打开引擎后照抄即可，"验收四查"就是给那一刻准备的。`deploy-serve` 入口与鉴权逻辑本身已在 Windows 本机起服务冒烟通过（healthz 200 / 无token 401 / 带token 200）。
+> 状态如实说：本机 Docker Desktop 引擎无头起不来（无登录会话时进程自己退了），**下面的 build/run 未在本机验证**；你回来双击打开引擎后照抄即可，"验收四查"就是给那一刻准备的。`deploy-serve` 入口与鉴权逻辑本身已在 Windows 本机起服务冒烟通过（healthz 200 / 无token 401 / 带token 200）。同款 Dockerfile 配方已在 Render 云端构建验证通过（见上面"上云实战"，模型改为烤进镜像），本机的卷挂载版仍未本地实测。
 
 ```bash
 docker build -t ml-deploy ml-deploy/

@@ -1,10 +1,12 @@
 """问答 CLI：python scripts/ask.py "问题" —— 混合检索 top4 资料，RAG 作答并给出处。
-默认 hybrid（90 题大盘 top-4 命中 87.8% vs 纯向量 81.1%）；--vec 回退纯向量。"""
+默认 hybrid（90 题大盘 top-4 命中 87.8% vs 纯向量 81.1%）；--vec 回退纯向量。
+答后附一行零费数字核验：答案里凡是资料+题面都查无逐字出处的数字，提示复核。"""
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+from rag.attribution import ungrounded_numbers
 from rag.config import INDEX_DIR
 from rag.pipeline import answer_with_context, retrieve, retrieve_hybrid
 from rag.store import VectorStore
@@ -21,7 +23,12 @@ def main() -> None:
     print("引用来源：")
     for c, s in hits:
         print(f"  [{s:.3f}] {c.doc} § {c.heading}")
-    print("\n" + answer_with_context(q, hits, score_label="向量分" if vec_only else "RRF分"))
+    answer = answer_with_context(q, hits, score_label="向量分" if vec_only else "RRF分")
+    print("\n" + answer)
+    bad = ungrounded_numbers(answer, hits, q)
+    if bad:
+        print(f"\n⚠ 数字核验：{'、'.join(bad)} 在资料与题面中查无逐字出处"
+              "（换算/四舍五入属正常，否则请对照上方资料复核）")
 
 
 if __name__ == "__main__":

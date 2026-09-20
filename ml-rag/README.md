@@ -181,6 +181,14 @@ v8 判词指向输出端结构化。`evaluation/run_cite_output_ab.py` 把提示
 - **v8+v9 合并判词（本线结案）**：缺腿幻觉在输出端两头堵死——软提示没意愿（14% 触发），硬结构饿死完整性。生成端措辞这条路**双证伪关闭**，欠的债认给检索端覆盖，而检索端 v5 已证明查询分解修不动名次——这是诚实的负结果闭环：当前架构下缺腿有据性 -1.2 是**已知且暂无更优解**的代价，`ask.py` 维持原样。
 - **v9 教训**：干预测出显著负效应同样是高价值结果——它把"看着最像解法"的路封了，还顺手留下一个可复用的仪器。负结果连报两届（v8、v9），方法线到此为止，再深挖要先换变量（检索配置/语料规模），不加钱不加题的消融已经榨干。
 
+## v10：v9 的核验器转正——ask.py 答后附一行零费"数字查无出处"提示
+生成端措辞已双证伪（v8/v9），但检测端没人试过：不改答案、不拦输出，答完之后**免费**复核一遍数字。生产答案不带逐句【资料i】标注，所以核验器改成无标注版（`src/rag/attribution.py::ungrounded_numbers`）：答案里每个数字（小数或 ≥2 位整数），若在**模型的整个输入**（top-4 检索正文 + 题面）里找不到逐字出处，就列为可疑。
+
+- **接主流程前先在 42 题缓存答案上体检**（`evaluation/calibrate_attribution.py`，全走缓存零费）：第一版只认检索资料，45% 答案带警报，翻开一看大半是**答案复述题面自带的数字**（0.4437、0.853…）——不是幻觉，是 grounding 集少了一块；把题面纳入后降到 40%（28 个可疑数字/42 题）。
+- 残留标记的构成（逐条人查）：大头是**算术派生值**（0.853−0.826=0.027、0.4437−0.4229=0.0208），字符串核验天然抓不住换算；真收获是 `1797`（digits 数据集尺寸，资料和题面里根本没有，模型从自己知识里掏的）——这正是"数字必须出自资料且一字不差"承诺的违例。
+- **判词：进主流程，但以提示器身份**。措辞写死留余地（"换算/四舍五入属正常，否则请复核"），只列数字不动答案，零 API 零延迟。v9 判词"ask.py 维持原样"修正为：**生成路径原样，答后多一行免费体检报告**。
+- **v10 教训**：仪器转正前要拿已知判决的样本校准误报构成——"40% 答案带警报"这个数字本身没有意义，**拆开看警报里谁是真凶谁是冤案**才有。grounding 集要等于模型的完整输入，少一块（题面）误报率就虚高 5 个点。
+
 ## 工程化要点
 - **凭证**：全从 `~/.bailian` 或环境变量读，仓库零明文（复用第9课教训）
 - **缓存**：嵌入和 judge 结果落 `index/`（已 gitignore），重建索引、重跑评估零重复计费
@@ -206,6 +214,7 @@ D:/.../.venv/Scripts/python.exe evaluation/run_multihop50_e2e.py # v7 多跳金�
 D:/.../.venv/Scripts/python.exe scripts/repair_multihop_bank.py  # v7.1 废题按原文档对重出，再过闸门+e2e
 D:/.../.venv/Scripts/python.exe evaluation/run_coverage_guard_ab.py  # v8 缺腿诚实护栏消融（基线走缓存）
 D:/.../.venv/Scripts/python.exe evaluation/run_cite_output_ab.py      # v9 逐句出处标注消融（基线走缓存，附离线归因核验器）
+D:/.../.venv/Scripts/python.exe evaluation/calibrate_attribution.py    # v10 核验器体检：42 题缓存答案上的误报构成（零费）
 D:/.../.venv/Scripts/python.exe scripts/build_multihop20.py      # v4 生成20道跨文档题（一次性）
 D:/.../.venv/Scripts/python.exe evaluation/run_multihop20_ab.py  # v4 分解检索三臂 L1 A/B
 python -m pytest && python -m ruff check src scripts tests # 离线测试+lint

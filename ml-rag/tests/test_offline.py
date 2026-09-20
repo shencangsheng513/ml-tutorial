@@ -2,6 +2,7 @@
 import numpy as np
 import pytest
 
+from rag.attribution import ungrounded_numbers
 from rag.bm25 import BM25, rrf_fuse, tokenize
 from rag.chunker import MAX_CHARS, Chunk, chunk_markdown
 from rag.decompose import parse_subqueries
@@ -92,3 +93,19 @@ def test_parse_subqueries_strips_numbering_dedups_caps():
     out = parse_subqueries(raw)
     assert out == ["ml-deploy 的护栏有哪些？", "帖子分类的上线方案是什么？", "空白行"]  # 去重+封顶3条
     assert parse_subqueries("") == []
+
+
+def test_ungrounded_numbers_flags_only_out_of_input_numbers():
+    hits = [(Chunk("d", "h", "CNN 在 8×8 图上准确率 0.980，共 1797 张", 0), 0.9)]
+    # 答案里 0.980/1797 在资料中（有据），0.991 与 5000  nowhere（可疑）；小数点/两位以上才查
+    ans = "准确率为0.980（1797 张），SVM 达 0.991，另有 5 类与 3 位隐藏单元。"
+    bad = ungrounded_numbers(ans, hits)
+    assert bad == ["0.991"]  # 0.980/1797 有据；个位数 5/3 不纳入核验
+
+
+def test_ungrounded_numbers_question_echo_is_grounded():
+    hits = [(Chunk("d", "h", "RMSE 从 0.4437 降至 0.4229", 0), 0.9)]
+    q = "RMSE 从 0.4437→0.4229，RRF 命中率 87.8%，二者说明什么？"
+    ans = "都强调用数字说话：RMSE 改善 0.0208，命中率 87.8%。"
+    # 87.8/0.4437/0.4229 在题面（纳入依据集），0.0208 是两数之差→派生值仍会误标为可疑
+    assert ungrounded_numbers(ans, hits, q) == ["0.0208"]

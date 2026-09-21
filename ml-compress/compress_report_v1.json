@@ -1,0 +1,114 @@
+{
+  "archive_acc": 0.9798,
+  "test_n": 10000,
+  "torch": "2.14.0+cpu",
+  "engine": "onednn",
+  "single_thread": true,
+  "quant_error_demo": {
+    "layer_params": 100352,
+    "scale": 0.00284074,
+    "max_abs_err": 0.00142,
+    "mean_abs_err": 0.000711,
+    "rel_l2_err_pct": 2.061
+  },
+  "arms": {
+    "A fp32基线": {
+      "kb": 416.6,
+      "acc": 0.9798,
+      "wrong": 202,
+      "flip_broken": 0,
+      "flip_fixed": 0,
+      "layers_quantized": "0/4",
+      "param_coverage": 0.0,
+      "ms_p50": 0.511,
+      "ms_p95": 0.883,
+      "ms_rounds": [
+        0.565,
+        0.393,
+        0.511
+      ],
+      "ms_spread_pct": 33.7,
+      "throughput": 4056.3
+    },
+    "B fp16": {
+      "kb": 209.9,
+      "acc": 0.9798,
+      "wrong": 202,
+      "flip_broken": 0,
+      "flip_fixed": 0,
+      "layers_quantized": "0/4",
+      "param_coverage": 0.0,
+      "ms_p50": 4.501,
+      "ms_p95": 5.605,
+      "ms_rounds": [
+        5.236,
+        4.501,
+        3.864
+      ],
+      "ms_spread_pct": 30.5,
+      "throughput": 269.3
+    },
+    "C int8动态(Linear)": {
+      "kb": 122.1,
+      "acc": 0.98,
+      "wrong": 200,
+      "flip_broken": 4,
+      "flip_fixed": 6,
+      "layers_quantized": "2/4",
+      "param_coverage": 0.955,
+      "ms_p50": 0.749,
+      "ms_p95": 1.309,
+      "ms_rounds": [
+        0.844,
+        0.749,
+        0.748
+      ],
+      "ms_spread_pct": 12.7,
+      "throughput": 3766.4
+    },
+    "D int8动态(点名Conv)": {
+      "kb": 122.1,
+      "acc": 0.98,
+      "wrong": 200,
+      "flip_broken": 4,
+      "flip_fixed": 6,
+      "layers_quantized": "2/4",
+      "param_coverage": 0.955,
+      "ms_p50": 0.961,
+      "ms_p95": 1.452,
+      "ms_rounds": [
+        0.971,
+        0.961,
+        0.721
+      ],
+      "ms_spread_pct": 26.1,
+      "throughput": 3324.0
+    },
+    "E int8静态(含卷积)": {
+      "kb": 113.6,
+      "acc": 0.9801,
+      "wrong": 199,
+      "flip_broken": 2,
+      "flip_fixed": 5,
+      "layers_quantized": "4/4",
+      "param_coverage": 1.0,
+      "ms_p50": 0.732,
+      "ms_p95": 1.552,
+      "ms_rounds": [
+        0.675,
+        0.732,
+        0.85
+      ],
+      "ms_spread_pct": 24.0,
+      "throughput": 10381.6
+    }
+  },
+  "size_ratio_vs_A": {
+    "A fp32基线": 1.0,
+    "B fp16": 1.98,
+    "C int8动态(Linear)": 3.41,
+    "D int8动态(点名Conv)": 3.41,
+    "E int8静态(含卷积)": 3.67
+  },
+  "c_equals_d": true
+}

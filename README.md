@@ -15,6 +15,7 @@
 | [mlflow-lab](mlflow-lab/) 实验跟踪 | 8 runs 入库 | — | search_runs 一行重排历史 |
 | [ml-deploy](ml-deploy/) 模型服务 | ml-text 的 87.0% 分类器 | pytest 14/14 · 延迟~17ms | 护栏/日志/healthz+ready 前置到服务层 |
 | [ml-rag](ml-rag/) 知识库问答 | 仓库 9 篇 md → 76 块（生产索引随语料重建） | v7.1 端到端 RAG 8.19 vs 裸考 4.19（p=7.5e-6） | v8~v12 五轮消融：四条修法全部实测封死，负结果才是产出 |
+| [ml-compress](ml-compress/) 模型压缩 | ml-vision 的 MNIST CNN（106k 参数） | int8 静态 3.7x 体积、批量吞吐 2.6x，精度 0.9798→0.9801 | 体积跟参数分布走、速度跟算力分布走：压小 ≠ 跑快 |
 
 ## 跨项目方法论（踩出来的）
 

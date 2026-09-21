@@ -1,0 +1,179 @@
+{
+  "seeds": [
+    42,
+    7,
+    2026
+  ],
+  "width": 128,
+  "test_n": 10000,
+  "train_fit_n": 8500,
+  "parity_seed42_vs_archive": {
+    "满数据8500 CE": {
+      "match": true,
+      "this_run": 0.9326,
+      "archive": 0.9326
+    },
+    "满数据8500 KD": {
+      "match": true,
+      "this_run": 0.9263,
+      "archive": 0.9263
+    },
+    "低数据2000 CE": {
+      "match": true,
+      "this_run": 0.9045,
+      "archive": 0.9045
+    },
+    "低数据2000 KD": {
+      "match": true,
+      "this_run": 0.9072,
+      "archive": 0.9072
+    }
+  },
+  "arms": {
+    "满数据8500 种子42": {
+      "seed": 42,
+      "acc_ce": 0.9326,
+      "acc_kd": 0.9263,
+      "gap_pp": -0.63,
+      "gap_imgs": -63,
+      "flips": {
+        "broken": 131,
+        "fixed": 68
+      },
+      "p_sign": 9e-06,
+      "wrong_ce": 674,
+      "wrong_kd": 737
+    },
+    "满数据8500 种子7": {
+      "seed": 7,
+      "acc_ce": 0.9348,
+      "acc_kd": 0.9287,
+      "gap_pp": -0.61,
+      "gap_imgs": -61,
+      "flips": {
+        "broken": 110,
+        "fixed": 49
+      },
+      "p_sign": 1e-06,
+      "wrong_ce": 652,
+      "wrong_kd": 713
+    },
+    "满数据8500 种子2026": {
+      "seed": 2026,
+      "acc_ce": 0.9347,
+      "acc_kd": 0.9246,
+      "gap_pp": -1.01,
+      "gap_imgs": -101,
+      "flips": {
+        "broken": 155,
+        "fixed": 54
+      },
+      "p_sign": 0.0,
+      "wrong_ce": 653,
+      "wrong_kd": 754
+    },
+    "低数据2000 种子42": {
+      "seed": 42,
+      "acc_ce": 0.9045,
+      "acc_kd": 0.9072,
+      "gap_pp": 0.27,
+      "gap_imgs": 27,
+      "flips": {
+        "broken": 135,
+        "fixed": 162
+      },
+      "p_sign": 0.131244,
+      "wrong_ce": 955,
+      "wrong_kd": 928
+    },
+    "低数据2000 种子7": {
+      "seed": 7,
+      "acc_ce": 0.908,
+      "acc_kd": 0.9102,
+      "gap_pp": 0.22,
+      "gap_imgs": 22,
+      "flips": {
+        "broken": 127,
+        "fixed": 149
+      },
+      "p_sign": 0.20613,
+      "wrong_ce": 920,
+      "wrong_kd": 898
+    },
+    "低数据2000 种子2026": {
+      "seed": 2026,
+      "acc_ce": 0.905,
+      "acc_kd": 0.9065,
+      "gap_pp": 0.15,
+      "gap_imgs": 15,
+      "flips": {
+        "broken": 130,
+        "fixed": 145
+      },
+      "p_sign": 0.398582,
+      "wrong_ce": 950,
+      "wrong_kd": 935
+    }
+  },
+  "verdicts": {
+    "满数据8500": {
+      "gaps_imgs": [
+        -63,
+        -61,
+        -101
+      ],
+      "gap_spread": {
+        "min": -101,
+        "max": -61,
+        "range": 40,
+        "mean": -75.0
+      },
+      "same_dir_seeds": "3/3",
+      "p_seeds": 0.25,
+      "pooled_flips": {
+        "broken": 396,
+        "fixed": 171
+      },
+      "p_pooled": 0.0,
+      "seed_floor_imgs": {
+        "CE": 22,
+        "KD": 41
+      },
+      "gap_over_floor": 1.83,
+      "survives_seed": true
+    },
+    "低数据2000": {
+      "gaps_imgs": [
+        27,
+        22,
+        15
+      ],
+      "gap_spread": {
+        "min": 15,
+        "max": 27,
+        "range": 12,
+        "mean": 21.33
+      },
+      "same_dir_seeds": "3/3",
+      "p_seeds": 0.25,
+      "pooled_flips": {
+        "broken": 392,
+        "fixed": 456
+      },
+      "p_pooled": 0.03044803,
+      "seed_floor_imgs": {
+        "CE": 35,
+        "KD": 37
+      },
+      "gap_over_floor": 0.58,
+      "survives_seed": false
+    }
+  },
+  "limitations": [
+    "每种子只训一次：种子底由 3 个点的极差估，欠估",
+    "只复现了 S128；S64 两档判决未换种子",
+    "α/T 未扫参（第4课同款边界，本轮没动）",
+    "p_pooled 偏乐观：三个种子共用同一批 10000 张测试图，翻牌事件跨种子不独立",
+    "本轮不测墙钟：精度是确定性读数，墙钟要另开交错配对流程"
+  ]
+}

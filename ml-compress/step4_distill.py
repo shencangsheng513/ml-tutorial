@@ -92,10 +92,11 @@ def soft_label_audit(logits: torch.Tensor) -> dict:
 
 # ---------- Q2 训练臂：CE 与 KD 只差一个目标函数 ----------
 def train_student(hidden: int, xd: torch.Tensor, yd: torch.Tensor, soft: torch.Tensor,
-                  mode: str, xv: torch.Tensor, yv: torch.Tensor) -> tuple[nn.Module, list]:
-    torch.manual_seed(SEED)                       # 重播 → 两臂初始权重逐位相同
+                  mode: str, xv: torch.Tensor, yv: torch.Tensor,
+                  seed: int = SEED) -> tuple[nn.Module, list]:
+    torch.manual_seed(seed)                       # 重播 → 两臂初始权重逐位相同
     m = build_mlp(hidden)
-    gen = torch.Generator().manual_seed(SEED)     # 批次序列走独立流，不污染全局（第3课的修法）
+    gen = torch.Generator().manual_seed(seed)     # 批次序列走独立流，不污染全局（第3课的修法）
     opt = torch.optim.Adam(m.parameters(), lr=LR)
     ce = nn.CrossEntropyLoss()
     n, curve = len(xd), []

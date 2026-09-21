@@ -20,9 +20,15 @@ H2 说那一列随 T 涨。顺带还能回答第4课留的那个"如果 α→0 �
 **配平臂**：每个温度用自己那个能把 KD 梯度钉回锚点水平的 α，再看 T 轴还斜不斜。
 
 仪器规矩沿用前几课：同种子配对（CE 与 KD 每个种子一副权重同起点）、逐图符号检验、
-幅度只跟**种子底**比（底不硬编码，从 compress_report_v4b.json 读）。
+幅度只跟**种子底**比（底不硬编码，从对应宽度的 compress_report_v4b*.json 读——锚点档案值、
+H1 的伤害基数、种子底三样全都跟着宽度走，S64 那一份是 0.9224/776、−55 张、底 53 张）。
+
+`--width 64` 是后补的一发：S128 那张表判出"伤害的旋钮是 T 不是 α"，但那只在一副学生上成立。
+这一发问的是**这条归因跨不跨架构**（同一老师、同一批数据、同一份软标签，只换学生宽度；
+所以同号=结论不随学生宽度变，不等于换个数据集还成立）。
 零 API 费，纯 CPU。跑法：
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py
+  PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py --width 64
 """
 from __future__ import annotations
 
@@ -38,30 +44,51 @@ from step4_distill import (BS, KD_ALPHA, KD_T, SEED, TIERS, VAL_N, build_mlp, lo
 from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
-OUT = HERE / "compress_report_v4c.json"
-V4 = HERE / "compress_report_v4.json"
-V4B = HERE / "compress_report_v4b.json"
-
 TIER = "满数据8500"                                 # 只扫主档：两档一起扫翻倍，且低数据那一档
-WIDTH = 128                                         # 已被第4课b 降级为"不显著"，先不追
+WIDTH = 128                                         # 默认副；已被第4课b 降级为"不显著"的低数据档不追
 ALPHAS = (0.3, 0.7, 1.0)
 TEMPS = (1.0, 3.0, 6.0)
 SEEDS = (42, 7, 2026)
-# 第4课那一格（α=0.7, T=3, 种子42）的档案值：本课的锚，必须逐位复现
-ANCHOR_KD = {"acc": 0.9263, "wrong": 737, "broken": 131, "fixed": 68}
-ANCHOR_CE_ACC = 0.9326
-# H1 的可打数字：把第4课那 −63 张按 α 线性缩放（α/α_anchor × −63）
 ALPHA_ANCHOR = KD_ALPHA                             # 0.7：第4课那格的权重分配
-H1_PRED = {a: round(a / ALPHA_ANCHOR * (-63)) for a in ALPHAS}
-ANCHOR_T = KD_T                                     # 3.0：探针的基准温度
+ANCHOR_T = KD_T                                     # 3.0：探针的基准温度，也是锚点格
 T2_TOL = 0.15                                       # KD 梯度范数随 T 漂移超过 ±15% 就算 T 轴被污染
+
+
+def v4b_path(width: int) -> Path:
+    return HERE / ("compress_report_v4b.json" if width == 128 else f"compress_report_v4b_s{width}.json")
+
+
+def out_path(width: int) -> Path:
+    return HERE / ("compress_report_v4c.json" if width == 128 else f"compress_report_v4c_s{width}.json")
+
+
+def load_anchor(v4b: Path, width: int) -> dict:
+    """锚点档案值 + 种子底 + H1 的伤害基数，三样全从第4课b 那一副宽度的报告读。
+
+    为什么不写第二套字面量：换一副宽度这些数字**全都变**（S64 的锚是 0.9224/776/128/73、
+    伤害基数 −55 张、底 53 张），而"对账"这件事的效力完全来自它比的是档案真值。
+    抄一份数字进代码，档案一改就对上老账了——所以档案是唯一来源，这里只负责读。"""
+    d = json.loads(v4b.read_text(encoding="utf-8"))
+    if int(d["width"]) != width:
+        raise SystemExit(f"{v4b.name} 是 S{d['width']} 的报告，不是 S{width}——换宽度请连档案一起换")
+    arm = d["arms"][f"{TIER} 种子{SEEDS[0]}"]        # α=0.7/T=3 那一格，种子 42
+    return {"kd": {"acc": arm["acc_kd"], "wrong": arm["wrong_kd"],
+                   "broken": arm["flips"]["broken"], "fixed": arm["flips"]["fixed"]},
+            "ce_acc": arm["acc_ce"],
+            "gap_imgs": arm["gap_imgs"],            # KD−CE，负=KD 更差，与本课 gap 同号向
+            "floor": int(d["verdicts"][TIER]["seed_floor_imgs"]["KD"])}
+
+
+def h1_pred(gap_imgs: int) -> dict:
+    """H1 的可打数字：把锚点那一格的伤害按 α 线性缩放（α/α_anchor × gap）。"""
+    return {a: round(a / ALPHA_ANCHOR * gap_imgs) for a in ALPHAS}
 
 
 def key(a: float, t: float) -> str:
     return f"a{a:g}_T{t:g}"
 
 
-def term_grad_norms(xd, yd, soft, t: float, seed: int = SEED) -> dict:
+def term_grad_norms(xd, yd, soft, t: float, width: int, seed: int = SEED) -> dict:
     """零训练探针：同一副初始权重、同一批数据，把 loss 两项各自 backward，
     量它们真正作用到学生参数上的梯度 L2 范数（KL 按标准写法带 T² 补偿）。
 
@@ -69,7 +96,7 @@ def term_grad_norms(xd, yd, soft, t: float, seed: int = SEED) -> dict:
     升 T 就会顺带把 KD 项的**有效权重**抬起来。那样"温度越高越坏"里就掺着
     "权重分配越偏越坏"（H1 借温度之名发生），事后再也分不开。"""
     torch.manual_seed(seed)
-    m = build_mlp(WIDTH)
+    m = build_mlp(width)
     gen = torch.Generator().manual_seed(seed)
     idx = torch.randint(0, len(xd), (BS,), generator=gen)
     z = m(xd[idx])
@@ -84,18 +111,19 @@ def term_grad_norms(xd, yd, soft, t: float, seed: int = SEED) -> dict:
     return {"g_ce": round(flat(g_ce), 5), "g_kd_unit": round(flat(g_kd), 5)}
 
 
-def load_seed_floor() -> int:
-    """种子底：同一目标函数只换随机流，错图数极差。第4课b 量的 KD 臂。"""
-    v4b = json.loads(V4B.read_text(encoding="utf-8"))
-    return int(v4b["verdicts"][TIER]["seed_floor_imgs"]["KD"])
-
-
-def main() -> None:
+def main(width: int = WIDTH) -> None:
     if not (MODELS / "mnist_cnn_fp32.pt").exists():
         raise SystemExit("缺 teacher 权重，先跑 python train_baseline.py")
-    if not V4B.exists():
-        raise SystemExit("缺 compress_report_v4b.json——种子底从它读，先跑 step4b_seed_variance.py")
-    floor = load_seed_floor()
+    v4b = v4b_path(width)
+    if not v4b.exists():
+        raise SystemExit(f"缺 {v4b.name}——锚点档案值和种子底都从它读，先跑 "
+                         f"python step4b_seed_variance.py"
+                         + ("" if width == 128 else " --width 64"))
+    out = out_path(width)
+    anchor = load_anchor(v4b, width)
+    floor = anchor["floor"]
+    ANCHOR_KD, ANCHOR_CE_ACC = anchor["kd"], anchor["ce_acc"]
+    H1_PRED = h1_pred(anchor["gap_imgs"])
 
     xt_all, yt_all, xte, yte = load_split()
     cut = len(xt_all) - VAL_N
@@ -107,9 +135,12 @@ def main() -> None:
     xd, yd = xt_all[:n_data], torch.tensor(yt_all[:n_data])
     soft = logits_of(teacher, xd)                   # 软标签与 T 无关：温度在 loss 里加，全程共用一份
 
-    print(f"teacher+数据就位 | {TIER} 训练 {n_data} 张 | 测试 {len(yte)} | "
+    print(f"teacher+数据就位 | {TIER} 训练 {n_data} 张 | 测试 {len(yte)} | 学生 S{width} | "
           f"网格 {len(ALPHAS)}×{len(TEMPS)}×{len(SEEDS)} = "
           f"{len(ALPHAS) * len(TEMPS) * len(SEEDS)} 次 KD + {len(SEEDS)} 次 CE 对照")
+    print(f"[仪器] 锚点档案值来自 {v4b.name}：α={ALPHA_ANCHOR}/T={ANCHOR_T:g}/种子{SEEDS[0]} "
+          f"KD {ANCHOR_KD['acc']}/错{ANCHOR_KD['wrong']}/坏{ANCHOR_KD['broken']}/正{ANCHOR_KD['fixed']}，"
+          f"CE {ANCHOR_CE_ACC}，那一格伤害 {anchor['gap_imgs']} 张（H1 按 α 线性缩放它）")
     print(f"[仪器] 种子底（第4课b 的 KD 臂，换随机流的错图数极差）= {floor} 张，"
           f"任何 |均值 gap| ≤ {floor} 张在本机上不算疗效")
 
@@ -130,7 +161,7 @@ def main() -> None:
 
     # ---------- 零训练探针：T 是温度轴，还是偷偷的权重轴？ ----------
     assert ALPHA_ANCHOR in ALPHAS and ANCHOR_T in TEMPS, "锚点格不在网格里，探针没有基准"
-    probe = {t: term_grad_norms(xd, yd, soft, t) for t in TEMPS}
+    probe = {t: term_grad_norms(xd, yd, soft, t, width) for t in TEMPS}
     ref_g = probe[ANCHOR_T]["g_kd_unit"] * ALPHA_ANCHOR      # 第4课那格真正推参数的 KD 梯度
     print("\n[零训练探针] 同一副初始权重、同一批数据，loss 两项各自 backward 的梯度 L2 范数：")
     for t in TEMPS:
@@ -181,14 +212,14 @@ def main() -> None:
     cells: dict[str, list[dict]] = {k: [] for k, _, _ in specs}
     print(f"\n[开跑] 每个种子一副 CE + {len(specs)} 副 KD（同种子同初始权重、同批次流，只差目标函数）：")
     for seed in SEEDS:
-        ce, _ = train_student(WIDTH, xd, yd, soft, "CE", xv, yv, seed=seed)
+        ce, _ = train_student(width, xd, yd, soft, "CE", xv, yv, seed=seed)
         ce_pred = predict(ce, xte, False)
         ce_wrong = int((ce_pred != yte).sum())
         ce_ref[seed] = {"acc": round(1 - ce_wrong / len(yte), 4), "wrong": ce_wrong}
         line = [f"  种子 {seed:<5} CE 错 {ce_wrong} 张"]
         mline = []
         for k, a, t in specs:
-            m, _ = train_student(WIDTH, xd, yd, soft, "KD", xv, yv, seed=seed, alpha=a, t=t)
+            m, _ = train_student(width, xd, yd, soft, "KD", xv, yv, seed=seed, alpha=a, t=t)
             p = predict(m, xte, False)
             wrong = int((p != yte).sum())
             broken = int(((ce_pred == yte) & (p != yte)).sum())
@@ -346,8 +377,12 @@ def main() -> None:
           "严格说各格自己的种子底要各扫各的；这里用一格的底当全表的闸，是**借来的仪器**，会低估 T 大端的方差。")
     print(f"[自我审计② 多重比较] {len(free)} 格 × 三种子，p_pooled 只看方向不看在底之上（同一批 10000 张测试图，"
           f"种子之间翻牌事件不独立，p 偏乐观）。全表只有一件事是硬判决：{floor} 张这条线。")
-    print("[自我审计③ 只扫了满数据档与 S128] 低数据那一档第4课b 已降级为不显著；"
+    print(f"[自我审计③ 只扫了满数据档与 S{width}] 低数据那一档第4课b 已降级为不显著；"
           "若 H1/H2 想在低数据档有不同答案，本课没测。")
+    if width != WIDTH:
+        print(f"[自我审计③ b 跨架构 ≠ 独立复证] 这一副 S{width} 与默认那副 S{WIDTH} 共用**同一个老师、同一批数据、"
+              "同一份软标签**，只有学生那侧换了。所以两份报告若同号，说明的是「结论不随学生宽度变」，"
+              "而不是「换个数据集还成立」——数据那侧的独立性要到第5课（另一副 teacher）才有。")
     print("[自我审计④ 探针只管到梯度幅值] 权重/温度解耦靠的是初始那一步、一个批次、一副初始权重上"
           "两项梯度的 L2 范数之比；训练过程中两项的相对尺度会随学生逼近老师而变（KL 变小），"
           "所以配平是**起手配平**，不是全程配平。")
@@ -359,9 +394,11 @@ def main() -> None:
           f"α≤1 配不平（需要 α={probe[TEMPS[0]]['alpha_to_match_anchor']}），"
           "这一格按「不可配平」记账而不是悄悄删掉。")
 
-    report = {"tier": TIER, "width": WIDTH, "alphas": list(ALPHAS), "temps": list(TEMPS),
+    other = 64 if width == 128 else 128
+    report = {"tier": TIER, "width": width, "alphas": list(ALPHAS), "temps": list(TEMPS),
               "seeds": list(SEEDS), "test_n": int(len(yte)), "train_fit_n": cut,
               "anchor_hyperparams": {"alpha": ALPHA_ANCHOR, "T": ANCHOR_T},
+              "anchor_archive_from": v4b.name,
               "seed_floor_imgs_from_v4b": floor,
               "soft_label_audit_by_T": audit_by_t,
               "gradient_probe": {"t2_tolerance_pct": round(T2_TOL * 100, 1),
@@ -380,13 +417,18 @@ def main() -> None:
                                 "ce_acc_archive": ANCHOR_CE_ACC},
               "ce_ref_by_seed": ce_ref, "grid": grid, "verdicts": verdicts,
               "limitations": ["种子底借自第4课b 的 α=0.7/T=3 一格，未逐格重量",
-                              f"只扫满数据 8500 + S{WIDTH}；低数据档、另一副宽度未扫",
+                              f"只扫满数据 8500 + S{width}；低数据档未扫，另一副宽度是"
+                              f"{out_path(other).name}（各写各的表，跨架构结论要两份对照着读）",
                               "每格 3 个种子，均值本身没有二次底",
                               "权重/温度解耦只在初始一步的一个批次上配平，不是全程配平",
                               "p_pooled 偏乐观（三种子共用同一批测试图）"]}
-    OUT.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"\n已存 {OUT.name}（{len(SEEDS) * (len(cells) + 1)} 次训练，10000 张全量测试，纯 CPU，零 API 费）")
+    out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"\n已存 {out.name}（{len(SEEDS) * (len(cells) + 1)} 次训练，10000 张全量测试，纯 CPU，零 API 费）")
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    ap = argparse.ArgumentParser(description="α×T 扫参归因（默认 S128；--width 64 测结论跨不跨架构）")
+    ap.add_argument("--width", type=int, choices=(128, 64), default=WIDTH,
+                    help="学生宽度；锚点档案值/伤害基数/种子底都从该宽度的 compress_report_v4b*.json 读")
+    main(ap.parse_args().width)

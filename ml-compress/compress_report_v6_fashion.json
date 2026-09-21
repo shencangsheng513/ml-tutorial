@@ -1,0 +1,531 @@
+{
+  "dataset": "FashionMNIST",
+  "n_pool": 10000,
+  "test_n": 10000,
+  "teacher": {
+    "test_acc": 0.8771,
+    "created_by": "复用缓存权重（本轮没重训）",
+    "epochs": 20,
+    "weight": "fashion_cnn_fp32.pt"
+  },
+  "teacher_dryness_by_T": {
+    "1.0": {
+      "raw_top1": 0.8983,
+      "raw_collapse_pct": 42.5,
+      "raw_p2": 0.0784,
+      "divT_top1": 0.8983,
+      "divT_collapse_pct": 42.5,
+      "divT_p2": 0.0784
+    },
+    "6.0": {
+      "raw_top1": 0.8983,
+      "raw_collapse_pct": 42.5,
+      "raw_p2": 0.0784,
+      "divT_top1": 0.3881,
+      "divT_collapse_pct": 0.0,
+      "divT_p2": 0.1675
+    }
+  },
+  "mnist_refs_read_from_archive": {
+    "满数据8500": {
+      "archive": "compress_report_v4c.json",
+      "T_main_effect_like_for_like_imgs": -130.2,
+      "T_main_effect_as_archived_imgs": -124.3,
+      "seed_floor_imgs": 41,
+      "collapse_pct_after_divT": {
+        "T1": 93.3,
+        "T6": 0.0
+      },
+      "mean_p2_after_divT": {
+        "T1": 0.0046,
+        "T6": 0.1029
+      }
+    },
+    "低数据2000": {
+      "archive": "compress_report_v4c_low.json",
+      "T_main_effect_like_for_like_imgs": 58.4,
+      "T_main_effect_as_archived_imgs": 56.4,
+      "seed_floor_imgs": 37,
+      "collapse_pct_after_divT": {
+        "T1": 92.8,
+        "T6": 0.0
+      },
+      "mean_p2_after_divT": {
+        "T1": 0.0046,
+        "T6": 0.1026
+      }
+    }
+  },
+  "gate_mnist_parity": {
+    "cell": "a0.7_T3",
+    "seed": 42,
+    "this_script": {
+      "wrong_kd": 737,
+      "wrong_ce": 674,
+      "broken": 131,
+      "fixed": 68
+    },
+    "archive_v4c": {
+      "wrong_kd": 737,
+      "wrong_ce": 674,
+      "broken": 131,
+      "fixed": 68
+    },
+    "ce_wrong_v4b_archive": 674,
+    "match": true
+  },
+  "width": 128,
+  "alphas": [
+    0.7,
+    1.0
+  ],
+  "temps": [
+    1.0,
+    6.0
+  ],
+  "seeds": [
+    42,
+    7,
+    2026
+  ],
+  "floor_rule": "第4课g：每档用自己的底（CE 臂 + 各 KD 格跨种子极差取 max），不借 MNIST 账里的 41/37 张",
+  "per_tier": {
+    "满数据8500": {
+      "T_main_effect_imgs": -125.5,
+      "own_floor_imgs": 112,
+      "per_target_span_imgs": {
+        "CE": 81,
+        "a0.7_T1": 112,
+        "a0.7_T6": 86,
+        "a1_T1": 81,
+        "a1_T6": 82
+      },
+      "has_direction": true,
+      "in_units_of_own_floor": 1.12,
+      "sign": "负（加热有害）",
+      "grid": {
+        "a0.7_T1": {
+          "gaps_imgs": [
+            -8,
+            31,
+            111
+          ],
+          "mean_gap_imgs": 44.7,
+          "pooled_flips": {
+            "broken": 672,
+            "fixed": 806
+          },
+          "p_pooled": 0.000537,
+          "vs_own_floor": 0.4
+        },
+        "a0.7_T6": {
+          "gaps_imgs": [
+            -85,
+            -76,
+            -22
+          ],
+          "mean_gap_imgs": -61.0,
+          "pooled_flips": {
+            "broken": 1039,
+            "fixed": 856
+          },
+          "p_pooled": 2.9e-05,
+          "vs_own_floor": 0.54
+        },
+        "a1_T1": {
+          "gaps_imgs": [
+            -52,
+            8,
+            57
+          ],
+          "mean_gap_imgs": 4.3,
+          "pooled_flips": {
+            "broken": 942,
+            "fixed": 955
+          },
+          "p_pooled": 0.782928,
+          "vs_own_floor": 0.04
+        },
+        "a1_T6": {
+          "gaps_imgs": [
+            -217,
+            -120,
+            -86
+          ],
+          "mean_gap_imgs": -141.0,
+          "pooled_flips": {
+            "broken": 1292,
+            "fixed": 869
+          },
+          "p_pooled": 0.0,
+          "vs_own_floor": 1.26
+        }
+      },
+      "raw_rows": {
+        "a0.7_T1": [
+          {
+            "seed": 42,
+            "alpha": 0.7,
+            "T": 1.0,
+            "wrong_kd": 1609,
+            "wrong_ce": 1601,
+            "gap_imgs": -8,
+            "broken": 198,
+            "fixed": 190,
+            "p_sign": 0.722362
+          },
+          {
+            "seed": 7,
+            "alpha": 0.7,
+            "T": 1.0,
+            "wrong_kd": 1651,
+            "wrong_ce": 1682,
+            "gap_imgs": 31,
+            "broken": 236,
+            "fixed": 267,
+            "p_sign": 0.180959
+          },
+          {
+            "seed": 2026,
+            "alpha": 0.7,
+            "T": 1.0,
+            "wrong_kd": 1539,
+            "wrong_ce": 1650,
+            "gap_imgs": 111,
+            "broken": 238,
+            "fixed": 349,
+            "p_sign": 5e-06
+          }
+        ],
+        "a0.7_T6": [
+          {
+            "seed": 42,
+            "alpha": 0.7,
+            "T": 6.0,
+            "wrong_kd": 1686,
+            "wrong_ce": 1601,
+            "gap_imgs": -85,
+            "broken": 332,
+            "fixed": 247,
+            "p_sign": 0.000471
+          },
+          {
+            "seed": 7,
+            "alpha": 0.7,
+            "T": 6.0,
+            "wrong_kd": 1758,
+            "wrong_ce": 1682,
+            "gap_imgs": -76,
+            "broken": 359,
+            "fixed": 283,
+            "p_sign": 0.003046
+          },
+          {
+            "seed": 2026,
+            "alpha": 0.7,
+            "T": 6.0,
+            "wrong_kd": 1672,
+            "wrong_ce": 1650,
+            "gap_imgs": -22,
+            "broken": 348,
+            "fixed": 326,
+            "p_sign": 0.418599
+          }
+        ],
+        "a1_T1": [
+          {
+            "seed": 42,
+            "alpha": 1.0,
+            "T": 1.0,
+            "wrong_kd": 1653,
+            "wrong_ce": 1601,
+            "gap_imgs": -52,
+            "broken": 267,
+            "fixed": 215,
+            "p_sign": 0.020085
+          },
+          {
+            "seed": 7,
+            "alpha": 1.0,
+            "T": 1.0,
+            "wrong_kd": 1674,
+            "wrong_ce": 1682,
+            "gap_imgs": 8,
+            "broken": 323,
+            "fixed": 331,
+            "p_sign": 0.784323
+          },
+          {
+            "seed": 2026,
+            "alpha": 1.0,
+            "T": 1.0,
+            "wrong_kd": 1593,
+            "wrong_ce": 1650,
+            "gap_imgs": 57,
+            "broken": 352,
+            "fixed": 409,
+            "p_sign": 0.042286
+          }
+        ],
+        "a1_T6": [
+          {
+            "seed": 42,
+            "alpha": 1.0,
+            "T": 6.0,
+            "wrong_kd": 1818,
+            "wrong_ce": 1601,
+            "gap_imgs": -217,
+            "broken": 470,
+            "fixed": 253,
+            "p_sign": 0.0
+          },
+          {
+            "seed": 7,
+            "alpha": 1.0,
+            "T": 6.0,
+            "wrong_kd": 1802,
+            "wrong_ce": 1682,
+            "gap_imgs": -120,
+            "broken": 440,
+            "fixed": 320,
+            "p_sign": 1.5e-05
+          },
+          {
+            "seed": 2026,
+            "alpha": 1.0,
+            "T": 6.0,
+            "wrong_kd": 1736,
+            "wrong_ce": 1650,
+            "gap_imgs": -86,
+            "broken": 382,
+            "fixed": 296,
+            "p_sign": 0.001082
+          }
+        ]
+      }
+    },
+    "低数据2000": {
+      "T_main_effect_imgs": -94.7,
+      "own_floor_imgs": 106,
+      "per_target_span_imgs": {
+        "CE": 80,
+        "a0.7_T1": 33,
+        "a0.7_T6": 44,
+        "a1_T1": 106,
+        "a1_T6": 58
+      },
+      "has_direction": false,
+      "in_units_of_own_floor": 0.89,
+      "sign": "负（加热有害）",
+      "grid": {
+        "a0.7_T1": {
+          "gaps_imgs": [
+            142,
+            106,
+            45
+          ],
+          "mean_gap_imgs": 97.7,
+          "pooled_flips": {
+            "broken": 734,
+            "fixed": 1027
+          },
+          "p_pooled": 0.0,
+          "vs_own_floor": 0.92
+        },
+        "a0.7_T6": {
+          "gaps_imgs": [
+            77,
+            42,
+            -30
+          ],
+          "mean_gap_imgs": 29.7,
+          "pooled_flips": {
+            "broken": 1348,
+            "fixed": 1437
+          },
+          "p_pooled": 0.095394,
+          "vs_own_floor": 0.28
+        },
+        "a1_T1": {
+          "gaps_imgs": [
+            174,
+            60,
+            -12
+          ],
+          "mean_gap_imgs": 74.0,
+          "pooled_flips": {
+            "broken": 1081,
+            "fixed": 1303
+          },
+          "p_pooled": 6e-06,
+          "vs_own_floor": 0.7
+        },
+        "a1_T6": {
+          "gaps_imgs": [
+            31,
+            -66,
+            -107
+          ],
+          "mean_gap_imgs": -47.3,
+          "pooled_flips": {
+            "broken": 1713,
+            "fixed": 1571
+          },
+          "p_pooled": 0.013863,
+          "vs_own_floor": 0.45
+        }
+      },
+      "raw_rows": {
+        "a0.7_T1": [
+          {
+            "seed": 42,
+            "alpha": 0.7,
+            "T": 1.0,
+            "wrong_kd": 1715,
+            "wrong_ce": 1857,
+            "gap_imgs": 142,
+            "broken": 199,
+            "fixed": 341,
+            "p_sign": 0.0
+          },
+          {
+            "seed": 7,
+            "alpha": 0.7,
+            "T": 1.0,
+            "wrong_kd": 1699,
+            "wrong_ce": 1805,
+            "gap_imgs": 106,
+            "broken": 263,
+            "fixed": 369,
+            "p_sign": 2.8e-05
+          },
+          {
+            "seed": 2026,
+            "alpha": 0.7,
+            "T": 1.0,
+            "wrong_kd": 1732,
+            "wrong_ce": 1777,
+            "gap_imgs": 45,
+            "broken": 272,
+            "fixed": 317,
+            "p_sign": 0.069743
+          }
+        ],
+        "a0.7_T6": [
+          {
+            "seed": 42,
+            "alpha": 0.7,
+            "T": 6.0,
+            "wrong_kd": 1780,
+            "wrong_ce": 1857,
+            "gap_imgs": 77,
+            "broken": 461,
+            "fixed": 538,
+            "p_sign": 0.016151
+          },
+          {
+            "seed": 7,
+            "alpha": 0.7,
+            "T": 6.0,
+            "wrong_kd": 1763,
+            "wrong_ce": 1805,
+            "gap_imgs": 42,
+            "broken": 428,
+            "fixed": 470,
+            "p_sign": 0.171219
+          },
+          {
+            "seed": 2026,
+            "alpha": 0.7,
+            "T": 6.0,
+            "wrong_kd": 1807,
+            "wrong_ce": 1777,
+            "gap_imgs": -30,
+            "broken": 459,
+            "fixed": 429,
+            "p_sign": 0.330468
+          }
+        ],
+        "a1_T1": [
+          {
+            "seed": 42,
+            "alpha": 1.0,
+            "T": 1.0,
+            "wrong_kd": 1683,
+            "wrong_ce": 1857,
+            "gap_imgs": 174,
+            "broken": 331,
+            "fixed": 505,
+            "p_sign": 0.0
+          },
+          {
+            "seed": 7,
+            "alpha": 1.0,
+            "T": 1.0,
+            "wrong_kd": 1745,
+            "wrong_ce": 1805,
+            "gap_imgs": 60,
+            "broken": 349,
+            "fixed": 409,
+            "p_sign": 0.032047
+          },
+          {
+            "seed": 2026,
+            "alpha": 1.0,
+            "T": 1.0,
+            "wrong_kd": 1789,
+            "wrong_ce": 1777,
+            "gap_imgs": -12,
+            "broken": 401,
+            "fixed": 389,
+            "p_sign": 0.695555
+          }
+        ],
+        "a1_T6": [
+          {
+            "seed": 42,
+            "alpha": 1.0,
+            "T": 6.0,
+            "wrong_kd": 1826,
+            "wrong_ce": 1857,
+            "gap_imgs": 31,
+            "broken": 570,
+            "fixed": 601,
+            "p_sign": 0.380666
+          },
+          {
+            "seed": 7,
+            "alpha": 1.0,
+            "T": 6.0,
+            "wrong_kd": 1871,
+            "wrong_ce": 1805,
+            "gap_imgs": -66,
+            "broken": 562,
+            "fixed": 496,
+            "p_sign": 0.045628
+          },
+          {
+            "seed": 2026,
+            "alpha": 1.0,
+            "T": 6.0,
+            "wrong_kd": 1884,
+            "wrong_ce": 1777,
+            "gap_imgs": -107,
+            "broken": 581,
+            "fixed": 474,
+            "p_sign": 0.001091
+          }
+        ]
+      }
+    }
+  },
+  "verdict": "测不动：低数据2000 的主效应落在本档自己的底以内",
+  "ref_note": "对照里的 MNIST 主效应按本课的 α∈(0.7, 1.0) 重算（同类可比）；档案原那条对三档 α 取平均，两个数都留在表里",
+  "limitations": [
+    "每格 3 条随机流、每流训一次：主效应只有本档底这一个误差棒代理，没扩到 n=8",
+    "只 S128、只两个数据档（中段三档第4课g 已量出在底内，这里不再花那份钱）",
+    "换数据集同时换了老师的干湿与任务难度，『符号跟数据量』与『符号跟干湿』在这一发里分不开——第5课那把刀在 Fashion 上没有对应物",
+    "只一档老师（无跨老师复证）：本课的独立性来自**换任务**，不来自换知识源",
+    "Fashion 上没跑 α→0 阶梯，污染说是否跨任务未测"
+  ]
+}

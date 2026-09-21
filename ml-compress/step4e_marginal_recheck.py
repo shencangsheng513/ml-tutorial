@@ -25,6 +25,10 @@
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4e_marginal_recheck.py
   # 低数据档 T=6 那两格（对账基准读 compress_report_v4c_low.json）：
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4e_marginal_recheck.py --tier 低数据2000 --t 6
+  # 第三发：低数据档 T=3 那一列（a0.7_T3 +17.7 张 p=0.052、a1_T3 +22.0 张 p=0.0196，
+  # 两格都还在自己的 ±2SE 里）——第4课g 量到中间档"符号读不出"之后，这一列是低数据档最有肉的两格，
+  # 值得用 8 条流而不是 3 条来看。产物另起一名（compress_report_v4e_low_t3.json），
+  # 因为 t=6 那一本已入库：**同一件仪器换温度必须换档案名**，否则第二次跑无声盖掉第一次的判决。
 """
 from __future__ import annotations
 
@@ -37,6 +41,7 @@ import torch
 from step1_quantize import MODELS, build_cnn, predict
 from step4_distill import TIERS, VAL_N, logits_of, sign_test_p, train_student
 from step4c_alpha_T_sweep import ALPHA_ANCHOR, TIER, WIDTH, key
+from step4c_alpha_T_sweep import out_path as v4c_out_path
 from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
@@ -55,7 +60,7 @@ def cells_for(t: float) -> list[tuple[str, float]]:
 def archive_name(width: int, tier: str) -> str:
     """v4c 各档档案名**只有一个来源**：step4c 的 out_path。这里再抄一份后缀规则，
     下一档（_mid 这种）一进来就会去读一本不存在（或更糟：存在但是别档的）的账。"""
-    return out_path(width, tier).name
+    return v4c_out_path(width, tier).name
 
 
 def archive_cells(width: int, tier: str, cells: tuple[str, ...]) -> dict:
@@ -75,8 +80,16 @@ def archive_cells(width: int, tier: str, cells: tuple[str, ...]) -> dict:
                           for r in d["grid"][k]["per_seed"]} for k in cells}}
 
 
-def out_path(width: int, tier: str) -> Path:
-    return HERE / ("compress_report_v4e.json" if tier == TIER else "compress_report_v4e_low.json")
+def v4e_path(width: int, tier: str, t: float) -> Path:
+    """档案名必须带上**复检的是哪一档、哪一列温度、哪一副学生**：低数据档 t=6 那一本
+    （compress_report_v4e_low.json）已经入库，同一脚本换 --t 3 再跑就会无声盖掉那本账。
+    已入库的两本保持原名不动（旧账不许换名字），其余组合一律由 (档, 宽度, 温度) 拼出来。"""
+    archived = {(128, TIER, 1.0): "compress_report_v4e.json",
+                (128, "低数据2000", 6.0): "compress_report_v4e_low.json"}
+    if (width, tier, t) in archived:
+        return HERE / archived[(width, tier, t)]
+    tag = "" if tier == TIER else "_low"
+    return HERE / f"compress_report_v4e{tag}{'' if width == 128 else f'_s{width}'}_t{t:g}.json"
 
 
 def summarize(gaps: list[int], label: str) -> dict:
@@ -103,7 +116,10 @@ def main(width: int = WIDTH, tier: str = TIER, t: float = 1.0) -> None:
     cells = tuple(k for k, _ in spec)
     arc = archive_cells(width, tier, cells)
     seeds = list(OLD_SEEDS) + list(NEW_SEEDS)
-    out = out_path(width, tier)
+    out = v4e_path(width, tier, t)
+    if out.exists():
+        raise SystemExit(f"{out.name} 已入库——重跑会盖掉那本账。要重跑先删或改名，"
+                         f"别在没对过账的情况下换掉已入库的判决")
     print(f"[开跑] S{width} | {tier} | 复检 T={t:g} 两格 {list(cells)} × {len(seeds)} 条随机流"
           f"（老 {len(OLD_SEEDS)} 条只对账、新 {len(NEW_SEEDS)} 条才是复现）| 每格一副同种子 CE 锚")
     print(f"[档案] 逐位对账基准来自 {arc['file']}；该档借来的种子底 {arc['floor_imgs']} 张")

@@ -59,8 +59,11 @@ curl http://127.0.0.1:8000/v1/classify -d "{\"texts\":[\"The goalie made a glove
 1. ~~首选 HF Spaces~~ **改道记录**：2026 起 HF 对 Docker/Gradio Space 免费档收费（402，需 $9/月 PRO，公开的也不行），只有 Static 免费 → 转 Render 免费档，首建 2m01s 上线
 2. 鉴权/入口按设计生效：`DEPLOY_API_TOKEN` 走 Render 环境变量注入（不落 repo），`deploy-serve` 读 `DEPLOY_PORT` 监听 7860
 3. **踩坑实录——健康检查必须配 `/healthz`**：Render 默认探 `HEAD /`，被 Bearer 中间件打 401，平台误判服务不健康触发重启。修法：Settings → Health Check Path = `/healthz`。这就是 `OPEN_PATHS` 白名单存在的实战理由
-4. 冒烟三查全绿：无钥匙 `/healthz` 200（model_loaded true）→ 无钥匙 `/v1/classify` 401 → 带钥匙 200 + 真实预测，公网延迟 ~183ms
-5. 免费档脾气：空闲 15 分钟休眠，冷启动 ~1 分钟；性能 ≈ 本地压测的 1/3–1/5，对外承诺按 p99 300ms 定
+4. 冒烟三查全绿：无钥匙 `/healthz` 200（model_loaded true）→ 无钥匙 `/v1/classify` 401 → 带钥匙 200 + 真实预测，公网延迟 ~183ms（**此为单样本，已被第 5 条实测推翻，别拿它当数**）
+5. 免费档脾气——**2026-09-20/21 实测版**（`scripts/cloud_probe.py`，只打公开 `/healthz` 不需要 token；原始数据 `cloud_probe_results.json` / `cloud_probe_warm.json`）：
+   - **冷启动：实测唤醒 33.4 秒**（空闲 >15 分钟后的第一发请求，含平台排队 + 容器起 + 模型载入；结局 200 + model_loaded true，唤醒可靠）。
+   - **热服务：最便宜的 `/healthz` 端点连测 25 发，公网 p50 684ms / p95 829ms / max 1149ms**，两轮共 50+ 发全 200。
+   - 结论：之前"≈ 本地 1/3–1/5、按 p99 300ms 对外承诺"是外推，**免费档兑现不了**——光是探活端点 p99 就接近 1 秒，预测接口只会更慢。对外承诺改口径：**p99 ≈ 1.2s + 首请求 ~35s 冷启动免责声明**；要低延迟只剩两条路：升付费实例，或在客户端侧做保活心跳。这是"单点数字不可信"（本地压测第 ③ 条）在生产环境的重演：183ms 那发恰好打在刚热身的窗口上。
 6. **已知告警 → 本机已修完，线上待重建**：`InconsistentVersionWarning` 根因是模型用 sklearn 1.9.0 pickle、镜像按 `>=1.5` 装到了 1.9.1。修法分三刀：`pyproject.toml` 锁 `==1.9.1`；用 1.9.1 重跑 `python -m src.train` 重新生成工件（指标逐位相同：CV 0.8808 / 测试 0.8702 / 阈值 0.207，说明补丁版本没动行为）；新工件换进服务仓库 `model/`。行为一致性证据：新旧工件对全部 1579 篇测试集 **0 条预测不一致、概率最大绝对差 0.0**，加载零告警，14 个离线测试在 `-W error::UserWarning` 下全绿。**线上只剩一步：push 触发 Render 重建**（会短暂重启，需现网确认）。
 7. 注意：uvicorn 多进程在 Windows 本机有 socket 继承毛病（实测偶发 WinError 10022），**多 worker 是为 Linux 容器准备的**，本机冒烟用单 worker 即可。
 

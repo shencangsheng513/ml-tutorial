@@ -1,0 +1,322 @@
+{
+  "tier": "满数据8500",
+  "width": 128,
+  "temps_fixed": 3.0,
+  "ladder": [
+    0.0,
+    0.05,
+    0.1,
+    0.2,
+    0.3
+  ],
+  "seeds": [
+    42,
+    7,
+    2026
+  ],
+  "probe_alpha": 0.3,
+  "floor_from": "compress_report_v4b.json",
+  "seed_floor_imgs": 41,
+  "anchor_mean_from": "compress_report_v4c.json",
+  "anchor_mean_gap_imgs": -75.0,
+  "predictions_ex_ante": {
+    "H1_line_through_origin": {
+      "0.05": -5,
+      "0.1": -11,
+      "0.2": -21,
+      "0.3": -32
+    },
+    "contamination_pred": "α=0.05 即接近 -75.0 张"
+  },
+  "gate_alpha_zero_identity": [
+    {
+      "seed": 42,
+      "wrong": 674,
+      "ce_wrong": 674,
+      "diff_vs_ce_imgs": 0,
+      "bit_identical": true
+    },
+    {
+      "seed": 7,
+      "wrong": 652,
+      "ce_wrong": 652,
+      "diff_vs_ce_imgs": 0,
+      "bit_identical": true
+    },
+    {
+      "seed": 2026,
+      "wrong": 653,
+      "ce_wrong": 653,
+      "diff_vs_ce_imgs": 0,
+      "bit_identical": true
+    }
+  ],
+  "gate_probe_vs_v4c": [
+    {
+      "seed": 42,
+      "match": true,
+      "this_run": {
+        "wrong_kd": 741,
+        "broken": 118,
+        "fixed": 51
+      },
+      "archive": {
+        "wrong_kd": 741,
+        "broken": 118,
+        "fixed": 51
+      }
+    },
+    {
+      "seed": 7,
+      "match": true,
+      "this_run": {
+        "wrong_kd": 699,
+        "broken": 93,
+        "fixed": 46
+      },
+      "archive": {
+        "wrong_kd": 699,
+        "broken": 93,
+        "fixed": 46
+      }
+    },
+    {
+      "seed": 2026,
+      "match": true,
+      "this_run": {
+        "wrong_kd": 755,
+        "broken": 144,
+        "fixed": 42
+      },
+      "archive": {
+        "wrong_kd": 755,
+        "broken": 144,
+        "fixed": 42
+      }
+    }
+  ],
+  "ladder_summary": {
+    "0.05": {
+      "gaps_imgs": [
+        -35,
+        -69,
+        -73
+      ],
+      "mean_gap_imgs": -59.0,
+      "vs_floor": 1.44,
+      "mean_diff_vs_ce_imgs": 128.0,
+      "pooled_flips": {
+        "broken": 248,
+        "fixed": 71
+      },
+      "p_pooled": 0.0,
+      "same_dir_seeds": "3/3",
+      "h1_pred_imgs": -5,
+      "beats_h1_line": true
+    },
+    "0.1": {
+      "gaps_imgs": [
+        -55,
+        -71,
+        -85
+      ],
+      "mean_gap_imgs": -70.3,
+      "vs_floor": 1.72,
+      "mean_diff_vs_ce_imgs": 157.0,
+      "pooled_flips": {
+        "broken": 300,
+        "fixed": 89
+      },
+      "p_pooled": 0.0,
+      "same_dir_seeds": "3/3",
+      "h1_pred_imgs": -11,
+      "beats_h1_line": true
+    },
+    "0.2": {
+      "gaps_imgs": [
+        -63,
+        -50,
+        -89
+      ],
+      "mean_gap_imgs": -67.3,
+      "vs_floor": 1.64,
+      "mean_diff_vs_ce_imgs": 178.7,
+      "pooled_flips": {
+        "broken": 320,
+        "fixed": 118
+      },
+      "p_pooled": 0.0,
+      "same_dir_seeds": "3/3",
+      "h1_pred_imgs": -21,
+      "beats_h1_line": true
+    },
+    "0.3": {
+      "gaps_imgs": [
+        -67,
+        -47,
+        -102
+      ],
+      "mean_gap_imgs": -72.0,
+      "vs_floor": 1.76,
+      "mean_diff_vs_ce_imgs": 199.0,
+      "pooled_flips": {
+        "broken": 355,
+        "fixed": 139
+      },
+      "p_pooled": 0.0,
+      "same_dir_seeds": "3/3",
+      "h1_pred_imgs": -32,
+      "beats_h1_line": true
+    }
+  },
+  "arms": {
+    "α0.05 种子42": {
+      "seed": 42,
+      "alpha": 0.05,
+      "wrong_kd": 709,
+      "wrong_ce": 674,
+      "gap_imgs": -35,
+      "broken": 68,
+      "fixed": 33,
+      "diff_vs_ce_imgs": 123,
+      "p_sign": 0.000641
+    },
+    "α0.05 种子7": {
+      "seed": 7,
+      "alpha": 0.05,
+      "wrong_kd": 721,
+      "wrong_ce": 652,
+      "gap_imgs": -69,
+      "broken": 88,
+      "fixed": 19,
+      "diff_vs_ce_imgs": 125,
+      "p_sign": 0.0
+    },
+    "α0.05 种子2026": {
+      "seed": 2026,
+      "alpha": 0.05,
+      "wrong_kd": 726,
+      "wrong_ce": 653,
+      "gap_imgs": -73,
+      "broken": 92,
+      "fixed": 19,
+      "diff_vs_ce_imgs": 136,
+      "p_sign": 0.0
+    },
+    "α0.1 种子42": {
+      "seed": 42,
+      "alpha": 0.1,
+      "wrong_kd": 729,
+      "wrong_ce": 674,
+      "gap_imgs": -55,
+      "broken": 90,
+      "fixed": 35,
+      "diff_vs_ce_imgs": 152,
+      "p_sign": 1e-06
+    },
+    "α0.1 种子7": {
+      "seed": 7,
+      "alpha": 0.1,
+      "wrong_kd": 723,
+      "wrong_ce": 652,
+      "gap_imgs": -71,
+      "broken": 98,
+      "fixed": 27,
+      "diff_vs_ce_imgs": 150,
+      "p_sign": 0.0
+    },
+    "α0.1 种子2026": {
+      "seed": 2026,
+      "alpha": 0.1,
+      "wrong_kd": 738,
+      "wrong_ce": 653,
+      "gap_imgs": -85,
+      "broken": 112,
+      "fixed": 27,
+      "diff_vs_ce_imgs": 169,
+      "p_sign": 0.0
+    },
+    "α0.2 种子42": {
+      "seed": 42,
+      "alpha": 0.2,
+      "wrong_kd": 737,
+      "wrong_ce": 674,
+      "gap_imgs": -63,
+      "broken": 103,
+      "fixed": 40,
+      "diff_vs_ce_imgs": 174,
+      "p_sign": 0.0
+    },
+    "α0.2 种子7": {
+      "seed": 7,
+      "alpha": 0.2,
+      "wrong_kd": 702,
+      "wrong_ce": 652,
+      "gap_imgs": -50,
+      "broken": 90,
+      "fixed": 40,
+      "diff_vs_ce_imgs": 159,
+      "p_sign": 1.4e-05
+    },
+    "α0.2 种子2026": {
+      "seed": 2026,
+      "alpha": 0.2,
+      "wrong_kd": 742,
+      "wrong_ce": 653,
+      "gap_imgs": -89,
+      "broken": 127,
+      "fixed": 38,
+      "diff_vs_ce_imgs": 203,
+      "p_sign": 0.0
+    },
+    "α0.3 种子42": {
+      "seed": 42,
+      "alpha": 0.3,
+      "wrong_kd": 741,
+      "wrong_ce": 674,
+      "gap_imgs": -67,
+      "broken": 118,
+      "fixed": 51,
+      "diff_vs_ce_imgs": 198,
+      "p_sign": 0.0
+    },
+    "α0.3 种子7": {
+      "seed": 7,
+      "alpha": 0.3,
+      "wrong_kd": 699,
+      "wrong_ce": 652,
+      "gap_imgs": -47,
+      "broken": 93,
+      "fixed": 46,
+      "diff_vs_ce_imgs": 174,
+      "p_sign": 8.3e-05
+    },
+    "α0.3 种子2026": {
+      "seed": 2026,
+      "alpha": 0.3,
+      "wrong_kd": 755,
+      "wrong_ce": 653,
+      "gap_imgs": -102,
+      "broken": 144,
+      "fixed": 42,
+      "diff_vs_ce_imgs": 225,
+      "p_sign": 0.0
+    }
+  },
+  "verdict": {
+    "shape": "污染型（有伤害不必有剂量）",
+    "reading": "α=0.05 已经把方向摆出来（3/3 同号、合并 p=0、均值 -59.0 张），而它是锚点剂量的 7%——H1 的『按份额掺毒』在最后一块地上也没了：软标签一旦进目标函数，坏的是它**在不在**，不是它占多少",
+    "first_cell_alpha": 0.05,
+    "first_cell_share_of_anchor_damage_pct": 79,
+    "step_low_imgs": -13.0,
+    "step_low_dose_x": 6.0,
+    "step_high_imgs": -3.0,
+    "step_high_dose_x": 2.33
+  },
+  "limitations": [
+    "每种子每格只训一次：跨种子极差没有二次底",
+    "只扫 T=3 一列，T=1/T=6 上的剂量响应未测",
+    "小 α 各格均值本就低于种子底（H1 的预测就是这个量级），判决依赖逐图配对检验而非重训抖动",
+    "只 满数据8500+S128：跨档/跨架构要各自带 --tier/--width 重跑，档案不同不能混读"
+  ]
+}

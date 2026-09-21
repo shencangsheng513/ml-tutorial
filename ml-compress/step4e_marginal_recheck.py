@@ -53,8 +53,9 @@ def cells_for(t: float) -> list[tuple[str, float]]:
 
 
 def archive_name(width: int, tier: str) -> str:
-    stem = "compress_report_v4c" if width == 128 else f"compress_report_v4c_s{width}"
-    return stem + ("" if tier == TIER else "_low") + ".json"
+    """v4c 各档档案名**只有一个来源**：step4c 的 out_path。这里再抄一份后缀规则，
+    下一档（_mid 这种）一进来就会去读一本不存在（或更糟：存在但是别档的）的账。"""
+    return out_path(width, tier).name
 
 
 def archive_cells(width: int, tier: str, cells: tuple[str, ...]) -> dict:

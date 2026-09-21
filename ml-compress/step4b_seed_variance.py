@@ -15,6 +15,8 @@
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4b_seed_variance.py
   # S64 那一档也换随机流复现（第4课：CE 0.9279 / KD 0.9224，−55 张）：
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4b_seed_variance.py --width 64
+  # 给第4课没跑过的数据档造种子底（扫参线要拿它当闸门；只产底，不产复现）：
+  PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4b_seed_variance.py --tier 中数据4500
 """
 from __future__ import annotations
 
@@ -25,21 +27,35 @@ from pathlib import Path
 import torch
 
 from step1_quantize import MODELS, build_cnn, predict
-from step4_distill import TIERS, VAL_N, logits_of, sign_test_p, train_student
+from step4_distill import DATA_TIERS, TIERS, VAL_N, logits_of, sign_test_p, train_student
 from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
 V4 = HERE / "compress_report_v4.json"
 SEEDS = (42, 7, 2026)                             # 42 是第4课那一轮，留着当逐位对账的锚
 WIDTH = 128                                        # 可被 --width 覆盖（S64 复现用）
+TIER = ""                                          # 可被 --tier 覆盖；空 = 第4课那两档全跑
 # 第4课档案值（committed run）——种子 42 必须逐位复现，否则说明本课改坏了 train_student
 # 低数据档第4课只在 S128 上配对，所以 64 这一副里只有满数据档可查
 ARCHIVE = {128: {"满数据8500": {"CE": 0.9326, "KD": 0.9263}, "低数据2000": {"CE": 0.9045, "KD": 0.9072}},
            64: {"满数据8500": {"CE": 0.9279, "KD": 0.9224}}}
 
 
+# 单档复现的档案名。第4课那两档**故意不在这里**：它们的账本是一份合并档案（两档都在里面），
+# 允许 --tier 单跑写回同名文件，就等于让一次单档运行把另一档的账抹掉。
+OUT_SUFFIX = {"中数据4500": "_mid"}
+
+
 def out_path() -> Path:
-    return HERE / ("compress_report_v4b.json" if WIDTH == 128 else f"compress_report_v4b_s{WIDTH}.json")
+    if TIER == "":
+        suffix = ""
+    elif TIER in OUT_SUFFIX:
+        suffix = OUT_SUFFIX[TIER]
+    else:
+        raise SystemExit(f"--tier {TIER!r} 没有登记档案名：它要么该并进合并档案（那别用 --tier），"
+                         f"要么该有自己的档案名（在这里登记）。回落成通用文件名等于把两档记进同一本")
+    stem = "compress_report_v4b" if WIDTH == 128 else f"compress_report_v4b_s{WIDTH}"
+    return HERE / (stem + suffix + ".json")
 
 
 
@@ -77,13 +93,23 @@ def main() -> None:
     teacher.load_state_dict(torch.load(MODELS / "mnist_cnn_fp32.pt", weights_only=True))
     teacher.eval()
 
-    print(f"[先立仪器] 种子 42 必须逐位复现第4课那一轮，否则是本课把 train_student 改坏了："
-          f"对照 {V4.name}（committed）")
-    parity = {}
+    selected = TIERS if TIER == "" else {TIER: DATA_TIERS[TIER]}
+    archivable = any(ARCHIVE[WIDTH].get(t) for t in selected)
+    print(f"[先立仪器] "
+          + ("种子 42 必须逐位复现第4课那一轮，否则是本课把 train_student 改坏了："
+             f"对照 {V4.name}（committed）" if archivable else
+             f"本次只跑 {TIER}（第4课没有这一档的档案）→ 对账栏无值可比，"
+             "代码是否漂移由默认跑法代测；本轮只交付一件仪器：这一档的种子底"))
+    parity: dict[str, tuple] = {}
+    parity_na: list[str] = []
     tiers: dict[str, list[dict]] = {}
-    for tier, n_data in TIERS.items():
-        if tier not in ARCHIVE[WIDTH]:
-            continue                                # 低数据档第4课只在 S128 上配对过，没有档案就不复现
+    for tier, n_data in selected.items():
+        arch = ARCHIVE[WIDTH].get(tier)
+        if arch is None and TIER == "":
+            continue        # 默认跑法只跑第4课配过对的那几档，不往合并档案里塞新档
+        if arch is None:
+            print(f"  [{tier}] 第4课没跑过这一档（S{WIDTH}）→ 没有可逐位对账的档案值，"
+                  f"parity 记 n/a；本课在这里只产**种子底**，不产复现")
         xd, yd = xt_all[:n_data], torch.tensor(yt_all[:n_data])
         soft = logits_of(teacher, xd)             # 软标签与随机流无关：各种子共用同一份
         rows = [one_pair(teacher, xd, yd, soft, xv, yv, xte, yte, s) for s in SEEDS]
@@ -92,18 +118,29 @@ def main() -> None:
             if r["seed"] == 42:
                 for mode in ("CE", "KD"):
                     v = r[f"acc_{mode.lower()}"]
-                    parity[f"{tier} {mode}"] = (v == ARCHIVE[WIDTH][tier][mode],
-                                                v, ARCHIVE[WIDTH][tier][mode])
+                    if arch is None:
+                        parity_na.append(f"{tier} {mode}")
+                    else:
+                        parity[f"{tier} {mode}"] = (v == arch[mode], v, arch[mode])
         print(f"\n[{tier} · S{WIDTH}] 三个随机流下的 KD−CE 配对（10000 张，翻牌逐图算）：")
         for r in rows:
-            ok = "  ←第4课那一轮" if r["seed"] == 42 else ""
+            ok = "  ←第4课那一轮" if (r["seed"] == 42 and arch) else ""
             print(f"  种子 {r['seed']:<5} CE {r['acc_ce']:.4f}（错 {r['wrong_ce']}） | "
                   f"KD {r['acc_kd']:.4f}（错 {r['wrong_kd']}） | gap {r['gap_pp']:+.2f}pp "
                   f"（翻坏 {r['flips']['broken']}/翻正 {r['flips']['fixed']}，"
                   f"p={r['p_sign']:.4g}）{ok}")
 
     bad = {k: v for k, v in parity.items() if not v[0]}
-    print(f"\n[仪器对账] {'逐位复现 ' + str(len(parity)) + '/' + str(len(parity)) + ' 通过 → 换种子测到的确实是随机流，不是代码漂了' if not bad else 'FAIL：' + str(bad)}")
+    na = f"（另有 {len(parity_na)} 项无档案可对：{ '、'.join(parity_na) }）" if parity_na else ""
+    if bad:
+        raise SystemExit(f"[仪器对账] FAIL：{bad}\n种子 42 没复现第4课 → 这一轮的数不能当复现用，"
+                         f"先查是不是 train_student/load_split 被改坏了")
+    if parity:
+        print(f"\n[仪器对账] 逐位复现 {len(parity)}/{len(parity)} 通过 → 换种子测到的确实是随机流，不是代码漂了{na}")
+    else:
+        print(f"\n[仪器对账] **本轮没有对账可做**（{len(parity_na)} 项全 n/a：这一档第4课没跑过，"
+              f"没有档案值可逐位比）→ 这一栏没测到任何事，别当闸门过了；"
+              f"本课在这里只产**种子底**，「代码有没有漂」由默认跑法（有档案那两档）代测")
 
     verdicts = {}
     for tier, rows in tiers.items():
@@ -152,6 +189,8 @@ def main() -> None:
           f"不能当第二个独立复现。真正干净的复现统计只有上面那行「{len(SEEDS)} 个种子同向」。")
 
     report = {"seeds": list(SEEDS), "width": WIDTH, "test_n": int(len(yte)),
+              "tier_arg": TIER or "默认（第4课两档）",
+              "parity_no_archive": parity_na,
               "train_fit_n": cut, "parity_seed42_vs_archive":
                   {k: {"match": v[0], "this_run": v[1], "archive": v[2]} for k, v in parity.items()},
               "arms": {f"{t} 种子{s}": r for t, rows in tiers.items() for s, r in zip(SEEDS, rows)},
@@ -162,6 +201,10 @@ def main() -> None:
                               "α/T 未扫参（本课只测随机流；扫参见 step4c_alpha_T_sweep.py）",
                               "p_pooled 偏乐观：三个种子共用同一批 10000 张测试图，翻牌事件跨种子不独立",
                               "本轮不测墙钟：精度是确定性读数，墙钟要另开交错配对流程"]}
+    if parity_na:
+        report["limitations"].append(
+            f"{'、'.join(parity_na)} 没有第4课档案可对：这一档只产种子底，"
+            f"「换随机流还同向吗」这件事对它没有历史判决可复核")
     n_train = len(SEEDS) * 2 * len(tiers)
     out_path().write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\n已存 {out_path().name}（{n_train} 次训练，10000 张全量测试，纯 CPU，零 API 费）")
@@ -171,6 +214,18 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="第4课判决的种子复现（默认 S128 两档）")
     ap.add_argument("--width", type=int, choices=(128, 64), default=128,
                     help="学生 MLP 宽度；64 只复现满数据档（第4课低数据档没跑 S64）")
+    ap.add_argument("--tier", choices=tuple(DATA_TIERS), default="",
+                    help="只复现这一档（给扫参线造种子底）。第4课那两档走默认合并档案，"
+                         "不在这里单跑——单跑一次就把另一档的账抹了")
     args = ap.parse_args()
+    # 闸门必须在这里、训练之前：out_path() 是流程最后一行，那时才炸就白烧十几分钟 CPU
+    if args.width == 64:
+        raise SystemExit("S64 的种子底已经跑过了（compress_report_v4b_s64.json，满数据档）；"
+                         "--tier 目前只服务 S128 的新档，换宽度请连档案一起核")
+    if args.tier in TIERS:
+        raise SystemExit(f"--tier {args.tier} 是第4课那两档之一：它属于合并档案 "
+                         f"compress_report_v4b.json（两档一起写）。单跑一档会把另一档的账抹掉——"
+                         f"要老档案就别带 --tier")
     WIDTH = args.width
+    TIER = args.tier
     main()

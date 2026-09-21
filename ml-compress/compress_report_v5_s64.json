@@ -1,0 +1,542 @@
+{
+  "teacher_b": {
+    "source": "第3课手术刀（NetU L1 剪 conv2 50% + 微调 8 epoch，种子 42）",
+    "kept_channels": 16,
+    "kb": 211.5,
+    "reused_cache": true,
+    "path": "mnist_cnn_pruned50.pt",
+    "test_acc": 0.9804,
+    "teacher_a_test_acc": 0.9798,
+    "disagree_imgs": 94,
+    "kl_A_given_B": 0.0112
+  },
+  "soft_label_audit": {
+    "满数据8500": {
+      "A": {
+        "原始": {
+          "T": 3.0,
+          "mean_top1": 0.9948,
+          "pct_top1_gt_0.99": 93.3,
+          "mean_margin_top1_top2": 0.9902,
+          "mean_p2": 0.0046
+        },
+        "除以T": {
+          "T": 3.0,
+          "mean_top1": 0.9249,
+          "pct_top1_gt_0.99": 23.1,
+          "mean_margin_top1_top2": 0.884,
+          "mean_p2": 0.041
+        }
+      },
+      "B": {
+        "原始": {
+          "T": 3.0,
+          "mean_top1": 0.9933,
+          "pct_top1_gt_0.99": 90.6,
+          "mean_margin_top1_top2": 0.9877,
+          "mean_p2": 0.0056
+        },
+        "除以T": {
+          "T": 3.0,
+          "mean_top1": 0.8918,
+          "pct_top1_gt_0.99": 11.2,
+          "mean_margin_top1_top2": 0.8392,
+          "mean_p2": 0.0526
+        }
+      }
+    },
+    "低数据2000": {
+      "A": {
+        "原始": {
+          "T": 3.0,
+          "mean_top1": 0.9948,
+          "pct_top1_gt_0.99": 92.8,
+          "mean_margin_top1_top2": 0.9902,
+          "mean_p2": 0.0046
+        },
+        "除以T": {
+          "T": 3.0,
+          "mean_top1": 0.9266,
+          "pct_top1_gt_0.99": 24.9,
+          "mean_margin_top1_top2": 0.8857,
+          "mean_p2": 0.0409
+        }
+      },
+      "B": {
+        "原始": {
+          "T": 3.0,
+          "mean_top1": 0.9936,
+          "pct_top1_gt_0.99": 90.8,
+          "mean_margin_top1_top2": 0.9883,
+          "mean_p2": 0.0053
+        },
+        "除以T": {
+          "T": 3.0,
+          "mean_top1": 0.8955,
+          "pct_top1_gt_0.99": 12.4,
+          "mean_margin_top1_top2": 0.8435,
+          "mean_p2": 0.052
+        }
+      }
+    }
+  },
+  "prediction_ex_ante": {
+    "discriminating": false,
+    "shrink_line_imgs": 73.8,
+    "collapse_gap_pp": 2.7,
+    "gate": "跨格量用借来的底，单格同时报自己的 ±2SE（第4课d 的两把尺）"
+  },
+  "ce_parity_vs_v4c": [
+    {
+      "tier": "满数据8500",
+      "seed": 42,
+      "wrong_ce": 721,
+      "wrong_ce_v4c": 721,
+      "match": true
+    },
+    {
+      "tier": "满数据8500",
+      "seed": 7,
+      "wrong_ce": 751,
+      "wrong_ce_v4c": 751,
+      "match": true
+    },
+    {
+      "tier": "满数据8500",
+      "seed": 2026,
+      "wrong_ce": 728,
+      "wrong_ce_v4c": 728,
+      "match": true
+    }
+  ],
+  "ce_parity_all_pass": true,
+  "verdict": {
+    "discriminating": false,
+    "low_data_positive_across_teacher": null,
+    "no_discriminating_quantity": true,
+    "full_data_sign_survives_both_swaps": true,
+    "full_data_shrunk": false,
+    "sentence": "这一发**没有判别量**（塌缩率差 2.7pp 不到 10pp，而 S64 从没跑过低数据档），所以只读形状不读裁决：老师 A 的满数据 -147.5 张之害，在换一副学生（S64）**并且**换一份软标签（老师 B）之后还在（同号且过该档自己的底）→ 这条负号同时扛住了架构与软标签两个维度"
+  },
+  "width": 64,
+  "alphas": [
+    0.7,
+    1.0
+  ],
+  "temps": [
+    1.0,
+    3.0,
+    6.0
+  ],
+  "seeds": [
+    42,
+    7,
+    2026
+  ],
+  "tiers": {
+    "满数据8500": {
+      "grid": {
+        "a0.7_T1": {
+          "per_seed": [
+            {
+              "seed": 42,
+              "alpha": 0.7,
+              "T": 1.0,
+              "wrong_kd": 718,
+              "wrong_ce": 721,
+              "acc_kd": 0.9282,
+              "gap_imgs": 3,
+              "broken": 9,
+              "fixed": 12,
+              "p_sign": 0.663624
+            },
+            {
+              "seed": 7,
+              "alpha": 0.7,
+              "T": 1.0,
+              "wrong_kd": 748,
+              "wrong_ce": 751,
+              "acc_kd": 0.9252,
+              "gap_imgs": 3,
+              "broken": 7,
+              "fixed": 10,
+              "p_sign": 0.629059
+            },
+            {
+              "seed": 2026,
+              "alpha": 0.7,
+              "T": 1.0,
+              "wrong_kd": 710,
+              "wrong_ce": 728,
+              "acc_kd": 0.929,
+              "gap_imgs": 18,
+              "broken": 8,
+              "fixed": 26,
+              "p_sign": 0.002935
+            }
+          ],
+          "gaps_imgs": [
+            3,
+            3,
+            18
+          ],
+          "mean_gap_imgs": 8.0,
+          "range_imgs": 15,
+          "pooled": {
+            "broken": 24,
+            "fixed": 48
+          },
+          "p_pooled": 0.00630983
+        },
+        "a0.7_T3": {
+          "per_seed": [
+            {
+              "seed": 42,
+              "alpha": 0.7,
+              "T": 3.0,
+              "wrong_kd": 781,
+              "wrong_ce": 721,
+              "acc_kd": 0.9219,
+              "gap_imgs": -60,
+              "broken": 120,
+              "fixed": 60,
+              "p_sign": 9e-06
+            },
+            {
+              "seed": 7,
+              "alpha": 0.7,
+              "T": 3.0,
+              "wrong_kd": 842,
+              "wrong_ce": 751,
+              "acc_kd": 0.9158,
+              "gap_imgs": -91,
+              "broken": 131,
+              "fixed": 40,
+              "p_sign": 0.0
+            },
+            {
+              "seed": 2026,
+              "alpha": 0.7,
+              "T": 3.0,
+              "wrong_kd": 814,
+              "wrong_ce": 728,
+              "acc_kd": 0.9186,
+              "gap_imgs": -86,
+              "broken": 138,
+              "fixed": 52,
+              "p_sign": 0.0
+            }
+          ],
+          "gaps_imgs": [
+            -60,
+            -91,
+            -86
+          ],
+          "mean_gap_imgs": -79.0,
+          "range_imgs": 31,
+          "pooled": {
+            "broken": 389,
+            "fixed": 152
+          },
+          "p_pooled": 0.0
+        },
+        "a0.7_T6": {
+          "per_seed": [
+            {
+              "seed": 42,
+              "alpha": 0.7,
+              "T": 6.0,
+              "wrong_kd": 858,
+              "wrong_ce": 721,
+              "acc_kd": 0.9142,
+              "gap_imgs": -137,
+              "broken": 245,
+              "fixed": 108,
+              "p_sign": 0.0
+            },
+            {
+              "seed": 7,
+              "alpha": 0.7,
+              "T": 6.0,
+              "wrong_kd": 871,
+              "wrong_ce": 751,
+              "acc_kd": 0.9129,
+              "gap_imgs": -120,
+              "broken": 214,
+              "fixed": 94,
+              "p_sign": 0.0
+            },
+            {
+              "seed": 2026,
+              "alpha": 0.7,
+              "T": 6.0,
+              "wrong_kd": 854,
+              "wrong_ce": 728,
+              "acc_kd": 0.9146,
+              "gap_imgs": -126,
+              "broken": 234,
+              "fixed": 108,
+              "p_sign": 0.0
+            }
+          ],
+          "gaps_imgs": [
+            -137,
+            -120,
+            -126
+          ],
+          "mean_gap_imgs": -127.7,
+          "range_imgs": 17,
+          "pooled": {
+            "broken": 693,
+            "fixed": 310
+          },
+          "p_pooled": 0.0
+        },
+        "a1_T1": {
+          "per_seed": [
+            {
+              "seed": 42,
+              "alpha": 1.0,
+              "T": 1.0,
+              "wrong_kd": 719,
+              "wrong_ce": 721,
+              "acc_kd": 0.9281,
+              "gap_imgs": 2,
+              "broken": 19,
+              "fixed": 21,
+              "p_sign": 0.874629
+            },
+            {
+              "seed": 7,
+              "alpha": 1.0,
+              "T": 1.0,
+              "wrong_kd": 750,
+              "wrong_ce": 751,
+              "acc_kd": 0.925,
+              "gap_imgs": 1,
+              "broken": 14,
+              "fixed": 15,
+              "p_sign": 1.0
+            },
+            {
+              "seed": 2026,
+              "alpha": 1.0,
+              "T": 1.0,
+              "wrong_kd": 713,
+              "wrong_ce": 728,
+              "acc_kd": 0.9287,
+              "gap_imgs": 15,
+              "broken": 8,
+              "fixed": 23,
+              "p_sign": 0.010674
+            }
+          ],
+          "gaps_imgs": [
+            2,
+            1,
+            15
+          ],
+          "mean_gap_imgs": 6.0,
+          "range_imgs": 14,
+          "pooled": {
+            "broken": 41,
+            "fixed": 59
+          },
+          "p_pooled": 0.08862608
+        },
+        "a1_T3": {
+          "per_seed": [
+            {
+              "seed": 42,
+              "alpha": 1.0,
+              "T": 3.0,
+              "wrong_kd": 779,
+              "wrong_ce": 721,
+              "acc_kd": 0.9221,
+              "gap_imgs": -58,
+              "broken": 130,
+              "fixed": 72,
+              "p_sign": 5.4e-05
+            },
+            {
+              "seed": 7,
+              "alpha": 1.0,
+              "T": 3.0,
+              "wrong_kd": 839,
+              "wrong_ce": 751,
+              "acc_kd": 0.9161,
+              "gap_imgs": -88,
+              "broken": 139,
+              "fixed": 51,
+              "p_sign": 0.0
+            },
+            {
+              "seed": 2026,
+              "alpha": 1.0,
+              "T": 3.0,
+              "wrong_kd": 825,
+              "wrong_ce": 728,
+              "acc_kd": 0.9175,
+              "gap_imgs": -97,
+              "broken": 153,
+              "fixed": 56,
+              "p_sign": 0.0
+            }
+          ],
+          "gaps_imgs": [
+            -58,
+            -88,
+            -97
+          ],
+          "mean_gap_imgs": -81.0,
+          "range_imgs": 39,
+          "pooled": {
+            "broken": 422,
+            "fixed": 179
+          },
+          "p_pooled": 0.0
+        },
+        "a1_T6": {
+          "per_seed": [
+            {
+              "seed": 42,
+              "alpha": 1.0,
+              "T": 6.0,
+              "wrong_kd": 870,
+              "wrong_ce": 721,
+              "acc_kd": 0.913,
+              "gap_imgs": -149,
+              "broken": 263,
+              "fixed": 114,
+              "p_sign": 0.0
+            },
+            {
+              "seed": 7,
+              "alpha": 1.0,
+              "T": 6.0,
+              "wrong_kd": 873,
+              "wrong_ce": 751,
+              "acc_kd": 0.9127,
+              "gap_imgs": -122,
+              "broken": 220,
+              "fixed": 98,
+              "p_sign": 0.0
+            },
+            {
+              "seed": 2026,
+              "alpha": 1.0,
+              "T": 6.0,
+              "wrong_kd": 864,
+              "wrong_ce": 728,
+              "acc_kd": 0.9136,
+              "gap_imgs": -136,
+              "broken": 248,
+              "fixed": 112,
+              "p_sign": 0.0
+            }
+          ],
+          "gaps_imgs": [
+            -149,
+            -122,
+            -136
+          ],
+          "mean_gap_imgs": -135.7,
+          "range_imgs": 27,
+          "pooled": {
+            "broken": 731,
+            "fixed": 324
+          },
+          "p_pooled": 0.0
+        }
+      },
+      "stats": {
+        "a0.7_T1": {
+          "mean": 8.0,
+          "range": 15,
+          "gate": 10.2,
+          "p_pooled": 0.00630983,
+          "over_own_gate": false,
+          "n_positive_seeds": 3
+        },
+        "a0.7_T3": {
+          "mean": -79.0,
+          "range": 31,
+          "gate": 21.1,
+          "p_pooled": 0.0,
+          "over_own_gate": true,
+          "n_positive_seeds": 0
+        },
+        "a0.7_T6": {
+          "mean": -127.7,
+          "range": 17,
+          "gate": 11.6,
+          "p_pooled": 0.0,
+          "over_own_gate": true,
+          "n_positive_seeds": 0
+        },
+        "a1_T1": {
+          "mean": 6.0,
+          "range": 14,
+          "gate": 9.5,
+          "p_pooled": 0.08862608,
+          "over_own_gate": false,
+          "n_positive_seeds": 3
+        },
+        "a1_T3": {
+          "mean": -81.0,
+          "range": 39,
+          "gate": 26.6,
+          "p_pooled": 0.0,
+          "over_own_gate": true,
+          "n_positive_seeds": 0
+        },
+        "a1_T6": {
+          "mean": -135.7,
+          "range": 27,
+          "gate": 18.4,
+          "p_pooled": 0.0,
+          "over_own_gate": true,
+          "n_positive_seeds": 0
+        }
+      },
+      "t_main_effect_imgs": -138.7,
+      "vs_borrowed_floor": 2.62,
+      "beats_floor": true,
+      "teacher_A_t_main_imgs": -147.5,
+      "sign_agrees_with_A": true,
+      "soft_label_audit_B": {
+        "原始": {
+          "T": 3.0,
+          "mean_top1": 0.9933,
+          "pct_top1_gt_0.99": 90.6,
+          "mean_margin_top1_top2": 0.9877,
+          "mean_p2": 0.0056
+        },
+        "除以T": {
+          "T": 3.0,
+          "mean_top1": 0.8918,
+          "pct_top1_gt_0.99": 11.2,
+          "mean_margin_top1_top2": 0.8392,
+          "mean_p2": 0.0526
+        }
+      },
+      "ce_ref_by_seed": {
+        "42": 721,
+        "7": 751,
+        "2026": 728
+      },
+      "borrowed_floor_imgs": 53
+    }
+  },
+  "tiers_skipped_no_archive": [
+    "低数据2000"
+  ],
+  "test_n": 10000,
+  "limitations": [
+    "α 只留两档（0.7/1.0）：本课的判别量是 T 的符号，两档够定符号；α 轴的形状第4课已在三个档案里量过（0.11x/0.11x/0.33x），不在本课范围",
+    "每格 3 条随机流，且与第4课c 共用同种子 ⇒ 两副老师的 gap 可逐种子配对；但「换老师」本身只有 1 个重复：B 是个例还是这一族稀疏 CNN 的代表，没测",
+    "±2SE 是独立合成的下界（三种子跨格共用同一批随机流），与第4课d 同一告警",
+    "预言是在看完 B 的零训练软标签体检之后立的（学生训练之前，但不是看到 B 之前）；体检差 <10pp 时脚本自动把本课降级为「形状复现」而不算判别，这条写在分支里",
+    "只 低数据2000 档在 S64 没有对照档案 → 本课换不了那一档，跨老师的判决仍只在 S128 的两档上成立"
+  ]
+}

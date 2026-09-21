@@ -27,12 +27,16 @@ H1 的伤害基数、种子底三样全都跟着宽度走，S64 那一份是 0.9
 这一发问的是**这条归因跨不跨架构**（同一老师、同一批数据、同一份软标签，只换学生宽度；
 所以同号=结论不随学生宽度变，不等于换个数据集还成立）。
 `--tier 低数据2000` 补的是自我审计③ 欠的那一发：同一副学生、同一个老师，把训练数据从 8500 张
-砍到 2000 张，问 **T 轴那条斜率换数据量还在不在**（这一档的锚点在第4课b 只有 3 条随机流、
-幅度本就不到底，所以只能读形状、不能读疗效）。
+砍到 2000 张，问 **T 轴那条斜率换数据量还在不在**（结果：**反号了**——满数据档加热有害、
+低数据档加热有益，于是这一发从"补漏"升成了本课最有意思的一条判决）。
+`--tier 中数据4500` 是顺着那条判决追的一发：两个端点反号，中间只隔一次 4.25 倍的数据量变化，
+**符号到底在哪一档翻**？只测两端等于在一条曲线上画了两个点就说知道它弯；补一个中点，
+才分得清"随数据量单调变坏"和"两端不同、中间还有一次翻转"。
 零 API 费，纯 CPU。跑法：
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py --width 64
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py --tier 低数据2000
+  PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py --tier 中数据4500
 """
 from __future__ import annotations
 
@@ -43,8 +47,8 @@ import torch
 import torch.nn as nn
 
 from step1_quantize import MODELS, build_cnn, predict
-from step4_distill import (BS, KD_ALPHA, KD_T, SEED, TIERS, VAL_N, build_mlp, logits_of,
-                           sign_test_p, soft_label_audit, train_student)
+from step4_distill import (BS, DATA_TIERS, KD_ALPHA, KD_T, SEED, TIERS, VAL_N, build_mlp,
+                           logits_of, sign_test_p, soft_label_audit, train_student)
 from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
@@ -58,13 +62,26 @@ ANCHOR_T = KD_T                                     # 3.0：探针的基准温�
 T2_TOL = 0.15                                       # KD 梯度范数随 T 漂移超过 ±15% 就算 T 轴被污染
 
 
-def v4b_path(width: int) -> Path:
-    return HERE / ("compress_report_v4b.json" if width == 128 else f"compress_report_v4b_s{width}.json")
+# 种子底档案的位置：**第4课那两档记在同一本合并账里**（step4b 默认跑法一次写两档，
+# 换档名会读到一本不存在的档案，而 step4b 又拒绝单跑这两档——两头堵死）。
+# 只有第4课没跑过的档（中数据4500）才有自己的一本。输出名不一样：v4c 每档各写各的表。
+V4B_SUFFIX = {"中数据4500": "_mid"}
+V4C_SUFFIX = {"低数据2000": "_low", "中数据4500": "_mid"}
+
+
+def v4b_path(width: int, tier: str) -> Path:
+    """这一档、这一副宽度的种子底档案。S64 只跑过满数据档，所以那本里没有档位后缀。"""
+    stem = "compress_report_v4b" if width == 128 else f"compress_report_v4b_s{width}"
+    if tier not in TIERS and tier not in V4B_SUFFIX:
+        raise SystemExit(f"档 {tier} 没登记种子底档案名：它要么在第4课那两档的合并账里（那就别新加名字），"
+                         f"要么有自己的 v4b 单档账（在这里登记后缀）。"
+                         f"悄悄回落到合并账等于拿别的档的底来判这一档")
+    return HERE / (stem + ("" if width != 128 else V4B_SUFFIX.get(tier, "")) + ".json")
 
 
 def out_path(width: int, tier: str = TIER) -> Path:
     stem = "compress_report_v4c" if width == 128 else f"compress_report_v4c_s{width}"
-    return HERE / (stem + ("" if tier == TIER else "_low") + ".json")
+    return HERE / (stem + V4C_SUFFIX.get(tier, "") + ".json")
 
 
 def load_anchor(v4b: Path, width: int, tier: str = TIER) -> dict:
@@ -79,14 +96,16 @@ def load_anchor(v4b: Path, width: int, tier: str = TIER) -> dict:
         raise SystemExit(f"{v4b.name} 是 S{d['width']} 的报告，不是 S{width}——换宽度请连档案一起换")
     arm_key = f"{tier} 种子{SEEDS[0]}"
     if arm_key not in d["arms"]:
-        raise SystemExit(f"{v4b.name} 里没有 {arm_key} 这一格——低数据档第4课只在 S128 上配过，"
-                         f"换宽度请连档位一起换回 {TIER}")
+        raise SystemExit(f"{v4b.name} 里没有 {arm_key} 这一格（该档案只有 "
+                         f"{'、'.join(sorted({k.split(' 种子')[0] for k in d['arms']}))}）——"
+                         f"这一档没在这副宽度上造过底，换档位请连档案一起换回 {TIER}")
     arm = d["arms"][arm_key]
     return {"kd": {"acc": arm["acc_kd"], "wrong": arm["wrong_kd"],
                    "broken": arm["flips"]["broken"], "fixed": arm["flips"]["fixed"]},
             "ce_acc": arm["acc_ce"],
             "gap_imgs": arm["gap_imgs"],            # KD−CE，负=KD 更差，与本课 gap 同号向
-            "floor": int(d["verdicts"][tier]["seed_floor_imgs"]["KD"])}
+            "floor": int(d["verdicts"][tier]["seed_floor_imgs"]["KD"]),
+            "floor_ce": int(d["verdicts"][tier]["seed_floor_imgs"]["CE"])}
 
 
 def h1_pred(gap_imgs: int) -> dict:
@@ -124,11 +143,12 @@ def term_grad_norms(xd, yd, soft, t: float, width: int, seed: int = SEED) -> dic
 def main(width: int = WIDTH, tier: str = TIER) -> None:
     if not (MODELS / "mnist_cnn_fp32.pt").exists():
         raise SystemExit("缺 teacher 权重，先跑 python train_baseline.py")
-    v4b = v4b_path(width)
+    v4b = v4b_path(width, tier)
     if not v4b.exists():
-        raise SystemExit(f"缺 {v4b.name}——锚点档案值和种子底都从它读，先跑 "
-                         f"python step4b_seed_variance.py"
-                         + ("" if width == 128 else " --width 64"))
+        hint = "python step4b_seed_variance.py" if tier == TIER else \
+            f"python step4b_seed_variance.py --tier {tier}"
+        raise SystemExit(f"缺 {v4b.name}——锚点档案值与**这一档自己的**种子底都从它读，先跑 "
+                         + (hint + ("" if width == 128 else " --width 64")))
     out = out_path(width, tier)
     anchor = load_anchor(v4b, width, tier)
     floor = anchor["floor"]
@@ -141,7 +161,7 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
     teacher = build_cnn()
     teacher.load_state_dict(torch.load(MODELS / "mnist_cnn_fp32.pt", weights_only=True))
     teacher.eval()
-    n_data = TIERS[tier]
+    n_data = DATA_TIERS[tier]
     xd, yd = xt_all[:n_data], torch.tensor(yt_all[:n_data])
     soft = logits_of(teacher, xd)                   # 软标签与 T 无关：温度在 loss 里加，全程共用一份
 
@@ -158,6 +178,12 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
               f"本课在低数据档要判的是「T 轴的斜率形状换档还在不在」，不是「KD 有没有用」。")
     print(f"[仪器] 种子底（第4课b 的 KD 臂，换随机流的错图数极差）= {floor} 张，"
           f"任何 |均值 gap| ≤ {floor} 张在本机上不算疗效")
+    if anchor["floor_ce"] > floor:
+        strict = anchor["floor_ce"]
+        print(f"       ⚠ **这一档的闸比前三档松**：被门控的量是 KD−CE 之差，可这一档 CE 臂自己的底"
+              f"（{anchor['floor_ce']} 张）比 KD 臂（{floor} 张）大——三档里第一次出现。"
+              f"沿用 KD 底是为了和三份已入库的 v4c 表可比，那就得把话说清楚："
+              f"落在 {floor}~{strict} 张之间的读数，换个更保守的底就翻，不能当疗效。")
 
     # ---------- 零训练先验：三个温度下老师的软标签到底"软"了多少 ----------
     print("\n[零训练先验] 老师在拟合集上的软标签体检，逐温度：")
@@ -413,12 +439,20 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
     print(f"[自我审计② 多重比较] {len(free)} 格 × 三种子，p_pooled 只看方向不看在底之上（同一批 10000 张测试图，"
           f"种子之间翻牌事件不独立，p 偏乐观）。全表只有一件事是硬判决：{floor} 张这条线。")
     if tier == TIER:
-        print(f"[自我审计③ 只扫了满数据档与 S{width}] 低数据那一档第4课b 已降级为不显著；"
-              "若 H1/H2 想在低数据档有不同答案，本课没测（补法：加 --tier 低数据2000）。")
+        others = [t for t in DATA_TIERS if t != tier]
+        print(f"[自我审计③ 只扫了 {tier} 与 S{width}] 其余档位 {others} 各自加 `--tier` 补扫；"
+              "补扫前那一档必须先有自己的种子底（step4b --tier 造），拿本档的底去判别档的读数，"
+              "等于用一把不知道刻度的尺量东西。")
     else:
-        print(f"[自我审计③ 这一发扫的是 {tier}] 该档锚点格在第4课b 只有 3 条随机流、"
-              f"幅度 {anchor['gap_imgs']:+d} 张本就不到该档底（{floor} 张）——"
-              "所以这一档的判决只能读「T 轴形状换档后还在不在」，不能读成「KD 在低数据下有疗效」。")
+        g, strict = anchor["gap_imgs"], max(floor, anchor["floor_ce"])
+        print(f"[自我审计③ 这一发扫的是 {tier}] 该档锚点格在第4课b 只有 {len(SEEDS)} 条随机流，"
+              f"幅度 {g:+d} 张；这一档自己的底 = KD {floor} / CE {anchor['floor_ce']} 张 → |gap| 是它们的 "
+              f"{abs(g) / floor:.2f}x / {abs(g) / strict:.2f}x。"
+              + ("压在底以下：本档只能读「T 轴形状换档后还在不在」，不能读成「KD 在这一档有疗效」。"
+                 if abs(g) <= floor else
+                 "过了 KD 底、没过更保守的 CE 底：方向可以读，**幅度得按会被底翻掉的量报**——"
+                 "换把保守的尺就不显著。" if abs(g) <= strict else
+                 "两把底都过：这一档的锚点读数是硬的。"))
     if width != WIDTH:
         print(f"[自我审计③ b 跨架构 ≠ 独立复证] 这一副 S{width} 与默认那副 S{WIDTH} 共用**同一个老师、同一批数据、"
               "同一份软标签**，只有学生那侧换了。所以两份报告若同号，说明的是「结论不随学生宽度变」，"
@@ -440,6 +474,9 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
               "anchor_hyperparams": {"alpha": ALPHA_ANCHOR, "T": ANCHOR_T},
               "anchor_archive_from": v4b.name,
               "seed_floor_imgs_from_v4b": floor,
+              "seed_floor_imgs_detail": {"gate_used_kd_arm": floor, "ce_arm": anchor["floor_ce"],
+                                         "note": ("被门控量是 KD−CE 之差；CE 底更大时，"
+                                                  "介于两数之间的读数按保守底就不显著")},
               "soft_label_audit_by_T": audit_by_t,
               "gradient_probe": {"t2_tolerance_pct": round(T2_TOL * 100, 1),
                                  "matched_temps": matched, "unmatchable_temps": unmatched,
@@ -459,9 +496,10 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
               "limitations": ["种子底借自第4课b 的 α=0.7/T=3 一格；第4课d 已逐格量过自己的配对误差棒"
                               "（借来的底对单格读数偏大，±2SE 又因跨格共用随机流是下界）",
                               (f"只扫 {tier} + S{width}；" +
-                               ("低数据档未扫，另一副宽度是" if tier == TIER
-                                else "S64 那一份 v4b 里没有低数据配对，档位没法同时换；另一副宽度是")
-                               + f"{out_path(other).name}（各写各的表，跨架构结论要两份对照着读）"),
+                               ("其余档位各自补扫（每档要先有 step4b --tier 造的种子底），另一副宽度是"
+                                if tier == TIER else
+                                f"另一副宽度（S{other}）只造过 {TIER} 一档的底，档位与宽度没法同时换；")
+                               + f"{out_path(other).name}（各写各的表，跨架构/跨档结论要几份对照着读）"),
                               "每格 3 个种子，均值本身没有二次底",
                               "权重/温度解耦只在初始一步的一个批次上配平，不是全程配平",
                               "p_pooled 偏乐观（三种子共用同一批测试图）"]}
@@ -475,7 +513,8 @@ if __name__ == "__main__":
                                              "--tier 低数据2000 测跨数据量）")
     ap.add_argument("--width", type=int, choices=(128, 64), default=WIDTH,
                     help="学生宽度；锚点档案值/伤害基数/种子底都从该宽度的 compress_report_v4b*.json 读")
-    ap.add_argument("--tier", choices=tuple(TIERS), default=TIER,
-                    help="数据档位；低数据档目前只有 S128 在第4课b 配过对，配 --width 64 会直接报错")
+    ap.add_argument("--tier", choices=tuple(DATA_TIERS), default=TIER,
+                    help="数据档位；每档的种子底/锚点档案值从该档自己的 compress_report_v4b*.json 读。"
+                         "低数据与中数据目前只有 S128 造过底，配 --width 64 会直接报错")
     args = ap.parse_args()
     main(args.width, args.tier)

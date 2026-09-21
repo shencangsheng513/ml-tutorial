@@ -1,0 +1,96 @@
+{
+  "seeds": [
+    42,
+    7,
+    2026
+  ],
+  "width": 128,
+  "test_n": 10000,
+  "tier_arg": "中数据4500",
+  "parity_no_archive": [
+    "中数据4500 CE",
+    "中数据4500 KD"
+  ],
+  "train_fit_n": 8500,
+  "parity_seed42_vs_archive": {},
+  "arms": {
+    "中数据4500 种子42": {
+      "seed": 42,
+      "acc_ce": 0.9262,
+      "acc_kd": 0.9199,
+      "gap_pp": -0.63,
+      "gap_imgs": -63,
+      "flips": {
+        "broken": 145,
+        "fixed": 82
+      },
+      "p_sign": 3.5e-05,
+      "wrong_ce": 738,
+      "wrong_kd": 801
+    },
+    "中数据4500 种子7": {
+      "seed": 7,
+      "acc_ce": 0.9258,
+      "acc_kd": 0.9207,
+      "gap_pp": -0.51,
+      "gap_imgs": -51,
+      "flips": {
+        "broken": 125,
+        "fixed": 74
+      },
+      "p_sign": 0.000368,
+      "wrong_ce": 742,
+      "wrong_kd": 793
+    },
+    "中数据4500 种子2026": {
+      "seed": 2026,
+      "acc_ce": 0.9215,
+      "acc_kd": 0.9187,
+      "gap_pp": -0.28,
+      "gap_imgs": -28,
+      "flips": {
+        "broken": 124,
+        "fixed": 96
+      },
+      "p_sign": 0.068464,
+      "wrong_ce": 785,
+      "wrong_kd": 813
+    }
+  },
+  "verdicts": {
+    "中数据4500": {
+      "gaps_imgs": [
+        -63,
+        -51,
+        -28
+      ],
+      "gap_spread": {
+        "min": -63,
+        "max": -28,
+        "range": 35,
+        "mean": -47.33
+      },
+      "same_dir_seeds": "3/3",
+      "p_seeds": 0.25,
+      "pooled_flips": {
+        "broken": 394,
+        "fixed": 252
+      },
+      "p_pooled": 3e-08,
+      "seed_floor_imgs": {
+        "CE": 47,
+        "KD": 20
+      },
+      "gap_over_floor": 1.01,
+      "survives_seed": true
+    }
+  },
+  "limitations": [
+    "每种子只训一次：种子底由 3 个点的极差估，欠估",
+    "只复现了 S128 + 档位 ['中数据4500']；其余臂（S64 满数据）未换种子",
+    "α/T 未扫参（本课只测随机流；扫参见 step4c_alpha_T_sweep.py）",
+    "p_pooled 偏乐观：三个种子共用同一批 10000 张测试图，翻牌事件跨种子不独立",
+    "本轮不测墙钟：精度是确定性读数，墙钟要另开交错配对流程",
+    "中数据4500 CE、中数据4500 KD 没有第4课档案可对：这一档只产种子底，「换随机流还同向吗」这件事对它没有历史判决可复核"
+  ]
+}

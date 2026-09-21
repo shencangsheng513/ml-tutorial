@@ -1,0 +1,358 @@
+{
+  "tier": "满数据8500",
+  "width": 128,
+  "target_T": 1.0,
+  "cells": [
+    "a1_T1",
+    "a0.7_T1"
+  ],
+  "seeds": [
+    42,
+    7,
+    2026,
+    11,
+    202,
+    3003,
+    40004,
+    55555
+  ],
+  "old_seeds_for_parity": [
+    42,
+    7,
+    2026
+  ],
+  "new_seeds": [
+    11,
+    202,
+    3003,
+    40004,
+    55555
+  ],
+  "h_min_effect_imgs": 5.0,
+  "archive_parity": {
+    "a1_T1 种子42": true,
+    "a0.7_T1 种子42": true,
+    "a1_T1 种子7": true,
+    "a0.7_T1 种子7": true,
+    "a1_T1 种子2026": true,
+    "a0.7_T1 种子2026": true
+  },
+  "archive_parity_all_pass": true,
+  "archive_file": "compress_report_v4c.json",
+  "borrowed_floor_imgs": 41,
+  "test_n": 10000,
+  "raw_rows": {
+    "a1_T1": [
+      {
+        "seed": 42,
+        "alpha": 1.0,
+        "T": 1.0,
+        "wrong_kd": 663,
+        "wrong_ce": 674,
+        "gap_imgs": 11,
+        "broken": 13,
+        "fixed": 24,
+        "p_sign_img": 0.098872,
+        "new": false
+      },
+      {
+        "seed": 7,
+        "alpha": 1.0,
+        "T": 1.0,
+        "wrong_kd": 650,
+        "wrong_ce": 652,
+        "gap_imgs": 2,
+        "broken": 21,
+        "fixed": 23,
+        "p_sign_img": 0.880396,
+        "new": false
+      },
+      {
+        "seed": 2026,
+        "alpha": 1.0,
+        "T": 1.0,
+        "wrong_kd": 637,
+        "wrong_ce": 653,
+        "gap_imgs": 16,
+        "broken": 24,
+        "fixed": 40,
+        "p_sign_img": 0.059941,
+        "new": false
+      },
+      {
+        "seed": 11,
+        "alpha": 1.0,
+        "T": 1.0,
+        "wrong_kd": 648,
+        "wrong_ce": 648,
+        "gap_imgs": 0,
+        "broken": 32,
+        "fixed": 32,
+        "p_sign_img": 1.0,
+        "new": true
+      },
+      {
+        "seed": 202,
+        "alpha": 1.0,
+        "T": 1.0,
+        "wrong_kd": 669,
+        "wrong_ce": 681,
+        "gap_imgs": 12,
+        "broken": 26,
+        "fixed": 38,
+        "p_sign_img": 0.168643,
+        "new": true
+      },
+      {
+        "seed": 3003,
+        "alpha": 1.0,
+        "T": 1.0,
+        "wrong_kd": 724,
+        "wrong_ce": 732,
+        "gap_imgs": 8,
+        "broken": 28,
+        "fixed": 36,
+        "p_sign_img": 0.381733,
+        "new": true
+      },
+      {
+        "seed": 40004,
+        "alpha": 1.0,
+        "T": 1.0,
+        "wrong_kd": 713,
+        "wrong_ce": 703,
+        "gap_imgs": -10,
+        "broken": 28,
+        "fixed": 18,
+        "p_sign_img": 0.183925,
+        "new": true
+      },
+      {
+        "seed": 55555,
+        "alpha": 1.0,
+        "T": 1.0,
+        "wrong_kd": 698,
+        "wrong_ce": 718,
+        "gap_imgs": 20,
+        "broken": 20,
+        "fixed": 40,
+        "p_sign_img": 0.013489,
+        "new": true
+      }
+    ],
+    "a0.7_T1": [
+      {
+        "seed": 42,
+        "alpha": 0.7,
+        "T": 1.0,
+        "wrong_kd": 664,
+        "wrong_ce": 674,
+        "gap_imgs": 10,
+        "broken": 9,
+        "fixed": 19,
+        "p_sign_img": 0.087159,
+        "new": false
+      },
+      {
+        "seed": 7,
+        "alpha": 0.7,
+        "T": 1.0,
+        "wrong_kd": 650,
+        "wrong_ce": 652,
+        "gap_imgs": 2,
+        "broken": 15,
+        "fixed": 17,
+        "p_sign_img": 0.86005,
+        "new": false
+      },
+      {
+        "seed": 2026,
+        "alpha": 0.7,
+        "T": 1.0,
+        "wrong_kd": 638,
+        "wrong_ce": 653,
+        "gap_imgs": 15,
+        "broken": 17,
+        "fixed": 32,
+        "p_sign_img": 0.044384,
+        "new": false
+      },
+      {
+        "seed": 11,
+        "alpha": 0.7,
+        "T": 1.0,
+        "wrong_kd": 643,
+        "wrong_ce": 648,
+        "gap_imgs": 5,
+        "broken": 19,
+        "fixed": 24,
+        "p_sign_img": 0.542384,
+        "new": true
+      },
+      {
+        "seed": 202,
+        "alpha": 0.7,
+        "T": 1.0,
+        "wrong_kd": 677,
+        "wrong_ce": 681,
+        "gap_imgs": 4,
+        "broken": 19,
+        "fixed": 23,
+        "p_sign_img": 0.643969,
+        "new": true
+      },
+      {
+        "seed": 3003,
+        "alpha": 0.7,
+        "T": 1.0,
+        "wrong_kd": 722,
+        "wrong_ce": 732,
+        "gap_imgs": 10,
+        "broken": 18,
+        "fixed": 28,
+        "p_sign_img": 0.183925,
+        "new": true
+      },
+      {
+        "seed": 40004,
+        "alpha": 0.7,
+        "T": 1.0,
+        "wrong_kd": 712,
+        "wrong_ce": 703,
+        "gap_imgs": -9,
+        "broken": 19,
+        "fixed": 10,
+        "p_sign_img": 0.136046,
+        "new": true
+      },
+      {
+        "seed": 55555,
+        "alpha": 0.7,
+        "T": 1.0,
+        "wrong_kd": 704,
+        "wrong_ce": 718,
+        "gap_imgs": 14,
+        "broken": 14,
+        "fixed": 28,
+        "p_sign_img": 0.043559,
+        "new": true
+      }
+    ]
+  },
+  "stats": {
+    "a1_T1": {
+      "8 条全用": {
+        "label": "a1_T1 | 8 条全用",
+        "n_seeds": 8,
+        "mean_gap_imgs": 7.4,
+        "sd_imgs": 9.7,
+        "se_imgs": 3.4,
+        "ci95_imgs": [
+          -0.7,
+          15.5
+        ],
+        "gaps": [
+          11,
+          2,
+          16,
+          0,
+          12,
+          8,
+          -10,
+          20
+        ],
+        "same_sign_seeds": "6/8（+）",
+        "p_seeds_binomial": 0.2891,
+        "range_imgs": 30,
+        "d4_sigma_hat": 10.5,
+        "counts_as_verdict": true,
+        "verdict": "H0：CI 跨 0 → 边缘读数不算疗效（a1_T1 @ 满数据8500）"
+      },
+      "只用新 5 条": {
+        "label": "a1_T1 | 只用新 5 条",
+        "n_seeds": 5,
+        "mean_gap_imgs": 6.0,
+        "sd_imgs": 11.5,
+        "se_imgs": 5.1,
+        "ci95_imgs": [
+          -8.3,
+          20.3
+        ],
+        "gaps": [
+          0,
+          12,
+          8,
+          -10,
+          20
+        ],
+        "same_sign_seeds": "3/5（+）",
+        "p_seeds_binomial": 1.0,
+        "range_imgs": 30,
+        "d4_sigma_hat": 12.9,
+        "counts_as_verdict": false,
+        "verdict": "H0：CI 跨 0 → 边缘读数不算疗效（a1_T1 @ 满数据8500）"
+      }
+    },
+    "a0.7_T1": {
+      "8 条全用": {
+        "label": "a0.7_T1 | 8 条全用",
+        "n_seeds": 8,
+        "mean_gap_imgs": 6.4,
+        "sd_imgs": 7.8,
+        "se_imgs": 2.7,
+        "ci95_imgs": [
+          -0.1,
+          12.9
+        ],
+        "gaps": [
+          10,
+          2,
+          15,
+          5,
+          4,
+          10,
+          -9,
+          14
+        ],
+        "same_sign_seeds": "7/8（+）",
+        "p_seeds_binomial": 0.0703,
+        "range_imgs": 24,
+        "d4_sigma_hat": 8.4,
+        "counts_as_verdict": true,
+        "verdict": "H0：CI 跨 0 → 边缘读数不算疗效（a0.7_T1 @ 满数据8500）"
+      },
+      "只用新 5 条": {
+        "label": "a0.7_T1 | 只用新 5 条",
+        "n_seeds": 5,
+        "mean_gap_imgs": 4.8,
+        "sd_imgs": 8.7,
+        "se_imgs": 3.9,
+        "ci95_imgs": [
+          -6.0,
+          15.6
+        ],
+        "gaps": [
+          5,
+          4,
+          10,
+          -9,
+          14
+        ],
+        "same_sign_seeds": "4/5（+）",
+        "p_seeds_binomial": 0.375,
+        "range_imgs": 23,
+        "d4_sigma_hat": 9.9,
+        "counts_as_verdict": false,
+        "verdict": "H0：CI 跨 0 → 边缘读数不算疗效（a0.7_T1 @ 满数据8500）"
+      }
+    }
+  },
+  "why_more_seeds": "第4课d 用每格自己的 ±2SE 重算闸门，T=1 那两格从「0.24x 底=不算」翻成「1.01x=刚好过」——但 ±2SE 是按独立合成的下界，n=3 的极差又是 σ 的粗估，所以翻档本身不能当结论，只能当「值得把种子加到 8 条」的理由。低数据档 T=6 那条正号（+71.7 张 = 该档底 1.9x）同理：不能因为它大就免检。",
+  "limitations": [
+    "只补了 T=1 两格，其余格的种子数仍是 3 条",
+    "「只用新 5 条」那一档的样本标准差只有 4 个自由度，CI 宽度自己就不确定，它只当敏感性检查（结论别被对账那 3 条主导），不参与判决",
+    "8 条同架构同数据同老师：这是「同一副仪器把读数做精」，不是独立复证",
+    "逐图 p 在种子间不独立，只报进表不参与判决；判决用 CI + 以种子为单位的二项检验",
+    "满数据档那一发效力量级 +10 张 = 0.1pp，对选型结论不构成改口，只改措辞；低数据档若成立则是 +0.7pp 量级，会改进选"
+  ]
+}

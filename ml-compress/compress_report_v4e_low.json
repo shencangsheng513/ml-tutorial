@@ -1,0 +1,358 @@
+{
+  "tier": "低数据2000",
+  "width": 128,
+  "target_T": 6.0,
+  "cells": [
+    "a1_T6",
+    "a0.7_T6"
+  ],
+  "seeds": [
+    42,
+    7,
+    2026,
+    11,
+    202,
+    3003,
+    40004,
+    55555
+  ],
+  "old_seeds_for_parity": [
+    42,
+    7,
+    2026
+  ],
+  "new_seeds": [
+    11,
+    202,
+    3003,
+    40004,
+    55555
+  ],
+  "h_min_effect_imgs": 5.0,
+  "archive_parity": {
+    "a1_T6 种子42": true,
+    "a0.7_T6 种子42": true,
+    "a1_T6 种子7": true,
+    "a0.7_T6 种子7": true,
+    "a1_T6 种子2026": true,
+    "a0.7_T6 种子2026": true
+  },
+  "archive_parity_all_pass": true,
+  "archive_file": "compress_report_v4c_low.json",
+  "borrowed_floor_imgs": 37,
+  "test_n": 10000,
+  "raw_rows": {
+    "a1_T6": [
+      {
+        "seed": 42,
+        "alpha": 1.0,
+        "T": 6.0,
+        "wrong_kd": 857,
+        "wrong_ce": 955,
+        "gap_imgs": 98,
+        "broken": 190,
+        "fixed": 288,
+        "p_sign_img": 9e-06,
+        "new": false
+      },
+      {
+        "seed": 7,
+        "alpha": 1.0,
+        "T": 6.0,
+        "wrong_kd": 877,
+        "wrong_ce": 920,
+        "gap_imgs": 43,
+        "broken": 207,
+        "fixed": 250,
+        "p_sign_img": 0.049333,
+        "new": false
+      },
+      {
+        "seed": 2026,
+        "alpha": 1.0,
+        "T": 6.0,
+        "wrong_kd": 876,
+        "wrong_ce": 950,
+        "gap_imgs": 74,
+        "broken": 192,
+        "fixed": 266,
+        "p_sign_img": 0.000631,
+        "new": false
+      },
+      {
+        "seed": 11,
+        "alpha": 1.0,
+        "T": 6.0,
+        "wrong_kd": 844,
+        "wrong_ce": 920,
+        "gap_imgs": 76,
+        "broken": 186,
+        "fixed": 262,
+        "p_sign_img": 0.000384,
+        "new": true
+      },
+      {
+        "seed": 202,
+        "alpha": 1.0,
+        "T": 6.0,
+        "wrong_kd": 861,
+        "wrong_ce": 934,
+        "gap_imgs": 73,
+        "broken": 184,
+        "fixed": 257,
+        "p_sign_img": 0.000591,
+        "new": true
+      },
+      {
+        "seed": 3003,
+        "alpha": 1.0,
+        "T": 6.0,
+        "wrong_kd": 884,
+        "wrong_ce": 983,
+        "gap_imgs": 99,
+        "broken": 178,
+        "fixed": 277,
+        "p_sign_img": 4e-06,
+        "new": true
+      },
+      {
+        "seed": 40004,
+        "alpha": 1.0,
+        "T": 6.0,
+        "wrong_kd": 866,
+        "wrong_ce": 917,
+        "gap_imgs": 51,
+        "broken": 204,
+        "fixed": 255,
+        "p_sign_img": 0.019507,
+        "new": true
+      },
+      {
+        "seed": 55555,
+        "alpha": 1.0,
+        "T": 6.0,
+        "wrong_kd": 862,
+        "wrong_ce": 992,
+        "gap_imgs": 130,
+        "broken": 156,
+        "fixed": 286,
+        "p_sign_img": 0.0,
+        "new": true
+      }
+    ],
+    "a0.7_T6": [
+      {
+        "seed": 42,
+        "alpha": 0.7,
+        "T": 6.0,
+        "wrong_kd": 861,
+        "wrong_ce": 955,
+        "gap_imgs": 94,
+        "broken": 182,
+        "fixed": 276,
+        "p_sign_img": 1.3e-05,
+        "new": false
+      },
+      {
+        "seed": 7,
+        "alpha": 0.7,
+        "T": 6.0,
+        "wrong_kd": 872,
+        "wrong_ce": 920,
+        "gap_imgs": 48,
+        "broken": 195,
+        "fixed": 243,
+        "p_sign_img": 0.024609,
+        "new": false
+      },
+      {
+        "seed": 2026,
+        "alpha": 0.7,
+        "T": 6.0,
+        "wrong_kd": 883,
+        "wrong_ce": 950,
+        "gap_imgs": 67,
+        "broken": 188,
+        "fixed": 255,
+        "p_sign_img": 0.001684,
+        "new": false
+      },
+      {
+        "seed": 11,
+        "alpha": 0.7,
+        "T": 6.0,
+        "wrong_kd": 844,
+        "wrong_ce": 920,
+        "gap_imgs": 76,
+        "broken": 174,
+        "fixed": 250,
+        "p_sign_img": 0.000261,
+        "new": true
+      },
+      {
+        "seed": 202,
+        "alpha": 0.7,
+        "T": 6.0,
+        "wrong_kd": 867,
+        "wrong_ce": 934,
+        "gap_imgs": 67,
+        "broken": 184,
+        "fixed": 251,
+        "p_sign_img": 0.001525,
+        "new": true
+      },
+      {
+        "seed": 3003,
+        "alpha": 0.7,
+        "T": 6.0,
+        "wrong_kd": 878,
+        "wrong_ce": 983,
+        "gap_imgs": 105,
+        "broken": 165,
+        "fixed": 270,
+        "p_sign_img": 1e-06,
+        "new": true
+      },
+      {
+        "seed": 40004,
+        "alpha": 0.7,
+        "T": 6.0,
+        "wrong_kd": 874,
+        "wrong_ce": 917,
+        "gap_imgs": 43,
+        "broken": 202,
+        "fixed": 245,
+        "p_sign_img": 0.046853,
+        "new": true
+      },
+      {
+        "seed": 55555,
+        "alpha": 0.7,
+        "T": 6.0,
+        "wrong_kd": 856,
+        "wrong_ce": 992,
+        "gap_imgs": 136,
+        "broken": 145,
+        "fixed": 281,
+        "p_sign_img": 0.0,
+        "new": true
+      }
+    ]
+  },
+  "stats": {
+    "a1_T6": {
+      "8 条全用": {
+        "label": "a1_T6 | 8 条全用",
+        "n_seeds": 8,
+        "mean_gap_imgs": 80.5,
+        "sd_imgs": 28.0,
+        "se_imgs": 9.9,
+        "ci95_imgs": [
+          57.1,
+          103.9
+        ],
+        "gaps": [
+          98,
+          43,
+          74,
+          76,
+          73,
+          99,
+          51,
+          130
+        ],
+        "same_sign_seeds": "8/8（+）",
+        "p_seeds_binomial": 0.0078,
+        "range_imgs": 87,
+        "d4_sigma_hat": 30.6,
+        "counts_as_verdict": true,
+        "verdict": "H+ 这一格确实值几张图（原措辞要改口）（a1_T6 @ 低数据2000）"
+      },
+      "只用新 5 条": {
+        "label": "a1_T6 | 只用新 5 条",
+        "n_seeds": 5,
+        "mean_gap_imgs": 85.8,
+        "sd_imgs": 30.0,
+        "se_imgs": 13.4,
+        "ci95_imgs": [
+          48.6,
+          123.0
+        ],
+        "gaps": [
+          76,
+          73,
+          99,
+          51,
+          130
+        ],
+        "same_sign_seeds": "5/5（+）",
+        "p_seeds_binomial": 0.0625,
+        "range_imgs": 79,
+        "d4_sigma_hat": 34.0,
+        "counts_as_verdict": false,
+        "verdict": "H+ 这一格确实值几张图（原措辞要改口）（a1_T6 @ 低数据2000）"
+      }
+    },
+    "a0.7_T6": {
+      "8 条全用": {
+        "label": "a0.7_T6 | 8 条全用",
+        "n_seeds": 8,
+        "mean_gap_imgs": 79.5,
+        "sd_imgs": 30.9,
+        "se_imgs": 10.9,
+        "ci95_imgs": [
+          53.6,
+          105.4
+        ],
+        "gaps": [
+          94,
+          48,
+          67,
+          76,
+          67,
+          105,
+          43,
+          136
+        ],
+        "same_sign_seeds": "8/8（+）",
+        "p_seeds_binomial": 0.0078,
+        "range_imgs": 93,
+        "d4_sigma_hat": 32.7,
+        "counts_as_verdict": true,
+        "verdict": "H+ 这一格确实值几张图（原措辞要改口）（a0.7_T6 @ 低数据2000）"
+      },
+      "只用新 5 条": {
+        "label": "a0.7_T6 | 只用新 5 条",
+        "n_seeds": 5,
+        "mean_gap_imgs": 85.4,
+        "sd_imgs": 35.9,
+        "se_imgs": 16.1,
+        "ci95_imgs": [
+          40.8,
+          130.0
+        ],
+        "gaps": [
+          76,
+          67,
+          105,
+          43,
+          136
+        ],
+        "same_sign_seeds": "5/5（+）",
+        "p_seeds_binomial": 0.0625,
+        "range_imgs": 93,
+        "d4_sigma_hat": 40.0,
+        "counts_as_verdict": false,
+        "verdict": "H+ 这一格确实值几张图（原措辞要改口）（a0.7_T6 @ 低数据2000）"
+      }
+    }
+  },
+  "why_more_seeds": "第4课d 用每格自己的 ±2SE 重算闸门，T=1 那两格从「0.24x 底=不算」翻成「1.01x=刚好过」——但 ±2SE 是按独立合成的下界，n=3 的极差又是 σ 的粗估，所以翻档本身不能当结论，只能当「值得把种子加到 8 条」的理由。低数据档 T=6 那条正号（+71.7 张 = 该档底 1.9x）同理：不能因为它大就免检。",
+  "limitations": [
+    "只补了 T=6 两格，其余格的种子数仍是 3 条",
+    "「只用新 5 条」那一档的样本标准差只有 4 个自由度，CI 宽度自己就不确定，它只当敏感性检查（结论别被对账那 3 条主导），不参与判决",
+    "8 条同架构同数据同老师：这是「同一副仪器把读数做精」，不是独立复证",
+    "逐图 p 在种子间不独立，只报进表不参与判决；判决用 CI + 以种子为单位的二项检验",
+    "满数据档那一发效力量级 +10 张 = 0.1pp，对选型结论不构成改口，只改措辞；低数据档若成立则是 +0.7pp 量级，会改进选"
+  ]
+}

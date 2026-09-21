@@ -26,9 +26,13 @@ H1 的伤害基数、种子底三样全都跟着宽度走，S64 那一份是 0.9
 `--width 64` 是后补的一发：S128 那张表判出"伤害的旋钮是 T 不是 α"，但那只在一副学生上成立。
 这一发问的是**这条归因跨不跨架构**（同一老师、同一批数据、同一份软标签，只换学生宽度；
 所以同号=结论不随学生宽度变，不等于换个数据集还成立）。
+`--tier 低数据2000` 补的是自我审计③ 欠的那一发：同一副学生、同一个老师，把训练数据从 8500 张
+砍到 2000 张，问 **T 轴那条斜率换数据量还在不在**（这一档的锚点在第4课b 只有 3 条随机流、
+幅度本就不到底，所以只能读形状、不能读疗效）。
 零 API 费，纯 CPU。跑法：
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py --width 64
+  PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py --tier 低数据2000
 """
 from __future__ import annotations
 
@@ -44,7 +48,7 @@ from step4_distill import (BS, KD_ALPHA, KD_T, SEED, TIERS, VAL_N, build_mlp, lo
 from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
-TIER = "满数据8500"                                 # 只扫主档：两档一起扫翻倍，且低数据那一档
+TIER = "满数据8500"                                 # 默认档；--tier 低数据2000 兑现自我审计③ 欠的那一发
 WIDTH = 128                                         # 默认副；已被第4课b 降级为"不显著"的低数据档不追
 ALPHAS = (0.3, 0.7, 1.0)
 TEMPS = (1.0, 3.0, 6.0)
@@ -58,25 +62,31 @@ def v4b_path(width: int) -> Path:
     return HERE / ("compress_report_v4b.json" if width == 128 else f"compress_report_v4b_s{width}.json")
 
 
-def out_path(width: int) -> Path:
-    return HERE / ("compress_report_v4c.json" if width == 128 else f"compress_report_v4c_s{width}.json")
+def out_path(width: int, tier: str = TIER) -> Path:
+    stem = "compress_report_v4c" if width == 128 else f"compress_report_v4c_s{width}"
+    return HERE / (stem + ("" if tier == TIER else "_low") + ".json")
 
 
-def load_anchor(v4b: Path, width: int) -> dict:
-    """锚点档案值 + 种子底 + H1 的伤害基数，三样全从第4课b 那一副宽度的报告读。
+def load_anchor(v4b: Path, width: int, tier: str = TIER) -> dict:
+    """锚点档案值 + 种子底 + H1 的伤害基数，三样全从第4课b 那一副宽度、那一档的报告读。
 
     为什么不写第二套字面量：换一副宽度这些数字**全都变**（S64 的锚是 0.9224/776/128/73、
-    伤害基数 −55 张、底 53 张），而"对账"这件事的效力完全来自它比的是档案真值。
+    伤害基数 −55 张、底 53 张），换一档数据也全变（S128 低数据档的锚是 0.9072/928、
+    伤害基数 +27 张——符号都反了），而"对账"这件事的效力完全来自它比的是档案真值。
     抄一份数字进代码，档案一改就对上老账了——所以档案是唯一来源，这里只负责读。"""
     d = json.loads(v4b.read_text(encoding="utf-8"))
     if int(d["width"]) != width:
         raise SystemExit(f"{v4b.name} 是 S{d['width']} 的报告，不是 S{width}——换宽度请连档案一起换")
-    arm = d["arms"][f"{TIER} 种子{SEEDS[0]}"]        # α=0.7/T=3 那一格，种子 42
+    arm_key = f"{tier} 种子{SEEDS[0]}"
+    if arm_key not in d["arms"]:
+        raise SystemExit(f"{v4b.name} 里没有 {arm_key} 这一格——低数据档第4课只在 S128 上配过，"
+                         f"换宽度请连档位一起换回 {TIER}")
+    arm = d["arms"][arm_key]
     return {"kd": {"acc": arm["acc_kd"], "wrong": arm["wrong_kd"],
                    "broken": arm["flips"]["broken"], "fixed": arm["flips"]["fixed"]},
             "ce_acc": arm["acc_ce"],
             "gap_imgs": arm["gap_imgs"],            # KD−CE，负=KD 更差，与本课 gap 同号向
-            "floor": int(d["verdicts"][TIER]["seed_floor_imgs"]["KD"])}
+            "floor": int(d["verdicts"][tier]["seed_floor_imgs"]["KD"])}
 
 
 def h1_pred(gap_imgs: int) -> dict:
@@ -111,7 +121,7 @@ def term_grad_norms(xd, yd, soft, t: float, width: int, seed: int = SEED) -> dic
     return {"g_ce": round(flat(g_ce), 5), "g_kd_unit": round(flat(g_kd), 5)}
 
 
-def main(width: int = WIDTH) -> None:
+def main(width: int = WIDTH, tier: str = TIER) -> None:
     if not (MODELS / "mnist_cnn_fp32.pt").exists():
         raise SystemExit("缺 teacher 权重，先跑 python train_baseline.py")
     v4b = v4b_path(width)
@@ -119,8 +129,8 @@ def main(width: int = WIDTH) -> None:
         raise SystemExit(f"缺 {v4b.name}——锚点档案值和种子底都从它读，先跑 "
                          f"python step4b_seed_variance.py"
                          + ("" if width == 128 else " --width 64"))
-    out = out_path(width)
-    anchor = load_anchor(v4b, width)
+    out = out_path(width, tier)
+    anchor = load_anchor(v4b, width, tier)
     floor = anchor["floor"]
     ANCHOR_KD, ANCHOR_CE_ACC = anchor["kd"], anchor["ce_acc"]
     H1_PRED = h1_pred(anchor["gap_imgs"])
@@ -131,16 +141,21 @@ def main(width: int = WIDTH) -> None:
     teacher = build_cnn()
     teacher.load_state_dict(torch.load(MODELS / "mnist_cnn_fp32.pt", weights_only=True))
     teacher.eval()
-    n_data = TIERS[TIER]
+    n_data = TIERS[tier]
     xd, yd = xt_all[:n_data], torch.tensor(yt_all[:n_data])
     soft = logits_of(teacher, xd)                   # 软标签与 T 无关：温度在 loss 里加，全程共用一份
 
-    print(f"teacher+数据就位 | {TIER} 训练 {n_data} 张 | 测试 {len(yte)} | 学生 S{width} | "
+    print(f"teacher+数据就位 | {tier} 训练 {n_data} 张 | 测试 {len(yte)} | 学生 S{width} | "
           f"网格 {len(ALPHAS)}×{len(TEMPS)}×{len(SEEDS)} = "
           f"{len(ALPHAS) * len(TEMPS) * len(SEEDS)} 次 KD + {len(SEEDS)} 次 CE 对照")
     print(f"[仪器] 锚点档案值来自 {v4b.name}：α={ALPHA_ANCHOR}/T={ANCHOR_T:g}/种子{SEEDS[0]} "
           f"KD {ANCHOR_KD['acc']}/错{ANCHOR_KD['wrong']}/坏{ANCHOR_KD['broken']}/正{ANCHOR_KD['fixed']}，"
-          f"CE {ANCHOR_CE_ACC}，那一格伤害 {anchor['gap_imgs']} 张（H1 按 α 线性缩放它）")
+          f"CE {ANCHOR_CE_ACC}，那一格 gap {anchor['gap_imgs']:+d} 张（H1 按 α 线性缩放它）")
+    if anchor["gap_imgs"] > 0:
+        print(f"       ⚠ 这一档的锚点本身是**正向**的（KD 比 CE 少错 {anchor['gap_imgs']} 张），"
+              f"所以 H1 的三个预测全带正号。但别把符号读成疗效：第4课b 已经把这一格降级为不显著"
+              f"（幅度只有该档 KD 种子底 {floor} 张的 {abs(anchor['gap_imgs']) / floor:.2f}x）。"
+              f"本课在低数据档要判的是「T 轴的斜率形状换档还在不在」，不是「KD 有没有用」。")
     print(f"[仪器] 种子底（第4课b 的 KD 臂，换随机流的错图数极差）= {floor} 张，"
           f"任何 |均值 gap| ≤ {floor} 张在本机上不算疗效")
 
@@ -284,25 +299,32 @@ def main(width: int = WIDTH) -> None:
         "rises_as_H2_says": bool(at(a_max, TEMPS[-1]) - at(a_max, TEMPS[0]) > floor)}
     t_span_all = [round(sum(at(a, TEMPS[-1]) for a in ALPHAS) / len(ALPHAS)
                         - sum(at(a, TEMPS[0]) for a in ALPHAS) / len(ALPHAS), 1)]
+    # T 轴的符号在两档是反的：满数据档加热有害（锚点 gap<0，读"伤害"），低数据档加热有益
+    # （gap>0，读"收益"）。写死"伤害"会让低数据档把最大的一步挑反（挑成最小的那个正号）。
+    axis_noun = "伤害" if at(ALPHA_ANCHOR, ANCHOR_T) < 0 else "收益"
     steps = {}
     for t_lo, t_hi in zip(TEMPS[:-1], TEMPS[1:]):
         d = round(sum(at(a, t_hi) - at(a, t_lo) for a in ALPHAS) / len(ALPHAS), 1)
         steps[f"{t_lo:g}→{t_hi:g}"] = {"imgs": d, "in_seed_floor_units": round(abs(d) / floor, 2)}
+    pick = max if t_span_all[0] > 0 else min
     verdicts["T_main_effect"] = {"T_max_minus_T_min_pooled_over_alpha": t_span_all[0],
                                  "beats_seed_floor": bool(abs(t_span_all[0]) > floor),
-                                 "adjacent_steps": steps,
-                                 "where_the_damage_lives": min(steps, key=lambda k: steps[k]["imgs"])}
+                                 "adjacent_steps": steps, "axis_noun": axis_noun,
+                                 "where_the_effect_lives": pick(steps, key=lambda k: steps[k]["imgs"])}
     v_pure = at(a_max, TEMPS[0])
     verdicts["pure_KD_low_T_vs_CE"] = {"mean_gap_imgs": v_pure,
                                        "vs_floor": round(abs(v_pure) / floor, 2),
                                        "sign": "KD 更好" if v_pure > 0 else "CE 更好",
                                        "counts_as_effect": bool(abs(v_pure) > floor)}
     v_low = at(ALPHAS[0], ANCHOR_T)
-    verdicts["alpha_03_at_anchor_T"] = {"mean_gap_imgs": v_low,
-                                        "vs_floor": round(abs(v_low) / floor, 2),
-                                        "survives_seed": bool(abs(v_low) > floor),
-                                        "reading": "α→0 方向上伤害没消失" if abs(v_low) > floor
-                                        else "α→0 伤害消失"}
+    verdicts["alpha_03_at_anchor_T"] = {
+        "mean_gap_imgs": v_low, "vs_floor": round(abs(v_low) / floor, 2),
+        "survives_seed": bool(abs(v_low) > floor),
+        "reading": ("α→0 方向上伤害没消失" if axis_noun == "伤害" and abs(v_low) > floor
+                    else "α→0 伤害消失" if axis_noun == "伤害"
+                    else f"这句反事实在本档用不上：锚点格自身 {at(ALPHA_ANCHOR, ANCHOR_T):+.1f} 张"
+                         f"也在底（{floor} 张）以内，α=0.3 与 α=0.7 都还没和纯 CE 分出胜负，"
+                         "所以「往 α→0 走会怎样」在本档是两个不显著读数之间的比较")}
     free = {k: g for k, g in grid.items() if not k.startswith("match_")}
     best = max(free, key=lambda k: free[k]["mean_gap_imgs"])
     worst = min(free, key=lambda k: free[k]["mean_gap_imgs"])
@@ -321,14 +343,24 @@ def main(width: int = WIDTH) -> None:
                                                          - at(ALPHA_ANCHOR, t), 1)}
                  for t in matched}
         recovered = round(sum(v["damage_recovered_imgs"] for v in per_T.values()) / len(per_T), 1)
+        if axis_noun == "伤害":
+            explains, reading = bool(recovered > floor), (
+                ("钉回梯度后伤害大部分回来了（回收 "
+                 f"{recovered} 张 > 底 {floor} 张）→ 高 T 之害主要来自 T² 抬权重，H1 借温度复活"
+                 if recovered > floor else
+                 f"钉回梯度只换回 {recovered} 张（底 {floor} 张）→ 权重解释不了这档伤害，"
+                 "锅在温度本身：软化的目标分布真把学生带偏了"))
+        else:
+            explains, reading = bool(abs(recovered) > floor), (
+                f"本档 T 轴是{axis_noun}：把 KD 梯度钉回锚点（降 α）后收益变化 {recovered:+.1f} 张，"
+                f"幅度 {abs(recovered)} 张 > 底 {floor} 张 → 这档收益里确实有一部分是「T² 顺带抬了权重」"
+                "买来的，温度与权重在本档没完全分开" if abs(recovered) > floor else
+                f"本档 T 轴是{axis_noun}：钉回梯度（降 α）后收益只动了 {recovered:+.1f} 张，"
+                f"在底（{floor} 张）以内 → 收益也不是「T² 顺带抬权重」买来的：把权重降回去，收益没跟着降；"
+                "它跟着温度本身走——低数据下真被摊软的目标分布确实给学生带了东西")
         verdicts["weight_or_temperature"] = {
             "per_T": per_T, "mean_damage_recovered_imgs": recovered,
-            "weight_explains_the_T_dose": bool(recovered > floor),
-            "reading": ("钉回梯度后伤害大部分回来了（回收 "
-                        f"{recovered} 张 > 底 {floor} 张）→ 高 T 之害主要来自 T² 抬权重，H1 借温度复活"
-                        if recovered > floor else
-                        f"钉回梯度只换回 {recovered} 张（底 {floor} 张）→ 权重解释不了这档伤害，"
-                        "锅在温度本身：软化的目标分布真把学生带偏了")}
+            "axis_noun": axis_noun, "weight_explains_the_T_dose": explains, "reading": reading}
     else:
         verdicts["weight_or_temperature"] = {
             "max_kd_grad_drift_pct": round(max(abs(probe[t]["g_kd_drift_vs_anchor_pct"])
@@ -350,7 +382,7 @@ def main(width: int = WIDTH) -> None:
           f"压过种子底={v['beats_seed_floor']}；逐档走一步："
           + "、".join(f"{k} {d['imgs']:+.1f} 张（{d['in_seed_floor_units']}x 底）"
                       for k, d in v["adjacent_steps"].items())
-          + f" → 伤害主要住在 {v['where_the_damage_lives']} 这一步")
+          + f" → {v['axis_noun']}主要住在 {v['where_the_effect_lives']} 这一步")
     v = verdicts["pure_KD_low_T_vs_CE"]
     print(f"  ④ α={a_max}/T={TEMPS[0]:g}（只用老师 argmax 的软标签、不加热）：{v['sign']}，gap {v['mean_gap_imgs']} 张 = "
           f"种子底的 {v['vs_floor']}x，算疗效={v['counts_as_effect']}")
@@ -374,11 +406,19 @@ def main(width: int = WIDTH) -> None:
               f"（闸门 ±{v['gate_pct']}%）→ {v['reading']}")
 
     print("\n[自我审计① 底是别课的] 种子底取自第4课b 的 KD 臂（α=0.7/T=3），本课改的是目标函数的两个系数，"
-          "严格说各格自己的种子底要各扫各的；这里用一格的底当全表的闸，是**借来的仪器**，会低估 T 大端的方差。")
+          "严格说各格自己的种子底要各扫各的；这里用一格的底当全表的闸，是**借来的仪器**。"
+          "方向本课当时猜「低估 T 大端方差」，第4课d/e 已实测：猜反了——借来的底对**单格读数偏大**"
+          "（换成每格自己的 ±2SE，T=1 两格立刻翻成显著），而那个翻档在扩到 8 条随机流后又消失了 ⇒ "
+          "借来的底当闸这轮是对的，但「谁埋了谁」得先量再猜（±2SE 按独立合成是下界，见第4课d limitations）。")
     print(f"[自我审计② 多重比较] {len(free)} 格 × 三种子，p_pooled 只看方向不看在底之上（同一批 10000 张测试图，"
           f"种子之间翻牌事件不独立，p 偏乐观）。全表只有一件事是硬判决：{floor} 张这条线。")
-    print(f"[自我审计③ 只扫了满数据档与 S{width}] 低数据那一档第4课b 已降级为不显著；"
-          "若 H1/H2 想在低数据档有不同答案，本课没测。")
+    if tier == TIER:
+        print(f"[自我审计③ 只扫了满数据档与 S{width}] 低数据那一档第4课b 已降级为不显著；"
+              "若 H1/H2 想在低数据档有不同答案，本课没测（补法：加 --tier 低数据2000）。")
+    else:
+        print(f"[自我审计③ 这一发扫的是 {tier}] 该档锚点格在第4课b 只有 3 条随机流、"
+              f"幅度 {anchor['gap_imgs']:+d} 张本就不到该档底（{floor} 张）——"
+              "所以这一档的判决只能读「T 轴形状换档后还在不在」，不能读成「KD 在低数据下有疗效」。")
     if width != WIDTH:
         print(f"[自我审计③ b 跨架构 ≠ 独立复证] 这一副 S{width} 与默认那副 S{WIDTH} 共用**同一个老师、同一批数据、"
               "同一份软标签**，只有学生那侧换了。所以两份报告若同号，说明的是「结论不随学生宽度变」，"
@@ -395,7 +435,7 @@ def main(width: int = WIDTH) -> None:
           "这一格按「不可配平」记账而不是悄悄删掉。")
 
     other = 64 if width == 128 else 128
-    report = {"tier": TIER, "width": width, "alphas": list(ALPHAS), "temps": list(TEMPS),
+    report = {"tier": tier, "width": width, "alphas": list(ALPHAS), "temps": list(TEMPS),
               "seeds": list(SEEDS), "test_n": int(len(yte)), "train_fit_n": cut,
               "anchor_hyperparams": {"alpha": ALPHA_ANCHOR, "T": ANCHOR_T},
               "anchor_archive_from": v4b.name,
@@ -416,9 +456,12 @@ def main(width: int = WIDTH) -> None:
                                 "ce_acc_this_run": ce_ref[SEEDS[0]]["acc"],
                                 "ce_acc_archive": ANCHOR_CE_ACC},
               "ce_ref_by_seed": ce_ref, "grid": grid, "verdicts": verdicts,
-              "limitations": ["种子底借自第4课b 的 α=0.7/T=3 一格，未逐格重量",
-                              f"只扫满数据 8500 + S{width}；低数据档未扫，另一副宽度是"
-                              f"{out_path(other).name}（各写各的表，跨架构结论要两份对照着读）",
+              "limitations": ["种子底借自第4课b 的 α=0.7/T=3 一格；第4课d 已逐格量过自己的配对误差棒"
+                              "（借来的底对单格读数偏大，±2SE 又因跨格共用随机流是下界）",
+                              (f"只扫 {tier} + S{width}；" +
+                               ("低数据档未扫，另一副宽度是" if tier == TIER
+                                else "S64 那一份 v4b 里没有低数据配对，档位没法同时换；另一副宽度是")
+                               + f"{out_path(other).name}（各写各的表，跨架构结论要两份对照着读）"),
                               "每格 3 个种子，均值本身没有二次底",
                               "权重/温度解耦只在初始一步的一个批次上配平，不是全程配平",
                               "p_pooled 偏乐观（三种子共用同一批测试图）"]}
@@ -428,7 +471,11 @@ def main(width: int = WIDTH) -> None:
 
 if __name__ == "__main__":
     import argparse
-    ap = argparse.ArgumentParser(description="α×T 扫参归因（默认 S128；--width 64 测结论跨不跨架构）")
+    ap = argparse.ArgumentParser(description="α×T 扫参归因（默认 S128+满数据；--width 64 测跨架构，"
+                                             "--tier 低数据2000 测跨数据量）")
     ap.add_argument("--width", type=int, choices=(128, 64), default=WIDTH,
                     help="学生宽度；锚点档案值/伤害基数/种子底都从该宽度的 compress_report_v4b*.json 读")
-    main(ap.parse_args().width)
+    ap.add_argument("--tier", choices=tuple(TIERS), default=TIER,
+                    help="数据档位；低数据档目前只有 S128 在第4课b 配过对，配 --width 64 会直接报错")
+    args = ap.parse_args()
+    main(args.width, args.tier)

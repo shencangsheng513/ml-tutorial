@@ -1,0 +1,786 @@
+{
+  "teacher_acc": 0.9798,
+  "teacher_kb": 416.6,
+  "teacher_macs": 1117056,
+  "test_n": 10000,
+  "train_fit_n": 8500,
+  "torch": "2.14.0+cpu",
+  "hyperparams": {
+    "steps": 600,
+    "bs": 128,
+    "lr": 0.001,
+    "alpha": 0.7,
+    "T": 3.0
+  },
+  "soft_label_audit": {
+    "fit_set": {
+      "原始": {
+        "mean_top1": 0.9948,
+        "pct_top1_gt_0.99": 93.3,
+        "mean_margin_top1_top2": 0.9902,
+        "mean_p2": 0.0046
+      },
+      "除以T": {
+        "mean_top1": 0.9249,
+        "pct_top1_gt_0.99": 23.1,
+        "mean_margin_top1_top2": 0.884,
+        "mean_p2": 0.041
+      }
+    },
+    "test_set": {
+      "原始": {
+        "mean_top1": 0.9889,
+        "pct_top1_gt_0.99": 92.0,
+        "mean_margin_top1_top2": 0.9794,
+        "mean_p2": 0.0096
+      },
+      "除以T": {
+        "mean_top1": 0.9213,
+        "pct_top1_gt_0.99": 23.7,
+        "mean_margin_top1_top2": 0.8775,
+        "mean_p2": 0.0438
+      }
+    },
+    "collapse_gap_pp": 1.3
+  },
+  "q2_prediction_before_training": "KD 与 CE 分不出胜负（软标签≈one-hot ⇒ KL 项没有 CE 给不出的信息）",
+  "prior_prediction": {
+    "128": {
+      "macs": 101632,
+      "macs_pct_of_teacher": 9.1,
+      "params": 101770,
+      "kb": 399.7,
+      "macs_by_layer": {
+        "fc1": 100352,
+        "fc2": 1280
+      },
+      "predicted_ms_best": 0.0965
+    },
+    "64": {
+      "macs": 50816,
+      "macs_pct_of_teacher": 4.5,
+      "params": 50890,
+      "kb": 201.0,
+      "macs_by_layer": {
+        "fc1": 50176,
+        "fc2": 640
+      },
+      "predicted_ms_best": 0.0947
+    }
+  },
+  "v3_fit_used": {
+    "points": [
+      [
+        1.0,
+        0.131
+      ],
+      [
+        0.832,
+        0.125
+      ],
+      [
+        0.551,
+        0.114
+      ]
+    ],
+    "fixed_overhead_ms": 0.093,
+    "per_macs_ms": 0.038,
+    "max_abs_residual_ms": 0.0002,
+    "compute_share_pct": 28.9
+  },
+  "arms": {
+    "S128 CE 满数据8500": {
+      "kb": 399.7,
+      "macs_pct_of_teacher": 9.1,
+      "params": 101770,
+      "acc": 0.9326,
+      "wrong": 674,
+      "flip_vs_teacher": {
+        "broken": 520,
+        "fixed": 48
+      },
+      "kd_vs_ce_flips": null,
+      "acc_gap_vs_ce_pp": null,
+      "error_structure": {
+        "student_wrong": 674,
+        "shared_wrong": 154,
+        "student_only_wrong": 520,
+        "fixed_teacher_wrong": 48,
+        "inherit_rate_pct": 22.8
+      },
+      "kl_to_teacher_test": 3.272,
+      "val_curve": [
+        {
+          "step": 100,
+          "val_acc": 0.8873
+        },
+        {
+          "step": 200,
+          "val_acc": 0.9013
+        },
+        {
+          "step": 300,
+          "val_acc": 0.9033
+        },
+        {
+          "step": 400,
+          "val_acc": 0.9173
+        },
+        {
+          "step": 500,
+          "val_acc": 0.922
+        },
+        {
+          "step": 600,
+          "val_acc": 0.9247
+        }
+      ]
+    },
+    "S128 KD 满数据8500": {
+      "kb": 399.7,
+      "macs_pct_of_teacher": 9.1,
+      "params": 101770,
+      "acc": 0.9263,
+      "wrong": 737,
+      "flip_vs_teacher": {
+        "broken": 579,
+        "fixed": 44
+      },
+      "kd_vs_ce_flips": {
+        "broken": 131,
+        "fixed": 68
+      },
+      "acc_gap_vs_ce_pp": -0.63,
+      "error_structure": {
+        "student_wrong": 737,
+        "shared_wrong": 158,
+        "student_only_wrong": 579,
+        "fixed_teacher_wrong": 44,
+        "inherit_rate_pct": 21.4
+      },
+      "kl_to_teacher_test": 1.2947,
+      "val_curve": [
+        {
+          "step": 100,
+          "val_acc": 0.8627
+        },
+        {
+          "step": 200,
+          "val_acc": 0.8893
+        },
+        {
+          "step": 300,
+          "val_acc": 0.9013
+        },
+        {
+          "step": 400,
+          "val_acc": 0.9053
+        },
+        {
+          "step": 500,
+          "val_acc": 0.91
+        },
+        {
+          "step": 600,
+          "val_acc": 0.9167
+        }
+      ],
+      "kd_vs_ce_p_sign": 9e-06
+    },
+    "S64 CE 满数据8500": {
+      "kb": 201.0,
+      "macs_pct_of_teacher": 4.5,
+      "params": 50890,
+      "acc": 0.9279,
+      "wrong": 721,
+      "flip_vs_teacher": {
+        "broken": 567,
+        "fixed": 48
+      },
+      "kd_vs_ce_flips": null,
+      "acc_gap_vs_ce_pp": null,
+      "error_structure": {
+        "student_wrong": 721,
+        "shared_wrong": 154,
+        "student_only_wrong": 567,
+        "fixed_teacher_wrong": 48,
+        "inherit_rate_pct": 21.4
+      },
+      "kl_to_teacher_test": 3.8402,
+      "val_curve": [
+        {
+          "step": 100,
+          "val_acc": 0.8627
+        },
+        {
+          "step": 200,
+          "val_acc": 0.8933
+        },
+        {
+          "step": 300,
+          "val_acc": 0.902
+        },
+        {
+          "step": 400,
+          "val_acc": 0.908
+        },
+        {
+          "step": 500,
+          "val_acc": 0.916
+        },
+        {
+          "step": 600,
+          "val_acc": 0.9207
+        }
+      ]
+    },
+    "S64 KD 满数据8500": {
+      "kb": 201.0,
+      "macs_pct_of_teacher": 4.5,
+      "params": 50890,
+      "acc": 0.9224,
+      "wrong": 776,
+      "flip_vs_teacher": {
+        "broken": 614,
+        "fixed": 40
+      },
+      "kd_vs_ce_flips": {
+        "broken": 128,
+        "fixed": 73
+      },
+      "acc_gap_vs_ce_pp": -0.55,
+      "error_structure": {
+        "student_wrong": 776,
+        "shared_wrong": 162,
+        "student_only_wrong": 614,
+        "fixed_teacher_wrong": 40,
+        "inherit_rate_pct": 20.9
+      },
+      "kl_to_teacher_test": 1.4505,
+      "val_curve": [
+        {
+          "step": 100,
+          "val_acc": 0.8333
+        },
+        {
+          "step": 200,
+          "val_acc": 0.8773
+        },
+        {
+          "step": 300,
+          "val_acc": 0.8913
+        },
+        {
+          "step": 400,
+          "val_acc": 0.8987
+        },
+        {
+          "step": 500,
+          "val_acc": 0.9073
+        },
+        {
+          "step": 600,
+          "val_acc": 0.9133
+        }
+      ],
+      "kd_vs_ce_p_sign": 0.000128
+    },
+    "S128 CE 低数据2000": {
+      "kb": 399.7,
+      "macs_pct_of_teacher": 9.1,
+      "params": 101770,
+      "acc": 0.9045,
+      "wrong": 955,
+      "flip_vs_teacher": {
+        "broken": 802,
+        "fixed": 49
+      },
+      "kd_vs_ce_flips": null,
+      "acc_gap_vs_ce_pp": null,
+      "error_structure": {
+        "student_wrong": 955,
+        "shared_wrong": 153,
+        "student_only_wrong": 802,
+        "fixed_teacher_wrong": 49,
+        "inherit_rate_pct": 16.0
+      },
+      "kl_to_teacher_test": 2.8217,
+      "val_curve": [
+        {
+          "step": 100,
+          "val_acc": 0.8807
+        },
+        {
+          "step": 200,
+          "val_acc": 0.8933
+        },
+        {
+          "step": 300,
+          "val_acc": 0.9007
+        },
+        {
+          "step": 400,
+          "val_acc": 0.8967
+        },
+        {
+          "step": 500,
+          "val_acc": 0.894
+        },
+        {
+          "step": 600,
+          "val_acc": 0.898
+        }
+      ]
+    },
+    "S128 KD 低数据2000": {
+      "kb": 399.7,
+      "macs_pct_of_teacher": 9.1,
+      "params": 101770,
+      "acc": 0.9072,
+      "wrong": 928,
+      "flip_vs_teacher": {
+        "broken": 766,
+        "fixed": 40
+      },
+      "kd_vs_ce_flips": {
+        "broken": 135,
+        "fixed": 162
+      },
+      "acc_gap_vs_ce_pp": 0.27,
+      "error_structure": {
+        "student_wrong": 928,
+        "shared_wrong": 162,
+        "student_only_wrong": 766,
+        "fixed_teacher_wrong": 40,
+        "inherit_rate_pct": 17.5
+      },
+      "kl_to_teacher_test": 1.6213,
+      "val_curve": [
+        {
+          "step": 100,
+          "val_acc": 0.8627
+        },
+        {
+          "step": 200,
+          "val_acc": 0.894
+        },
+        {
+          "step": 300,
+          "val_acc": 0.8967
+        },
+        {
+          "step": 400,
+          "val_acc": 0.9047
+        },
+        {
+          "step": 500,
+          "val_acc": 0.9027
+        },
+        {
+          "step": 600,
+          "val_acc": 0.906
+        }
+      ],
+      "kd_vs_ce_p_sign": 0.131244
+    }
+  },
+  "kd_vs_ce": {
+    "S128 满数据8500": {
+      "width": 128,
+      "tier": "满数据8500",
+      "ce_acc": 0.9326,
+      "kd_acc": 0.9263,
+      "gap_pp": -0.63,
+      "gap_imgs": -63,
+      "flips": {
+        "broken": 131,
+        "fixed": 68
+      },
+      "p_sign": 9.422495164348068e-06,
+      "significant": true,
+      "val_gap_curve_pp": [
+        -2.46,
+        -1.2,
+        -0.2,
+        -1.2,
+        -1.2,
+        -0.8
+      ],
+      "val_shape": "全程落后",
+      "student_only_delta_vs_ce": 59,
+      "cross_run_floor_imgs": 3
+    },
+    "S64 满数据8500": {
+      "width": 64,
+      "tier": "满数据8500",
+      "ce_acc": 0.9279,
+      "kd_acc": 0.9224,
+      "gap_pp": -0.55,
+      "gap_imgs": -55,
+      "flips": {
+        "broken": 128,
+        "fixed": 73
+      },
+      "p_sign": 0.00012774170308479506,
+      "significant": true,
+      "val_gap_curve_pp": [
+        -2.94,
+        -1.6,
+        -1.07,
+        -0.93,
+        -0.87,
+        -0.74
+      ],
+      "val_shape": "全程落后",
+      "student_only_delta_vs_ce": 47,
+      "cross_run_floor_imgs": 3
+    },
+    "S128 低数据2000": {
+      "width": 128,
+      "tier": "低数据2000",
+      "ce_acc": 0.9045,
+      "kd_acc": 0.9072,
+      "gap_pp": 0.27,
+      "gap_imgs": 27,
+      "flips": {
+        "broken": 135,
+        "fixed": 162
+      },
+      "p_sign": 0.13124434589899298,
+      "significant": false,
+      "val_gap_curve_pp": [
+        -1.8,
+        0.07,
+        -0.4,
+        0.8,
+        0.87,
+        0.8
+      ],
+      "val_shape": "先落后→后段反超",
+      "student_only_delta_vs_ce": -36,
+      "cross_run_floor_imgs": 3
+    }
+  },
+  "latency_paired": {
+    "A0 teacher": {
+      "ms_p50": 0.149,
+      "ms_best": 0.125,
+      "thr_batch128": 10723.0,
+      "p50_rounds": [
+        0.147,
+        0.147,
+        0.145,
+        0.158,
+        0.158,
+        0.158,
+        0.149
+      ],
+      "best_rounds": [
+        0.131,
+        0.129,
+        0.125,
+        0.136,
+        0.127,
+        0.138,
+        0.126
+      ],
+      "round_spread_pct": 8.7
+    },
+    "A0复本(对照)": {
+      "ms_p50": 0.149,
+      "ms_best": 0.127,
+      "thr_batch128": 11226.2,
+      "p50_rounds": [
+        0.149,
+        0.146,
+        0.149,
+        0.154,
+        0.16,
+        0.152,
+        0.149
+      ],
+      "best_rounds": [
+        0.132,
+        0.127,
+        0.131,
+        0.131,
+        0.137,
+        0.131,
+        0.133
+      ],
+      "round_spread_pct": 9.1
+    },
+    "S128 CE 满数据8500": {
+      "ms_p50": 0.018,
+      "ms_best": 0.016,
+      "thr_batch128": 608413.2,
+      "p50_rounds": [
+        0.016,
+        0.016,
+        0.018,
+        0.016,
+        0.018,
+        0.027,
+        0.018
+      ],
+      "best_rounds": [
+        0.016,
+        0.016,
+        0.017,
+        0.016,
+        0.017,
+        0.016,
+        0.017
+      ],
+      "round_spread_pct": 62.7
+    },
+    "S128 KD 满数据8500": {
+      "ms_p50": 0.017,
+      "ms_best": 0.016,
+      "thr_batch128": 621108.0,
+      "p50_rounds": [
+        0.017,
+        0.017,
+        0.016,
+        0.016,
+        0.018,
+        0.017,
+        0.018
+      ],
+      "best_rounds": [
+        0.016,
+        0.016,
+        0.016,
+        0.016,
+        0.017,
+        0.016,
+        0.016
+      ],
+      "round_spread_pct": 9.1
+    },
+    "S64 CE 满数据8500": {
+      "ms_p50": 0.015,
+      "ms_best": 0.014,
+      "thr_batch128": 1029352.6,
+      "p50_rounds": [
+        0.015,
+        0.015,
+        0.015,
+        0.017,
+        0.016,
+        0.015,
+        0.016
+      ],
+      "best_rounds": [
+        0.015,
+        0.015,
+        0.015,
+        0.016,
+        0.016,
+        0.015,
+        0.014
+      ],
+      "round_spread_pct": 8.4
+    },
+    "S64 KD 满数据8500": {
+      "ms_p50": 0.015,
+      "ms_best": 0.014,
+      "thr_batch128": 1089670.8,
+      "p50_rounds": [
+        0.015,
+        0.016,
+        0.015,
+        0.016,
+        0.015,
+        0.016,
+        0.015
+      ],
+      "best_rounds": [
+        0.014,
+        0.015,
+        0.015,
+        0.016,
+        0.014,
+        0.015,
+        0.014
+      ],
+      "round_spread_pct": 8.5
+    },
+    "S128 CE 低数据2000": {
+      "ms_p50": 0.017,
+      "ms_best": 0.016,
+      "thr_batch128": 605869.4,
+      "p50_rounds": [
+        0.016,
+        0.017,
+        0.017,
+        0.018,
+        0.018,
+        0.018,
+        0.016
+      ],
+      "best_rounds": [
+        0.016,
+        0.016,
+        0.016,
+        0.017,
+        0.016,
+        0.017,
+        0.016
+      ],
+      "round_spread_pct": 12.7
+    },
+    "S128 KD 低数据2000": {
+      "ms_p50": 0.017,
+      "ms_best": 0.015,
+      "thr_batch128": 622517.6,
+      "p50_rounds": [
+        0.017,
+        0.017,
+        0.017,
+        0.018,
+        0.018,
+        0.018,
+        0.017
+      ],
+      "best_rounds": [
+        0.016,
+        0.016,
+        0.015,
+        0.016,
+        0.016,
+        0.017,
+        0.016
+      ],
+      "round_spread_pct": 8.4
+    }
+  },
+  "ctrl_floor_pct": {
+    "p50": 0.61,
+    "best": 2.17,
+    "thr": 4.69
+  },
+  "latency_gate_pct": 5.0,
+  "latency_stat": "ms_best",
+  "tick_ms": 0.001,
+  "prediction_check": {
+    "S128 CE 满数据8500": {
+      "predicted_ms": 0.0965,
+      "measured_ms": 0.016,
+      "err_pct": -83.4,
+      "floor_pct": 6.2,
+      "within_instrument_floor": false
+    },
+    "S128 KD 满数据8500": {
+      "predicted_ms": 0.0965,
+      "measured_ms": 0.016,
+      "err_pct": -83.4,
+      "floor_pct": 6.2,
+      "within_instrument_floor": false
+    },
+    "S64 CE 满数据8500": {
+      "predicted_ms": 0.0947,
+      "measured_ms": 0.014,
+      "err_pct": -85.2,
+      "floor_pct": 7.1,
+      "within_instrument_floor": false
+    },
+    "S64 KD 满数据8500": {
+      "predicted_ms": 0.0947,
+      "measured_ms": 0.014,
+      "err_pct": -85.2,
+      "floor_pct": 7.1,
+      "within_instrument_floor": false
+    },
+    "S128 CE 低数据2000": {
+      "predicted_ms": 0.0965,
+      "measured_ms": 0.016,
+      "err_pct": -83.4,
+      "floor_pct": 6.2,
+      "within_instrument_floor": false
+    },
+    "S128 KD 低数据2000": {
+      "predicted_ms": 0.0965,
+      "measured_ms": 0.015,
+      "err_pct": -84.5,
+      "floor_pct": 6.7,
+      "within_instrument_floor": false
+    }
+  },
+  "prediction_within": 0,
+  "prediction_arms": 6,
+  "max_pred_err_pct": 85.2,
+  "v3_ceiling_recheck": {
+    "student_ms_pct_of_teacher": 12.8,
+    "v3_ceiling_pct": 28.9,
+    "broke": true,
+    "mlp_own_intercept_ms": 0.012,
+    "mlp_own_slope_ms": 0.0435,
+    "gmac_per_s": {
+      "A0 teacher": 8.9,
+      "A0复本(对照)": 8.8,
+      "S128 CE 满数据8500": 6.4,
+      "S128 KD 满数据8500": 6.4,
+      "S64 CE 满数据8500": 3.6,
+      "S64 KD 满数据8500": 3.6,
+      "S128 CE 低数据2000": 6.4,
+      "S128 KD 低数据2000": 6.8
+    }
+  },
+  "pareto": [
+    {
+      "tag": "teacher CNN fp32（第0课）",
+      "kb": 416.6,
+      "macs_pct": 100.0,
+      "acc": 0.9798,
+      "ms_best": 0.125,
+      "lat_ratio_vs_own_teacher": 1.0,
+      "dominated_by": [
+        "剪 50% CNN+微调（第3课）"
+      ]
+    },
+    {
+      "tag": "剪 50% CNN+微调（第3课）",
+      "kb": 211.5,
+      "macs_pct": 55.1,
+      "acc": 0.98,
+      "ms_best": 0.112,
+      "lat_ratio_vs_own_teacher": 0.855,
+      "dominated_by": []
+    },
+    {
+      "tag": "剪 50%+int8（第3课）",
+      "kb": 62.1,
+      "macs_pct": 55.1,
+      "acc": 0.9799,
+      "ms_best": 0.267,
+      "lat_ratio_vs_own_teacher": 2.0382,
+      "dominated_by": []
+    },
+    {
+      "tag": "蒸馏学生 S128 KD 满数据8500",
+      "kb": 399.7,
+      "macs_pct": 9.1,
+      "acc": 0.9263,
+      "ms_best": 0.016,
+      "lat_ratio_vs_own_teacher": 0.128,
+      "dominated_by": []
+    },
+    {
+      "tag": "蒸馏学生 S64 KD 满数据8500",
+      "kb": 201.0,
+      "macs_pct": 4.5,
+      "acc": 0.9224,
+      "ms_best": 0.014,
+      "lat_ratio_vs_own_teacher": 0.112,
+      "dominated_by": []
+    }
+  ],
+  "limitations": [
+    "T/α 单点未扫参（α=0.7 偏高，KD 的伤害有多少来自权重分配而非软标签本身没拆）",
+    "数据量只有 8500/2000 两档",
+    "每臂只训一次：符号检验只管图间配对，不管种子间方差",
+    "teacher 的软标签取自它拟合过的训练图（塌缩程度已量于 soft_label_audit）",
+    "学生落后老师 4.72pp 里架构与训练步数两件事没拆开（固定步数为配对服务）"
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "seeds": [
+    42,
+    7,
+    2026
+  ],
+  "width": 64,
+  "test_n": 10000,
+  "train_fit_n": 8500,
+  "parity_seed42_vs_archive": {
+    "满数据8500 CE": {
+      "match": true,
+      "this_run": 0.9279,
+      "archive": 0.9279
+    },
+    "满数据8500 KD": {
+      "match": true,
+      "this_run": 0.9224,
+      "archive": 0.9224
+    }
+  },
+  "arms": {
+    "满数据8500 种子42": {
+      "seed": 42,
+      "acc_ce": 0.9279,
+      "acc_kd": 0.9224,
+      "gap_pp": -0.55,
+      "gap_imgs": -55,
+      "flips": {
+        "broken": 128,
+        "fixed": 73
+      },
+      "p_sign": 0.000128,
+      "wrong_ce": 721,
+      "wrong_kd": 776
+    },
+    "满数据8500 种子7": {
+      "seed": 7,
+      "acc_ce": 0.9249,
+      "acc_kd": 0.9173,
+      "gap_pp": -0.76,
+      "gap_imgs": -76,
+      "flips": {
+        "broken": 131,
+        "fixed": 55
+      },
+      "p_sign": 0.0,
+      "wrong_ce": 751,
+      "wrong_kd": 827
+    },
+    "满数据8500 种子2026": {
+      "seed": 2026,
+      "acc_ce": 0.9272,
+      "acc_kd": 0.9171,
+      "gap_pp": -1.01,
+      "gap_imgs": -101,
+      "flips": {
+        "broken": 151,
+        "fixed": 50
+      },
+      "p_sign": 0.0,
+      "wrong_ce": 728,
+      "wrong_kd": 829
+    }
+  },
+  "verdicts": {
+    "满数据8500": {
+      "gaps_imgs": [
+        -55,
+        -76,
+        -101
+      ],
+      "gap_spread": {
+        "min": -101,
+        "max": -55,
+        "range": 46,
+        "mean": -77.33
+      },
+      "same_dir_seeds": "3/3",
+      "p_seeds": 0.25,
+      "pooled_flips": {
+        "broken": 410,
+        "fixed": 178
+      },
+      "p_pooled": 0.0,
+      "seed_floor_imgs": {
+        "CE": 30,
+        "KD": 53
+      },
+      "gap_over_floor": 1.46,
+      "survives_seed": true
+    }
+  },
+  "limitations": [
+    "每种子只训一次：种子底由 3 个点的极差估，欠估",
+    "只复现了 S64 + 档位 ['满数据8500']；其余臂（低数据档 S64 本就没跑）未换种子",
+    "α/T 未扫参（本课只测随机流；扫参见 step4c_alpha_T_sweep.py）",
+    "p_pooled 偏乐观：三个种子共用同一批 10000 张测试图，翻牌事件跨种子不独立",
+    "本轮不测墙钟：精度是确定性读数，墙钟要另开交错配对流程"
+  ]
+}

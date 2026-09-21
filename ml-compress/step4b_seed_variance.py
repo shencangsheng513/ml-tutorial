@@ -13,9 +13,12 @@
 
 零 API 费，纯 CPU。跑法：
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4b_seed_variance.py
+  # S64 那一档也换随机流复现（第4课：CE 0.9279 / KD 0.9224，−55 张）：
+  PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4b_seed_variance.py --width 64
 """
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
@@ -26,12 +29,18 @@ from step4_distill import TIERS, VAL_N, logits_of, sign_test_p, train_student
 from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
-OUT = HERE / "compress_report_v4b.json"
 V4 = HERE / "compress_report_v4.json"
 SEEDS = (42, 7, 2026)                             # 42 是第4课那一轮，留着当逐位对账的锚
-WIDTH = 128
+WIDTH = 128                                        # 可被 --width 覆盖（S64 复现用）
 # 第4课档案值（committed run）——种子 42 必须逐位复现，否则说明本课改坏了 train_student
-ARCHIVE = {"满数据8500": {"CE": 0.9326, "KD": 0.9263}, "低数据2000": {"CE": 0.9045, "KD": 0.9072}}
+# 低数据档第4课只在 S128 上配对，所以 64 这一副里只有满数据档可查
+ARCHIVE = {128: {"满数据8500": {"CE": 0.9326, "KD": 0.9263}, "低数据2000": {"CE": 0.9045, "KD": 0.9072}},
+           64: {"满数据8500": {"CE": 0.9279, "KD": 0.9224}}}
+
+
+def out_path() -> Path:
+    return HERE / ("compress_report_v4b.json" if WIDTH == 128 else f"compress_report_v4b_s{WIDTH}.json")
+
 
 
 def one_pair(teacher: torch.nn.Module, xd, yd, soft, xv, yv, xte, yte, seed: int) -> dict:
@@ -73,6 +82,8 @@ def main() -> None:
     parity = {}
     tiers: dict[str, list[dict]] = {}
     for tier, n_data in TIERS.items():
+        if tier not in ARCHIVE[WIDTH]:
+            continue                                # 低数据档第4课只在 S128 上配对过，没有档案就不复现
         xd, yd = xt_all[:n_data], torch.tensor(yt_all[:n_data])
         soft = logits_of(teacher, xd)             # 软标签与随机流无关：各种子共用同一份
         rows = [one_pair(teacher, xd, yd, soft, xv, yv, xte, yte, s) for s in SEEDS]
@@ -81,8 +92,8 @@ def main() -> None:
             if r["seed"] == 42:
                 for mode in ("CE", "KD"):
                     v = r[f"acc_{mode.lower()}"]
-                    parity[f"{tier} {mode}"] = (v == ARCHIVE[tier][mode],
-                                                v, ARCHIVE[tier][mode])
+                    parity[f"{tier} {mode}"] = (v == ARCHIVE[WIDTH][tier][mode],
+                                                v, ARCHIVE[WIDTH][tier][mode])
         print(f"\n[{tier} · S{WIDTH}] 三个随机流下的 KD−CE 配对（10000 张，翻牌逐图算）：")
         for r in rows:
             ok = "  ←第4课那一轮" if r["seed"] == 42 else ""
@@ -92,7 +103,7 @@ def main() -> None:
                   f"p={r['p_sign']:.4g}）{ok}")
 
     bad = {k: v for k, v in parity.items() if not v[0]}
-    print(f"\n[仪器对账] {'逐位复现 4/4 通过 → 换种子测到的确实是随机流，不是代码漂了' if not bad else 'FAIL：' + str(bad)}")
+    print(f"\n[仪器对账] {'逐位复现 ' + str(len(parity)) + '/' + str(len(parity)) + ' 通过 → 换种子测到的确实是随机流，不是代码漂了' if not bad else 'FAIL：' + str(bad)}")
 
     verdicts = {}
     for tier, rows in tiers.items():
@@ -130,8 +141,10 @@ def main() -> None:
     print(f"[自我审计② 两层误差别混] 图配对检验（p 很小）说的是「同一副权重下 KD 与 CE 谁判对更多」，"
           f"种子层（n={len(SEEDS)}）说的是「换一副权重还成不成立」。前者管系统误差、后者管重训方差，"
           "两者不能互相顶替，也不能乘在一起吹成「p 更小」。")
-    print(f"[自我审计③ 仍未做] α/T 扫参、宽度 S64 的种子复现、"
-          f"每种子只训一次（种子底本身没有二次底，n={len(SEEDS)} 个点的极差是欠估的）。")
+    print(f"[自我审计③ 仍未做] 每种子只训一次（种子底本身没有二次底，n={len(SEEDS)} 个点的极差是欠估的）；"
+          + ("另一副宽度 S64 未换种子。" if WIDTH == 128
+             else "S128 已复现，但 S64 低数据档第4课本就没跑，无从复现。")
+          + "α/T 扫参见 step4c_alpha_T_sweep.py。")
     pool = "、".join(f"{t} {v['pooled_flips']['broken']}+{v['pooled_flips']['fixed']}"
                      for t, v in verdicts.items())
     print(f"[自我审计④ 合并 p 偏乐观] 三个种子吃的是同一批 10000 张测试图：同一张图可以在三种子里都翻坏，"
@@ -144,13 +157,20 @@ def main() -> None:
               "arms": {f"{t} 种子{s}": r for t, rows in tiers.items() for s, r in zip(SEEDS, rows)},
               "verdicts": verdicts,
               "limitations": ["每种子只训一次：种子底由 3 个点的极差估，欠估",
-                              "只复现了 S128；S64 两档判决未换种子",
-                              "α/T 未扫参（第4课同款边界，本轮没动）",
+                              f"只复现了 S{WIDTH} + 档位 {list(tiers)}；"
+                              f"其余臂（{'S64 满数据' if WIDTH == 128 else '低数据档 S64 本就没跑'}）未换种子",
+                              "α/T 未扫参（本课只测随机流；扫参见 step4c_alpha_T_sweep.py）",
                               "p_pooled 偏乐观：三个种子共用同一批 10000 张测试图，翻牌事件跨种子不独立",
                               "本轮不测墙钟：精度是确定性读数，墙钟要另开交错配对流程"]}
-    OUT.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"\n已存 {OUT.name}（12 次训练，10000 张全量测试，纯 CPU，零 API 费）")
+    n_train = len(SEEDS) * 2 * len(tiers)
+    out_path().write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"\n已存 {out_path().name}（{n_train} 次训练，10000 张全量测试，纯 CPU，零 API 费）")
 
 
 if __name__ == "__main__":
+    ap = argparse.ArgumentParser(description="第4课判决的种子复现（默认 S128 两档）")
+    ap.add_argument("--width", type=int, choices=(128, 64), default=128,
+                    help="学生 MLP 宽度；64 只复现满数据档（第4课低数据档没跑 S64）")
+    args = ap.parse_args()
+    WIDTH = args.width
     main()

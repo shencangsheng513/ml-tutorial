@@ -77,13 +77,14 @@ def logits_of(model: nn.Module, x: torch.Tensor) -> torch.Tensor:
 
 
 # ---------- Q3a 软标签体检：老师手里到底有没有信息 ----------
-def soft_label_audit(logits: torch.Tensor) -> dict:
+def soft_label_audit(logits: torch.Tensor, t: float = KD_T) -> dict:
     """温度前后各量一次。塌缩（top1 逼近 1）意味着 KL 项梯度接近 0，
     KD 就只是换了个写法、信息量与 one-hot 无异——那时 Q2 测不出差异是机制决定的，不是运气。"""
     out = {}
-    for tag, lg in (("原始", logits), ("除以T", logits / KD_T)):
+    for tag, lg in (("原始", logits), ("除以T", logits / t)):
         top2 = torch.softmax(lg, dim=1).topk(2, dim=1).values
-        out[tag] = {"mean_top1": round(float(top2[:, 0].mean()), 4),
+        out[tag] = {"T": t,
+                    "mean_top1": round(float(top2[:, 0].mean()), 4),
                     "pct_top1_gt_0.99": round(float((top2[:, 0] > 0.99).float().mean() * 100), 1),
                     "mean_margin_top1_top2": round(float((top2[:, 0] - top2[:, 1]).mean()), 4),
                     "mean_p2": round(float(top2[:, 1].mean()), 4)}   # 第二名的概率才是暗知识本体
@@ -93,7 +94,8 @@ def soft_label_audit(logits: torch.Tensor) -> dict:
 # ---------- Q2 训练臂：CE 与 KD 只差一个目标函数 ----------
 def train_student(hidden: int, xd: torch.Tensor, yd: torch.Tensor, soft: torch.Tensor,
                   mode: str, xv: torch.Tensor, yv: torch.Tensor,
-                  seed: int = SEED) -> tuple[nn.Module, list]:
+                  seed: int = SEED, alpha: float = KD_ALPHA,
+                  t: float = KD_T) -> tuple[nn.Module, list]:
     torch.manual_seed(seed)                       # 重播 → 两臂初始权重逐位相同
     m = build_mlp(hidden)
     gen = torch.Generator().manual_seed(seed)     # 批次序列走独立流，不污染全局（第3课的修法）
@@ -108,9 +110,9 @@ def train_student(hidden: int, xd: torch.Tensor, yd: torch.Tensor, soft: torch.T
             loss = ce(z, yd[idx])
         else:
             soft_loss = nn.functional.kl_div(
-                torch.log_softmax(z / KD_T, dim=1),
-                torch.softmax(soft[idx] / KD_T, dim=1), reduction="batchmean") * KD_T ** 2
-            loss = (1 - KD_ALPHA) * ce(z, yd[idx]) + KD_ALPHA * soft_loss
+                torch.log_softmax(z / t, dim=1),
+                torch.softmax(soft[idx] / t, dim=1), reduction="batchmean") * t ** 2
+            loss = (1 - alpha) * ce(z, yd[idx]) + alpha * soft_loss
         opt.zero_grad()
         loss.backward()
         opt.step()

@@ -1,0 +1,158 @@
+{
+  "archive_acc": 0.9798,
+  "test_n": 10000,
+  "torch": "2.14.0+cpu",
+  "engine": "onednn",
+  "cpu": "Intel Core i7-14650HX",
+  "isa": {
+    "avx2": true,
+    "avx512_f": false,
+    "avx512_vnni": false,
+    "avx_vnni": true,
+    "avx_vnni_int8": false,
+    "amx_int8": false
+  },
+  "weight_error_prior": [
+    {
+      "layer": "L0 Conv2d",
+      "numel": 144,
+      "pt_err_pct": 0.5054,
+      "pc_err_pct": 0.3517,
+      "gain_pct_points": 0.1537,
+      "channel_absmax_cv": 0.18
+    },
+    {
+      "layer": "L3 Conv2d",
+      "numel": 4608,
+      "pt_err_pct": 1.028,
+      "pc_err_pct": 0.7597,
+      "gain_pct_points": 0.2682,
+      "channel_absmax_cv": 0.313
+    },
+    {
+      "layer": "L7 Linear",
+      "numel": 100352,
+      "pt_err_pct": 2.0607,
+      "pc_err_pct": 1.2316,
+      "gain_pct_points": 0.8291,
+      "channel_absmax_cv": 0.545
+    },
+    {
+      "layer": "L9 Linear",
+      "numel": 640,
+      "pt_err_pct": 0.7086,
+      "pc_err_pct": 0.5119,
+      "gain_pct_points": 0.1968,
+      "channel_absmax_cv": 0.155
+    }
+  ],
+  "arms": {
+    "D0 默认qconfig(=第1课E)": {
+      "kb": 113.6,
+      "acc": 0.9801,
+      "wrong": 199,
+      "flip_broken": 2,
+      "flip_fixed": 5,
+      "layers_quantized": "4/4",
+      "param_coverage": 1.0,
+      "per_layer_scheme": {
+        "Conv2d0": "逐通道(axis=0)｜scale=16",
+        "Conv2d1": "逐通道(axis=0)｜scale=32",
+        "Linear2": "逐通道(axis=0)｜scale=64",
+        "Linear3": "逐通道(axis=0)｜scale=10"
+      },
+      "size_ledger": {
+        "int8_weight_kb": 103.27,
+        "fp32_bias_kb": 0.48,
+        "floor_kb": 103.74,
+        "saved_kb": 113.6,
+        "unexplained_kb": 9.86,
+        "pct_of_artifact_not_int8_weight": 9.1,
+        "meta_theory_kb": 1.43
+      },
+      "ms_p50": 0.369,
+      "ms_p95": 1.001,
+      "ms_rounds": [
+        0.371,
+        0.369,
+        0.337
+      ],
+      "ms_spread_pct": 9.3,
+      "throughput": 21137.5
+    },
+    "P 显式逐通道": {
+      "kb": 113.6,
+      "acc": 0.9801,
+      "wrong": 199,
+      "flip_broken": 2,
+      "flip_fixed": 5,
+      "layers_quantized": "4/4",
+      "param_coverage": 1.0,
+      "per_layer_scheme": {
+        "Conv2d0": "逐通道(axis=0)｜scale=16",
+        "Conv2d1": "逐通道(axis=0)｜scale=32",
+        "Linear2": "逐通道(axis=0)｜scale=64",
+        "Linear3": "逐通道(axis=0)｜scale=10"
+      },
+      "size_ledger": {
+        "int8_weight_kb": 103.27,
+        "fp32_bias_kb": 0.48,
+        "floor_kb": 103.74,
+        "saved_kb": 113.6,
+        "unexplained_kb": 9.86,
+        "pct_of_artifact_not_int8_weight": 9.1,
+        "meta_theory_kb": 1.43
+      },
+      "ms_p50": 0.337,
+      "ms_p95": 0.819,
+      "ms_rounds": [
+        0.343,
+        0.337,
+        0.33
+      ],
+      "ms_spread_pct": 3.8,
+      "throughput": 25252.5
+    },
+    "T 强制逐张量": {
+      "kb": 110.0,
+      "acc": 0.9795,
+      "wrong": 205,
+      "flip_broken": 7,
+      "flip_fixed": 4,
+      "layers_quantized": "4/4",
+      "param_coverage": 1.0,
+      "per_layer_scheme": {
+        "Conv2d0": "逐张量｜scale=1",
+        "Conv2d1": "逐张量｜scale=1",
+        "Linear2": "逐张量｜scale=1",
+        "Linear3": "逐张量｜scale=1"
+      },
+      "size_ledger": {
+        "int8_weight_kb": 103.27,
+        "fp32_bias_kb": 0.48,
+        "floor_kb": 103.74,
+        "saved_kb": 110.0,
+        "unexplained_kb": 6.26,
+        "pct_of_artifact_not_int8_weight": 6.1,
+        "meta_theory_kb": 0.05
+      },
+      "ms_p50": 0.272,
+      "ms_p95": 0.318,
+      "ms_rounds": [
+        0.274,
+        0.271,
+        0.272
+      ],
+      "ms_spread_pct": 1.1,
+      "throughput": 31751.0
+    }
+  },
+  "latency_runs": 4,
+  "latency_run_ratio": 4.3,
+  "latency_verdict": "作废：次间漂移远大于臂间差",
+  "residual_gain_to_acc_transfer_pct": 7.2,
+  "default_is_per_channel": true,
+  "acc_gap_pp": 0.06,
+  "kb_gap": 3.6,
+  "p_equals_t": false
+}

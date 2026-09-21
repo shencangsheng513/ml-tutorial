@@ -1,2 +1,4 @@
 models/
 *.log
+__pycache__/
+latency_history.json

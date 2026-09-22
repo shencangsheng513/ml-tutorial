@@ -17,6 +17,9 @@
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4b_seed_variance.py --width 64
   # 给第4课没跑过的数据档造种子底（扫参线要拿它当闸门；只产底，不产复现）：
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4b_seed_variance.py --tier 中数据4500
+  # 第八发：把这本种子底本身扩到第4课e/f 那批 8 条流（老 3 条先与 compress_report_v4b.json 逐位对账，
+  # 档案名带 _n8 与老账并存）——板块一路用 3 个点的极差当闸门，这一发就是还那笔粗估债：
+  PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4b_seed_variance.py --nseeds 8
 """
 from __future__ import annotations
 
@@ -28,11 +31,14 @@ import torch
 
 from step1_quantize import MODELS, build_cnn, predict
 from step4_distill import DATA_TIERS, TIERS, VAL_N, logits_of, sign_test_p, train_student
+from step4e_marginal_recheck import summarize          # CI 用全板块同一套 t 系数表，不在这里另刻一把
 from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
 V4 = HERE / "compress_report_v4.json"
 SEEDS = (42, 7, 2026)                             # 42 是第4课那一轮，留着当逐位对账的锚
+SEEDS8 = SEEDS + (11, 202, 3003, 40004, 55555)    # 后五条是第4课e/f 那批流：跨脚本才配得上「同一批随机流」
+NSEEDS = 3                                         # 可被 --nseeds 覆盖
 WIDTH = 128                                        # 可被 --width 覆盖（S64 复现用）
 TIER = ""                                          # 可被 --tier 覆盖；空 = 第4课那两档全跑
 # 第4课档案值（committed run）——种子 42 必须逐位复现，否则说明本课改坏了 train_student
@@ -55,7 +61,8 @@ def out_path() -> Path:
         raise SystemExit(f"--tier {TIER!r} 没有登记档案名：它要么该并进合并档案（那别用 --tier），"
                          f"要么该有自己的档案名（在这里登记）。回落成通用文件名等于把两档记进同一本")
     stem = "compress_report_v4b" if WIDTH == 128 else f"compress_report_v4b_s{WIDTH}"
-    return HERE / (stem + suffix + ".json")
+    # 流数是这本账的判别维度：8 条流那发若写回同名文件，就无声盖掉了板块一路在用的那把 3 点底
+    return HERE / (stem + suffix + ("_n8" if NSEEDS == 8 else "") + ".json")
 
 
 
@@ -86,6 +93,19 @@ def spread(xs: list[int]) -> dict:
 def main() -> None:
     if not (MODELS / "mnist_cnn_fp32.pt").exists():
         raise SystemExit("缺 teacher 权重，先跑 python train_baseline.py")
+    seeds = SEEDS if NSEEDS == 3 else SEEDS8
+    # 8 条流这本账的全部价值在于它能与老账**并起来读**（同一批流、同一顺序）。所以训练之前先立一道
+    # 跨脚本闸：老 3 条流必须与已入库那本逐位相同。不相同只有两种解释——代码漂了，或这批流不是那批流；
+    # 两种都不允许把新底报成"同一把尺子量得更精"。
+    v4b_ref = HERE / "compress_report_v4b.json"
+    if NSEEDS == 8:
+        if not v4b_ref.exists():
+            raise SystemExit("--nseeds 8 要拿 compress_report_v4b.json 当跨脚本基准，它不在盘上：先确认老账在不在")
+        ref = json.loads(v4b_ref.read_text(encoding="utf-8"))["arms"]
+        for tier in (TIERS if TIER == "" else {TIER: None}):
+            for s in SEEDS:
+                if f"{tier} 种子{s}" not in ref:
+                    raise SystemExit(f"跨脚本闸没有记录可比（{tier} 种子{s}）：空表在 all() 下恒真，那不算测过")
     xt_all, yt_all, xte, yte = load_split()
     cut = len(xt_all) - VAL_N
     xv, yv = xt_all[cut:], torch.tensor(yt_all[cut:])
@@ -103,6 +123,7 @@ def main() -> None:
     parity: dict[str, tuple] = {}
     parity_na: list[str] = []
     tiers: dict[str, list[dict]] = {}
+    xcheck: dict[str, str] = {}
     for tier, n_data in selected.items():
         arch = ARCHIVE[WIDTH].get(tier)
         if arch is None and TIER == "":
@@ -112,8 +133,17 @@ def main() -> None:
                   f"parity 记 n/a；本课在这里只产**种子底**，不产复现")
         xd, yd = xt_all[:n_data], torch.tensor(yt_all[:n_data])
         soft = logits_of(teacher, xd)             # 软标签与随机流无关：各种子共用同一份
-        rows = [one_pair(teacher, xd, yd, soft, xv, yv, xte, yte, s) for s in SEEDS]
+        rows = [one_pair(teacher, xd, yd, soft, xv, yv, xte, yte, s) for s in seeds]
         tiers[tier] = rows
+        if NSEEDS == 8:                             # 跨脚本闸：老 3 条流逐位，才配把新 5 条报成"同一把尺量得更精"
+            for r in rows[:len(SEEDS)]:
+                o = ref[f"{tier} 种子{r['seed']}"]
+                four = (r["wrong_ce"], r["wrong_kd"], r["flips"]["broken"], r["flips"]["fixed"])
+                if four != (o["wrong_ce"], o["wrong_kd"], o["flips"]["broken"], o["flips"]["fixed"]):
+                    raise SystemExit(f"[跨脚本对账] FAIL {tier} 种子{r['seed']}：本发 {four} vs "
+                                     f"{v4b_ref.name} {tuple(o[k] for k in ('wrong_ce', 'wrong_kd')) + (o['flips']['broken'], o['flips']['fixed'])}"
+                                     f"\n老 3 条流没复现老账 → 这 8 条与那 3 条不可并读，先查 train_student/load_split")
+            xcheck[f"{tier} 老3条流×4项读数"] = "逐位相同"
         for r in rows:
             if r["seed"] == 42:
                 for mode in ("CE", "KD"):
@@ -122,7 +152,7 @@ def main() -> None:
                         parity_na.append(f"{tier} {mode}")
                     else:
                         parity[f"{tier} {mode}"] = (v == arch[mode], v, arch[mode])
-        print(f"\n[{tier} · S{WIDTH}] 三个随机流下的 KD−CE 配对（10000 张，翻牌逐图算）：")
+        print(f"\n[{tier} · S{WIDTH}] {len(seeds)} 个随机流下的 KD−CE 配对（10000 张，翻牌逐图算）：")
         for r in rows:
             ok = "  ←第4课那一轮" if (r["seed"] == 42 and arch) else ""
             print(f"  种子 {r['seed']:<5} CE {r['acc_ce']:.4f}（错 {r['wrong_ce']}） | "
@@ -141,6 +171,9 @@ def main() -> None:
         print(f"\n[仪器对账] **本轮没有对账可做**（{len(parity_na)} 项全 n/a：这一档第4课没跑过，"
               f"没有档案值可逐位比）→ 这一栏没测到任何事，别当闸门过了；"
               f"本课在这里只产**种子底**，「代码有没有漂」由默认跑法（有档案那两档）代测")
+    if xcheck:
+        print(f"[跨脚本对账] { '；'.join(xcheck) } —— 这 {len(xcheck)} 本老账逐位相同，"
+              f"所以新 5 条流与老 3 条是同一把尺子的更精读数，不是换了一把")
 
     verdicts = {}
     for tier, rows in tiers.items():
@@ -160,52 +193,68 @@ def main() -> None:
         floor = max(v["seed_floor_imgs"]["CE"], v["seed_floor_imgs"]["KD"])
         v["gap_over_floor"] = round(abs(v["gap_spread"]["mean"]) / floor, 2)
         v["survives_seed"] = bool(abs(v["gap_spread"]["mean"]) > floor)
+        v["floor_is_n_dependent"] = (
+            f"底是 max−min 型统计量，随流数机械变宽：n={len(seeds)} 时它必然 ≥ n=3 时的值，"
+            f"所以 gap_over_floor 这个比值**跨本不可比**，换流数的那一发不能用它翻案或定案")
+        v["paired_gap"] = summarize(gaps, f"{tier} · S{WIDTH} 按流配对")
+        pg = v["paired_gap"]
         print(f"\n[判决 {tier}] gap 跨种子 {v['gaps_imgs']} 张 → 极差 {v['gap_spread']['range']} 张、"
               f"均值 {v['gap_spread']['mean']:+.1f} 张")
         print(f"  · 符号维度的复现：{v['same_dir_seeds']} 个种子同向，种子层二项 p={v['p_seeds']}"
-              f"（n=3 最多只能到 0.25，**方向稳 ≠ 种子层显著**）")
-        print(f"  · 三次复现的翻牌合并：坏 {v['pooled_flips']['broken']} / 正 {v['pooled_flips']['fixed']}，"
-              f"p={v['p_pooled']:.4g}（可合并的前提：三组是同一份数据的不同随机流，交换性成立）")
+              f"（{len(seeds)} 条流全同号也只对应 p={2 * 0.5 ** len(seeds):.4g}，**方向稳不等于种子层显著**）")
+        print(f"  · {len(seeds)} 次复现的翻牌合并：坏 {v['pooled_flips']['broken']} / 正 {v['pooled_flips']['fixed']}，"
+              f"p={v['p_pooled']:.4g}（可合并的前提：它们是同一份数据的不同随机流，交换性成立）")
         print(f"  · **种子底：同一目标函数只换随机流，错图数极差 CE {v['seed_floor_imgs']['CE']} 张 / "
               f"KD {v['seed_floor_imgs']['KD']} 张**——以后任何单臂读数小于这个数，在这台机器上都不算疗效")
         print(f"  · 疗效对底：|均值 gap| {abs(v['gap_spread']['mean']):.1f} 张 ÷ 种子底 {floor} 张 = "
               f"{v['gap_over_floor']}x → "
               + ("**扛住换随机流**" if v["survives_seed"] else "**没扛住：幅度与换一次权重的抖动同量级，不算疗效**"))
+        print(f"  · 同一条腿换配对尺子（这 {len(seeds)} 条 gap 是**同起点同批次流**的配对差，"
+              f"该用它自己的 σ 而不是单臂极差）：均值 {pg['mean_gap_imgs']:+.1f} 张、"
+              f"σ {pg['sd_imgs']} 张、95% CI [{pg['ci95_imgs'][0]:+.1f}, {pg['ci95_imgs'][1]:+.1f}]、"
+              f"{pg['same_sign_seeds']} 同号、二项 p={pg['p_seeds_binomial']}")
+        if not v["survives_seed"] and pg["ci95_imgs"][0] * pg["ci95_imgs"][1] > 0:
+            print(f"       ⚠ **两把尺子判反了，而且反得可以预期**：极差是 max−min，流越多它越宽（这本 {floor} 张 vs "
+                  f"3 条流那本的同档底），所以『疗效 ÷ 极差』这个比值会随着你补流**自己往下掉**——"
+                  f"它是 n 依赖的分母，不能拿来翻案。承重的是上面那条配对 CI：它不含 0，"
+                  f"说明『换随机流之后 KD 与 CE 谁更强』这件事**有方向**；"
+                  f"而『比一次重训的抖动大』这件事在这个 n 上没通过，报出来必须连着两把尺子一起报。")
 
     print("\n[自我审计① 重跑不等于复现] 第4课固定种子，精度/翻牌/KB 跨运行逐位相同，"
           "所以「再跑一遍 step4」只能量到墙钟漂移、量不到种子方差；"
           "这一课必须改随机流才是还那笔债——别把「跑过两次」当成「复现过」。")
     print(f"[自我审计② 两层误差别混] 图配对检验（p 很小）说的是「同一副权重下 KD 与 CE 谁判对更多」，"
-          f"种子层（n={len(SEEDS)}）说的是「换一副权重还成不成立」。前者管系统误差、后者管重训方差，"
+          f"种子层（n={len(seeds)}）说的是「换一副权重还成不成立」。前者管系统误差、后者管重训方差，"
           "两者不能互相顶替，也不能乘在一起吹成「p 更小」。")
-    print(f"[自我审计③ 仍未做] 每种子只训一次（种子底本身没有二次底，n={len(SEEDS)} 个点的极差是欠估的）；"
+    print(f"[自我审计③ 仍未做] 每种子只训一次（种子底本身没有二次底，n={len(seeds)} 个点的极差是欠估的）；"
           + ("另一副宽度 S64 未换种子。" if WIDTH == 128
              else "S128 已复现，但 S64 低数据档第4课本就没跑，无从复现。")
           + "α/T 扫参见 step4c_alpha_T_sweep.py。")
     pool = "、".join(f"{t} {v['pooled_flips']['broken']}+{v['pooled_flips']['fixed']}"
                      for t, v in verdicts.items())
-    print(f"[自我审计④ 合并 p 偏乐观] 三个种子吃的是同一批 10000 张测试图：同一张图可以在三种子里都翻坏，"
+    print(f"[自我审计④ 合并 p 偏乐观] {len(seeds)} 个种子吃的是同一批 10000 张测试图：同一张图可以在多个种子里都翻坏，"
           f"所以合并起来的翻牌数（{pool}）不是独立事件，p_pooled 只是「比单种子更稳的方向感」，"
-          f"不能当第二个独立复现。真正干净的复现统计只有上面那行「{len(SEEDS)} 个种子同向」。")
+          f"不能当第二个独立复现。真正干净的复现统计只有上面那行「{len(seeds)} 个种子同向」。")
 
-    report = {"seeds": list(SEEDS), "width": WIDTH, "test_n": int(len(yte)),
-              "tier_arg": TIER or "默认（第4课两档）",
+    report = {"seeds": list(seeds), "cross_script_parity": xcheck, "width": WIDTH, "test_n": int(len(yte)),
+              "tier_arg": TIER or "默认（第4课两档）", "n_seeds_arg": NSEEDS,
               "parity_no_archive": parity_na,
               "train_fit_n": cut, "parity_seed42_vs_archive":
                   {k: {"match": v[0], "this_run": v[1], "archive": v[2]} for k, v in parity.items()},
-              "arms": {f"{t} 种子{s}": r for t, rows in tiers.items() for s, r in zip(SEEDS, rows)},
+              "arms": {f"{t} 种子{s}": r for t, rows in tiers.items() for s, r in zip(seeds, rows)},
               "verdicts": verdicts,
-              "limitations": ["每种子只训一次：种子底由 3 个点的极差估，欠估",
+              "limitations": ["每种子只训一次：种子底由 {len(seeds)} 个点的极差估，仍是欠估",
                               f"只复现了 S{WIDTH} + 档位 {list(tiers)}；"
                               f"其余臂（{'S64 满数据' if WIDTH == 128 else '低数据档 S64 本就没跑'}）未换种子",
                               "α/T 未扫参（本课只测随机流；扫参见 step4c_alpha_T_sweep.py）",
-                              "p_pooled 偏乐观：三个种子共用同一批 10000 张测试图，翻牌事件跨种子不独立",
-                              "本轮不测墙钟：精度是确定性读数，墙钟要另开交错配对流程"]}
+                              "p_pooled 偏乐观：多个种子共用同一批 10000 张测试图，翻牌事件跨种子不独立",
+                              "本轮不测墙钟：精度是确定性读数，墙钟要另开交错配对流程",
+                              "种子底用的是 max−min 型极差：它随流数机械变宽，所以 gap_over_floor 只能在同一本账内部读，拿 3 条流那本与 8 条流这本的比值互相翻案就是拿 n 当效应"]}
     if parity_na:
         report["limitations"].append(
             f"{'、'.join(parity_na)} 没有第4课档案可对：这一档只产种子底，"
             f"「换随机流还同向吗」这件事对它没有历史判决可复核")
-    n_train = len(SEEDS) * 2 * len(tiers)
+    n_train = len(seeds) * 2 * len(tiers)
     out_path().write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\n已存 {out_path().name}（{n_train} 次训练，10000 张全量测试，纯 CPU，零 API 费）")
 
@@ -217,6 +266,8 @@ if __name__ == "__main__":
     ap.add_argument("--tier", choices=tuple(DATA_TIERS), default="",
                     help="只复现这一档（给扫参线造种子底）。第4课那两档走默认合并档案，"
                          "不在这里单跑——单跑一次就把另一档的账抹了")
+    ap.add_argument("--nseeds", type=int, choices=(3, 8), default=3,
+                    help="8 = 把这本种子底扩到第4课e/f 那批 8 条流；档案名带 _n8，与 3 条流那本并存不覆盖")
     args = ap.parse_args()
     # 闸门必须在这里、训练之前：out_path() 是流程最后一行，那时才炸就白烧十几分钟 CPU
     if args.width == 64:
@@ -228,4 +279,8 @@ if __name__ == "__main__":
                          f"要老档案就别带 --tier")
     WIDTH = args.width
     TIER = args.tier
+    NSEEDS = args.nseeds
+    if out_path().exists():
+        raise SystemExit(f"{out_path().name} 已入库：重跑会无声盖掉那本种子底（板块所有判决的闸门都建在它上面）。"
+                         f"要重跑得先自己改名或删档，并说清为什么")
     main()

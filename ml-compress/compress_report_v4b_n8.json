@@ -1,0 +1,394 @@
+{
+  "seeds": [
+    42,
+    7,
+    2026,
+    11,
+    202,
+    3003,
+    40004,
+    55555
+  ],
+  "cross_script_parity": {
+    "满数据8500 老3条流×4项读数": "逐位相同",
+    "低数据2000 老3条流×4项读数": "逐位相同"
+  },
+  "width": 128,
+  "test_n": 10000,
+  "tier_arg": "默认（第4课两档）",
+  "n_seeds_arg": 8,
+  "parity_no_archive": [],
+  "train_fit_n": 8500,
+  "parity_seed42_vs_archive": {
+    "满数据8500 CE": {
+      "match": true,
+      "this_run": 0.9326,
+      "archive": 0.9326
+    },
+    "满数据8500 KD": {
+      "match": true,
+      "this_run": 0.9263,
+      "archive": 0.9263
+    },
+    "低数据2000 CE": {
+      "match": true,
+      "this_run": 0.9045,
+      "archive": 0.9045
+    },
+    "低数据2000 KD": {
+      "match": true,
+      "this_run": 0.9072,
+      "archive": 0.9072
+    }
+  },
+  "arms": {
+    "满数据8500 种子42": {
+      "seed": 42,
+      "acc_ce": 0.9326,
+      "acc_kd": 0.9263,
+      "gap_pp": -0.63,
+      "gap_imgs": -63,
+      "flips": {
+        "broken": 131,
+        "fixed": 68
+      },
+      "p_sign": 9e-06,
+      "wrong_ce": 674,
+      "wrong_kd": 737
+    },
+    "满数据8500 种子7": {
+      "seed": 7,
+      "acc_ce": 0.9348,
+      "acc_kd": 0.9287,
+      "gap_pp": -0.61,
+      "gap_imgs": -61,
+      "flips": {
+        "broken": 110,
+        "fixed": 49
+      },
+      "p_sign": 1e-06,
+      "wrong_ce": 652,
+      "wrong_kd": 713
+    },
+    "满数据8500 种子2026": {
+      "seed": 2026,
+      "acc_ce": 0.9347,
+      "acc_kd": 0.9246,
+      "gap_pp": -1.01,
+      "gap_imgs": -101,
+      "flips": {
+        "broken": 155,
+        "fixed": 54
+      },
+      "p_sign": 0.0,
+      "wrong_ce": 653,
+      "wrong_kd": 754
+    },
+    "满数据8500 种子11": {
+      "seed": 11,
+      "acc_ce": 0.9352,
+      "acc_kd": 0.9275,
+      "gap_pp": -0.77,
+      "gap_imgs": -77,
+      "flips": {
+        "broken": 140,
+        "fixed": 63
+      },
+      "p_sign": 0.0,
+      "wrong_ce": 648,
+      "wrong_kd": 725
+    },
+    "满数据8500 种子202": {
+      "seed": 202,
+      "acc_ce": 0.9319,
+      "acc_kd": 0.9249,
+      "gap_pp": -0.7,
+      "gap_imgs": -70,
+      "flips": {
+        "broken": 137,
+        "fixed": 67
+      },
+      "p_sign": 1e-06,
+      "wrong_ce": 681,
+      "wrong_kd": 751
+    },
+    "满数据8500 种子3003": {
+      "seed": 3003,
+      "acc_ce": 0.9268,
+      "acc_kd": 0.921,
+      "gap_pp": -0.58,
+      "gap_imgs": -58,
+      "flips": {
+        "broken": 127,
+        "fixed": 69
+      },
+      "p_sign": 4.1e-05,
+      "wrong_ce": 732,
+      "wrong_kd": 790
+    },
+    "满数据8500 种子40004": {
+      "seed": 40004,
+      "acc_ce": 0.9297,
+      "acc_kd": 0.9234,
+      "gap_pp": -0.63,
+      "gap_imgs": -63,
+      "flips": {
+        "broken": 128,
+        "fixed": 65
+      },
+      "p_sign": 7e-06,
+      "wrong_ce": 703,
+      "wrong_kd": 766
+    },
+    "满数据8500 种子55555": {
+      "seed": 55555,
+      "acc_ce": 0.9282,
+      "acc_kd": 0.9229,
+      "gap_pp": -0.53,
+      "gap_imgs": -53,
+      "flips": {
+        "broken": 134,
+        "fixed": 81
+      },
+      "p_sign": 0.000367,
+      "wrong_ce": 718,
+      "wrong_kd": 771
+    },
+    "低数据2000 种子42": {
+      "seed": 42,
+      "acc_ce": 0.9045,
+      "acc_kd": 0.9072,
+      "gap_pp": 0.27,
+      "gap_imgs": 27,
+      "flips": {
+        "broken": 135,
+        "fixed": 162
+      },
+      "p_sign": 0.131244,
+      "wrong_ce": 955,
+      "wrong_kd": 928
+    },
+    "低数据2000 种子7": {
+      "seed": 7,
+      "acc_ce": 0.908,
+      "acc_kd": 0.9102,
+      "gap_pp": 0.22,
+      "gap_imgs": 22,
+      "flips": {
+        "broken": 127,
+        "fixed": 149
+      },
+      "p_sign": 0.20613,
+      "wrong_ce": 920,
+      "wrong_kd": 898
+    },
+    "低数据2000 种子2026": {
+      "seed": 2026,
+      "acc_ce": 0.905,
+      "acc_kd": 0.9065,
+      "gap_pp": 0.15,
+      "gap_imgs": 15,
+      "flips": {
+        "broken": 130,
+        "fixed": 145
+      },
+      "p_sign": 0.398582,
+      "wrong_ce": 950,
+      "wrong_kd": 935
+    },
+    "低数据2000 种子11": {
+      "seed": 11,
+      "acc_ce": 0.908,
+      "acc_kd": 0.9111,
+      "gap_pp": 0.31,
+      "gap_imgs": 31,
+      "flips": {
+        "broken": 121,
+        "fixed": 152
+      },
+      "p_sign": 0.069223,
+      "wrong_ce": 920,
+      "wrong_kd": 889
+    },
+    "低数据2000 种子202": {
+      "seed": 202,
+      "acc_ce": 0.9066,
+      "acc_kd": 0.9106,
+      "gap_pp": 0.4,
+      "gap_imgs": 40,
+      "flips": {
+        "broken": 129,
+        "fixed": 169
+      },
+      "p_sign": 0.023709,
+      "wrong_ce": 934,
+      "wrong_kd": 894
+    },
+    "低数据2000 种子3003": {
+      "seed": 3003,
+      "acc_ce": 0.9017,
+      "acc_kd": 0.9038,
+      "gap_pp": 0.21,
+      "gap_imgs": 21,
+      "flips": {
+        "broken": 122,
+        "fixed": 143
+      },
+      "p_sign": 0.219152,
+      "wrong_ce": 983,
+      "wrong_kd": 962
+    },
+    "低数据2000 种子40004": {
+      "seed": 40004,
+      "acc_ce": 0.9083,
+      "acc_kd": 0.9101,
+      "gap_pp": 0.18,
+      "gap_imgs": 18,
+      "flips": {
+        "broken": 135,
+        "fixed": 153
+      },
+      "p_sign": 0.316472,
+      "wrong_ce": 917,
+      "wrong_kd": 899
+    },
+    "低数据2000 种子55555": {
+      "seed": 55555,
+      "acc_ce": 0.9008,
+      "acc_kd": 0.9072,
+      "gap_pp": 0.64,
+      "gap_imgs": 64,
+      "flips": {
+        "broken": 100,
+        "fixed": 164
+      },
+      "p_sign": 9.8e-05,
+      "wrong_ce": 992,
+      "wrong_kd": 928
+    }
+  },
+  "verdicts": {
+    "满数据8500": {
+      "gaps_imgs": [
+        -63,
+        -61,
+        -101,
+        -77,
+        -70,
+        -58,
+        -63,
+        -53
+      ],
+      "gap_spread": {
+        "min": -101,
+        "max": -53,
+        "range": 48,
+        "mean": -68.25
+      },
+      "same_dir_seeds": "8/8",
+      "p_seeds": 0.0078,
+      "pooled_flips": {
+        "broken": 1062,
+        "fixed": 516
+      },
+      "p_pooled": 0.0,
+      "seed_floor_imgs": {
+        "CE": 84,
+        "KD": 77
+      },
+      "gap_over_floor": 0.81,
+      "survives_seed": false,
+      "floor_is_n_dependent": "底是 max−min 型统计量，随流数机械变宽：n=8 时它必然 ≥ n=3 时的值，所以 gap_over_floor 这个比值**跨本不可比**，换流数的那一发不能用它翻案或定案",
+      "paired_gap": {
+        "label": "满数据8500 · S128 按流配对",
+        "n_seeds": 8,
+        "mean_gap_imgs": -68.2,
+        "sd_imgs": 15.1,
+        "se_imgs": 5.3,
+        "ci95_imgs": [
+          -80.9,
+          -55.6
+        ],
+        "gaps": [
+          -63,
+          -61,
+          -101,
+          -77,
+          -70,
+          -58,
+          -63,
+          -53
+        ],
+        "same_sign_seeds": "8/8（−）",
+        "p_seeds_binomial": 0.0078,
+        "range_imgs": 48,
+        "d4_sigma_hat": 16.9
+      }
+    },
+    "低数据2000": {
+      "gaps_imgs": [
+        27,
+        22,
+        15,
+        31,
+        40,
+        21,
+        18,
+        64
+      ],
+      "gap_spread": {
+        "min": 15,
+        "max": 64,
+        "range": 49,
+        "mean": 29.75
+      },
+      "same_dir_seeds": "8/8",
+      "p_seeds": 0.0078,
+      "pooled_flips": {
+        "broken": 999,
+        "fixed": 1237
+      },
+      "p_pooled": 5.3e-07,
+      "seed_floor_imgs": {
+        "CE": 75,
+        "KD": 73
+      },
+      "gap_over_floor": 0.4,
+      "survives_seed": false,
+      "floor_is_n_dependent": "底是 max−min 型统计量，随流数机械变宽：n=8 时它必然 ≥ n=3 时的值，所以 gap_over_floor 这个比值**跨本不可比**，换流数的那一发不能用它翻案或定案",
+      "paired_gap": {
+        "label": "低数据2000 · S128 按流配对",
+        "n_seeds": 8,
+        "mean_gap_imgs": 29.8,
+        "sd_imgs": 15.9,
+        "se_imgs": 5.6,
+        "ci95_imgs": [
+          16.4,
+          43.1
+        ],
+        "gaps": [
+          27,
+          22,
+          15,
+          31,
+          40,
+          21,
+          18,
+          64
+        ],
+        "same_sign_seeds": "8/8（+）",
+        "p_seeds_binomial": 0.0078,
+        "range_imgs": 49,
+        "d4_sigma_hat": 17.2
+      }
+    }
+  },
+  "limitations": [
+    "每种子只训一次：种子底由 {len(seeds)} 个点的极差估，仍是欠估",
+    "只复现了 S128 + 档位 ['满数据8500', '低数据2000']；其余臂（S64 满数据）未换种子",
+    "α/T 未扫参（本课只测随机流；扫参见 step4c_alpha_T_sweep.py）",
+    "p_pooled 偏乐观：多个种子共用同一批 10000 张测试图，翻牌事件跨种子不独立",
+    "本轮不测墙钟：精度是确定性读数，墙钟要另开交错配对流程",
+    "种子底用的是 max−min 型极差：它随流数机械变宽，所以 gap_over_floor 只能在同一本账内部读，拿 3 条流那本与 8 条流这本的比值互相翻案就是拿 n 当效应"
+  ]
+}

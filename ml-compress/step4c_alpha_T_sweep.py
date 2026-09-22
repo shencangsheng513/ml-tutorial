@@ -32,11 +32,15 @@ H1 的伤害基数、种子底三样全都跟着宽度走，S64 那一份是 0.9
 `--tier 中数据4500` 是顺着那条判决追的一发：两个端点反号，中间只隔一次 4.25 倍的数据量变化，
 **符号到底在哪一档翻**？只测两端等于在一条曲线上画了两个点就说知道它弯；补一个中点，
 才分得清"随数据量单调变坏"和"两端不同、中间还有一次翻转"。
+`--nseeds 8` 还的是**分辨率债**：这张 3×3 表一直只有 3 条随机流，而 3/3 全同号的双侧二项 p 恰好是
+0.25——"无反例"不等于"显著"。扩到 8 条流（与第4课b/e/f 同一批种子，不许自创）之后，T 主效应
+除了那个随流数机械变宽的极差型种子底，还多一条**按流配对**的 CI，能跨 3 条/8 两本账并读。
 零 API 费，纯 CPU。跑法：
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py --width 64
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py --tier 低数据2000
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py --tier 中数据4500
+  PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py --nseeds 8
 """
 from __future__ import annotations
 
@@ -48,7 +52,7 @@ import torch.nn as nn
 
 from step1_quantize import MODELS, build_cnn, predict
 from step4_distill import (BS, DATA_TIERS, KD_ALPHA, KD_T, SEED, TIERS, VAL_N, build_mlp,
-                           logits_of, sign_test_p, soft_label_audit, train_student)
+                           logits_of, sign_test_p, soft_label_audit, summarize, train_student)
 from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
@@ -57,6 +61,8 @@ WIDTH = 128                                         # 默认副；已被第4课b
 ALPHAS = (0.3, 0.7, 1.0)
 TEMPS = (1.0, 3.0, 6.0)
 SEEDS = (42, 7, 2026)
+SEEDS8 = SEEDS + (11, 202, 3003, 40004, 55555)     # 第4课e/f 那批流：扩种子只能扩这一套，换一批就等于换一把尺
+NSEEDS = 3                                          # 可被 --nseeds 覆盖
 ALPHA_ANCHOR = KD_ALPHA                             # 0.7：第4课那格的权重分配
 ANCHOR_T = KD_T                                     # 3.0：探针的基准温度，也是锚点格
 T2_TOL = 0.15                                       # KD 梯度范数随 T 漂移超过 ±15% 就算 T 轴被污染
@@ -71,6 +77,11 @@ V4C_SUFFIX = {"低数据2000": "_low", "中数据4500": "_mid"}
 
 def v4b_path(width: int, tier: str) -> Path:
     """这一档、这一副宽度的种子底档案。S64 只跑过满数据档，所以那本里没有档位后缀。"""
+    if NSEEDS == 8:                                     # 8 条流那本底只覆盖 S128 的两档，别的组合直接拒
+        if width != 128 or tier not in TIERS:
+            raise SystemExit(f"--nseeds 8 的种子底档案只有 S128 × {list(TIERS)}（compress_report_v4b_n8.json）；"
+                             f"要测 S{width} 或 {tier}，得先给那一副把那本底扩出来，不许借别档的底")
+        return HERE / "compress_report_v4b_n8.json"
     stem = "compress_report_v4b" if width == 128 else f"compress_report_v4b_s{width}"
     if tier not in TIERS and tier not in V4B_SUFFIX:
         raise SystemExit(f"档 {tier} 没登记种子底档案名：它要么在第4课那两档的合并账里（那就别新加名字），"
@@ -81,7 +92,8 @@ def v4b_path(width: int, tier: str) -> Path:
 
 def out_path(width: int, tier: str = TIER) -> Path:
     stem = "compress_report_v4c" if width == 128 else f"compress_report_v4c_s{width}"
-    return HERE / (stem + V4C_SUFFIX.get(tier, "") + ".json")
+    # 流数是这本账的判别维度：不带 _n8 就会把板块一路在用的那本 3 条流的判决无声盖掉
+    return HERE / (stem + V4C_SUFFIX.get(tier, "") + ("_n8" if NSEEDS == 8 else "") + ".json")
 
 
 def load_anchor(v4b: Path, width: int, tier: str = TIER) -> dict:
@@ -92,6 +104,12 @@ def load_anchor(v4b: Path, width: int, tier: str = TIER) -> dict:
     伤害基数 +27 张——符号都反了），而"对账"这件事的效力完全来自它比的是档案真值。
     抄一份数字进代码，档案一改就对上老账了——所以档案是唯一来源，这里只负责读。"""
     d = json.loads(v4b.read_text(encoding="utf-8"))
+    if NSEEDS == 8:
+        # 借来的底必须先证明它没换尺子：v4b_n8 自己带那道跨脚本闸，这里读它，不在这里重算
+        got = (d.get("cross_script_parity") or {}).get(f"{tier} 老3条流×4项读数")
+        if got != "逐位相同":
+            raise SystemExit(f"{v4b.name} 里 {tier} 的跨脚本对账不是「逐位相同」（读到 {got!r}）："
+                             f"这本 8 条流的底与 3 条流那本不可并读，先查上游那一发")
     if int(d["width"]) != width:
         raise SystemExit(f"{v4b.name} 是 S{d['width']} 的报告，不是 S{width}——换宽度请连档案一起换")
     arm_key = f"{tier} 种子{SEEDS[0]}"
@@ -105,7 +123,13 @@ def load_anchor(v4b: Path, width: int, tier: str = TIER) -> dict:
             "ce_acc": arm["acc_ce"],
             "gap_imgs": arm["gap_imgs"],            # KD−CE，负=KD 更差，与本课 gap 同号向
             "floor": int(d["verdicts"][tier]["seed_floor_imgs"]["KD"]),
-            "floor_ce": int(d["verdicts"][tier]["seed_floor_imgs"]["CE"])}
+            "floor_ce": int(d["verdicts"][tier]["seed_floor_imgs"]["CE"]),
+            # 8 条流那本底把锚点格的**逐流 gap** 也记着：那一列就是这一课锚点格的同批读数，
+            # 逐位对上 ⇒ 两本账量的是同 8 条随机流，而不只是同一个种子 42
+            "paired_gaps": ({"seeds": d["seeds"],
+                            "gaps": d["verdicts"][tier]["gaps_imgs"],
+                            "label": f"{v4b.name} verdicts.{tier}.gaps_imgs"}
+                            if NSEEDS == 8 else None)}
 
 
 def h1_pred(gap_imgs: int) -> dict:
@@ -164,10 +188,11 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
     n_data = DATA_TIERS[tier]
     xd, yd = xt_all[:n_data], torch.tensor(yt_all[:n_data])
     soft = logits_of(teacher, xd)                   # 软标签与 T 无关：温度在 loss 里加，全程共用一份
+    seeds = SEEDS if NSEEDS == 3 else SEEDS8
 
     print(f"teacher+数据就位 | {tier} 训练 {n_data} 张 | 测试 {len(yte)} | 学生 S{width} | "
-          f"网格 {len(ALPHAS)}×{len(TEMPS)}×{len(SEEDS)} = "
-          f"{len(ALPHAS) * len(TEMPS) * len(SEEDS)} 次 KD + {len(SEEDS)} 次 CE 对照")
+          f"网格 {len(ALPHAS)}×{len(TEMPS)}×{len(seeds)} = "
+          f"{len(ALPHAS) * len(TEMPS) * len(seeds)} 次 KD + {len(seeds)} 次 CE 对照")
     print(f"[仪器] 锚点档案值来自 {v4b.name}：α={ALPHA_ANCHOR}/T={ANCHOR_T:g}/种子{SEEDS[0]} "
           f"KD {ANCHOR_KD['acc']}/错{ANCHOR_KD['wrong']}/坏{ANCHOR_KD['broken']}/正{ANCHOR_KD['fixed']}，"
           f"CE {ANCHOR_CE_ACC}，那一格 gap {anchor['gap_imgs']:+d} 张（H1 按 α 线性缩放它）")
@@ -252,7 +277,7 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
     ce_ref: dict[int, dict] = {}
     cells: dict[str, list[dict]] = {k: [] for k, _, _ in specs}
     print(f"\n[开跑] 每个种子一副 CE + {len(specs)} 副 KD（同种子同初始权重、同批次流，只差目标函数）：")
-    for seed in SEEDS:
+    for seed in seeds:
         ce, _ = train_student(width, xd, yd, soft, "CE", xv, yv, seed=seed)
         ce_pred = predict(ce, xte, False)
         ce_wrong = int((ce_pred != yte).sum())
@@ -275,7 +300,7 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
         print(" ".join(line))
         if mline:
             print(" " * 12 + "（配平臂）" + "  ".join(mline))
-        if seed == SEEDS[0]:
+        if seed == seeds[0]:
             r = cells[key(ALPHA_ANCHOR, ANCHOR_T)][0]
             ok = (abs(r["acc_kd"] - ANCHOR_KD["acc"]) < 5e-5 and r["wrong_kd"] == ANCHOR_KD["wrong"]
                   and r["broken"] == ANCHOR_KD["broken"] and r["fixed"] == ANCHOR_KD["fixed"]
@@ -298,7 +323,26 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
                    "p_pooled": round(sign_test_p(tb, tf), 8)}
     at = lambda a, t: grid[key(a, t)]["mean_gap_imgs"]      # noqa: E731
 
-    print("\n[网格] 每格三个种子的 KD−CE 平均（张，负=KD 更差）；括号内是该格跨种子极差：")
+    # ---------- 跨脚本**逐流**对账（零额外训练，只在借了 8 条流那本底的一发可做） ----------
+    pg = anchor.get("paired_gaps")
+    if pg:
+        mine = [r["gap_imgs"] for r in cells[key(ALPHA_ANCHOR, ANCHOR_T)]]
+        same_flows = pg["seeds"] == list(seeds)
+        ok = same_flows and mine == pg["gaps"]
+        print(f"\n[跨脚本逐流对账 锚点格 α={ALPHA_ANCHOR}/T={ANCHOR_T:g}] 本课 {mine} vs {pg['label']} {pg['gaps']}"
+              f" → " + ("逐位相同：这两本账量的是**同 8 条随机流**，「换流数」这一维对得上尺子"
+                        if ok else
+                        f"**不同**（流序一致={same_flows}）：两本账不是同一批流，"
+                        "与 v4b_n8 并读的一切结论作废"))
+        gap_parity = {"this_run_gaps": mine, "archive_gaps": pg["gaps"],
+                      "flow_order_matches": same_flows, "from": pg["label"],
+                      "verdict": "逐位相同" if ok else "不同：作废"}
+    else:
+        gap_parity = {"verdict": "这一发没有可借的逐流账（3 条流那本底只记极差，不记逐流 gap）",
+                      "flow_order_matches": None}
+        print("\n[跨脚本逐流对账] 跳过：3 条流那本 v4b 底不记逐流 gap，只有恒等闸与锚点单格对账。")
+
+    print(f"\n[网格] 每格{len(seeds)} 条流的 KD−CE 平均（张，负=KD 更差）；括号内是该格跨种子极差：")
     print("        T=" + "        ".join(f"{t:<7g}" for t in TEMPS))
     for a in ALPHAS:
         print(f"  α={a:<4} " + "        ".join(f"{at(a, t):+6.1f}({grid[key(a, t)]['range_imgs']:2d})"
@@ -325,6 +369,13 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
         "rises_as_H2_says": bool(at(a_max, TEMPS[-1]) - at(a_max, TEMPS[0]) > floor)}
     t_span_all = [round(sum(at(a, TEMPS[-1]) for a in ALPHAS) / len(ALPHAS)
                         - sum(at(a, TEMPS[0]) for a in ALPHAS) / len(ALPHAS), 1)]
+    # 同一个量的**配对**读法：每条流先自己「高温 − 低温」（同一条流的两格相减，CE 锚自动抵消），
+    # 再按 α 平均。为什么要它：种子底是 max−min 型统计量，流数一多就机械变宽，
+    # 所以下面那个 beats_seed_floor 不能用来跨流数确认或推翻判决——能跨的只有这条配对 CI。
+    per_flow_t = [round(sum(grid[key(a, TEMPS[-1])]["per_seed"][i]["gap_imgs"]
+                            - grid[key(a, TEMPS[0])]["per_seed"][i]["gap_imgs"]
+                            for a in ALPHAS) / len(ALPHAS), 1) for i in range(len(seeds))]
+    t_paired = summarize(per_flow_t, f"T{TEMPS[-1]:g}−T{TEMPS[0]:g}（每流先配对再按 α 平均）")
     # T 轴的符号在两档是反的：满数据档加热有害（锚点 gap<0，读"伤害"），低数据档加热有益
     # （gap>0，读"收益"）。写死"伤害"会让低数据档把最大的一步挑反（挑成最小的那个正号）。
     axis_noun = "伤害" if at(ALPHA_ANCHOR, ANCHOR_T) < 0 else "收益"
@@ -335,6 +386,10 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
     pick = max if t_span_all[0] > 0 else min
     verdicts["T_main_effect"] = {"T_max_minus_T_min_pooled_over_alpha": t_span_all[0],
                                  "beats_seed_floor": bool(abs(t_span_all[0]) > floor),
+                                 "seed_floor_gate_is_n_dependent": (
+                                     f"底 {floor} 张是 {len(seeds)} 条流的 max−min，换流数不可比"
+                                     f"（{v4b.name}）；跨流数只能读 paired_per_flow"),
+                                 "paired_per_flow": t_paired,
                                  "adjacent_steps": steps, "axis_noun": axis_noun,
                                  "where_the_effect_lives": pick(steps, key=lambda k: steps[k]["imgs"])}
     v_pure = at(a_max, TEMPS[0])
@@ -343,14 +398,33 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
                                        "sign": "KD 更好" if v_pure > 0 else "CE 更好",
                                        "counts_as_effect": bool(abs(v_pure) > floor)}
     v_low = at(ALPHAS[0], ANCHOR_T)
+    low_paired = summarize([r["gap_imgs"] for r in cells[key(ALPHAS[0], ANCHOR_T)]],
+                           f"α={ALPHAS[0]:g}/T={ANCHOR_T:g} 按流配对")
+    ci_low = low_paired["ci95_imgs"]
+    low_floor, low_ci = bool(abs(v_low) > floor), bool(not (ci_low[0] <= 0 <= ci_low[1]))
+    if axis_noun != "伤害":
+        low_reading = (f"这句反事实在本档用不上：锚点格自身 {at(ALPHA_ANCHOR, ANCHOR_T):+.1f} 张"
+                       f"也在底（{floor} 张）以内，α={ALPHAS[0]:g} 与 α={ALPHA_ANCHOR:g} 都还没和纯 CE 分出胜负，"
+                       "所以「往 α→0 走会怎样」在本档是两个不显著读数之间的比较")
+    elif low_floor and low_ci:
+        low_reading = "α→0 方向上伤害没消失（两把尺同判）"
+    elif low_ci:
+        low_reading = (f"**两把尺打架，而判决站在配对那一侧**：极差型底（{floor} 张，随流数机械变宽）"
+                       f"说 {abs(v_low)} 张没穿过，但按流配对 {low_paired['mean_gap_imgs']:+.1f} 张 "
+                       f"CI [{ci_low[0]:+.1f}, {ci_low[1]:+.1f}]、{low_paired['same_sign_seeds']} 条流同号不含 0 "
+                       f"⇒ 伤害没消失；「α→0 伤害就消失」这句反事实仍然不成立。"
+                       f"（3 条流那本底只有 {floor} 张的一半量级，同一个读数当时判的是「穿过」）"
+                       if NSEEDS == 8 else f"α→0 方向上伤害没消失（底没穿过但 CI 不含 0：{floor} 张这把尺太粗）")
+    elif low_floor:
+        low_reading = (f"穿过了底但配对 CI 含 0：底是随流数变宽的粗尺、CI 是同一条流内相减的细尺，"
+                       "两把不同意时按 CI 读 ⇒ 这一格只能说「说不清」")
+    else:
+        low_reading = "α→0 伤害消失（两把尺同判）"
     verdicts["alpha_03_at_anchor_T"] = {
         "mean_gap_imgs": v_low, "vs_floor": round(abs(v_low) / floor, 2),
-        "survives_seed": bool(abs(v_low) > floor),
-        "reading": ("α→0 方向上伤害没消失" if axis_noun == "伤害" and abs(v_low) > floor
-                    else "α→0 伤害消失" if axis_noun == "伤害"
-                    else f"这句反事实在本档用不上：锚点格自身 {at(ALPHA_ANCHOR, ANCHOR_T):+.1f} 张"
-                         f"也在底（{floor} 张）以内，α=0.3 与 α=0.7 都还没和纯 CE 分出胜负，"
-                         "所以「往 α→0 走会怎样」在本档是两个不显著读数之间的比较")}
+        "survives_seed": low_floor, "paired_per_flow": low_paired,
+        "paired_ci_excludes_zero": low_ci, "yardsticks_agree": bool(low_floor == low_ci),
+        "reading": low_reading}
     free = {k: g for k, g in grid.items() if not k.startswith("match_")}
     best = max(free, key=lambda k: free[k]["mean_gap_imgs"])
     worst = min(free, key=lambda k: free[k]["mean_gap_imgs"])
@@ -409,6 +483,12 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
           + "、".join(f"{k} {d['imgs']:+.1f} 张（{d['in_seed_floor_units']}x 底）"
                       for k, d in v["adjacent_steps"].items())
           + f" → {v['axis_noun']}主要住在 {v['where_the_effect_lives']} 这一步")
+    p = v["paired_per_flow"]
+    print(f"     ③ b 同一量的**按流配对**读法（{p['n_seeds']} 条流，CE 锚在同一条流内相减自动抵消）："
+          f"{p['mean_gap_imgs']:+.1f} 张 CI95 [{p['ci95_imgs'][0]:+.1f}, {p['ci95_imgs'][1]:+.1f}]"
+          f"（SD {p['sd_imgs']}）、同号 {p['same_sign_seeds']}、流级二项 p={p['p_seeds_binomial']}"
+          f" → CI 不含 0 = {not (p['ci95_imgs'][0] <= 0 <= p['ci95_imgs'][1])}。"
+          "种子底那条闸门随流数变宽，只在本表内部可比；跨流数（3 条 vs 8 条）只能读这一条。")
     v = verdicts["pure_KD_low_T_vs_CE"]
     print(f"  ④ α={a_max}/T={TEMPS[0]:g}（只用老师 argmax 的软标签、不加热）：{v['sign']}，gap {v['mean_gap_imgs']} 张 = "
           f"种子底的 {v['vs_floor']}x，算疗效={v['counts_as_effect']}")
@@ -436,7 +516,7 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
           "方向本课当时猜「低估 T 大端方差」，第4课d/e 已实测：猜反了——借来的底对**单格读数偏大**"
           "（换成每格自己的 ±2SE，T=1 两格立刻翻成显著），而那个翻档在扩到 8 条随机流后又消失了 ⇒ "
           "借来的底当闸这轮是对的，但「谁埋了谁」得先量再猜（±2SE 按独立合成是下界，见第4课d limitations）。")
-    print(f"[自我审计② 多重比较] {len(free)} 格 × 三种子，p_pooled 只看方向不看在底之上（同一批 10000 张测试图，"
+    print(f"[自我审计② 多重比较] {len(free)} 格 × {len(seeds)} 条流，p_pooled 只看方向不看在底之上（同一批 10000 张测试图，"
           f"种子之间翻牌事件不独立，p 偏乐观）。全表只有一件事是硬判决：{floor} 张这条线。")
     if tier == TIER:
         others = [t for t in DATA_TIERS if t != tier]
@@ -445,7 +525,7 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
               "等于用一把不知道刻度的尺量东西。")
     else:
         g, strict = anchor["gap_imgs"], max(floor, anchor["floor_ce"])
-        print(f"[自我审计③ 这一发扫的是 {tier}] 该档锚点格在第4课b 只有 {len(SEEDS)} 条随机流，"
+        print(f"[自我审计③ 这一发扫的是 {tier}] 该档锚点格在第4课b 只有 {len(seeds)} 条随机流，"
               f"幅度 {g:+d} 张；这一档自己的底 = KD {floor} / CE {anchor['floor_ce']} 张 → |gap| 是它们的 "
               f"{abs(g) / floor:.2f}x / {abs(g) / strict:.2f}x。"
               + ("压在底以下：本档只能读「T 轴形状换档后还在不在」，不能读成「KD 在这一档有疗效」。"
@@ -470,7 +550,7 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
 
     other = 64 if width == 128 else 128
     report = {"tier": tier, "width": width, "alphas": list(ALPHAS), "temps": list(TEMPS),
-              "seeds": list(SEEDS), "test_n": int(len(yte)), "train_fit_n": cut,
+              "seeds": list(seeds), "n_seeds_arg": NSEEDS, "test_n": int(len(yte)), "train_fit_n": cut,
               "anchor_hyperparams": {"alpha": ALPHA_ANCHOR, "T": ANCHOR_T},
               "anchor_archive_from": v4b.name,
               "seed_floor_imgs_from_v4b": floor,
@@ -492,6 +572,7 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
                                 "archive": ANCHOR_KD,
                                 "ce_acc_this_run": ce_ref[SEEDS[0]]["acc"],
                                 "ce_acc_archive": ANCHOR_CE_ACC},
+              "cross_script_gap_parity": gap_parity,
               "ce_ref_by_seed": ce_ref, "grid": grid, "verdicts": verdicts,
               "limitations": ["种子底借自第4课b 的 α=0.7/T=3 一格；第4课d 已逐格量过自己的配对误差棒"
                               "（借来的底对单格读数偏大，±2SE 又因跨格共用随机流是下界）",
@@ -499,12 +580,15 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
                                ("其余档位各自补扫（每档要先有 step4b --tier 造的种子底），另一副宽度是"
                                 if tier == TIER else
                                 f"另一副宽度（S{other}）只造过 {TIER} 一档的底，档位与宽度没法同时换；")
-                               + f"{out_path(other).name}（各写各的表，跨架构/跨档结论要几份对照着读）"),
-                              "每格 3 个种子，均值本身没有二次底",
+                               + f"compress_report_v4c{'' if width == 64 else '_s64'}.json"
+                                 f"{'_n8' if NSEEDS == 8 else ''}（3 条流那本，各写各的表；"
+                                 "8 条流只做过 S128 满/低两档，跨架构/跨档结论要几份对照着读，"
+                                 "而跨流数只能读配对 CI）"),
+                              f"每格 {len(seeds)} 条流，均值本身没有二次底",
                               "权重/温度解耦只在初始一步的一个批次上配平，不是全程配平",
-                              "p_pooled 偏乐观（三种子共用同一批测试图）"]}
+                              "p_pooled 偏乐观（多条流共用同一批测试图（极差型种子底还随流数变宽））"]}
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"\n已存 {out.name}（{len(SEEDS) * (len(cells) + 1)} 次训练，10000 张全量测试，纯 CPU，零 API 费）")
+    print(f"\n已存 {out.name}（{len(seeds) * (len(cells) + 1)} 次训练，10000 张全量测试，纯 CPU，零 API 费）")
 
 
 if __name__ == "__main__":
@@ -516,5 +600,13 @@ if __name__ == "__main__":
     ap.add_argument("--tier", choices=tuple(DATA_TIERS), default=TIER,
                     help="数据档位；每档的种子底/锚点档案值从该档自己的 compress_report_v4b*.json 读。"
                          "低数据与中数据目前只有 S128 造过底，配 --width 64 会直接报错")
+    ap.add_argument("--nseeds", type=int, choices=(3, 8), default=3,
+                    help="每个格子几条随机流；8 只服务「老账只有 3 条流」那笔分辨率债，"
+                         "种子底必须换到对应的 compress_report_v4b_n8.json")
     args = ap.parse_args()
+    NSEEDS = args.nseeds
+    # 闸门在训练之前：跑完 80 次训练再发现要覆盖老档案，那一发就白烧了
+    if out_path(args.width, args.tier).exists():
+        raise SystemExit(f"{out_path(args.width, args.tier).name} 已入库（判决档案不覆盖重跑）；"
+                         f"要重跑得先把它 mv 成 _prev_*，并且事后逐位核对只有派生字段变")
     main(args.width, args.tier)

@@ -63,7 +63,8 @@ from pathlib import Path
 import torch
 
 from step1_quantize import MODELS, build_cnn, predict
-from step4_distill import DATA_TIERS, VAL_N, logits_of, sign_test_p, train_student
+from step4_distill import (D4, T95, DATA_TIERS, VAL_N, logits_of, sign_test_p, summarize,
+                         train_student)
 from step4c_alpha_T_sweep import ALPHA_ANCHOR, TIER, V4C_SUFFIX, WIDTH, key
 from step4c_alpha_T_sweep import out_path as v4c_out_path
 from step6_fashion_replication import TEACHER_PT, load_fashion
@@ -72,8 +73,6 @@ from train_baseline import load_split
 HERE = Path(__file__).resolve().parent
 OLD_SEEDS = (42, 7, 2026)                    # v4c/v6 已跑过的三条：本课只当对账锚，不重算结论
 NEW_SEEDS = (11, 202, 3003, 40004, 55555)    # 补进来的五条随机流
-D4 = {3: 1.693, 5: 2.326, 8: 2.847}                # E[极差]/σ
-T95 = {3: 4.303, 5: 2.776, 8: 2.365}               # 双侧 95% t 分位数
 H_MIN_EFFECT = 5.0                            # 训练前立的下限：低于 5 张不值得为它开一课
 FIELDS = ("wrong_kd", "wrong_ce", "broken", "fixed")
 
@@ -219,23 +218,6 @@ def v4e_path(dataset: str, teacher: str, width: int, tier: str,
                    + "_t" + "t".join(f"{t:g}" for t in temps) + ".json")
 
 
-def summarize(gaps: list[int], label: str) -> dict:
-    """以种子为单位的估计：均值 ± 95% CI（t 分布，SE 用样本标准差），外加同号计数。"""
-    n = len(gaps)
-    mean = sum(gaps) / n
-    sd = math.sqrt(sum((g - mean) ** 2 for g in gaps) / (n - 1))
-    se = sd / math.sqrt(n)
-    ci = T95[n] * se          # 故意不用 .get：加种子时必须连系数表一起改，回落=用错刻度
-    pos = sum(1 for g in gaps if g > 0)
-    neg = sum(1 for g in gaps if g < 0)
-    # 复现级检验：把"这条随机流站哪边"当 Bernoulli，双侧二项
-    p_seed = min(1.0, 2 * sum(math.comb(n, k) for k in range(max(pos, neg), n + 1)) / 2 ** n)
-    return {"label": label, "n_seeds": n, "mean_gap_imgs": round(mean, 1),
-            "sd_imgs": round(sd, 1), "se_imgs": round(se, 1),
-            "ci95_imgs": [round(mean - ci, 1), round(mean + ci, 1)],
-            "gaps": gaps, "same_sign_seeds": f"{max(pos, neg)}/{n}（{'+' if pos >= neg else '−'}）",
-            "p_seeds_binomial": round(p_seed, 4),
-            "range_imgs": max(gaps) - min(gaps), "d4_sigma_hat": round((max(gaps) - min(gaps)) / D4[n], 1)}
 
 
 def t_effects_by_seed(spec, rows, seeds, temps: tuple[float, ...]) -> list[float]:

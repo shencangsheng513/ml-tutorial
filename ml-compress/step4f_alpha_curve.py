@@ -108,6 +108,27 @@ v1 的形状判据只吃**逐图合并 p**（`p_pooled`）。于是 T=1 那一�
   · 同一句话还有第三处错位：它拿**闸格**（s_probe）当"锚点格"。Fashion 薄账上两者恰好同格所以没露馅，
     MNIST 的闸格是 α=0.3 ⇒ 反号分支印成"α=0.05 买到锚点伤害的 197%"。改：份额与同号一律对
     `summary[ANC]`（本格的阶梯顶），低数据档那本随之从 197% 修成 63%。
+
+第七发（`SHAPE_RULE = "v3"`）还的是第五发自己记下的那笔债，判据写在重跑之前。v2 有两条视野缺陷，
+都不是"腿太松"，是**压根没看那一格**：
+  ① 判据只吃（最小剂量格, 闸格）两格。MNIST 的闸格是 α=0.3、阶梯顶是 α=0.7，于是低数据档那一发
+    阶梯顶实测 8/8 同号、+29.8 张（按 v2 两条腿它有方向）却进不了判决，印出来是"测不动"——
+    那句判词记的是仪器的视野，不是那一列的可读性。
+  ② "两格反号"没有正式分支。α=0.05 = −18.9（逐图 p=1e-06）与阶梯顶 +29.8 反号，污染说预言两格
+    同量级、H1 过原点直线预言两格同号且按剂量比例，两说都不合；可 v2 的三分支里没有"反向"这一格位置，
+    只能靠人在判词外面补一段描述性读数。描述性读数不进判词 = 下一轮没人能复算它。
+  · v3 的分支顺序（写死，此后不许改口；"有方向"的定义**逐字不动**＝逐图合并 p<0.05 且全部流同号）：
+      1 污染型：最小剂量格自己就有方向、且方向与锚点同侧（=v2 的第一支，一字未改）
+      2 **反号线**（新）：最小剂量格逐图决定性（合并 p<0.05）且与**阶梯顶**反号，同时阶梯顶有方向
+        ⇒ 判"反号线"，读数是配对步长那条 CI；这一支排在"有阈值"之前，因为"之前测不出"这句话
+        在"之前反向地显著"面前是错的。
+      3 有阈值：小剂量端没方向，而闸格**或阶梯顶**有方向（v2 只看闸格）
+      4 测不动：三格都没过两关，且连"逐图决定性反号"这条最弱的形状证据都凑不齐
+    阶梯顶与闸格同格时（Fashion 薄账）第 2、3 支自动退回 v2 的行为——这不是巧合，是要求：
+    **v3 不许在 v2 本来就读得清的地方改口**，它只买"判据看得见阶梯顶"这一件事。
+  · 离线验红（零训练，八本已入库档案）：v1/v2 复算必须各自等于档案里那句判词（v2 那两本按 v2 记，
+    v1-era 六本按 v1 记；已知例外只有 T=1 那一本，它已被 _v2 副本改判），v3 相对 v2 的**翻转集合
+    必须恰好等于**低数据档那一本（测不动 → 反号线），其余七本判词逐字不变。全翻是破坏，不翻是装饰。
 """
 from __future__ import annotations
 
@@ -131,7 +152,7 @@ SEEDS = (42, 7, 2026)                              # 与第4课b/c 同一批随�
 SEEDS8 = SEEDS + (11, 202, 3003, 40004, 55555)     # 第4课e 那五条：老 3 条只对账，新 5 条才是复现
 PROBE_ALPHA = 0.3                                   # 已在 v4c 档案里的那一格
 P_SIG = 0.05
-SHAPE_RULE = "v2"        # 形状判据版本：v1 只看逐图合并 p，v2 加一条流级符号检验（见文档串第四发）
+SHAPE_RULE = "v3"        # 形状判据版本：v1 只看逐图合并 p，v2 加流级同号腿，v3 让判据吃阶梯顶＋给反号一个正式分支
 V6 = HERE / "compress_report_v6_fashion.json"
 
 DATASETS = {
@@ -159,8 +180,19 @@ def flow_leg(s: dict, n: int) -> dict:
 
 
 def shape_verdict(s_small: dict, s_probe: dict, n: int, dirn: float,
-                  a_small: float, a_probe: float, anc_a: float) -> tuple:
-    """v2 形状判据（预登记于重跑之前）：一格**有方向** = 逐图合并 p < 0.05 **且** 全流同号。
+                  a_small: float, a_probe: float, anc_a: float,
+                  s_top: dict | None = None, pair_step: dict | None = None) -> tuple:
+    """v3 形状判据（预登记于重跑之前）：一格**有方向** = 逐图合并 p < 0.05 **且** 全流同号。
+
+    `s_top=None` 时逐字退化为 v2 的三分支——离线验红就靠这条把已入库档案的 v2 判词复算一遍。
+    传进 `s_top`（本发的阶梯顶 α={anc_a}）就是 v3：多一支「反号线」，并让「有阈值」也能由阶梯顶撑起。
+    分支顺序写死：① 污染型（条件与 v2 一字未改）② 反号线 ③ 有阈值 ④ 测不动。
+    阶梯顶与闸格同格时（Fashion 薄账）②③ 自动退回 v2 的行为——**v3 不许在 v2 本来就读得清的地方改口**。
+
+    为什么「反号线」要排在「有阈值」之前、又要两条件同时才判：v2 的三分支里没有"反向"的位置，
+    于是低数据档那一发只能印『测不动』再补一段人写的描述性读数——描述性读数不进判词，下一轮没人能复算它。
+    而"有阈值"说的是"起点之前测不出"，读数说的是"起点之前在**另一侧**"，那是两回事。
+    门槛刻意收紧（小剂量格逐图决定性 **且** 阶梯顶自己有方向），差一条就回到『测不动』，不硬给形状。
 
     为什么 v1 那一关不够：合并 p 是在同一批 10000 张测试图上数翻牌，n 条流共用的就是那一批图——
     它再小也只证明『这条流内部稳』，不证明『换个随机源还稳』。复现单位是流，所以**方向这一票由流派**。
@@ -176,6 +208,9 @@ def shape_verdict(s_small: dict, s_probe: dict, n: int, dirn: float,
     lo, hi = flow_leg(s_small, n), flow_leg(s_probe, n)
     harm_small = lo["has_direction"] and dirn * s_small["mean_gap_imgs"] > 0
     lo["alpha"], hi["alpha"] = a_small, a_probe
+    top = hi if s_top is None else dict(flow_leg(s_top, n), alpha=anc_a)
+    reverse = bool(s_top is not None) and top["has_direction"] and lo["p_pooled"] < P_SIG \
+        and s_small["mean_gap_imgs"] * s_top["mean_gap_imgs"] < 0
     if hi["p_pooled"] < P_SIG:
         v1_note = (f"特别注意 α={a_probe:g} 那一格：v1 只看逐图合并 p 会把它读成『有方向』"
                    f"（{hi['p_pooled']:.3g} < 0.05），但它只有 {hi['same_dir_flows']} 条流同号"
@@ -184,7 +219,7 @@ def shape_verdict(s_small: dict, s_probe: dict, n: int, dirn: float,
         v1_note = (f"两格的逐图合并 p 本来就没有全过（{lo['p_pooled']:.3g} / {hi['p_pooled']:.3g}）："
                    f"这一发 v1 与 {SHAPE_RULE} 会同判『测不动』，判据版本不是这里的不确定来源，"
                    f"不确定来自**流数与效应大小**")
-    if a_probe != anc_a:
+    if a_probe != anc_a and s_top is None:
         v1_note += (f"。另记一笔债：判据吃的是 α={a_small:g} 与 α={a_probe:g} 这两格，"
                     f"而这一发的阶梯顶是 α={anc_a:g}——它有没有方向、跟这两格同不同向，判据一概没看")
     if harm_small:
@@ -193,27 +228,44 @@ def shape_verdict(s_small: dict, s_probe: dict, n: int, dirn: float,
                    f"逐图合并 p={lo['p_pooled']:.4g}、均值 {s_small['mean_gap_imgs']:+.1f} 张），"
                    f"而它是锚点剂量的 {a_small / anc_a:.0%}——H1 的『按份额掺毒』在最后一块地上也没了："
                    f"软标签一旦进目标函数，坏的是它**在不在**，不是它占多少")
-    elif hi["has_direction"]:
+    elif reverse:
+        shape = "反号线（小剂量端与阶梯顶反向：两说都不合）"
+        ps = ("" if pair_step is None else
+              f"；把两端钉在一起的**配对步长** α={a_small:g}→{anc_a:g} 是 {pair_step['mean_gap_imgs']:+.1f} 张"
+              f"（CI [{pair_step['ci95_imgs'][0]:+.1f}, {pair_step['ci95_imgs'][1]:+.1f}]、"
+              f"{pair_step['same_sign_seeds']} 条流同号、二项 p={pair_step['p_seeds_binomial']}）")
+        mid = ("" if a_probe == anc_a else
+               f"（闸格 α={a_probe:g} 均值 {s_probe['mean_gap_imgs']:+.1f} 张夹在中间、流级 {hi['same_dir_flows']}"
+               f" 没方向，所以这一发读的不是『小剂量有害、大剂量有益』，而是整条线在往上走且截距为负）")
+        reading = (f"最小剂量端自己就是**反向**的：α={a_small:g} 均值 {s_small['mean_gap_imgs']:+.1f} 张"
+                   f"（逐图合并 p={lo['p_pooled']:.4g} 决定性、流级 {lo['same_dir_flows']} p={lo['p_flows']:.3g}），"
+                   f"而阶梯顶 α={anc_a:g} 两关同过：{s_top['mean_gap_imgs']:+.1f} 张"
+                   f"（合并 p={top['p_pooled']:.4g}、流级 {top['same_dir_flows']} p={top['p_flows']:.3g}）"
+                   f"{mid}{ps}。⇒ 污染说预言两格同量级（不合：两端差 "
+                   f"{abs(s_top['mean_gap_imgs'] - s_small['mean_gap_imgs']):.1f} 张且反号）、"
+                   f"H1 过原点直线预言两格同号且按剂量比例（也不合：符号相反）——数据支持的是一条"
+                   f"**带负截距的上升线**：剂量小时 KD 比 CE 更差，剂量大了才翻正并继续涨。"
+                   f"这一支不判谁赢，只把『份额线』和『饱和线』一起否掉。")
+    elif hi["has_direction"] or top["has_direction"]:
+        carrier, which = (hi, "闸格") if hi["has_direction"] else (top, "阶梯顶")
         shape = "有阈值（H1 半活）"
         reading = (f"小剂量端（α≤{a_small:g}）两关都出不了方向（合并 p={lo['p_pooled']:.3g}、"
-                   f"流级 {lo['same_dir_flows']} p={lo['p_flows']:.3g}），到 α={a_probe:g} 两关同过"
-                   f"（合并 p={hi['p_pooled']:.3g}、流级 {hi['same_dir_flows']} p={hi['p_flows']:.3g}）"
-                   f"→ 存在一个 0~{a_probe:g} 之间的起点，之前测不出、之后基本饱和；"
+                   f"流级 {lo['same_dir_flows']} p={lo['p_flows']:.3g}），到 α={carrier['alpha']:g}"
+                   f"（{which}）两关同过"
+                   f"（合并 p={carrier['p_pooled']:.3g}、流级 {carrier['same_dir_flows']} p={carrier['p_flows']:.3g}）"
+                   f"→ 存在一个 0~{carrier['alpha']:g} 之间的起点，之前测不出、之后基本饱和；"
                    f"说『伤害随 α 线性增长』仍然没有证据")
     else:
         shape = "测不动（这一发没判决）"
         reading = (f"两端都过不了两关（α={a_small:g}：合并 p={lo['p_pooled']:.3g} / 流级 "
                    f"{lo['same_dir_flows']} p={lo['p_flows']:.3g}；α={a_probe:g}：合并 p={hi['p_pooled']:.3g} "
-                   f"/ 流级 {hi['same_dir_flows']} p={hi['p_flows']:.3g}）→ 这一列的剂量响应判不了，别硬解。"
-                   + v1_note)
-        if s_small["p_pooled"] < P_SIG and s_small["mean_gap_imgs"] * s_probe["mean_gap_imgs"] < 0:
-            reading += (f"。**但『测不动』不等于没读数**：这两格是**反号**的"
-                        f"（α={a_small:g} 均值 {s_small['mean_gap_imgs']:+.1f} 张、逐图 p={s_small['p_pooled']:.3g}；"
-                        f"α={a_probe:g} 均值 {s_probe['mean_gap_imgs']:+.1f} 张）——"
-                        f"污染说预言两格同量级、H1 直线预言两格同号且按剂量比例——这一个反号两样都不合："
-                        f"这条阶梯是有**负截距**的上升线，不是份额线也不是饱和线。"
-                        f"注意这一句是描述性读数，不在预登记的三分支里，所以它不改判词、只记成下一版的债")
-    return shape, reading, {"small": lo, "anchor": hi}
+                   f"/ 流级 {hi['same_dir_flows']} p={hi['p_flows']:.3g}"
+                   + ("" if s_top is None or a_probe == anc_a else
+                      f"；阶梯顶 α={anc_a:g}：合并 p={top['p_pooled']:.3g} / 流级 {top['same_dir_flows']} "
+                      f"p={top['p_flows']:.3g}")
+                   + "）→ 这一列的剂量响应判不了，别硬解。" + v1_note)
+    legs = {"small": lo, "anchor": hi} if s_top is None else {"small": lo, "anchor": hi, "top": top}
+    return shape, reading, legs
 
 
 def shape_verdict_v1(s_small: dict, s_probe: dict, dirn: float) -> str:
@@ -266,7 +318,10 @@ def setup(dataset: str, width: int, tier: str, extra: str = "",
         arch = json.loads(v4c.read_text(encoding="utf-8"))
         if int(arch["width"]) != width or arch["tier"] != tier:
             raise SystemExit(f"{v4c.name} 是 {arch['tier']}/S{arch['width']} 的表，不是 {tier}/S{width}")
-        anc_a, gate_a, lad = ALPHA_ANCHOR, PROBE_ALPHA, LADDER
+        anc_a, gate_a = ALPHA_ANCHOR, PROBE_ALPHA
+        # 阶梯必须**真的训到锚点剂量**：v3 的判据能吃阶梯顶，而上一轮刚把"份额/反号"那两句话
+        # 改成读本格现读的阶梯顶（不借 3 条流的档案读数）。少这一格，那两句话与 v3 的第三格都没有原料。
+        lad = LADDER + (anc_a,)
         t = ANCHOR_T if t_col is None else t_col
         floor, floor_kind, floor_from = load_anchor(v4b, width, tier)["floor"], "v4b 的 KD 臂跨种子极差", v4b.name
         grid, anchor_from = arch["grid"], v4c.name
@@ -302,7 +357,7 @@ def setup(dataset: str, width: int, tier: str, extra: str = "",
     return {"t": t, "anchor_alpha": anc_a, "gate_alpha": gate_a, "ladder": lad,
             "teacher_acc": (float(d["teacher"]["test_acc"]) if dataset == "fashion" else TEACHER_ARCHIVE_ACC),
             "anchor_mean": float(grid[key(anc_a, t)]["mean_gap_imgs"]),
-            "gate_rows": gate, "gate_mean": round(sum(r["gap_imgs"] for r in gate) / len(gate), 1),
+            "gate_rows": gate, "anchor_rows": rows_of(key(anc_a, t)), "gate_mean": round(sum(r["gap_imgs"] for r in gate) / len(gate), 1),
             "floor": floor, "floor_kind": floor_kind, "floor_from": floor_from, "anchor_from": anchor_from,
             "peers": peers, "out": out,
             "gate_is_anchor": bool(gate_a == anc_a), "grid_keys": sorted(grid)}
@@ -331,6 +386,9 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
               f"闸格 α={PROBE:g} 是独立于锚点的对账线所以保留")
     floor, anchor_mean = L["floor"], L["anchor_mean"]
     probe = {"mean_gap_imgs": L["gate_mean"], "per_seed": L["gate_rows"]}
+    # 跨脚本对账的格子跟着**判据吃哪几格**走：v3 能让阶梯顶承载判决，那一格就必须有自己的独立对账线
+    # （否则"最硬的那一格"恰恰是唯一没跟上游对过的）。闸格与顶同格时（Fashion 薄账）去重成一条。
+    gate_refs = {a: rr for a, rr in ((PROBE, L["gate_rows"]), (ANC, L["anchor_rows"]))}
     out = L["out"]
     if out.exists():
         raise SystemExit(f"{out.name} 已入库——重跑会盖掉那本账。要重跑先删或改名")
@@ -392,10 +450,12 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
                             "diff_vs_ce_imgs": int((p != pe).sum()),
                             "p_sign": round(sign_test_p(broken, fixed), 6)})
             line.append(f"a{a:g}:{ce_wrong - wrong:+d}(差{int((p != pe).sum())})")
-            if a == PROBE and seed in SEEDS:   # 只有老 3 条有跨脚本账可核
+            for ga, gref in gate_refs.items():
+                if a != ga or seed not in SEEDS:
+                    continue                   # 只有老 3 条有跨脚本账可核
                 r = rows[a][-1]
-                ref = probe["per_seed"][SEEDS.index(seed)]
-                probe_gate.append({"seed": seed,
+                ref = gref[SEEDS.index(seed)]
+                probe_gate.append({"alpha": a, "seed": seed,
                                    "match": bool(r["wrong_kd"] == ref["wrong_kd"] and r["broken"] == ref["broken"]
                                                  and r["fixed"] == ref["fixed"]),
                                    "this_run": {k: r[k] for k in ("wrong_kd", "broken", "fixed")},
@@ -411,9 +471,15 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
         raise SystemExit(1)
     bad_probe = [g for g in probe_gate if not g["match"]]
     if not probe_gate:
-        raise SystemExit(f"跨脚本闸一条记录都没有（阶梯 {list(rows)} 里没有闸格 α={PROBE:g}）："
-                         "空表『全过』不是通过，是没测到")
-    print(f"[跨脚本闸 α={PROBE:g}] {f'{len(probe_gate)}/{len(probe_gate)} 与 {src} 档案逐位一致 → 本课与那一课是同一台训练器' if not bad_probe else 'FAIL：' + str(bad_probe)}")
+        raise SystemExit(f"跨脚本闸一条记录都没有（阶梯 {list(rows)} 里没有对账格 "
+                         f"{sorted(gate_refs)}）：空表『全过』不是通过，是没测到")
+    for ga in sorted(gate_refs):
+        sub = [g for g in probe_gate if g["alpha"] == ga]
+        role = ("闸格＝阶梯顶" if ga == PROBE == ANC else
+                ("阶梯顶" if ga == ANC else "") + ("闸格" if ga == PROBE else ""))
+        print(f"[跨脚本闸 α={ga:g}（{role}）] "
+              + (f"{len(sub)}/{len(sub)} 与 {src} 档案逐位一致" if sub else "这一格不在本发阶梯里（没测到）"))
+    print(f"  → {'本课与那一课是同一台训练器，判据吃的每一格都有独立对账线' if not bad_probe else 'FAIL：' + str(bad_probe)}")
     if bad_probe:
         print(f"  对不上 ⇒ 本课与 {src} 不是同一台仪器，锚点伤害就没有基准，阶梯读数只能重跑")
         raise SystemExit(1)
@@ -461,10 +527,13 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
               if pair_step["mean_gap_imgs"] < 0 else
               "CI 不含 0 且为正：小剂量格比锚点格更差，先查仪器再谈形状")))
 
-    # ---------- 判决：形状由数字挑，不由人挑（判据 = SHAPE_RULE，见文档串第四发） ----------
+    # ---------- 判决：形状由数字挑，不由人挑（判据 = SHAPE_RULE，见文档串第四发与第七发） ----------
     s_small, s_probe = summary[small], summary[PROBE]
-    shape, reading, legs = shape_verdict(s_small, s_probe, len(seeds), dirn, small, PROBE, ANC)
+    s_top = summary[ANC] if SHAPE_RULE == "v3" else None      # 只有 v3 把阶梯顶交给判据
+    shape, reading, legs = shape_verdict(s_small, s_probe, len(seeds), dirn, small, PROBE, ANC,
+                                         s_top, pair_step)
     v1_shape = shape_verdict_v1(s_small, s_probe, dirn)
+    v2_shape = shape_verdict(s_small, s_probe, len(seeds), dirn, small, PROBE, ANC)[0]
     print(f"\n[两关明细] 复现单位是流：合并 p 数的是同一批 10000 张图上的翻牌，流级腿数的是 {len(seeds)} 条流")
     for nm, lg in (("小剂量", legs["small"]), ("闸格", legs["anchor"])):
         print(f"  {nm} α={lg['alpha']:g}  逐图合并 p={lg['p_pooled']:.4g} | 流同号 {lg['same_dir_flows']} "
@@ -473,14 +542,20 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
         top = flow_leg(summary[ANC], len(seeds))
         top["alpha"] = ANC
         legs["top"] = top
-        print(f"  阶梯顶 α={ANC:g}（**判据没吃这一格**）逐图合并 p={top['p_pooled']:.4g} | "
+        print(f"  阶梯顶 α={ANC:g}（判据 {SHAPE_RULE} {'**吃了**这一格' if s_top is not None else '没吃这一格'}）"
+              f"逐图合并 p={top['p_pooled']:.4g} | "
               f"流同号 {top['same_dir_flows']} p={top['p_flows']:.4g} → "
               f"{'这一格其实有方向' if top['has_direction'] else '这一格也没方向'}"
-              + ("  ⇒ 上面那句『测不动』是**判据看不见阶梯顶**造成的，不是这一列真的读不出来：这笔债记进 v3"
-                 if top["has_direction"] else ""))
-    print(f"[判据版本] {SHAPE_RULE}；同一批数字交给 v1（只看逐图合并 p）会判 {v1_shape} → "
-          + ("两版同判，这条判据在这一发上没换到东西（也无损失）" if v1_shape.split("（")[0] == shape.split("（")[0]
-             else "**两版判词不同**：多出来的那条流级腿在这一发上是有读数的（下面判决以 " + SHAPE_RULE + " 为准）"))
+              + ("" if s_top is not None else
+                 ("  ⇒ 上面那句『测不动』是**判据看不见阶梯顶**造成的，不是这一列真的读不出来：这笔债记进 v3"
+                  if top["has_direction"] else "")))
+    print(f"[判据版本] 同一批数字交给三版判词：v1（只看逐图合并 p）{v1_shape} ｜ v2（加流级同号腿）{v2_shape} ｜ "
+          f"**{SHAPE_RULE}（本发采用）**{shape.split('（')[0]} → "
+          + ("三版同判，这一发判据版本不换东西（也无损失）"
+             if len({v1_shape.split('（')[0], v2_shape.split('（')[0], shape.split('（')[0]}) == 1 else
+             ("v3 相对 v2 换到了东西：判据这一发看得见阶梯顶（多出来的那格方向或反号进了判词）"
+              if v2_shape.split('（')[0] != shape.split('（')[0] else
+              "**v2 相对 v1 换到了东西**，而 v3 与 v2 同判（这一发阶梯顶不改变结论）")))
     print(f"\n[判决] {shape}：{reading}")
     # 分段也用以流为单位的**配对**差（同一批种子上相减），于是两段之和恰好等于上面那个整段配对步长。
     # 早先一版拿两格各自四舍五入过的均值相减，同一页上同一量出现 18.3 / 18.4 两个数。
@@ -559,6 +634,8 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
               "verdict": {"shape": shape, "reading": reading,
                           "shape_rule": SHAPE_RULE,
                           "verdict_under_v1_rule": v1_shape,
+                          "verdict_under_v2_rule": v2_shape,
+                          "criterion_cells": [small, PROBE] + ([] if L["gate_is_anchor"] else [ANC]),
                           "two_leg_detail": legs,
                           "first_cell_alpha": small,
                           "first_cell_same_sign_as_anchor": bool(same_sign_cells),
@@ -571,6 +648,10 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
                               f"（反向一条即 {flow_sign_p(len(seeds) - 1, len(seeds)):.4g}）——"
                               "3 条流的账上它只等于『没有反例』，并不构成 0.05 意义上的显著。"
                               "要收紧只能补流，不能再换判据",
+                              f"判据 {SHAPE_RULE} 吃的是 {('最小剂量格 + 闸格 + 阶梯顶' if SHAPE_RULE == 'v3' and not L['gate_is_anchor'] else '最小剂量格 + 闸格')}"
+                              "：『测不动』现在说的是这几格**都**没过两关，而『反号线』只报形状"
+                              "（负截距 + 还在涨），不判污染说与 H1 谁赢；"
+                              "小剂量端那条流级腿仍是计数，松紧跟着流数走",
                               "每种子每格只训一次：跨种子极差没有二次底" if nseeds == 3 else
                               f"{len(seeds)} 条流各训一次：这是把分辨率做精，新增的不是独立性",
                               f"只扫 T={T:g} 一列，其余温度上的剂量响应未测",

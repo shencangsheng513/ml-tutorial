@@ -39,6 +39,7 @@
 """
 import json
 import sys
+import math                      # summarize 用 sqrt；下面 comb 那行是这个文件原有的
 from math import comb
 from pathlib import Path
 
@@ -66,6 +67,31 @@ WIDTHS = (128, 64)
 NOISE_IMG = 3                                    # 本板块反复用的噪声底：10000 张里 ±3 张（**同臂跨运行**）
 TICK_MS = 0.001     # paired_timing 只留 3 位小数 = 一格 1µs；在 0.015 ms 量级上一格就是 6.7%，
                     # 比对照臂量出来的 0.76% 底大一个数量级——底必须按被测臂自己的刻度重算
+
+
+# ---------- 以「流」为单位的汇总：全板块一把尺子 ----------
+# 表放在这里而不是各脚本自带：补流数时必须连系数表一起改，回落成默认值等于用错刻度（第4课e 的教训）
+D4 = {3: 1.693, 5: 2.326, 8: 2.847}                # E[极差]/σ
+T95 = {3: 4.303, 5: 2.776, 8: 2.365}               # 双侧 95% t 分位数
+# 极差是 max−min 型统计量，随流数机械变宽，所以它只配当「单臂重训一次的抖动」的底；
+# 判配对差要用下面这个函数自己的 σ（d4_sigma_hat 是把它折算回 σ 的那一步）。
+def summarize(gaps: list[int], label: str) -> dict:
+    """以种子为单位的估计：均值 ± 95% CI（t 分布，SE 用样本标准差），外加同号计数。"""
+    n = len(gaps)
+    mean = sum(gaps) / n
+    sd = math.sqrt(sum((g - mean) ** 2 for g in gaps) / (n - 1))
+    se = sd / math.sqrt(n)
+    ci = T95[n] * se          # 故意不用 .get：加种子时必须连系数表一起改，回落=用错刻度
+    pos = sum(1 for g in gaps if g > 0)
+    neg = sum(1 for g in gaps if g < 0)
+    # 复现级检验：把"这条随机流站哪边"当 Bernoulli，双侧二项
+    p_seed = min(1.0, 2 * sum(math.comb(n, k) for k in range(max(pos, neg), n + 1)) / 2 ** n)
+    return {"label": label, "n_seeds": n, "mean_gap_imgs": round(mean, 1),
+            "sd_imgs": round(sd, 1), "se_imgs": round(se, 1),
+            "ci95_imgs": [round(mean - ci, 1), round(mean + ci, 1)],
+            "gaps": gaps, "same_sign_seeds": f"{max(pos, neg)}/{n}（{'+' if pos >= neg else '−'}）",
+            "p_seeds_binomial": round(p_seed, 4),
+            "range_imgs": max(gaps) - min(gaps), "d4_sigma_hat": round((max(gaps) - min(gaps)) / D4[n], 1)}
 
 
 # ---------- 学生架构：一副 MLP，与 teacher 唯一的共同点是输入和输出 ----------

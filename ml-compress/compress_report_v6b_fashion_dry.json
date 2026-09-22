@@ -1,0 +1,559 @@
+{
+  "dataset": "FashionMNIST",
+  "tier": "低数据2000",
+  "n_train_imgs": 2000,
+  "teacher": {
+    "epochs": 40,
+    "weight": "fashion_cnn_ep40.pt",
+    "test_acc": 0.8847,
+    "created_by": "复用缓存权重（本轮没重训）"
+  },
+  "dryness_gate": {
+    "a_collapse_pct": 42.5,
+    "dry_collapse_pct": 64.0,
+    "moved_pp": 21.5,
+    "required_pp": 10.0,
+    "pass": true
+  },
+  "ce_anchor_parity": [
+    {
+      "seed": 42,
+      "this_run_ce_wrong": 1857,
+      "v6_archive_ce_wrong": 1857,
+      "match": true
+    },
+    {
+      "seed": 7,
+      "this_run_ce_wrong": 1805,
+      "v6_archive_ce_wrong": 1805,
+      "match": true
+    },
+    {
+      "seed": 2026,
+      "this_run_ce_wrong": 1777,
+      "v6_archive_ce_wrong": 1777,
+      "match": true
+    }
+  ],
+  "seeds": [
+    42,
+    7,
+    2026,
+    11,
+    202,
+    3003,
+    40004,
+    55555
+  ],
+  "alphas": [
+    0.7,
+    1.0
+  ],
+  "temps": [
+    1.0,
+    6.0
+  ],
+  "paired_t_effect_per_seed_imgs": [
+    -27.5,
+    -119.5,
+    -136.5,
+    7.0,
+    -51.5,
+    -120.5,
+    -134.0,
+    -97.0
+  ],
+  "paired_t_effect_stats": {
+    "label": "dry 老师 | 低数据2000 配对 T 主效应",
+    "n_seeds": 8,
+    "mean_gap_imgs": -84.9,
+    "sd_imgs": 54.2,
+    "se_imgs": 19.2,
+    "ci95_imgs": [
+      -130.2,
+      -39.6
+    ],
+    "gaps": [
+      -27.5,
+      -119.5,
+      -136.5,
+      7.0,
+      -51.5,
+      -120.5,
+      -134.0,
+      -97.0
+    ],
+    "same_sign_seeds": "7/8（−）",
+    "p_seeds_binomial": 0.0703,
+    "range_imgs": 143.5,
+    "d4_sigma_hat": 50.4
+  },
+  "single_arm_own_floor_imgs": 122,
+  "teacher_a_low_tier_ref_from_v6_imgs": -94.7,
+  "prediction_ex_ante": {
+    "H_dryness": "训干 ⇒ 低数据 T 主效应往正走（任务内翻号）",
+    "H_task": "换干湿不换符号（仍负）",
+    "yardstick": "逐种子配对 + 95% CI；单臂底只当仪器刻度"
+  },
+  "verdict": "换干湿不换符号：dry 老师仍为负 ⇒ H_任务占优，『幅度跟干湿』在第二个任务里没拿到因果",
+  "per_tier_raw": {
+    "T_main_effect_imgs": -85.0,
+    "own_floor_imgs": 122,
+    "per_target_span_imgs": {
+      "CE": 122,
+      "a0.7_T1": 120,
+      "a0.7_T6": 72,
+      "a1_T1": 106,
+      "a1_T6": 59
+    },
+    "has_direction": false,
+    "in_units_of_own_floor": 0.7,
+    "sign": "负（加热有害）",
+    "grid": {
+      "a0.7_T1": {
+        "gaps_imgs": [
+          72,
+          91,
+          55,
+          65,
+          97,
+          56,
+          75,
+          140
+        ],
+        "mean_gap_imgs": 81.4,
+        "pooled_flips": {
+          "broken": 1344,
+          "fixed": 1995
+        },
+        "p_pooled": 0.0,
+        "vs_own_floor": 0.67
+      },
+      "a0.7_T6": {
+        "gaps_imgs": [
+          60,
+          -18,
+          -66,
+          115,
+          51,
+          -69,
+          -66,
+          70
+        ],
+        "mean_gap_imgs": 9.6,
+        "pooled_flips": {
+          "broken": 3396,
+          "fixed": 3473
+        },
+        "p_pooled": 0.359146,
+        "vs_own_floor": 0.08
+      },
+      "a1_T1": {
+        "gaps_imgs": [
+          52,
+          106,
+          64,
+          106,
+          98,
+          36,
+          59,
+          141
+        ],
+        "mean_gap_imgs": 82.8,
+        "pooled_flips": {
+          "broken": 1860,
+          "fixed": 2522
+        },
+        "p_pooled": 0.0,
+        "vs_own_floor": 0.68
+      },
+      "a1_T6": {
+        "gaps_imgs": [
+          9,
+          -24,
+          -88,
+          70,
+          41,
+          -80,
+          -68,
+          17
+        ],
+        "mean_gap_imgs": -15.4,
+        "pooled_flips": {
+          "broken": 3765,
+          "fixed": 3642
+        },
+        "p_pooled": 0.156317,
+        "vs_own_floor": 0.13
+      }
+    },
+    "raw_rows": {
+      "a0.7_T1": [
+        {
+          "seed": 42,
+          "alpha": 0.7,
+          "T": 1.0,
+          "wrong_kd": 1785,
+          "wrong_ce": 1857,
+          "gap_imgs": 72,
+          "broken": 214,
+          "fixed": 286,
+          "p_sign": 0.001472
+        },
+        {
+          "seed": 7,
+          "alpha": 0.7,
+          "T": 1.0,
+          "wrong_kd": 1714,
+          "wrong_ce": 1805,
+          "gap_imgs": 91,
+          "broken": 174,
+          "fixed": 265,
+          "p_sign": 1.6e-05
+        },
+        {
+          "seed": 2026,
+          "alpha": 0.7,
+          "T": 1.0,
+          "wrong_kd": 1722,
+          "wrong_ce": 1777,
+          "gap_imgs": 55,
+          "broken": 147,
+          "fixed": 202,
+          "p_sign": 0.003783
+        },
+        {
+          "seed": 11,
+          "alpha": 0.7,
+          "T": 1.0,
+          "wrong_kd": 1822,
+          "wrong_ce": 1887,
+          "gap_imgs": 65,
+          "broken": 160,
+          "fixed": 225,
+          "p_sign": 0.001081
+        },
+        {
+          "seed": 202,
+          "alpha": 0.7,
+          "T": 1.0,
+          "wrong_kd": 1750,
+          "wrong_ce": 1847,
+          "gap_imgs": 97,
+          "broken": 151,
+          "fixed": 248,
+          "p_sign": 1e-06
+        },
+        {
+          "seed": 3003,
+          "alpha": 0.7,
+          "T": 1.0,
+          "wrong_kd": 1709,
+          "wrong_ce": 1765,
+          "gap_imgs": 56,
+          "broken": 128,
+          "fixed": 184,
+          "p_sign": 0.001802
+        },
+        {
+          "seed": 40004,
+          "alpha": 0.7,
+          "T": 1.0,
+          "wrong_kd": 1703,
+          "wrong_ce": 1778,
+          "gap_imgs": 75,
+          "broken": 157,
+          "fixed": 232,
+          "p_sign": 0.000168
+        },
+        {
+          "seed": 55555,
+          "alpha": 0.7,
+          "T": 1.0,
+          "wrong_kd": 1702,
+          "wrong_ce": 1842,
+          "gap_imgs": 140,
+          "broken": 213,
+          "fixed": 353,
+          "p_sign": 0.0
+        }
+      ],
+      "a0.7_T6": [
+        {
+          "seed": 42,
+          "alpha": 0.7,
+          "T": 6.0,
+          "wrong_kd": 1797,
+          "wrong_ce": 1857,
+          "gap_imgs": 60,
+          "broken": 452,
+          "fixed": 512,
+          "p_sign": 0.057342
+        },
+        {
+          "seed": 7,
+          "alpha": 0.7,
+          "T": 6.0,
+          "wrong_kd": 1823,
+          "wrong_ce": 1805,
+          "gap_imgs": -18,
+          "broken": 453,
+          "fixed": 435,
+          "p_sign": 0.568375
+        },
+        {
+          "seed": 2026,
+          "alpha": 0.7,
+          "T": 6.0,
+          "wrong_kd": 1843,
+          "wrong_ce": 1777,
+          "gap_imgs": -66,
+          "broken": 440,
+          "fixed": 374,
+          "p_sign": 0.022654
+        },
+        {
+          "seed": 11,
+          "alpha": 0.7,
+          "T": 6.0,
+          "wrong_kd": 1772,
+          "wrong_ce": 1887,
+          "gap_imgs": 115,
+          "broken": 326,
+          "fixed": 441,
+          "p_sign": 3.7e-05
+        },
+        {
+          "seed": 202,
+          "alpha": 0.7,
+          "T": 6.0,
+          "wrong_kd": 1796,
+          "wrong_ce": 1847,
+          "gap_imgs": 51,
+          "broken": 432,
+          "fixed": 483,
+          "p_sign": 0.098288
+        },
+        {
+          "seed": 3003,
+          "alpha": 0.7,
+          "T": 6.0,
+          "wrong_kd": 1834,
+          "wrong_ce": 1765,
+          "gap_imgs": -69,
+          "broken": 430,
+          "fixed": 361,
+          "p_sign": 0.015562
+        },
+        {
+          "seed": 40004,
+          "alpha": 0.7,
+          "T": 6.0,
+          "wrong_kd": 1844,
+          "wrong_ce": 1778,
+          "gap_imgs": -66,
+          "broken": 437,
+          "fixed": 371,
+          "p_sign": 0.022155
+        },
+        {
+          "seed": 55555,
+          "alpha": 0.7,
+          "T": 6.0,
+          "wrong_kd": 1772,
+          "wrong_ce": 1842,
+          "gap_imgs": 70,
+          "broken": 426,
+          "fixed": 496,
+          "p_sign": 0.023011
+        }
+      ],
+      "a1_T1": [
+        {
+          "seed": 42,
+          "alpha": 1.0,
+          "T": 1.0,
+          "wrong_kd": 1805,
+          "wrong_ce": 1857,
+          "gap_imgs": 52,
+          "broken": 299,
+          "fixed": 351,
+          "p_sign": 0.045376
+        },
+        {
+          "seed": 7,
+          "alpha": 1.0,
+          "T": 1.0,
+          "wrong_kd": 1699,
+          "wrong_ce": 1805,
+          "gap_imgs": 106,
+          "broken": 221,
+          "fixed": 327,
+          "p_sign": 7e-06
+        },
+        {
+          "seed": 2026,
+          "alpha": 1.0,
+          "T": 1.0,
+          "wrong_kd": 1713,
+          "wrong_ce": 1777,
+          "gap_imgs": 64,
+          "broken": 205,
+          "fixed": 269,
+          "p_sign": 0.003762
+        },
+        {
+          "seed": 11,
+          "alpha": 1.0,
+          "T": 1.0,
+          "wrong_kd": 1781,
+          "wrong_ce": 1887,
+          "gap_imgs": 106,
+          "broken": 194,
+          "fixed": 300,
+          "p_sign": 2e-06
+        },
+        {
+          "seed": 202,
+          "alpha": 1.0,
+          "T": 1.0,
+          "wrong_kd": 1749,
+          "wrong_ce": 1847,
+          "gap_imgs": 98,
+          "broken": 233,
+          "fixed": 331,
+          "p_sign": 4.2e-05
+        },
+        {
+          "seed": 3003,
+          "alpha": 1.0,
+          "T": 1.0,
+          "wrong_kd": 1729,
+          "wrong_ce": 1765,
+          "gap_imgs": 36,
+          "broken": 203,
+          "fixed": 239,
+          "p_sign": 0.095846
+        },
+        {
+          "seed": 40004,
+          "alpha": 1.0,
+          "T": 1.0,
+          "wrong_kd": 1719,
+          "wrong_ce": 1778,
+          "gap_imgs": 59,
+          "broken": 225,
+          "fixed": 284,
+          "p_sign": 0.010077
+        },
+        {
+          "seed": 55555,
+          "alpha": 1.0,
+          "T": 1.0,
+          "wrong_kd": 1701,
+          "wrong_ce": 1842,
+          "gap_imgs": 141,
+          "broken": 280,
+          "fixed": 421,
+          "p_sign": 0.0
+        }
+      ],
+      "a1_T6": [
+        {
+          "seed": 42,
+          "alpha": 1.0,
+          "T": 6.0,
+          "wrong_kd": 1848,
+          "wrong_ce": 1857,
+          "gap_imgs": 9,
+          "broken": 528,
+          "fixed": 537,
+          "p_sign": 0.806362
+        },
+        {
+          "seed": 7,
+          "alpha": 1.0,
+          "T": 6.0,
+          "wrong_kd": 1829,
+          "wrong_ce": 1805,
+          "gap_imgs": -24,
+          "broken": 491,
+          "fixed": 467,
+          "p_sign": 0.457441
+        },
+        {
+          "seed": 2026,
+          "alpha": 1.0,
+          "T": 6.0,
+          "wrong_kd": 1865,
+          "wrong_ce": 1777,
+          "gap_imgs": -88,
+          "broken": 482,
+          "fixed": 394,
+          "p_sign": 0.003265
+        },
+        {
+          "seed": 11,
+          "alpha": 1.0,
+          "T": 6.0,
+          "wrong_kd": 1817,
+          "wrong_ce": 1887,
+          "gap_imgs": 70,
+          "broken": 376,
+          "fixed": 446,
+          "p_sign": 0.016048
+        },
+        {
+          "seed": 202,
+          "alpha": 1.0,
+          "T": 6.0,
+          "wrong_kd": 1806,
+          "wrong_ce": 1847,
+          "gap_imgs": 41,
+          "broken": 474,
+          "fixed": 515,
+          "p_sign": 0.203376
+        },
+        {
+          "seed": 3003,
+          "alpha": 1.0,
+          "T": 6.0,
+          "wrong_kd": 1845,
+          "wrong_ce": 1765,
+          "gap_imgs": -80,
+          "broken": 456,
+          "fixed": 376,
+          "p_sign": 0.006132
+        },
+        {
+          "seed": 40004,
+          "alpha": 1.0,
+          "T": 6.0,
+          "wrong_kd": 1846,
+          "wrong_ce": 1778,
+          "gap_imgs": -68,
+          "broken": 465,
+          "fixed": 397,
+          "p_sign": 0.022433
+        },
+        {
+          "seed": 55555,
+          "alpha": 1.0,
+          "T": 6.0,
+          "wrong_kd": 1825,
+          "wrong_ce": 1842,
+          "gap_imgs": 17,
+          "broken": 493,
+          "fixed": 510,
+          "p_sign": 0.613435
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "干湿由 epoch 轮数决定，同时改变了老师精度与拟合度：拆开的是轮数，拆不掉『老师强弱』这一维（第5课 D 同一告警）",
+    "只一个任务、只低数据档、只一副新老师：这是干湿说的第一次任务内判别，不是收敛",
+    "温度列只有 T∈(1.0, 6.0) 两端，中间形状未测",
+    "8 条流同架构同数据同老师：把读数做精，不是独立复证"
+  ]
+}

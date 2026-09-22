@@ -44,6 +44,16 @@ MNIST 的两副学生上（S128 79% / S64 63%），任务那一维一次都没�
 α=0 恒等闸跨任务照样成立（它测的是接线，不是世界）。产物 `compress_report_v4f_fashion.json`。
 跑法：
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4f_alpha_curve.py --dataset fashion --tier 满数据8500
+
+第三发（`--dataset fashion --tier 满数据8500 --nseeds 8 --thin --t 1`）补的是第二发自己留下的那条边界：
+上一发的阶梯铺在 `max(v6.temps)` = T=6 上，而 v6 那本账里 α=0.7/T=1 那格读数是 **+44.7 张（正号：
+KD 比 CE 少犯错）**。所以"有阈值"当时只是 **T=6 那一列**的形状，不能往别的温度列搬。把阶梯搬到 T=1，
+两说的分歧点照旧只有一个数字，只是符号反了：
+  · 污染说 → α=0.05 就该吃到 +44.7 量级的增益（这一列的阶梯是平的）；
+  · H1 直线 → α=0.05 只有 +3.2 张（这一列的阶梯是陡的）。
+`--t` 换的是**列**不是档，所以档案名带 `_t1`，且 `check_t` 只允许开在这一本账已有的温度列上：
+拿一本没有那一列的账铺阶梯，锚点格与闸格都会凭空造出来（最坏的一种绿）。产物
+`compress_report_v4f_fashion_n8_thin_t1.json`。
 """
 from __future__ import annotations
 
@@ -55,6 +65,7 @@ import torch
 
 from step1_quantize import MODELS, build_cnn, predict
 from step4_distill import DATA_TIERS, TEACHER_ARCHIVE_ACC, VAL_N, logits_of, sign_test_p, train_student
+from step4e_marginal_recheck import OLD_SEEDS, summarize          # 复现单位是流：CI 用同一套系数表
 from step4c_alpha_T_sweep import ALPHA_ANCHOR, ANCHOR_T, TIER, V4C_SUFFIX, key, load_anchor, out_path, v4b_path
 from step6_fashion_replication import TEACHER_PT, load_fashion
 from train_baseline import load_split
@@ -62,6 +73,7 @@ from train_baseline import load_split
 HERE = Path(__file__).resolve().parent
 LADDER = (0.0, 0.05, 0.1, 0.2, 0.3)               # 0 是恒等闸不是臂；0.3 是跨脚本闸
 SEEDS = (42, 7, 2026)                              # 与第4课b/c 同一批随机流，才能与档案逐位对
+SEEDS8 = SEEDS + (11, 202, 3003, 40004, 55555)     # 第4课e 那五条：老 3 条只对账，新 5 条才是复现
 PROBE_ALPHA = 0.3                                   # 已在 v4c 档案里的那一格
 P_SIG = 0.05
 V6 = HERE / "compress_report_v6_fashion.json"
@@ -84,7 +96,18 @@ def name_suffix(tier: str, width: int) -> str:
     return V4C_SUFFIX.get(tier, "") + ("" if width == 128 else f"_s{width}")
 
 
-def setup(dataset: str, width: int, tier: str) -> dict:
+def check_t(t: float, grid: dict, where: str) -> float:
+    """阶梯只能铺在这一本账**已有**的温度列上：没有那一列就没有锚点格，
+    也就没有尺子更没有闸——换列等于换一本账。"""
+    cols = sorted({float(k.split("_T")[1]) for k in grid})
+    if t not in cols:
+        raise SystemExit(f"{where} 这本账只有温度列 {cols}，没有 T={t:g}："
+                         f"先把那一列跑进账里再来铺阶梯")
+    return t
+
+
+def setup(dataset: str, width: int, tier: str, extra: str = "",
+          t_col: float | None = None) -> dict:
     """六样读数（温度列 / 锚点剂量 / 闸格 / 该档的底 / 锚点伤害 / 产物名）全从**那一本账**现读。
 
     为什么必须现读而不是各写一套：Fashion 那本账没有 T=3、也没有 α=0.3——把 MNIST 的两个常量
@@ -99,9 +122,12 @@ def setup(dataset: str, width: int, tier: str) -> dict:
         arch = json.loads(v4c.read_text(encoding="utf-8"))
         if int(arch["width"]) != width or arch["tier"] != tier:
             raise SystemExit(f"{v4c.name} 是 {arch['tier']}/S{arch['width']} 的表，不是 {tier}/S{width}")
-        t, anc_a, gate_a, lad = ANCHOR_T, ALPHA_ANCHOR, PROBE_ALPHA, LADDER
+        anc_a, gate_a, lad = ALPHA_ANCHOR, PROBE_ALPHA, LADDER
+        t = ANCHOR_T if t_col is None else t_col
         floor, floor_kind, floor_from = load_anchor(v4b, width, tier)["floor"], "v4b 的 KD 臂跨种子极差", v4b.name
-        grid, anchor_from, out = arch["grid"], v4c.name, HERE / v4c.name.replace("v4c", "v4f")
+        grid, anchor_from = arch["grid"], v4c.name
+        t = check_t(t, grid, v4c.name)
+        out = HERE / v4c.name.replace("v4c", "v4f").replace(".json", f"{extra}.json")
         rows_of = lambda k: grid[k]["per_seed"]                        # noqa: E731
         need = [key(anc_a, t), key(gate_a, t)]
     else:
@@ -112,34 +138,49 @@ def setup(dataset: str, width: int, tier: str) -> dict:
             raise SystemExit(f"{V6.name} 是 {d.get('dataset')}/S{d.get('width')}"
                              f"（档位 {list(d.get('per_tier', {}))}），装不下 {dataset}/S{width}/{tier}")
         pt, lad_t = d["per_tier"][tier], [float(x) for x in d["temps"]]
-        t = max(lad_t)                              # 伤害最大那一端：阶梯要有伤害可测
+        t = max(lad_t) if t_col is None else t_col   # 默认铺在伤害最大那一端；--t 换列
         anc_a = min(float(x) for x in d["alphas"])  # 那本账里最小的 α 就是锚点剂量（0.7）
         gate_a, lad = anc_a, LADDER + (anc_a,)      # 没有 α=0.3 可对账 ⇒ 闸落在锚点格上
         floor, floor_kind, floor_from = int(pt["own_floor_imgs"]), "该档自己的底（第4课g 规矩）", V6.name
         grid, anchor_from = pt["grid"], f"{V6.name} 的 {tier}"
+        t = check_t(t, grid, V6.name)
         rows_of = lambda k: pt["raw_rows"][k]                          # noqa: E731
-        out = HERE / f"compress_report_v4f_{dataset}{name_suffix(tier, width)}.json"
+        out = HERE / f"compress_report_v4f_{dataset}{name_suffix(tier, width)}{extra}.json"
         need = [key(anc_a, t), key(gate_a, t)]
     miss = [k for k in dict.fromkeys(need) if k not in grid]
     if miss:
         raise SystemExit(f"{anchor_from} 里没有 {miss} 这几格：这一列温度/这个剂量那一本账没跑过，"
                          f"阶梯的尺子和闸就没有基准（有 {sorted(grid)}）")
+    peers = {tt: grid[key(anc_a, tt)]["mean_gap_imgs"] for tt in
+             sorted({float(k.split("_T")[1]) for k in grid} - {t})
+             if key(anc_a, tt) in grid}
     gate = rows_of(key(gate_a, t))
     return {"t": t, "anchor_alpha": anc_a, "gate_alpha": gate_a, "ladder": lad,
             "teacher_acc": (float(d["teacher"]["test_acc"]) if dataset == "fashion" else TEACHER_ARCHIVE_ACC),
             "anchor_mean": float(grid[key(anc_a, t)]["mean_gap_imgs"]),
             "gate_rows": gate, "gate_mean": round(sum(r["gap_imgs"] for r in gate) / len(gate), 1),
             "floor": floor, "floor_kind": floor_kind, "floor_from": floor_from, "anchor_from": anchor_from,
-            "t1_cell": grid.get(key(anc_a, 1.0)), "out": out,
+            "peers": peers, "out": out,
             "gate_is_anchor": bool(gate_a == anc_a), "grid_keys": sorted(grid)}
 
 
-def main(dataset: str = "mnist", width: int = 128, tier: str = TIER) -> None:
+def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
+         nseeds: int = 3, thin: bool = False, t_col: float | None = None) -> None:
     ds = DATASETS[dataset]
+    if nseeds not in (3, 8):
+        raise SystemExit(f"复现流只有 3（对账那批）与 8（加第4课e 那五条）两档")
+    seeds = SEEDS if nseeds == 3 else SEEDS8
+    extra = ("" if nseeds == 3 else "_n8") + ("_thin" if thin else "") + \
+            ("" if t_col is None else f"_t{t_col:g}")
     if not ds["teacher_pt"].exists():
         raise SystemExit(f"缺 {ds['teacher_pt'].name}——这一课的老师权重只能复用，别现造")
-    L = setup(dataset, width, tier)
+    L = setup(dataset, width, tier, extra, t_col)
     T, LAD, PROBE, ANC = L["t"], L["ladder"], L["gate_alpha"], L["anchor_alpha"]
+    if thin:
+        # 薄阶梯：只留判决真正吃的那两格（最小剂量 + 锚点剂量），恒等闸只在老 3 条流上跑。
+        # 为什么可以砍：这一发要判的是"从 0.05 走到 0.7 这一步陡不陡"，中间三格不参与那个配对差。
+        LAD = (0.0, LAD[1], ANC)
+        print(f"[薄阶梯] 只跑 {LAD}：两格剂量差 = 污染说与 H1 的全部分歧所在")
     floor, anchor_mean = L["floor"], L["anchor_mean"]
     probe = {"mean_gap_imgs": L["gate_mean"], "per_seed": L["gate_rows"]}
     out = L["out"]
@@ -157,7 +198,7 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER) -> None:
 
     h1_line = {a: round(a / ANC * anchor_mean) for a in LAD if a > 0}
     print(f"[{dataset} · {tier} · S{width}] 训练 {DATA_TIERS[tier]} 张 | 测试 {len(yte)} | "
-          f"α 阶梯 {LAD} @ T={T:g} | {len(LAD) * len(SEEDS) + len(SEEDS)} 次训练")
+          f"α 阶梯 {LAD} @ T={T:g} | {len(seeds)} 条流")
     print(f"[仪器] 底（{L['floor_from']} 的{L['floor_kind']}）= {floor} 张；"
           f"锚点格 α={ANC:g}/T={T:g} 三种子均值 {anchor_mean:+.1f} 张（{L['anchor_from']}）")
     print(f"[仪器] α={PROBE:g} 档案读数（跨脚本对账基准）：均值 {probe['mean_gap_imgs']:+.1f} 张，"
@@ -167,7 +208,7 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER) -> None:
     print("\n[先立预言（此后不许改口）]")
     print(f"  H1 残城（伤害 ∝ α，直线过原点）→ " +
           "、".join(f"α={a:g} {h1_line[a]:+.1f} 张" for a in LAD if a > 0))
-    print(f"  污染说（份额只决定多快生效）→ α={LAD[1]:g} 就有 {anchor_mean:+.1f} 张量级的伤害，"
+    print(f"  污染说（份额只决定多快生效）→ α={LAD[1]:g} 就有 {anchor_mean:+.1f} 张量级的效应（方向随锚点符号），"
           f"且阶梯小剂量各格彼此差不超过一个底（{floor} 张）")
     print(f"  判别线：α={LAD[1]:g} 实测距 0 更近（|gap| < {abs(h1_line[LAD[1]]) * 2:.0f} 张）→ H1 活；"
           f"距 {anchor_mean:+.1f} 更近（|gap| > {floor}）→ H1 死在最后一块地上")
@@ -175,13 +216,15 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER) -> None:
     ce_pred, rows = {}, {a: [] for a in LAD if a > 0}
     id_gate, probe_gate = [], []
     print("\n[开跑] 每个种子一副 CE + 阶梯各一副（同起点同批次流）：")
-    for seed in SEEDS:
+    for seed in seeds:
         mce, _ = train_student(width, xd, yd, soft, "CE", xv, yv, seed=seed)
         pe = predict(mce, xte, False)
         ce_pred[seed] = pe
         ce_wrong = int((pe != yte).sum())
         line = [f"  种子 {seed:<5} CE 错 {ce_wrong} 张"]
         for a in LAD:
+            if a == 0.0 and thin and seed not in SEEDS:
+                continue                     # 薄阶梯：接线证明在老 3 条上跑过就够（它不随种子变）
             if a == 0.0:                       # 恒等闸：这一格不许当臂用，它测的是接线
                 m0, _ = train_student(width, xd, yd, soft, "KD", xv, yv, seed=seed, alpha=0.0, t=T)
                 p0 = predict(m0, xte, False)
@@ -201,7 +244,7 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER) -> None:
                             "diff_vs_ce_imgs": int((p != pe).sum()),
                             "p_sign": round(sign_test_p(broken, fixed), 6)})
             line.append(f"a{a:g}:{ce_wrong - wrong:+d}(差{int((p != pe).sum())})")
-            if a == PROBE:
+            if a == PROBE and seed in SEEDS:   # 只有老 3 条有跨脚本账可核
                 r = rows[a][-1]
                 ref = probe["per_seed"][SEEDS.index(seed)]
                 probe_gate.append({"seed": seed,
@@ -227,7 +270,8 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER) -> None:
         print(f"  对不上 ⇒ 本课与 {src} 不是同一台仪器，锚点伤害就没有基准，阶梯读数只能重跑")
         raise SystemExit(1)
 
-    print(f"\n[阶梯] 每格 {len(SEEDS)} 条随机流（10000 张全量测试；差=与同种子 CE 预测不同的图数，是**分辨率**不是疗效）：")
+    dirn = -1.0 if anchor_mean < 0 else 1.0      # 伤害方向跟着锚点符号：T=1 那列锚点可能是正号
+    print(f"\n[阶梯] 每格 {len(seeds)} 条随机流（10000 张全量测试；差=与同种子 CE 预测不同的图数，是**分辨率**不是疗效）：")
     summary = {}
     for a, rr in rows.items():
         gaps = [r["gap_imgs"] for r in rr]
@@ -239,16 +283,34 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER) -> None:
                       "pooled_flips": {"broken": tb, "fixed": tf}, "p_pooled": pooled,
                       "same_dir_seeds": f"{sum(1 for g in gaps if g < 0)}/{len(gaps)}",
                       "h1_pred_imgs": h1_line[a],
-                      "beats_h1_line": bool(sum(gaps) / len(gaps) < 2 * h1_line[a])}   # 比直线坏一倍以上
+                      "beats_h1_line": bool(dirn * (sum(gaps) / len(gaps)) > 2 * abs(h1_line[a]))}
         s = summary[a]
         print(f"  α={a:<5} gap {gaps} 张 均值 {s['mean_gap_imgs']:+6.1f}（底 {floor} 的 {s['vs_floor']}x）| "
               f"合并翻坏 {tb}/翻正 {tf} p={pooled:.4g} | 与 CE 预测不同 {s['mean_diff_vs_ce_imgs']:.0f} 张 | "
               f"H1 该格预测 {h1_line[a]:+.1f} → {'**比直线坏得多：污染型**' if s['beats_h1_line'] else '与直线同量级：H1 撑住'}")
 
-    # ---------- 判决：形状由数字挑，不由人挑 ----------
+    # ---------- 配对步长（第4课e 那把尺）：同一条流里 锚点格 − 最小剂量格 ----------
+    # 污染说预测这一步 ≈ 0（两格都早饱和），H1 直线预测它 ≈ 锚点伤害的绝大部分。
+    # 老 3 条流那发只有逐图配对（合并 p）：同一批 10000 张图上重复数牌，复现单位是图不是流。
     small = min(a for a in rows)
+    by_seed = {a: {r["seed"]: r["gap_imgs"] for r in rows[a]} for a in (small, ANC)}
+    step = [by_seed[ANC][sd] - by_seed[small][sd] for sd in seeds]
+    pair_step = summarize(step, f"α={small:g}→{ANC:g} 配对步长")
+    crosses = bool(pair_step["ci95_imgs"][0] < 0 < pair_step["ci95_imgs"][1])
+    print(f"\n[配对步长·以流为单位] α={small:g}→{ANC:g}（剂量 ×{ANC / small:.0f}）"
+          f"每条形如（锚点格 − 小剂量格）：{step}")
+    print(f"  均值 {pair_step['mean_gap_imgs']:+.1f} 张，95% CI [{pair_step['ci95_imgs'][0]:+.1f}, "
+          f"{pair_step['ci95_imgs'][1]:+.1f}]，σ {pair_step['sd_imgs']} 张，同号 {pair_step['same_sign_seeds']} 条"
+          f"（二项 p={pair_step['p_seeds_binomial']}）")
+    print(f"  污染说预测这一步 ≈ 0，H1 直线预测 {h1_line[ANC] - h1_line[small]:+.1f} 张 → "
+          + ("CI 跨 0：这一段掉多少说不清，两说都没判决" if crosses else
+             ("CI 不含 0 且为负：这一段真的在掉 ⇒ 阶梯不是平到锚点的，污染说在这一列站不住"
+              if pair_step["mean_gap_imgs"] < 0 else
+              "CI 不含 0 且为正：小剂量格比锚点格更差，先查仪器再谈形状")))
+
+    # ---------- 判决：形状由数字挑，不由人挑 ----------
     s_small, s_probe = summary[small], summary[PROBE]
-    all_same = f"{len(SEEDS)}/{len(SEEDS)}"
+    all_same = f"{len(seeds)}/{len(seeds)}"
     if s_small["p_pooled"] < P_SIG and s_small["same_dir_seeds"] == all_same:
         shape = "污染型（有伤害不必有剂量）"
         reading = (f"α={small:g} 已经把方向摆出来（{all_same} 同号、合并 p={s_small['p_pooled']:.4g}、"
@@ -294,14 +356,17 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER) -> None:
     print("[自我审计② 恒等闸只证明接线，不证明灵敏度] α=0 逐位等于 CE 说的是『α 确实乘在该乘的地方』；"
           "它不给仪器定分辨率。分辨率由每格与 CE 不同的预测图数给出（上面『差 xxx 张』那一列）——"
           "那一列如果本身就是几十张，任何『这一格与 CE 打平』的说法都只是没看见。")
-    print(f"[自我审计③ 阶梯是 {len(SEEDS)} 条随机流 × 每流一次] 与第4课b/c 同病：每种子只训一次，"
-          "跨种子的极差没有二次底。要把它当正式判决用，得先照第4课e 的办法扩到 8 条流。")
-    t1 = L["t1_cell"]
+    print(f"[自我审计③ 阶梯是 {len(seeds)} 条随机流 × 每流一次] 与第4课b/c 同病：每种子只训一次，"
+          "跨种子的极差没有二次底。"
+          + ("这一发已按第4课e 的办法扩到 8 条流：极差仍是粗估，但判决改吃配对步长的 CI。"
+             if nseeds == 8 else "要把它当正式判决用，得先照第4课e 的办法扩到 8 条流。"))
+    peers = {tt: m for tt, m in L["peers"].items() if tt != T}
     print(f"[自我审计④ 只在 T={T:g} 上扫 α] 第4课c 判过 T 才是主效应、α 是平的，"
-          "所以本阶梯是**在伤害最大的那个温度上**看剂量；"
-          + (f"同一本档案里 α={ANC:g}/T=1 那格 {t1['mean_gap_imgs']:+.1f} 张，"
-             "按污染说它也该跟着饱和，但本课没测。" if t1 else
-             f"这份档案里没有 α={ANC:g}/T=1 那格，无从对照。"))
+          f"所以本阶梯是**在 T={T:g} 这一列上**看剂量。"
+          + ("同一本档案里 " + "、".join(f"α={ANC:g}/T={tt:g} 那格 {m:+.1f} 张"
+                                        for tt, m in peers.items())
+             + " 本课没测——阶梯的形状结论不许往这些列搬。" if peers else
+             f"这本账只有 T={T:g} 一列，无其它温度可对照。"))
     print(f"[自我审计⑤ 对账基准跟着档案走] 本课的 α={PROBE:g} 格与 {src} 同种子同数据同起点，"
           "所以能逐位对账；换了 --dataset / --tier / --width 之后这条闸连着换档案——"
           "拿 A 档的账对 B 档的数就是自欺。")
@@ -311,7 +376,9 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER) -> None:
               "所以这一发判的是『污染型伤害在第二个任务上还在不在』，不是『污染型伤害与 MNIST 无关』。")
 
     report = {"dataset": dataset, "tier": tier, "width": width, "temps_fixed": T, "ladder": list(LAD),
-              "seeds": list(SEEDS), "probe_alpha": PROBE, "anchor_alpha": ANC,
+              "seeds": list(seeds), "probe_alpha": PROBE, "anchor_alpha": ANC,
+              "paired_step_small_to_anchor": pair_step,
+              "t_column_override": t_col, "thin_ladder": bool(thin), "identity_gate_seeds": len(id_gate),
               "gate_is_anchor": L["gate_is_anchor"], "teacher_acc": L["teacher_acc"],
               "floor_from": L["floor_from"], "floor_kind": L["floor_kind"], "seed_floor_imgs": floor,
               "anchor_mean_from": L["anchor_from"], "anchor_mean_gap_imgs": anchor_mean,
@@ -326,7 +393,8 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER) -> None:
                           "step_low_imgs": lo_step, "step_low_dose_x": round(PROBE / small, 2),
                           "step_high_imgs": hi_step,
                           "step_high_dose_x": (None if L["gate_is_anchor"] else round(ANC / PROBE, 2))},
-              "limitations": ["每种子每格只训一次：跨种子极差没有二次底",
+              "limitations": ["每种子每格只训一次：跨种子极差没有二次底" if nseeds == 3 else
+                              f"{len(seeds)} 条流各训一次：这是把分辨率做精，新增的不是独立性",
                               f"只扫 T={T:g} 一列，其余温度上的剂量响应未测",
                               "小 α 各格均值本就低于底（H1 的预测就是这个量级），"
                               "判决依赖逐图配对检验而非重训抖动",
@@ -338,7 +406,8 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER) -> None:
                   f"闸格就是锚点格（{src} 账里没有 α=0.3）：只剩恒等闸一条独立于锚点的对账线",
                   f"底是 {src} 该档自己的 own floor（{floor} 张），比 MNIST 两本账借来的 41/37 张宽"])}
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"\n已存 {out.name}（{len(SEEDS) * (len(LAD) + 1)} 次训练，10000 张全量测试，纯 CPU，零 API 费）")
+    print(f"\n已存 {out.name}（{len(seeds) + len(seeds) * len([a for a in LAD if a > 0])}"
+          f" + 恒等闸 {len(id_gate)} 次训练，10000 张全量测试，纯 CPU，零 API 费）")
 
 
 if __name__ == "__main__":
@@ -346,7 +415,15 @@ if __name__ == "__main__":
     ap.add_argument("--dataset", choices=tuple(DATASETS), default="mnist",
                     help="换任务：fashion 时温度列/锚点剂量/底全部从 compress_report_v6_fashion.json 现读")
     ap.add_argument("--width", type=int, choices=(128, 64), default=128)
+    ap.add_argument("--nseeds", type=int, choices=(3, 8), default=3,
+                    help="8 = 加第4课e 那五条随机流（老 3 条仍只当逐位对账的锚）；档案名加 _n8")
+    ap.add_argument("--thin", action="store_true",
+                    help="薄阶梯：只跑最小剂量格与锚点格两格（配对步长只吃这两格），"
+                         "恒等闸只在老 3 条流上跑；档案名加 _thin")
+    ap.add_argument("--t", type=float, choices=(1.0, 3.0, 6.0), default=None,
+                    help="把阶梯铺在哪一列温度上；默认 MNIST=T=3、Fashion=该账最大温度列。"
+                         "显式给值时档案名加 _t<值>（换列=换一本账，不能与默认那本撞名）")
     ap.add_argument("--tier", choices=tuple(DATA_TIERS), default=TIER,
                     help="数据档位；底与跨脚本闸基准都从那一档（那一本任务）自己的账里读，缺格就退出")
     args = ap.parse_args()
-    main(args.dataset, args.width, args.tier)
+    main(args.dataset, args.width, args.tier, nseeds=args.nseeds, thin=args.thin, t_col=args.t)

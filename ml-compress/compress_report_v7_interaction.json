@@ -1,0 +1,163 @@
+{
+  "cells": {
+    "MNIST×A": {
+      "mean_imgs": 60.4,
+      "sd_imgs": 25.2,
+      "ci95_imgs": [
+        39.3,
+        81.5
+      ],
+      "per_seed_imgs": [
+        74.0,
+        40.0,
+        61.0,
+        29.5,
+        40.5,
+        87.0,
+        50.0,
+        101.5
+      ],
+      "same_sign": "8/8（+）",
+      "p_binomial": 0.0078,
+      "excludes_zero": true
+    },
+    "MNIST×D": {
+      "mean_imgs": -11.9,
+      "sd_imgs": 22.3,
+      "ci95_imgs": [
+        -30.5,
+        6.7
+      ],
+      "per_seed_imgs": [
+        -28.0,
+        -45.0,
+        12.0,
+        3.0,
+        -30.5,
+        -18.5,
+        18.0,
+        -6.0
+      ],
+      "same_sign": "5/8（−）",
+      "p_binomial": 0.7266,
+      "excludes_zero": false
+    },
+    "Fashion×A": {
+      "mean_imgs": -79.1,
+      "sd_imgs": 38.6,
+      "ci95_imgs": [
+        -111.4,
+        -46.8
+      ],
+      "per_seed_imgs": [
+        -104.0,
+        -95.0,
+        -85.0,
+        -49.5,
+        -15.5,
+        -129.0,
+        -110.0,
+        -45.0
+      ],
+      "same_sign": "8/8（−）",
+      "p_binomial": 0.0078,
+      "excludes_zero": true
+    },
+    "Fashion×dry": {
+      "mean_imgs": -84.9,
+      "sd_imgs": 54.2,
+      "ci95_imgs": [
+        -130.2,
+        -39.6
+      ],
+      "per_seed_imgs": [
+        -27.5,
+        -119.5,
+        -136.5,
+        7.0,
+        -51.5,
+        -120.5,
+        -134.0,
+        -97.0
+      ],
+      "same_sign": "7/8（−）",
+      "p_binomial": 0.0703,
+      "excludes_zero": true
+    }
+  },
+  "within_task_paired_contrasts": {
+    "MNIST: D−A": {
+      "mean_imgs": -72.3,
+      "sd_imgs": 33.1,
+      "ci95_imgs": [
+        -100.0,
+        -44.7
+      ],
+      "per_seed_imgs": [
+        -102.0,
+        -85.0,
+        -49.0,
+        -26.5,
+        -71.0,
+        -105.5,
+        -32.0,
+        -107.5
+      ],
+      "same_sign": "8/8（−）",
+      "p_binomial": 0.0078,
+      "excludes_zero": true
+    },
+    "Fashion: dry−A": {
+      "mean_imgs": -5.8,
+      "sd_imgs": 48.8,
+      "ci95_imgs": [
+        -46.6,
+        35.0
+      ],
+      "per_seed_imgs": [
+        76.5,
+        -24.5,
+        -51.5,
+        56.5,
+        -36.0,
+        8.5,
+        -24.0,
+        -52.0
+      ],
+      "same_sign": "5/8（−）",
+      "p_binomial": 0.7266,
+      "excludes_zero": false
+    }
+  },
+  "seed_order": [
+    42,
+    7,
+    2026,
+    11,
+    202,
+    3003,
+    40004,
+    55555
+  ],
+  "quantity": "低数据档按种子配对的 T 主效应（mean over α 的 gap@T6 − gap@T1），单位张/10000",
+  "archives": {
+    "MNIST×A": "compress_report_v4e_low_t1t6.json",
+    "MNIST×D": "compress_report_v4e_d_low_t1t6.json",
+    "Fashion×A": "compress_report_v4e_fashion_low_t1t6.json",
+    "Fashion×dry": "compress_report_v6b_fashion_dry.json"
+  },
+  "teacher_softlabel_shift": {
+    "MNIST: A→D": "塌缩 92.8% → 49.3%（更湿 −43.5pp，读自 v5_d 的干湿闸）",
+    "Fashion: A→dry": "塌缩 42.5% → 64.0%（更干 +21.5pp，读自 v6b 的干湿闸）"
+  },
+  "prediction_ex_ante": "判据写在 step4e 文档串第五发那一段（跑 D 那发之前），此处照抄执行",
+  "verdict": "翻号收进『MNIST × 老师 A 的那份软标签』：换到同档更湿的老师 D，正号从 +60.4 塌到 -11.9 张（CI 跨 0 = 这一格读不出方向），而两副老师之差按种子配对是 -72.3 张、CI 不含 0 ⇒ 老师这一维有读数。『符号由数据量决定』在 MNIST 内部就站不住，任务级的说法降级为『数据量 × 这份软标签』的交互；而 Fashion 那两格两格全负：换任务连符号都不跟",
+  "limitations": [
+    "每格 8 条流只覆盖同一副学生、同一个数据档、同一对温度（T=1/T=6）：这是『四角齐全』，不是『四维齐全』——中间档与 α 轴不在这张表里",
+    "MNIST×D 的底是借来的 37 张（v5_d 现读）：两副老师共用一把尺，配对 CI 不吃这个底，但单格读数拿它当闸门时要记得它是老师 A 那侧量的",
+    "跨任务那一行不是配对的：同名种子在两个数据集里是两条不同的流，只报差值不报差的 CI",
+    "老师只有两副、且 D 的精度低于 A（94.05% vs 97.98%）：拆开的是知识源，拆不掉老师强弱这一维（与第5课同一句代价）",
+    "两行换老师的**干湿方向是相反的**（MNIST：A 塌缩 92.8% → D 49.3%，更湿 −43.5pp；Fashion：A 42.5% → dry 64.0%，更干 +21.5pp）：所以这两行不是同一假说的两次同向复证，而是两个不同方向的各一次读数——MNIST 那一侧『往湿走』把正号抹掉了，Fashion 这一侧『往干走』没动那个负号（CI 宽度 −46.6~+35.0，测不动不等于没效应）",
+    "干湿只各有一副对照老师、且都是单一配方旋钮（轮数）造的：这一发能否掉『符号只跟数据量』，不能给『符号跟干湿』定斜率"
+  ]
+}

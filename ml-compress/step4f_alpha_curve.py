@@ -159,10 +159,43 @@ v1 的形状判据只吃**逐图合并 p**（`p_pooled`）。于是 T=1 那一�
       ② `--v4loose` 实测**只红 ⑦，不红 ④**（预期落空）。不是 ④ 松：④ 的定义是"按 v2/v3 复算后
         在册污染型不许变"，它压根没读 v4 这条腿 ⇒ **v4 的连坐只有 ⑦ 一道防线**。这一条要记着：
         以后再加判据版本，旧的"不连坐"闸不会自动获得对新版本的判决权，必须显式接进去。
-      ③ 落地实测（同流 45+3 次重跑，零 API 费）：判词 = 『污染型·倒挂』、14 个训练路径字段逐位不动，
-        守卫 `--v4blind` / `--v4loose` 各红 1 条（都在 ⑦）。
+      ③ 落地实测（同流 40 臂 + 恒等闸 8 次 = 48 次重跑，零 API 费；`compress_report_v4f_mid_n8_v4.json`
+        现读 `len(arms)=40`、`gate_alpha_zero_identity` 8 条）：判词 = 『污染型·倒挂』、
+        14 个训练路径字段逐位不动，守卫 `--v4blind` / `--v4loose` 各红 1 条（都在 ⑦）。
   · 换流数＝换实验：v4 不回头改任何已入库判词，只对 118% 那一发做同流重跑本（`_v4` 后缀），
     训练路径 14 个字段必须逐位不变才算"翻案是判据换来的"。
+
+第九发（`--tier 中数据4500 --nseeds 12`）还的是第八发自己点名的那笔**"这一步没测干净"**的债，
+写在开跑之前。v4 把中数据档那本判成『污染型·倒挂』，但把判词钉住的那条配对步长
+（α=0.05 → 阶梯顶）**CI 跨 0**：+7.1 张 [−3.4, +17.6]、6/8 同号。所以当时只敢写"点估计倒挂、
+这一步还没测干净"。这一发把那条 CI 的宽度当成唯一的靶子——**买的是分辨率，不是独立性**：
+第 9~12 条流是板块新买的四条（`SEEDS12`），与共用那 8 条同一训练器、同一批图、同一个老师，
+只加读数密度；跨脚本的逐位对账仍然只发生在共用的前 8 条上。
+  · 预登记（此后不许改口）：
+      ① **判据一个字不动**（v4 + 单臂底 + 配对 CI 三样照旧）⇒ 判词只允许保持『污染型·倒挂』。
+        若它变成别的，**当事故查、不当发现庆祝**：先查是分子还是分母动了（份额是"第一格 ÷ 顶格"，
+        两端各是带噪声的读数），再查是不是那四条新流在往反方向翻。
+      ② 老 8 条流那 40 臂必须与 `compress_report_v4f_mid_n8_v4.json` **逐位相同**（守卫闸⑥ 的许可证 4 对 → 5 对）。
+        这一条不过，第①③条都无从谈起——那说明新增的四条流动了老读数，是换尺子不是量得更精。
+      ③ 那条步长 CI 只有三种出口，各自该怎么写也先定死：
+        (a) 仍跨 0 ⇒ 判词照旧，但要多报一个数：**CI 宽度从 21.0 张收到多少**。收得慢（例如仍 >15 张）
+            就是"补四条流不够，要测干净还得再加"，这句话进欠账。
+        (b) 不含 0 且仍是"顶比小剂量浅"那个方向 ⇒ "倒挂本身测干净了"从此**可以写**。
+        (c) 不含 0 但**反向**（顶比小剂量深回去）⇒ 判词退回『污染型』，且必须披露：这是新增的四条流翻的、
+            共用那 8 条的读数逐位没动，所以它是**分辨率换来的改口**，不是独立性换来的。
+      顺带一条：这一发**不新增任何独立性维度**，所以它不许被写成"倒挂被复证了"。复证倒挂要么换任务、
+      要么换老师、要么换样本批次——补流不算。
+  · 落地（跑完之后追加，预登记原文一个字不动）：
+      ① 过：判词仍是『污染型·倒挂』，措辞与 `..._n8_v4.json` 逐字相同（份额从 118% 变成 102% 是派生读数，
+        不是判词——分子那侧 −45.6 → −44.0 张，分母那侧的顶格从 −38.5 → −43.3 张，两端各自都在动）。
+      ② 过，但**这句话当初是白纸黑字验不到的**：守卫闸⑥ 旧规则按文件名谁小谁老定向，
+        `_n12` 恰好排在 `_n8` 前面 ⇒ "老 8 条流 ⊆ 新 12 条流"这一对从来不在对账里。
+        把定向改成"看流集合/阶梯的严格包含"之后才真逐位对过（`_red_v3.py` 的 `pair_dirs`，
+        并让 `--drift` 优先拆这一类对）。顺带自纠：这里写的"许可证 4 对 → 5 对"是猜的，实测 4 对 → **7 对**。
+      ③ 走的是 (a)：步长 CI = +0.7 张 [−8.2, +9.5]、6/12 同号 ⇒ 仍跨 0，宽度 21.0 张 → 17.7 张。
+        多花 50% 的流只收到 3.3 张（同 σ 下理论上该收到 5.0 张，因为新四条把样本 sd 从 12.5 抬到 14.0）
+        ⇒ "倒挂这一步还没测干净"这句话**继续欠着**，且欠账要写成"按 1/√n 收敛，收到判不动 0 大约还要
+        再一倍流"，不是"再多买四条就干净了"。
 """
 from __future__ import annotations
 
@@ -174,7 +207,7 @@ from pathlib import Path
 import torch
 
 from step1_quantize import MODELS, build_cnn, predict
-from step4_distill import DATA_TIERS, TEACHER_ARCHIVE_ACC, VAL_N, logits_of, sign_test_p, train_student
+from step4_distill import DATA_TIERS, TEACHER_ARCHIVE_ACC, VAL_N, check_flow_constants, logits_of, sign_test_p, train_student
 from step4e_marginal_recheck import OLD_SEEDS, summarize          # 复现单位是流：CI 用同一套系数表
 from step4c_alpha_T_sweep import ALPHA_ANCHOR, ANCHOR_T, TIER, V4C_SUFFIX, key, load_anchor, out_path, v4b_path
 from step6_fashion_replication import TEACHER_PT, load_fashion
@@ -184,6 +217,8 @@ HERE = Path(__file__).resolve().parent
 LADDER = (0.0, 0.05, 0.1, 0.2, 0.3)               # 0 是恒等闸不是臂；0.3 是跨脚本闸
 SEEDS = (42, 7, 2026)                              # 与第4课b/c 同一批随机流，才能与档案逐位对
 SEEDS8 = SEEDS + (11, 202, 3003, 40004, 55555)     # 第4课e 那五条：老 3 条只对账，新 5 条才是复现
+SEEDS12 = SEEDS8 + (808, 1337, 24601, 90210)       # 第九发新买的四条：只加读数密度，不属于板块共用的那 8 条
+                                                    # ⇒ 跨脚本逐位对账仍然只发生在前 8 条上（闸⑥ 的许可证范围）
 PROBE_ALPHA = 0.3                                   # 已在 v4c 档案里的那一格
 P_SIG = 0.05
 SHAPE_RULE = "v4"        # 形状判据版本：v1 只看逐图合并 p，v2 加流级同号腿，v3 让判据吃阶梯顶＋给反号一个正式分支，
@@ -429,10 +464,11 @@ def setup(dataset: str, width: int, tier: str, extra: str = "",
 def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
          nseeds: int = 3, thin: bool = False, t_col: float | None = None) -> None:
     ds = DATASETS[dataset]
-    if nseeds not in (3, 8):
-        raise SystemExit(f"复现流只有 3（对账那批）与 8（加第4课e 那五条）两档")
-    seeds = SEEDS if nseeds == 3 else SEEDS8
-    extra = ("" if nseeds == 3 else "_n8") + ("_thin" if thin else "") + \
+    if nseeds not in (3, 8, 12):
+        raise SystemExit("复现流只有三档：3（对账那批）/ 8（板块共用的那批）/ 12（第八发之后新买四条，只补分辨率）")
+    seeds = SEEDS if nseeds == 3 else SEEDS8 if nseeds == 8 else SEEDS12
+    check_flow_constants(len(seeds))   # 在最贵的事之前：缺系数的 KeyError 会炸在全部训练之后（n=12 白烧 233 秒）
+    extra = ("" if nseeds == 3 else f"_n{nseeds}") + ("_thin" if thin else "") + \
             ("" if t_col is None else f"_t{t_col:g}") + f"_{SHAPE_RULE}"
     if not ds["teacher_pt"].exists():
         raise SystemExit(f"缺 {ds['teacher_pt'].name}——这一课的老师权重只能复用，别现造")
@@ -681,8 +717,11 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
           "那一列如果本身就是几十张，任何『这一格与 CE 打平』的说法都只是没看见。")
     print(f"[自我审计③ 阶梯是 {len(seeds)} 条随机流 × 每流一次] 与第4课b/c 同病：每种子只训一次，"
           "跨种子的极差没有二次底。"
-          + ("这一发已按第4课e 的办法扩到 8 条流：极差仍是粗估，但判决改吃配对步长的 CI。"
-             if nseeds == 8 else "要把它当正式判决用，得先照第4课e 的办法扩到 8 条流。"))
+          + (f"这一发已按第4课e 的办法扩到 {nseeds} 条流"
+             + ("（第 9~12 条是本轮新买的四条，不在板块共用的那 8 条里 ⇒ 新增的只是读数密度，"
+                "跨脚本逐位对账仍然只发生在共用的那 8 条上）" if nseeds == 12 else "")
+             + "：极差仍是粗估，但判决改吃配对步长的 CI。"
+             if nseeds > 3 else "要把它当正式判决用，得先照第4课e 的办法扩到 8 条流。"))
     peers = {tt: m for tt, m in L["peers"].items() if tt != T}
     print(f"[自我审计④ 只在 T={T:g} 上扫 α] 第4课c 判过 T 才是主效应、α 是平的，"
           f"所以本阶梯是**在 T={T:g} 这一列上**看剂量。"
@@ -757,8 +796,9 @@ if __name__ == "__main__":
     ap.add_argument("--dataset", choices=tuple(DATASETS), default="mnist",
                     help="换任务：fashion 时温度列/锚点剂量/底全部从 compress_report_v6_fashion.json 现读")
     ap.add_argument("--width", type=int, choices=(128, 64), default=128)
-    ap.add_argument("--nseeds", type=int, choices=(3, 8), default=3,
-                    help="8 = 加第4课e 那五条随机流（老 3 条仍只当逐位对账的锚）；档案名加 _n8")
+    ap.add_argument("--nseeds", type=int, choices=(3, 8, 12), default=3,
+                    help="3 = 对账那批老流；8 = 加第4课e 那五条（板块共用，老 3 条仍只当逐位对账的锚）；"
+                         "12 = 再加本轮新买的四条（只补分辨率，新增的不是独立性）。档案名跟着流数加 _n8/_n12")
     ap.add_argument("--thin", action="store_true",
                     help="薄阶梯：只跑最小剂量格与锚点格两格（配对步长只吃这两格），"
                          "恒等闸只在老 3 条流上跑；档案名加 _thin")

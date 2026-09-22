@@ -11,32 +11,40 @@
                  （钉"翻案是判据换来的，不是重训换来的"；换了流数=另一发实验，不在这一条里）
                  基准账 = 同流同配置里**版本号最高的前一版**（不是 glob 顺序最老那本：v1→v2 时
                  判据合法换过 `same_dir_seeds` 这类派生字段，拿老本当基准会把它报成"数字动了"）
-  ⑥ 扩流不改老流 同配置的两本账（老 3 条流 ⊆ 新 8 条流、老阶梯 ⊆ 新阶梯）：小账的每一格必须在
-                 大账里逐位重现。这一条是"3 条流的账与 8 条流的账能对着读"的**唯一许可证**——
+  ⑥ 扩流不改老流 两本同配置账之间，**谁老是新由流集合/阶梯的严格包含决定，不看文件名**
+                 （`_n12` 字典序在 `_n8` 前面，按文件名定向会结构性地漏掉"8 条流 ⊆ 12 条流"这一对）：
+                 小账的每一格必须在大账里逐位重现。这一条是"3/8/12 条流的账能对着读"的**唯一许可证**——
                  本轮所有"换流数后判决变了/没变"的说法都默认了它，此前只是口头默认。
+                 实测在册 7 对（本轮 +3：`_mid` 与 `_mid_n8_v3/_v4` 各对 `_n12` 一本）。
   ⑦ v4 的翻转集合 v4 相对 v3 只许翻掉预登记那一本（份额 118%、唯一出界的账）。只对**阶梯顶在账里**
                  的账参评：顶不在账时这条腿恒等于 v3，那种"通过"是没测到（本轮实测 14 本里参评 11 本）
 
 自我拆红（每条各拆一道闸，跑了不红的模式=那条闸没测到，不许拿它当通过。下面全是**本轮实测**，
 不是预期——规矩是实测再写回这张表，写死的计数只对"当前在册的那几本"成立：
-本轮新账入库（14→15 本）之后 `--decorative` 从 5 条涨到 7 条、`--misfeed` 从 14 涨到 19、
-`--v4blind` 从 1 涨到 3，因为**每一本新账一入库就成了复算闸① 与落地闸⑤ 的新被测对象**。
+本轮又入库一本（15→16 本）：`--decorative` 7→8、`--misfeed` 19→23、`--v4blind` 3→4，
+因为**每一本新账一入库就成了复算闸① 与落地闸⑤ 的新被测对象**。
+`--drift` 1→3 不是这个原因：那一档换的是**挑哪一对账去注入**的规则（见下面那行）。
 加一本账就重跑九档再改这张表，沿用上轮的数字=这张表已经在说谎。）：
-  --decorative  v3 瞎掉阶梯顶（s_top=None）→ 实测 7 条红：①×2 ②③⑦ ⑤×2
+  --decorative  v3 瞎掉阶梯顶（s_top=None）→ 实测 8 条红：①×3 ② ③ ⑦ ⑤×2
                 （谁都翻不动=装饰；⑦ 顺带红，因为瞎顶的 v4 连"倒挂"这一格原料都没有；
-                 新落地的 `_v4` 本因此同时被 ① 与 ⑤ 点名）
+                 新落地的 `_v4`/`_n12` 本因此同时被 ① 与 ⑤ 点名）
   --destroy     把流级腿放松成"最多一条流反向"→ 实测 0 条红：它给的是"这批在册账的方向判定
                 不靠最后一条流"这一条敏感性读数，**不算任何一道闸的验红通过**（承重由另八档拆）
   --collateral  第 2 支忘记要求反号、且挪到第 1 支前面 → 实测 5 条红：①×2 ② ④ ⑦
                 （顺序与反号条件都承重）
-  --misfeed     复算时把伤害方向 dirn 取反 → 实测 19 条红：①×16 + ④ + ⑦ + ⑤（读错数字当场被抓）
-  --drift       把大账某一格的 wrong_kd/gap 挪 +1 → 实测 1 条红：⑥（扩流本偷改老读数必须被抓）
+  --misfeed     复算时把伤害方向 dirn 取反 → 实测 23 条红：①×20 + ④ + ⑤ + ⑦（读错数字当场被抓）
+  --drift       把扩出来的那本某一格的 wrong_kd/gap 挪 +1 → 实测 3 条红：⑥×3
+                （扩流本偷改老读数必须被抓。**注入点按包含关系挑、且优先挑"老那本文件名排在后面"
+                 的那一对**（本轮是 `_n8_v3 ⊆ _n12_v4`）：老规则按文件名谁小谁老，
+                 `_n12` 恰好排在 `_n8` 前面 ⇒ "8 条流 ⊆ 12 条流"这一对整个不在对账里，
+                 本轮预登记的②就是这么被漏掉的。这一档现在钉的是**定向规则本身**，
+                 三道同时红是因为 12 条流那本同时是三本老账的扩展）
   --sibdrift    给重跑本的一个训练路径读数（seed_floor_imgs）偷偷 +7 → 实测 3 条红：⑤ 逐本点名
                 （钉"数字真动了的时候闸⑤ 还活着"，与下面那条一起构成 ⑤ 的两端）
   --oldsib      兄弟账退回 glob 顺序最老那本 → 实测 1 条红：⑤（跨了判据版本 ⇒ 把派生字段的正常
                 演进报成漂移）。这一档钉的就是"基准挑哪一版"本身；它是**假红**，
                 出现即说明选择规则被改坏了。
-  --v4blind     v4 瞎掉倒挂腿（inverted_leg=False）→ 实测 3 条红：① + ⑦ + ⑤
+  --v4blind     v4 瞎掉倒挂腿（inverted_leg=False）→ 实测 4 条红：①×2 + ⑦ + ⑤
                 （上一版只有 ⑦：那时 `_v4` 本还没落地，① 与 ⑤ 没有对象可查。
                  现在这条腿一旦被摘掉，档案里那句"倒挂"复算不出来、落地预言也落空）
   --v4loose     倒挂腿忘掉"同号且更大"，只要判到污染型就改口 → 实测 1 条红：只有 ⑦，
@@ -333,34 +341,59 @@ def arm_index(d):
     return out
 
 
-print(f"[闸⑥ 扩流/扩格不改老读数（同配置账两两对账）]")
+def pair_dirs(da, db):
+    """两本同配置账之间"只扩不缩"的方向 → (老那本, 新那本, 各自的流数/格数)；不可比则 None。
+
+    定向只看流集合与阶梯的**严格包含**，不看文件名：`_n12` 字典序排在 `_n8` 前面，
+    按文件名谁小谁老会让"8 条流 ⊆ 12 条流"这一对结构上不存在——本轮预登记的②就这样被漏掉过。"""
+    for px, py in ((da, db), (db, da)):
+        sa, sb = set(px["seeds"]), set(py["seeds"])
+        la = {round(float(x), 4) for x in px["ladder"] if float(x) != 0.0}
+        lb = {round(float(x), 4) for x in py["ladder"] if float(x) != 0.0}
+        if sa <= sb and la <= lb and (len(sa) < len(sb) or len(la) < len(lb)):
+            return px, py, sa, sb, la, lb
+    return None
+
+
+print("[闸⑥ 扩流/扩格不改老读数（同配置账两两对账）]")
 if MODE == "--drift":
-    hit = next(((pa, pb) for pa in sorted(docs) for pb in sorted(docs)
-                if pa < pb and same_cfg(docs[pa], docs[pb])
-                and set(docs[pa]["seeds"]) <= set(docs[pb]["seeds"])
-                and {round(float(x), 4) for x in docs[pa]["ladder"] if float(x)}
-                <= {round(float(x), 4) for x in docs[pb]["ladder"] if float(x)}), None)
+    cand = []
+    for pa in sorted(docs):
+        for pb in sorted(docs):
+            if pa >= pb or not same_cfg(docs[pa], docs[pb]):
+                continue
+            got = pair_dirs(docs[pa], docs[pb])
+            if got:
+                cand.append((got[0] is docs[pb], pa, pb))   # True = 老那本名字排在后面
+    # 优先拆"文件名顺序与包含顺序相反"的那一对：按文件名挑对的老规则对它无感，
+    # 退回任意一对的话，这一档就只是在测"闸⑥ 还活着"，测不到这次修的东西。
+    hit = next(((pa, pb) for rev, pa, pb in cand if rev), None) or (cand[0][1:] if cand else None)
     if hit is None:
         fails.append("闸⑥（拆红模式 --drift）找不到可比的账对，注入没处放——这条红不算通过")
     else:
-        pa, pb = hit
-        kk = next(iter(arm_index(docs[pa])))
-        r = arm_index(docs[pb])[kk]
+        pa, pb = hit                                        # 字典序 pa < pb，谁是老那本由包含关系定
+        old, new = (pb, pa) if pair_dirs(docs[pa], docs[pb])[0] is docs[pb] else (pa, pb)
+        kk = next(iter(arm_index(docs[old])))
+        r = arm_index(docs[new])[kk]
         r["wrong_kd"] += 1
         r["gap_imgs"] += 1
-        print(f"  （拆红注入）把 {pb} 的 α={kk[0]:g}/种子{kk[1]} 那格 wrong_kd 与 gap 各挪 +1"
-              f"（基准 {pa} 同格不动）——只有这一道闸会看见它")
+        print(f"  （拆红注入）把扩出来的那本 {new} 的 α={kk[0]:g}/种子{kk[1]} 那格 wrong_kd 与 gap 各挪 +1"
+              f"（基准 {old} 同格不动）——只有这一道闸会看见它"
+              + (f"；这一对的**老那本文件名排在后面**（{old}），按文件名定向的旧规则看不见它"
+                 if old > new else ""))
 pairs = 0
 for pa, da in sorted(docs.items()):
     for pb, db in sorted(docs.items()):
         if pa >= pb or not same_cfg(da, db):
             continue
-        sa, sb = set(da["seeds"]), set(db["seeds"])
-        la = {round(float(x), 4) for x in da["ladder"] if float(x) != 0.0}
-        lb = {round(float(x), 4) for x in db["ladder"] if float(x) != 0.0}
-        if not (sa <= sb and la <= lb and (len(sa) < len(sb) or la < lb)):
-            continue                        # 只扩不缩才是"同一批老流加了几条"
-        ia, ib = arm_index(da), arm_index(db)
+        # 定向交给 pair_dirs()：与上面 --drift 的挑对规则**同一份代码**——两处各写一遍，
+        # 就是本轮那个漏网的对（`_n8 ⊆ _n12`）的来历。
+        got = pair_dirs(da, db)
+        if got is None:
+            continue                                    # 同流同格＝重跑，那是闸⑤ 的对象不是这条
+        dx, dy, sa, sb, la, lb = got
+        px, py = (pa, pb) if dx is da else (pb, pa)     # 老那本 / 新那本
+        ia, ib = arm_index(dx), arm_index(dy)
         miss, bad = [], []
         for kk, ra in ia.items():
             rb = ib.get(kk)
@@ -371,9 +404,9 @@ for pa, da in sorted(docs.items()):
             if lack or cut != ra:
                 bad.append(f"{kk}(缺{lack or ''}{'' if cut == ra else '值变'})")
         pairs += 1
-        tag = f"  {pa}（{len(sa)} 流×{len(la)} 格） ⊆ {pb}（{len(sb)} 流×{len(lb)} 格）"
+        tag = f"  {px}（{len(sa)} 流×{len(la)} 格） ⊆ {py}（{len(sb)} 流×{len(lb)} 格）"
         if miss or bad:
-            fails.append(f"闸⑥ {pa} → {pb}：缺格 {miss}、值变 {bad}——扩流那本动了老流，跨流数比较作废")
+            fails.append(f"闸⑥ {px} → {py}：缺格 {miss}、值变 {bad}——扩流那本动了老流，跨流数比较作废")
             print(f"{tag} → **红**：缺 {len(miss)} 格、变 {len(bad)} 格")
         else:
             print(f"{tag} → {len(ia)} 格逐位相同")

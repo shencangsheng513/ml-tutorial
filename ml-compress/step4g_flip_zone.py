@@ -65,7 +65,7 @@ from pathlib import Path
 import torch
 
 from step1_quantize import MODELS, build_cnn, predict
-from step4_distill import (D4, T95, DATA_TIERS, VAL_N, logits_of, sign_test_p,
+from step4_distill import (D4, T95, DATA_TIERS, VAL_N, check_flow_constants, logits_of, sign_test_p,
                            soft_label_audit, train_student)
 from step4c_alpha_T_sweep import TIER as FULL_TIER
 from train_baseline import load_split
@@ -200,6 +200,7 @@ def main(sample: str = "prefix", nseeds: int = 3) -> None:
     if nseeds not in NSEEDS:
         raise SystemExit(f"--nseeds 只认 {NSEEDS}（流数是判别变量，不接受顺手改第三个值）")
     seeds = SEED_SET[nseeds]
+    check_flow_constants(len(seeds))
     d4 = D4[len(seeds)]
     if not (MODELS / "mnist_cnn_fp32.pt").exists():
         raise SystemExit("缺 teacher 权重，先跑 python train_baseline.py")

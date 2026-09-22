@@ -8,17 +8,24 @@
   ④ 不连坐       板块全部在册『污染型』判词逐字不变（条数现算不写死；钉分支顺序与反号条件）
   ⑤ 落地自证     真的 _v3 **同流重跑**本：判词落在预登记预言上，且训练路径字段逐位不动
                  （钉"翻案是判据换来的，不是重训换来的"；换了流数=另一发实验，不在这一条里）
+                 基准账 = 同流同配置里**版本号最高的前一版**（不是 glob 顺序最老那本：v1→v2 时
+                 判据合法换过 `same_dir_seeds` 这类派生字段，拿老本当基准会把它报成"数字动了"）
   ⑥ 扩流不改老流 同配置的两本账（老 3 条流 ⊆ 新 8 条流、老阶梯 ⊆ 新阶梯）：小账的每一格必须在
                  大账里逐位重现。这一条是"3 条流的账与 8 条流的账能对着读"的**唯一许可证**——
                  本轮所有"换流数后判决变了/没变"的说法都默认了它，此前只是口头默认。
 
 自我拆红（每条各拆一道闸，跑了不红的模式=那条闸没测到，不许拿它当通过）：
   --decorative  v3 瞎掉阶梯顶（s_top=None）→ 预期 ①②③⑤ 红（谁都翻不动=装饰）
-  --destroy     把流级腿放松成"最多一条流反向"→ **本轮实测不红**：它给的是"这十本账的方向判定
-                不靠最后一条流"这一条敏感性读数，**不算任何一道闸的验红通过**（承重由下面四条拆）
-  --collateral  第 2 支忘记要求反号、且挪到第 1 支前面 → 预期 ②④ 红（顺序与反号条件都承重）
-  --misfeed     复算时把伤害方向 dirn 取反 → 预期 ① 红（读错数字当场被抓）
+  --destroy     把流级腿放松成"最多一条流反向"→ **本轮实测不红**：它给的是"这批在册账的方向判定
+                不靠最后一条流"这一条敏感性读数，**不算任何一道闸的验红通过**（承重由另五档拆）
+  --collateral  第 2 支忘记要求反号、且挪到第 1 支前面 → 预期 ①②④ 红（顺序与反号条件都承重）
+  --misfeed     复算时把伤害方向 dirn 取反 → 预期 ① 红（读错数字当场被抓；实测 7 条含 ④）
   --drift       把大账某一格的 wrong_kd/gap 挪 +1 → 预期 ⑥ 红（扩流本偷改老读数必须被抓）
+  --sibdrift    给重跑本的一个训练路径读数（seed_floor_imgs）偷偷 +7 → 预期 ⑤ 逐本红
+                （钉"数字真动了的时候闸⑤ 还活着"，与下面那条一起构成 ⑤ 的两端）
+  --oldsib      兄弟账退回 glob 顺序最老那本 → 预期 ⑤ 红（跨了判据版本 ⇒ 把派生字段的正常
+                演进报成漂移）。这一档钉的就是"基准挑哪一版"本身；它是**假红**，
+                出现即说明选择规则被改坏了。
 """
 import json
 import glob
@@ -182,6 +189,13 @@ TRAIN_PATH = ("dataset", "tier", "width", "seeds", "ladder", "ladder_summary", "
               "identity_gate_seeds", "probe_alpha", "anchor_alpha", "temps_fixed",
               "paired_step_small_to_anchor", "seed_floor_imgs", "predictions_ex_ante")
 by_path = {r[0]: r for r in rows}
+
+
+def ver_rank(q):                     # 文件名尾的 _v<N>；无后缀 = v1 时代，记 0
+    _head, sep, tail = q.rsplit(".json", 1)[0].rpartition("_v")
+    return int(tail) if sep and tail.isdigit() else 0
+
+
 fresh = [p for p, rule, *_ in rows if rule == "v3"]
 if not fresh:
     fails.append("闸⑤ 一本 _v3 重跑账都没有——预言没人验过就等于没落地，别宣布 v3 换到了东西")
@@ -191,6 +205,9 @@ for p, rule, rec, v1, v2, v3, *_ in rows:
     if rule != "v3":
         continue
     d_new = docs[p]
+    if MODE == "--sibdrift" and isinstance(d_new.get("seed_floor_imgs"), (int, float)):
+        # 突变：重跑本偷偷动了训练路径的一个数（不改判词，只改读数）→ 闸⑤ 必须逐本点名。
+        d_new["seed_floor_imgs"] = d_new["seed_floor_imgs"] + 7
     # 同配置同流的那本才是"重跑本"：名字推出来的兄弟账可能是**另一发实验**（换了流数=换了实验），
     # 拿它当基准逐位对账，红了也不是判据的错。所以按**流集合**认，不按文件名认。
     sibs = [q for q in docs if q != p and same_cfg(d_new, docs[q])]
@@ -199,7 +216,12 @@ for p, rule, rec, v1, v2, v3, *_ in rows:
         print(f"  {p}：{len(sibs)} 本同配置账、但没有一本流集合相同 → 这是该配置的**首跑**，"
               f"不是重跑本，闸⑤ 不管（它的对账线是恒等闸＋跨脚本闸）")
         continue
-    sib = same_flow[0]
+    pick_oldest = MODE == "--oldsib"
+    sib = (same_flow[0] if pick_oldest
+           else max(same_flow, key=lambda q: (ver_rank(q), q)))
+    print(f"  基准兄弟账 = {sib}"
+          f"（同流同配置 {len(same_flow)} 本，v 序 {[ver_rank(q) for q in sorted(same_flow)]}，"
+          f"按{'**最老**一本（--oldsib 突变：跨了判据版本）' if pick_oldest else '版本号最高的前一版'}挑）")
     srow = by_path[sib]
     d_old = docs[sib]
     on_pred = SHORT(rec) == SHORT(srow[5])

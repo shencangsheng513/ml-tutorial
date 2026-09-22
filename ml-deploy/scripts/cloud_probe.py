@@ -25,8 +25,16 @@ def get(url: str, timeout: float = 150.0):
             return r.status, body, (time.perf_counter() - t0) * 1000
     except urllib.error.HTTPError as e:
         return e.code, "", (time.perf_counter() - t0) * 1000
-    except Exception as e:
+    except OSError as e:  # URLError / socket.timeout / 断连都算"这一发失败"，但不算崩溃
         return None, repr(e), (time.perf_counter() - t0) * 1000
+
+
+def parsed_json(body: str):
+    """休眠中的免费档会返回 HTML 错误页，此时没有 model_loaded 可读（返回 None 让调用方保留上一发）。"""
+    try:
+        return json.loads(body)
+    except ValueError:
+        return None
 
 
 def main():
@@ -45,10 +53,9 @@ def main():
         st, body, ms = get(url, timeout=20)
         statuses.append(st)
         warm_ms.append(round(ms))
-        try:
-            loaded = json.loads(body).get("model_loaded")
-        except Exception:
-            pass
+        payload = parsed_json(body)
+        if isinstance(payload, dict):
+            loaded = payload.get("model_loaded", loaded)
     warm = {"n": len(warm_ms), "all_200": set(statuses) == {200},
             "model_loaded": loaded,
             "p50_ms": int(statistics.median(warm_ms)),

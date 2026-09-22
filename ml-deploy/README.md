@@ -66,6 +66,7 @@ curl http://127.0.0.1:8000/v1/classify -d "{\"texts\":[\"The goalie made a glove
    - 结论：之前"≈ 本地 1/3–1/5、按 p99 300ms 对外承诺"是外推，**免费档兑现不了**——光是探活端点 p99 就接近 1 秒，预测接口只会更慢。对外承诺改口径：**p99 ≈ 1.2s + 首请求 ~35s 冷启动免责声明**；要低延迟只剩两条路：升付费实例，或在客户端侧做保活心跳。这是"单点数字不可信"（本地压测第 ③ 条）在生产环境的重演：183ms 那发恰好打在刚热身的窗口上。
 6. **已知告警 → 本机已修完，线上待重建**：`InconsistentVersionWarning` 根因是模型用 sklearn 1.9.0 pickle、镜像按 `>=1.5` 装到了 1.9.1。修法分三刀：`pyproject.toml` 锁 `==1.9.1`；用 1.9.1 重跑 `python -m src.train` 重新生成工件（指标逐位相同：CV 0.8808 / 测试 0.8702 / 阈值 0.207，说明补丁版本没动行为）；新工件换进服务仓库 `model/`。行为一致性证据：新旧工件对全部 1579 篇测试集 **0 条预测不一致、概率最大绝对差 0.0**，加载零告警，14 个离线测试在 `-W error::UserWarning` 下全绿。**线上只剩一步：push 触发 Render 重建**（会短暂重启，需现网确认）。
 7. 注意：uvicorn 多进程在 Windows 本机有 socket 继承毛病（实测偶发 WinError 10022），**多 worker 是为 Linux 容器准备的**，本机冒烟用单 worker 即可。
+8. **环境漂移实录（2026-09-22）**：conda env `mt` 里**缺 `pyproject.toml` 已声明的 `pydantic-settings`** ⇒ `tests/test_auth.py` 在**收集期**就 ImportError（`Interrupted: 1 error during collection`），整套 14 个用例一个都没跑——这种失败长得像"测试坏了"，其实是环境坏了。`pip install pydantic-settings`（实得 2.15.0）后 **14 passed**。同日现读复核两条：该 env 的 `scikit-learn` 已是 **1.9.1**（与锁版一致），加载 `../ml-text/models/text_clf.joblib` 在把 warning 升级成 error 的设置下**零告警** ⇒ 第 6 条那把锁在本机侧已闭合，只剩现网重建。另：CI 与本 README 的 lint 口径只有 `src`/`tests`，**`scripts/` 不在其中**——那里三条裸 `except Exception` / `try-except-pass` 是我今天额外拿严格命令扫出来的（`cloud_probe.py`，收窄成 `OSError` + 一个"解析不出 JSON 就返回 None"的小 helper，行为不变：拿不到 `model_loaded` 时保留上一发），**不是 CI 红，别记成修了个失败**。
 
 ## CI
 `.github/workflows/deploy-ci.yml`：push 触及 `ml-deploy/**` 时自动装依赖 → ruff → pytest。

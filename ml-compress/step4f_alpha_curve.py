@@ -196,6 +196,62 @@ v1 的形状判据只吃**逐图合并 p**（`p_pooled`）。于是 T=1 那一�
         多花 50% 的流只收到 3.3 张（同 σ 下理论上该收到 5.0 张，因为新四条把样本 sd 从 12.5 抬到 14.0）
         ⇒ "倒挂这一步还没测干净"这句话**继续欠着**，且欠账要写成"按 1/√n 收敛，收到判不动 0 大约还要
         再一倍流"，不是"再多买四条就干净了"。
+
+第十发（`--tier 中数据4500 --nseeds 8 --ladder-high`）还的是**第八/九发都没有碰到的那笔界外债**：
+`面试版判决表.md` 第四节第一条欠账写着"α>0.7 之上还涨不涨没测——中数据档那本账没有更大的 α"。
+这一发把阶梯从锚点剂量往上接两格（α=0.85、1.0；α=1 是纯 KD，CE 权重归零仍在定义域，再往上 CE 权重
+变负＝换目标函数，所以不铺）。**这一发买的是"顶以上还涨不涨"，不是新判据**：v4 判据吃的三格仍是
+{最小剂量 α=0.05, 闸格 α=0.3, 阶梯顶 α=0.7}，一字不动——因为"阶梯顶"这个位置当初就是拿 α=0.7 标定的、
+闸⑦ 的翻转集合也是按它测的，中途把顶搬到 1.0 等于换判据却不付判据的钱。新增两格只多回答一个问题、
+只多报一个数：α=0.7 → α=1.0 的**配对步长**。
+  · 预登记（此后不许改口）：
+      ① 判据版本仍是 v4，判词**只允许保持**『污染型·倒挂』且份额数字仍按 α=0.7 那本算（份额的分母不许
+        换成 α=1.0——那是一个新的分母，要用它说话就得另开一档判据、走三段付费）。
+      ② 共用那 8 条流的 5 格老读数必须与 `compress_report_v4f_mid_n8_v4.json` **逐位相同**。这一对的定向
+        是"老 ⊆ 新"（同一本账往上长格子），走的正是这轮刚修好的 `pair_dirs` ⇒ 闸⑥ 的许可证 7 对 → 8 对。
+      ③ **扩格本不许冒充重跑本**：这一发与 `..._n8_v4.json` 同流、同配置，只有阶梯长了两格，
+        所以闸⑤（重跑本"训练路径 14 字段逐位不变"）一旦把它认成重跑本，红了的是 `ladder` 的**长度**——
+        那是设计然，不是漂移。修法是闸⑤ 的"重跑本"谓词加一条同阶梯条件，专属拆红 `--laddersib`
+        把这条排除关掉、钉住"扩格本冒充重跑"那一端（一个修复一档红，沿用本轮的规矩）。
+      ④ α=0.7 → α=1.0 那一步的配对步长只有三种出口，各自怎么写先定死：
+        (a) CI 跨 0 ⇒ "顶以上还涨不涨"**没判**，欠账照旧挂着，且要多报一句：这一发的分辨率判不动 0；
+        (b) 为负（α=1.0 比 α=0.7 更深）⇒ **"倒挂"就只是"顶选矮了"**：v4 那句"最小剂量比阶梯顶还伤"
+            可能是把一条还在走的线拦腰截断的产物。这句话必须**当场披露**，但判据不许中途换
+            （改口要用 v5 走三段付费，不是在这一发的打印里顺手加个形容词）；
+        (c) 为正（α=1.0 比 α=0.7 更浅）⇒ 剂量响应在 0.7 以上**掉头**，与低剂量段那条"0.05→0.1 反而更深"
+            的倒挂同号，于是这条曲线读成一个**驼峰**：伤害最深处不在纯 KD 端。这一格仍是点估计＋一个步长，
+            不构成"形状判据 v5"的原料。
+      顺带一条同样的边界：这一发**不新增独立性维度**（同一批图、同一个老师、同一副学生、同一批流），
+      所以它不许被写成"高剂量段被复证了"；它只把"没测"变成"测了"。
+  · 落地（跑完之后追加，预登记原文一个字不动）：
+      ① 过：判词仍是『污染型·倒挂（最小剂量比阶梯顶还伤）』，份额仍按 α=0.7 那本的分母算＝**118%**，
+        v1/v2/v3 三列并排判词逐字是 污染型｜污染型｜污染型（与 `_n8_v4.json` 那本一字不差）。
+        新格没有资格改判据吃的格子，也就没有改动任何一个派生字段。
+      ② 过，但**又抓到一次"把计数写成预期"**：这里当初写"闸⑥ 的许可证 7 对 → 8 对"，实测 **7 → 10 对**。
+        漏算的原因不是规则坏了，是我只想着"这一对"而忘了 `_hi` 那本**同时**是三本老账的扩展
+        （`_mid`、`_mid_n8_v3`、`_mid_n8_v4`）。逐位对账全过：`_mid_n8_v3/_v4` 各 40 格、`_mid` 12 格，
+        一位未动 ⇒ 新买的两格没有回头改动任何老读数。规矩收紧一句：**对数一类的事后计数不许进预登记，
+        预登记里只准写"必须至少多出『老 8 流 ⊆ 新 8 流』这一对"**（上一轮同一处也错过一次：写 4→5、实测 4→7）。
+      ③ 过：闸⑤ 把 `_hi` 认成扩格本、当场打印"交给闸⑥"而没有红；`--laddersib` 实测 2 条红、
+        只点名 `_mid_n8_hi_v4` 这一本，红的内容正是 `ladder` 的长度。这条排除现在有一档红盯着。
+      ④ 走的是 **(a)**：α=0.7→1.0 配对步长 **+3.0 张 CI [−1.4, +7.4]、7/8 同号**（σ 5.3 张）⇒ CI 跨 0，
+        "顶以上还涨不涨"**这一发仍然没判**，欠账照旧挂着。点估计是回浅方向的（α=0.7 −38.5 →
+        α=0.85 −37.6 → α=1.0 −35.5），所以 (c) 那个"驼峰"形状是**读不出来的**：把这三格连成一条下坡线
+        需要的正是这一步的分辨率，而它判不动 0。三条能写的：
+          · 曲线最深那一格在这本账里是 α=0.1（−54.0 张），比"顶"和"底"两端都深——这是七格都在账之后
+            才看得见的一句**点估计排序**，没有配对的步长 CI 撑着，所以它不构成形状判据的原料；
+          · H1 那条过原点直线在高剂量端是**反着走**的：它预测 α=1.0 该有 −68 张（比锚点更伤），
+            实测 −35.5 张（比锚点更不伤）。纯 KD（CE 权重恰好为零）反而是这本账里最不伤的一格，
+            所以"伤害 ∝ 掺了多少 CE"连方向都不对；
+          · 分辨率账：这一步 σ 只有 5.3 张（比 α=0.05→0.7 那一步的 12.5 张紧得多），8 条流给出 8.8 张宽的
+            CI，要把 ±3.0 判干净按 1/√n 大约还要再一倍流。
+      自纠（本轮最贵的一条）：**第一次真跑（64 次训练）在全部训练跑完之后死于 `KeyError: 1.0`**——
+      `by_seed` 当初只装了判据吃的那两格（最小剂量、锚点），`hi_pair` 却要查 α=1.0 那一格。上一轮刚把
+      "最贵的失败要提前到花钱之前"写进 README 方法论，这一轮自己就烧了一发：我预飞了**守卫**（拿一本
+      合成 `_hi` 账验"闸⑤ 跳过 / 闸⑥ 配对 / `--laddersib` 红"三件事，跑完即删），却没预飞**训练之后
+      才执行到的那段打印**。修法是两半：① `by_seed` 一次装齐要配对的格子；② 这一发改成先用
+      `--nseeds 3`（24 次训练、约 1 分钟）把整条路径走通一遍，再开 8 流真跑（预演那本账当场删掉、
+      不入库）。可执行的那句结论：**预飞必须覆盖"训练之后才跑到的代码"，否则它只值一次重跑的钱。**
 """
 from __future__ import annotations
 
@@ -215,6 +271,9 @@ from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
 LADDER = (0.0, 0.05, 0.1, 0.2, 0.3)               # 0 是恒等闸不是臂；0.3 是跨脚本闸
+HIGH_LADDER = (0.85, 1.0)                          # 第十发：锚点剂量 0.7 **之上**再铺两格。
+                                                   # α=1.0 是纯 KD（CE 权重 1−α 归零），仍在定义域内；
+                                                   # α>1 会让 CE 权重变负，那不是"更大的 α"而是另一个目标函数，所以不铺
 SEEDS = (42, 7, 2026)                              # 与第4课b/c 同一批随机流，才能与档案逐位对
 SEEDS8 = SEEDS + (11, 202, 3003, 40004, 55555)     # 第4课e 那五条：老 3 条只对账，新 5 条才是复现
 SEEDS12 = SEEDS8 + (808, 1337, 24601, 90210)       # 第九发新买的四条：只加读数密度，不属于板块共用的那 8 条
@@ -462,14 +521,17 @@ def setup(dataset: str, width: int, tier: str, extra: str = "",
 
 
 def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
-         nseeds: int = 3, thin: bool = False, t_col: float | None = None) -> None:
+         nseeds: int = 3, thin: bool = False, t_col: float | None = None,
+         high: bool = False) -> None:
     ds = DATASETS[dataset]
+    if high and thin:
+        raise SystemExit("--ladder-high 与 --thin 互斥：薄阶梯只留判据吃的那几格，而这一发买的正是顶以上那两格")
     if nseeds not in (3, 8, 12):
         raise SystemExit("复现流只有三档：3（对账那批）/ 8（板块共用的那批）/ 12（第八发之后新买四条，只补分辨率）")
     seeds = SEEDS if nseeds == 3 else SEEDS8 if nseeds == 8 else SEEDS12
     check_flow_constants(len(seeds))   # 在最贵的事之前：缺系数的 KeyError 会炸在全部训练之后（n=12 白烧 233 秒）
     extra = ("" if nseeds == 3 else f"_n{nseeds}") + ("_thin" if thin else "") + \
-            ("" if t_col is None else f"_t{t_col:g}") + f"_{SHAPE_RULE}"
+            ("" if t_col is None else f"_t{t_col:g}") + ("_hi" if high else "") + f"_{SHAPE_RULE}"
     if not ds["teacher_pt"].exists():
         raise SystemExit(f"缺 {ds['teacher_pt'].name}——这一课的老师权重只能复用，别现造")
     L = setup(dataset, width, tier, extra, t_col)
@@ -483,6 +545,15 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
         LAD = tuple(dict.fromkeys((0.0, LAD[1], PROBE, ANC)))
         print(f"[薄阶梯] 只跑 {LAD}：两格剂量差 = 污染说与 H1 的全部分歧所在，"
               f"闸格 α={PROBE:g} 是独立于锚点的对账线所以保留")
+    if high:
+        # 第十发：把阶梯**往上**接两格（α=0.85、1.0）。这一发买的是"顶以上还涨不涨"，
+        # 不是新判据：判据吃的三格仍是 {最小剂量, 闸格, 锚点剂量 0.7}，一字不动
+        # （v4 的"阶梯顶"当初就是拿 α=0.7 标定、闸⑦ 的翻转集合也是按它测的）。
+        # 所以新格回答的是另一个问题——v4 那句"最小剂量比顶还伤"里的"顶"会不会是**截断产物**：
+        # 若 α=1.0 比 α=0.7 更深，那"倒挂"就只是"顶选矮了"，这句话必须当场披露（但判据不许中途换）。
+        LAD = tuple(dict.fromkeys(LAD + HIGH_LADDER))
+        print(f"[高剂量] 阶梯从 α={ANC:g} 往上接到 {max(LAD):g}：{HIGH_LADDER}（判据吃的格子不变，"
+              f"新格只回答『顶以上还涨不涨』）")
     floor, anchor_mean = L["floor"], L["anchor_mean"]
     probe = {"mean_gap_imgs": L["gate_mean"], "per_seed": L["gate_rows"]}
     # 跨脚本对账的格子跟着**判据吃哪几格**走：v3 能让阶梯顶承载判决，那一格就必须有自己的独立对账线
@@ -611,7 +682,11 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
     # 污染说预测这一步 ≈ 0（两格都早饱和），H1 直线预测它 ≈ 锚点伤害的绝大部分。
     # 老 3 条流那发只有逐图配对（合并 p）：同一批 10000 张图上重复数牌，复现单位是图不是流。
     small = min(a for a in rows)
-    by_seed = {a: {r["seed"]: r["gap_imgs"] for r in rows[a]} for a in (small, ANC)}
+    # 要按流配对的格子：判据吃的那两格（最小剂量、锚点）；--ladder-high 再多一格（顶以上那一段）。
+    # 这一格必须在这里就进 by_seed：当初只写了 (small, ANC)，于是 KeyError 炸在**全部训练跑完之后**。
+    top_a = max(a for a in LAD if a > 0)
+    by_seed = {a: {r["seed"]: r["gap_imgs"] for r in rows[a]}
+               for a in dict.fromkeys((small, ANC, top_a))}
     step = [by_seed[ANC][sd] - by_seed[small][sd] for sd in seeds]
     pair_step = summarize(step, f"α={small:g}→{ANC:g} 配对步长")
     crosses = bool(pair_step["ci95_imgs"][0] < 0 < pair_step["ci95_imgs"][1])
@@ -625,6 +700,25 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
              ("CI 不含 0 且为负：这一段真的在掉 ⇒ 阶梯不是平到锚点的，污染说在这一列站不住"
               if pair_step["mean_gap_imgs"] < 0 else
               "CI 不含 0 且为正：小剂量格比锚点格更差，先查仪器再谈形状")))
+
+    hi_pair = None
+    if high:
+        # 这一发的靶子只有一句话：v4 的"阶梯顶"（α=0.7）是不是**截断产物**。三种出口开跑前定死。
+        hi_pair = summarize([by_seed[top_a][sd] - by_seed[ANC][sd] for sd in seeds],
+                            f"α={ANC:g}→{top_a:g} 配对步长")
+        ci_lo2, ci_hi2 = hi_pair["ci95_imgs"]
+        print(f"\n[顶以上那一段·本轮新买的格子] α={top_a:g} 本格现读 {summary[top_a]['mean_gap_imgs']:+.1f} 张"
+              f"（锚点格 α={ANC:g} 现读 {summary[ANC]['mean_gap_imgs']:+.1f} 张）；"
+              f"H1 直线外推到 α={top_a:g} = {h1_line[top_a]:+.1f} 张")
+        print(f"  以流为单位 α={ANC:g}→{top_a:g} 步长 {hi_pair['mean_gap_imgs']:+.1f} 张 "
+              f"CI [{ci_lo2:+.1f}, {ci_hi2:+.1f}]、同号 {hi_pair['same_sign_seeds']} ⇒ "
+              + ("CI 跨 0：**顶以上还涨不涨这一发没判**，别把点估计写成形状"
+                 if ci_lo2 < 0 < ci_hi2 else
+                 ("还在掉（更深）⇒ v4 那句『最小剂量比顶还伤』里的『顶』选矮了，"
+                  "**倒挂可能是截断产物**（判词按规矩保持，但这句话必须进欠账）"
+                  if hi_pair["mean_gap_imgs"] < 0 else
+                  "回浅（更不伤）⇒ 剂量响应在 α>0.7 这段掉头：那条线自己拐了，"
+                  "『顶=最深』这个默认从此要写清它只在 0.7 以下成立")))
 
     # ---------- 判决：形状由数字挑，不由人挑（判据 = SHAPE_RULE，见文档串第四发与第七发） ----------
     s_small, s_probe = summary[small], summary[PROBE]
@@ -740,6 +834,8 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
     report = {"dataset": dataset, "tier": tier, "width": width, "temps_fixed": T, "ladder": list(LAD),
               "seeds": list(seeds), "probe_alpha": PROBE, "anchor_alpha": ANC,
               "paired_step_small_to_anchor": pair_step,
+              "ladder_high": list(HIGH_LADDER) if high else None,
+              "paired_step_anchor_to_max": hi_pair,
               "t_column_override": t_col, "thin_ladder": bool(thin), "identity_gate_seeds": len(id_gate),
               "gate_is_anchor": L["gate_is_anchor"], "teacher_acc": L["teacher_acc"],
               "floor_from": L["floor_from"], "floor_kind": L["floor_kind"], "seed_floor_imgs": floor,
@@ -802,10 +898,15 @@ if __name__ == "__main__":
     ap.add_argument("--thin", action="store_true",
                     help="薄阶梯：只跑最小剂量格与锚点格两格（配对步长只吃这两格），"
                          "恒等闸只在老 3 条流上跑；档案名加 _thin")
+    ap.add_argument("--ladder-high", action="store_true",
+                    help="把阶梯往上接 α=0.85/1.0 两格，回答『锚点剂量以上还涨不涨』；"
+                         "判据吃的格子与那本 8 流账一字不动（新格只多报一个配对步长），"
+                         "与 --thin 互斥；档案名加 _hi")
     ap.add_argument("--t", type=float, choices=(1.0, 3.0, 6.0), default=None,
                     help="把阶梯铺在哪一列温度上；默认 MNIST=T=3、Fashion=该账最大温度列。"
                          "显式给值时档案名加 _t<值>（换列=换一本账，不能与默认那本撞名）")
     ap.add_argument("--tier", choices=tuple(DATA_TIERS), default=TIER,
                     help="数据档位；底与跨脚本闸基准都从那一档（那一本任务）自己的账里读，缺格就退出")
     args = ap.parse_args()
-    main(args.dataset, args.width, args.tier, nseeds=args.nseeds, thin=args.thin, t_col=args.t)
+    main(args.dataset, args.width, args.tier, nseeds=args.nseeds, thin=args.thin, t_col=args.t,
+         high=args.ladder_high)

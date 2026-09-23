@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-"""v3/v4 形状判据的离线验红（零训练）：把已入库的 v4f 档案按 v1/v2/v3/v4 各算一遍，看翻转集合落在哪。
+"""v3/v4/v5 形状判据的离线验红（零训练）：把已入库的 v4f 档案按 v1/v2/v3/v4/v5 各算一遍，看翻转集合落在哪。
 
-七道闸（沿用第四发的规矩：一道闸只钉一件修复，红要知道是哪件修复没装上）：
+八道闸（沿用第四发的规矩：一道闸只钉一件修复，红要知道是哪件修复没装上）：
   ① 复算自证     每本档案**记录在案**的那句判词 = 产出它那一版的复算值（钉"喂的是同一批数字"）
   ② 翻转集合     v3 相对 v2 只许翻掉预登记的那一本（钉"v3 不是装饰，也不是连坐"）
   ③ 只翻该翻的   那一本必须从 测不动 翻到 反号线（钉翻的是对的方向）
   ④ 不连坐       板块全部在册『污染型』判词逐字不变（条数现算不写死；钉分支顺序与反号条件）
                  注意它**只按 v2/v3 复算**，所以它结构性地看不见 v4 的连坐——v4 的连坐由 ⑦ 独扛
-  ⑤ 落地自证     真的 _v3 / _v4 **同流重跑**本：判词落在预登记预言上，且训练路径字段逐位不动
+  ⑤ 落地自证     真的 _v3 / _v4 / _v5 **同流重跑**本：判词落在预登记预言上，且训练路径字段逐位不动
                  （钉"翻案是判据换来的，不是重训换来的"；换了流数=另一发实验，不在这一条里）
                  基准账 = 同流同配置里**版本号最高的前一版**（不是 glob 顺序最老那本：v1→v2 时
                  判据合法换过 `same_dir_seeds` 这类派生字段，拿老本当基准会把它报成"数字动了"）
@@ -18,39 +18,52 @@
                  （`_n12` 字典序在 `_n8` 前面，按文件名定向会结构性地漏掉"8 条流 ⊆ 12 条流"这一对）：
                  小账的每一格必须在大账里逐位重现。这一条是"3/8/12 条流的账能对着读"的**唯一许可证**——
                  本轮所有"换流数后判决变了/没变"的说法都默认了它，此前只是口头默认。
-                 实测在册 10 对（`_n12` 那本 +3、`_hi` 那本 +3，都在前两轮现修后进入对账）。
-                 本轮三本 `_t6` 账**一对都没多**：它们是各自配置的首跑（同流同配置没有前一版，
-                 阶梯也没被任何老账包含），所以对账线只有恒等闸（实测 8/8、8/8、3/3）与
-                 跨脚本闸（各 6/6 逐位命中 v4c 档案）——**别把"新账入库"当成"许可证变多了"**。
+                 实测在册 **13 对**（`_n12` 那本 +3、`_hi` 那本 +3，都在前两轮现修后进入对账；
+                 上一轮三本 `_t6` 账**一对都没多**——它们是各自配置的首跑，阶梯也没被任何老账包含，
+                 对账线只有恒等闸（8/8、8/8、3/3）与跨脚本闸（各 6/6）：**别把"新账入库"当成"许可证变多了"**）。
+                 但**反过来也成立**：v5 那本同流重跑账一入库就多买 3 对（`_mid.json` ⊆ 它、它 ⊆ `_n12_v4`、
+                 它 ⊆ `_hi_v4`）——一本"什么维都没换"的账恰恰是**三对**"同一批流对着读"的中间人。
+                 我预登记时按 +1 猜的，实测 +3。**许可证对数与"买了什么维"没有单调关系，只能现读。**
   ⑦ v4 的翻转集合 v4 相对 v3 只许翻掉预登记那一本（份额 118%，**预登记当时**唯一出界的账）。只对**阶梯顶在账里**
                  的账参评：顶不在账时这条腿恒等于 v3，那种"通过"是没测到（本轮实测 14 本里参评 11 本）。
                  本轮新入库的两本 v4-era 出界账（`_mid_n8_t6_v4` 168%、`_n8_t6_v4` 101%）**不进这条集合**：
                  它们从落地那天就是 v4 判词、没有"v3 时代的旧判词"可翻 ⇒ 闸⑦ 对它们既不算通过也不算红，
                  它们的"倒挂"承重靠的是自己那本里的配对步长 CI，不是这道闸。
+  ⑧ v5 的翻转集合 v5 相对 v4 只许翻掉预登记那**四本**（出界幅度 < 那条配对步长的 CI 半宽 ⇒ 从『倒挂』退回
+                 『污染型』），且 `_mid_n8_t6_v4`（出界 29.8 > 半宽 22.4）**必须不翻**——它是全册唯一还站着的倒挂。
+                 参评口径与 ⑦ 同族：只看**判词记录在 v4 名下、阶梯顶在账**的账（实测 21 本里参评 6 本）；
+                 v5 落地那一本（`_mid_n8_v5`）是"预言兑现"，它的对账线是 ⑤，不进这里的参评表。
+                 参评为空 = **没测到**而不是通过。附带一条不连坐检查：v4 复算不在第 1 支里的参评账，
+                 v5 判词必须逐字相同（这条腿嵌在第 1 支内部，碰到别支就是实现走样）。
+                 旧闸接新版本这件事本轮做齐了：① 加 v5 复算列、②⑤⑦ 共用的"旧账/后继账"名单 `RERUN_RULES`
+                 含 v5、⑤ 的预言列按 `pred_col` 指向**本作**判据那一列。
 
 自我拆红（每条各拆一道闸，跑了不红的模式=那条闸没测到，不许拿它当通过。下面全是**本轮实测**，
 不是预期——规矩是实测再写回这张表，写死的计数只对"当前在册的那几本"成立：
-本轮又入库三本（17→20 本，全是"阶梯搬到 T=6 那一列"：`_mid_n8_t6_v4`、`_n8_t6_v4`、`_low_n8_thin_t6_v4`）：
-`--decorative` 9→13、`--collateral` 5→7、`--misfeed` 27→35、`--v4blind` 5→7，因为**每一本新账一入库
-就成了复算闸① 与落地闸⑤ 的新被测对象**（一本 v4 账最多能同时被 ① 点四次名：v1/v2/v3 并排列各一次
-＋ 本发判词一次）。`--drift`/`--sibdrift`/`--oldsib`/`--laddersib`/`--v4loose` 五档计数没动（3/3/1/2/1）。
-加一本账就重跑十档再改这张表，沿用上轮的数字=这张表已经在说谎。）：
-  --decorative  v3 瞎掉阶梯顶（s_top=None）→ 实测 13 条红：①×8 ② ③ ⑤×2 ⑦
-                （谁都翻不动=装饰；⑦ 顺带红，因为瞎顶的 v4 连"倒挂"这一格原料都没有；
-                 新落地的 `_t6` 两本因此也被 ① 点名——倒挂复算不出来就是这条腿被摘的证据）
+本轮入库一本（20→21 本，v5 的落地本 `compress_report_v4f_mid_n8_v5.json`），拆红从十档涨到**十二档**
+（新增 `--v5blind`/`--v5strict`）。计数变了的两条：**每一本新账一入库就成了复算闸① 与落地闸⑤ 的新被测对象**
+（一本 v5-era 账最多同时被 ① 点五次名：v1/v2/v3/v4 并排列各一次＋本发判词一次），所以
+`--decorative` 13→16、`--misfeed` 35→43；`--drift` 3→4 与 `--v4blind` 7→9、`--v5blind` 1→3 是因为
+闸⑥ 现在多认一本老账、闸① ⑤ ⑧ 现在多一个对象。**没动的**：`--collateral` 7、`--sibdrift` 3、`--oldsib` 1、
+`--laddersib` 2、`--v4loose` 1、`--v5strict` 2，`--destroy` 仍 0 红。
+加一本账就重跑十二档再改这张表，沿用上轮的数字=这张表已经在说谎。）：
+  --decorative  v3 瞎掉阶梯顶（s_top=None）→ 实测 16 条红：①×9 ② ③ ⑤×2 ⑦ ⑧×2
+                （谁都翻不动=装饰；⑦ 顺带红，因为瞎顶的 v4 连"倒挂"这一格原料都没有，⑧ 跟着红两次——
+                 翻转集合变空 ＋ 唯一该站着的倒挂也站不住）
   --destroy     把流级腿放松成"最多一条流反向"→ 实测 0 条红：它给的是"这批在册账的方向判定
-                不靠最后一条流"这一条敏感性读数，**不算任何一道闸的验红通过**（承重由另九档拆）
+                不靠最后一条流"这一条敏感性读数，**不算任何一道闸的验红通过**（承重由另十一档拆）
   --collateral  第 2 支忘记要求反号、且挪到第 1 支前面 → 实测 7 条红：①×4 ② ④ ⑦
-                （顺序与反号条件都承重；本轮新红的两本正是 `_t6` 那两本——它们一旦被读成反号线，
-                 板块最硬那条"污染型"就没了）
-  --misfeed     复算时把伤害方向 dirn 取反 → 实测 35 条红：①×32 + ④ + ⑤ + ⑦（读错数字当场被抓）
-  --drift       把扩出来的那本某一格的 wrong_kd/gap 挪 +1 → 实测 3 条红：⑥×3
+                （顺序与反号条件都承重；本轮计数没动，因为这一档红的是"读成反号线"那几本，
+                 v5 落地本判词与 v3 相同、本来就落不到反号线那一支）
+  --misfeed     复算时把伤害方向 dirn 取反 → 实测 43 条红：①×37 + ④ + ⑤×2 + ⑦ + ⑧×2（读错数字当场被抓）
+  --drift       把扩出来的那本某一格的 wrong_kd/gap 挪 +1 → 实测 4 条红：⑥×4
                 （扩流/扩格本偷改老读数必须被抓。**注入点按包含关系挑、且优先挑"老那本文件名排在后面"
                  的那一对**（本轮挑中的仍是 `_n8_v3 ⊆ _n12_v4`）：老规则按文件名谁小谁老，
                  `_n12` 恰好排在 `_n8` 前面 ⇒ "8 条流 ⊆ 12 条流"这一对整个不在对账里，
                  上一轮预登记的②就是这么被漏掉的。这一档现在钉的是**定向规则本身**，
-                 三道同时红是因为 12 条流那本同时是三本老账的扩展。注意它**只挑一对**注入：
-                 本轮新增的 `_n8_v3/_n8_v4 ⊆ _hi` 两对同样是"老那本名字排在后面"，
+                 四道同时红是因为 12 条流那本现在同时是**四本**老账的扩展（v3/v4/**v5**/`_mid`）——
+                 比上一档多一条红，就是那本新账入库的痕迹。注意它**只挑一对**注入：
+                 `_n8_v3/_n8_v4/_n8_v5 ⊆ _hi` 三对同样是"老那本名字排在后面"，
                  但排序在 `_n12` 之后所以没被选中——这一档测的是定向规则，不是全部对）
   --sibdrift    给重跑本的一个训练路径读数（seed_floor_imgs）偷偷 +7 → 实测 3 条红：⑤ 逐本点名
                 （钉"数字真动了的时候闸⑤ 还活着"，与下面两条一起构成 ⑤ 的三端）
@@ -61,13 +74,20 @@
                 （红的内容是 `ladder` 长度与随之找不到的字段）。这一档钉的是**扩格本不许冒充重跑本**
                  那一端：没有它，`--ladder-high` 一入库闸⑤ 就会把"多买了两格"报成"训练路径动了"；
                  有了它，这条排除是被一档红盯着的规矩，不是一句注释）
-  --v4blind     v4 瞎掉倒挂腿（inverted_leg=False）→ 实测 7 条红：①×5 + ⑦ + ⑤
-                （上一版只有 ⑦：那时 `_v4` 本还没落地，① 与 ⑤ 没有对象可查。
-                 现在在册 5 本"倒挂"账（`_mid_n8_v4`/`_mid_n12_v4`/`_mid_n8_hi_v4` 与本轮两本 `_t6`）
-                 全被 ① 点名——这条腿一旦被摘，档案里那句"倒挂"就复算不出来、落地预言也落空）
+  --v4blind     v4 瞎掉倒挂腿（inverted_leg=False）→ 实测 9 条红：①×6 + ⑤ + ⑦ + ⑧
+                （在册"倒挂"账被 ① 点名——这条腿一旦被摘，档案里那句"倒挂"就复算不出来、落地预言也落空。
+                 本轮多红一条 ⑧：v4 瞎掉的账同时让 v5 的翻转集合变空，**旧腿瞎了会连带让新腿没原料**）
   --v4loose     倒挂腿忘掉"同号且更大"，只要判到污染型就改口 → 实测 1 条红：只有 ⑦，
                 红的内容是"参评三本污染型全翻成倒挂"（连坐）。**④ 抓不到它**——不是 ④ 松，
                 是 ④ 定义在 v2/v3 复算上，结构性地看不见 v4 这条腿。
+  --v5blind     v5 瞎掉那条 CI 腿（`ci_leg=False` ⇒ 与 v4 逐字同判）→ 实测 3 条红：① + ⑤ + ⑧
+                （装饰端：v5 若与 v4 一字不差，⑧ 的翻转集合就是空的，"换了判据"什么都没换到；
+                 ① 与 ⑤ 那条红是 v5 落地本自己的——它的档案判词按 v4 复算不出来，
+                 所以这一档同时钉住了"落地本必须真的被 v5 判过"）
+  --v5strict    把 v5 那条腿的分母从 CI **半宽**换成**全宽** `hi − lo` → 实测 2 条红：⑧×2
+                （过头端：全宽之下 `_mid_n8_t6_v4`（29.8 vs 44.7）也跟着翻 ⇒ 翻转集合变五本、
+                 该站着的那本站不住。**这一档钉的是这条腿里唯一没被预言钉死的算术自由度**——
+                 不拆它，"半宽还是全宽"就成了"实现怎么写都算通过"）
 """
 import json
 import glob
@@ -104,6 +124,11 @@ elif MODE == "--collateral":                     # 反号条件忘掉的分支�
 
 SHORT = lambda s: s.split("（")[0]      # noqa: E731
 
+# "重跑/后继账"的名单只写这一处：闸②⑤⑦⑧ 都拿它区分"旧账"与"新判据下落地的账"。
+# 漏一个版本，那本账就会被算成"新一次翻案"，把预登记的翻转集合算脏（第十一发④ 的教训：
+# 老闸不会自动获得对新版本的判决权，必须显式接进去）。
+RERUN_RULES = ("v3", "v4", "v5")
+
 
 def v4_of(s_small, s_probe, n, dirn, a_small, a_probe, anc_a, s_top, pair_step):
     """把 v4 那条腿装上（默认＝诚实实现：第 1 支成立 + 顶在账里 + 同号 + |第一格|>|顶|）。"""
@@ -122,6 +147,19 @@ elif MODE == "--v4loose":              # 倒挂腿忘掉"同号且更大"：只�
         if s_top is not None and SHORT(sh) == "污染型":
             return "污染型·倒挂（拆红用：没要求同号与大小）"
         return sh
+
+
+def v5_of(s_small, s_probe, n, dirn, a_small, a_probe, anc_a, s_top, pair_step):
+    """v5 = v4 的全部条件 **且** 出界幅度 > 配对步长 CI 的**半宽**（默认即诚实实现）。"""
+    return _orig_sv(s_small, s_probe, n, dirn, a_small, a_probe, anc_a,
+                    s_top, pair_step, inverted_leg=True, ci_leg=True)[0]
+
+
+if MODE == "--v5blind":                # v5 瞎掉那条 CI 腿：与 v4 逐字同判 → 该被闸⑧ 报成装饰
+    def v5_of(s_small, s_probe, n, dirn, a_small, a_probe, anc_a, s_top, pair_step):   # noqa: F811
+        return v4_of(s_small, s_probe, n, dirn, a_small, a_probe, anc_a, s_top, pair_step)
+elif MODE == "--v5strict":             # 半宽换成全宽：唯一还站着的倒挂也跟着翻 → 该被闸⑧ 报成过头
+    sf.FULL_WIDTH_MODE = True
 
 
 def pruned(new, old):
@@ -200,14 +238,17 @@ for path in sorted(glob.glob("compress_report_v4f*.json")):
     v4 = v4_of(s_small, s_probe, n, dirn, small, a_probe, anc,
                None if MODE == "--decorative" else s_top,
                d.get("paired_step_small_to_anchor"))
+    v5 = v5_of(s_small, s_probe, n, dirn, small, a_probe, anc,
+               None if MODE == "--decorative" else s_top,
+               d.get("paired_step_small_to_anchor"))
     v2 = v2[0]
-    rows.append((path, rule, rec, v1, v2, v3, s_top is not None, anchor_src, n, small, a_probe, anc, v4))
+    rows.append((path, rule, rec, v1, v2, v3, s_top is not None, anchor_src, n, small, a_probe, anc, v4, v5))
 
-    same = SHORT(rec) == SHORT({"v1": v1, "v2": v2, "v3": v3, "v4": v4}[rule])
+    same = SHORT(rec) == SHORT({"v1": v1, "v2": v2, "v3": v3, "v4": v4, "v5": v5}[rule])
     print(f"{path}  [{n} 条流 | 阶梯顶 {'在账里' if s_top else '不在账里'} | dirn 来源：{anchor_src} "
           f"| α {small:g}/{a_probe:g}/{anc:g}]")
-    print(f"   复算  v1={SHORT(v1):<4} v2={SHORT(v2):<4} v3={SHORT(v3):<4} v4={SHORT(v4):<6}   "
-          f"档案记（{rule}）={SHORT(rec)}  {'== 复算' if same else '**不等：喂错数字了**'}")
+    print(f"   复算  v1={SHORT(v1):<4} v2={SHORT(v2):<4} v3={SHORT(v3):<4} v4={SHORT(v4):<6} "
+          f"v5={SHORT(v5):<6}   档案记（{rule}）={SHORT(rec)}  {'== 复算' if same else '**不等：喂错数字了**'}")
     if d["verdict"].get("verdict_under_v1_rule") and \
             SHORT(d["verdict"]["verdict_under_v1_rule"]) != SHORT(v1):
         fails.append(f"闸① {path} 档案里的 v1 并排判词与复算不符（记 "
@@ -220,21 +261,25 @@ for path in sorted(glob.glob("compress_report_v4f*.json")):
             SHORT(d["verdict"]["verdict_under_v3_rule"]) != SHORT(v3):
         fails.append(f"闸① {path} 档案里的 v3 并排判词与复算不符（记 "
                      f"{SHORT(d['verdict']['verdict_under_v3_rule'])}，复算 {SHORT(v3)}）")
+    if d["verdict"].get("verdict_under_v4_rule") and \
+            SHORT(d["verdict"]["verdict_under_v4_rule"]) != SHORT(v4):
+        fails.append(f"闸① {path} 档案里的 v4 并排判词与复算不符（记 "
+                     f"{SHORT(d['verdict']['verdict_under_v4_rule'])}，复算 {SHORT(v4)}）")
     if not same:
         fails.append(f"闸① {path} 的档案判词复算不出来（档案记 {SHORT(rec)}，{rule} 复算 "
-                     f"{SHORT({'v1': v1, 'v2': v2, 'v3': v3, 'v4': v4}[rule])}）——"
+                     f"{SHORT({'v1': v1, 'v2': v2, 'v3': v3, 'v4': v4, 'v5': v5}[rule])}）——"
                      f"先查是不是读了同一批数字，别谈 {rule}")
 
 # 翻转集合只在**旧账**（记录在 v1/v2 名下那几本）上算：同一发实验的 _v3 重跑本不是"新的一翻"，
 # 它是闸⑤要验的"预言落地"，算进翻转集合就是把一件事数两次。
 flips_v2_v3 = [p for p, rule, rec, v1, v2, v3, *_ in rows
-               if rule not in ("v3", "v4") and SHORT(v2) != SHORT(v3)]
+               if rule not in RERUN_RULES and SHORT(v2) != SHORT(v3)]
 expected = ["compress_report_v4f_low_n8_thin_v2.json"]
 print(f"\n[闸① 复算自证] {len(rows)} 本档案："
       f"{'判词全部由产出它的那一版复算出来 → 通过' if not any(f.startswith('闸①') for f in fails) else '见上：有复算不出的'}")
 
 print(f"[闸② v3 相对 v2 的翻转集合（只在旧账上算，"
-      f"{sum(1 for r in rows if r[1] not in ('v3', 'v4'))} 本）] {flips_v2_v3 or '（空）'}")
+      f"{sum(1 for r in rows if r[1] not in RERUN_RULES)} 本）] {flips_v2_v3 or '（空）'}")
 if sorted(flips_v2_v3) != expected:
     fails.append(f"闸② 翻转集合应为 {expected}，实为 {flips_v2_v3}——谁都翻不动是装饰，连坐翻掉板块最硬结论是把债转成损失")
 
@@ -256,9 +301,9 @@ if hard:
 # 闸⑦：v4 相对 v3 只许翻掉预登记的那一本（份额>100%、唯一出界的那发）。
 # 与闸② 同构：全翻是这条腿连坐（"只要判到污染型就说倒挂"），一本不翻是这条腿装饰。
 expected_v4 = ["compress_report_v4f_mid_n8_v3.json"]
-flips_v3_v4 = [r[0] for r in rows if r[1] != "v4" and SHORT(r[5]) != SHORT(r[12])]
-can_flip = [r for r in rows if r[1] != "v4" and r[6]]       # 阶梯顶不在账里的本**参评不了**这条腿
-print(f"[闸⑦ v4 相对 v3 的翻转集合（v3 及更早的 {sum(1 for r in rows if r[1] != 'v4')} 本里，"
+flips_v3_v4 = [r[0] for r in rows if r[1] not in ("v4", "v5") and SHORT(r[5]) != SHORT(r[12])]
+can_flip = [r for r in rows if r[1] not in ("v4", "v5") and r[6]]   # 阶梯顶不在账里的本**参评不了**这条腿
+print(f"[闸⑦ v4 相对 v3 的翻转集合（v3 及更早的 {sum(1 for r in rows if r[1] not in ('v4', 'v5'))} 本里，"
       f"阶梯顶在账因而**参评**的 {len(can_flip)} 本；三本 v1-era 非薄账没训到锚点，"
       f"这条腿对它们恒等于 v3，不算通过也不算红）] {flips_v3_v4 or '（空）'}")
 if sorted(flips_v3_v4) != expected_v4:
@@ -277,6 +322,36 @@ else:
     print("  近邻对照要分清两类：`compress_report_v4f_mid.json`(97%) 份额更贴界，但它是 3 条流的账、"
           "阶梯顶不在账里 ⇒ 这条腿对它恒等于 v3，**不能**当这条判据的近邻")
 
+# 闸⑧：v5 相对 v4 只许翻掉预登记那四本（出界幅度压不过"把两端钉在一起的这一步"自己的 CI 半宽）。
+# 参评＝**判词记录在 v4 名下**且阶梯顶在账里的那些本：v5 落地的那本是"预言兑现"，归闸⑤ 管，
+# 算进这里就是把同一次翻案数两遍（与闸②⑦ 同一套规矩）。
+EXPECTED_V5 = ["compress_report_v4f_mid_n12_v4.json", "compress_report_v4f_mid_n8_hi_v4.json",
+               "compress_report_v4f_mid_n8_v4.json", "compress_report_v4f_n8_t6_v4.json"]
+MUST_STAY = "compress_report_v4f_mid_n8_t6_v4.json"      # 出界 29.8 张 > 半宽 ±22.4 张 ⇒ v5 之下唯一还站着的倒挂
+can_flip_v5 = [r for r in rows if r[1] == "v4" and r[6]]
+flips_v4_v5 = [r[0] for r in can_flip_v5 if SHORT(r[12]) != SHORT(r[13])]
+print(f"\n[闸⑧ v5 相对 v4 的翻转集合（记录在 v4 名下、阶梯顶在账因而**参评**的 {len(can_flip_v5)} 本；"
+      f"v5 落地那本归闸⑤）] {flips_v4_v5 or '（空）'}")
+if not can_flip_v5:
+    fails.append("闸⑧ 一本参评的账都没有——不是通过，是没测到")
+if sorted(flips_v4_v5) != sorted(EXPECTED_V5):
+    fails.append(f"闸⑧ v5 的翻转集合应为 {sorted(EXPECTED_V5)}，实为 {flips_v4_v5}——"
+                 f"谁都翻不动是这条 CI 腿装饰，多翻是连坐（把界内或别的支的账一起改了）")
+stay = [r for r in can_flip_v5 if r[0] == MUST_STAY]
+if not stay:
+    fails.append(f"闸⑧ 该保持倒挂的 {MUST_STAY} 不在参评表里——它没了就等于这条腿没人验过")
+elif SHORT(stay[0][13]) != "污染型·倒挂":
+    fails.append(f"闸⑧ {MUST_STAY} 在 v5 下判成了 {SHORT(stay[0][13])}：它的出界幅度 29.8 张 > 半宽 22.4 张，"
+                 f"翻掉它说明这条腿被写松了（全宽？还是根本没比大小？）")
+else:
+    print(f"  唯一还站着的倒挂：{MUST_STAY}（v5 复算仍是{SHORT(stay[0][13])}）")
+beside = [r[0] for r in can_flip_v5 if not SHORT(r[12]).startswith("污染型") and SHORT(r[13]) != SHORT(r[12])]
+print(f"[闸⑧ 的附带不连坐检查] v4 复算不在第 1 支里的参评账 {len([r for r in can_flip_v5 if not SHORT(r[12]).startswith('污染型')])} 本："
+      + ("v5 判词逐字相同（这条腿结构上碰不到别的支）" if not beside else f"**被连坐：{beside}**"))
+if beside:
+    fails.append(f"闸⑧ 别的支被连坐：{beside}——v5 只许动倒挂那条腿的触发界")
+
+
 # 闸⑤：真实重跑必须落在预登记预言的那一格上，而且**只有判词能变**。
 # 为什么这条比闸②硬：闸② 是拿旧账的数字离线复算，重跑可能因为训练路径变了而给出别的判词；
 # 这一条同时钉住"预言=实测"和"数字没动"，动了数字的翻案就不是判据换到的东西，是重训换来的。
@@ -291,13 +366,13 @@ def ver_rank(q):                     # 文件名尾的 _v<N>；无后缀 = v1 �
     return int(tail) if sep and tail.isdigit() else 0
 
 
-fresh = [p for p, rule, *_ in rows if rule in ("v3", "v4")]
+fresh = [p for p, rule, *_ in rows if rule in RERUN_RULES]
 if not fresh:
     fails.append("闸⑤ 一本 _v3/_v4 重跑账都没有——预言没人验过就等于没落地，别宣布新判据换到了东西")
 else:
     print(f"[闸⑤ 落地自证] 已重跑 {len(fresh)} 本：{[p for p in fresh]}")
 for p, rule, rec, v1, v2, v3, *_ in rows:
-    if rule not in ("v3", "v4"):
+    if rule not in RERUN_RULES:
         continue
     d_new = docs[p]
     if MODE == "--sibdrift" and isinstance(d_new.get("seed_floor_imgs"), (int, float)):
@@ -338,7 +413,7 @@ for p, rule, rec, v1, v2, v3, *_ in rows:
           f"按{'**最老**一本（--oldsib 突变：跨了判据版本）' if pick_oldest else '版本号最高的前一版'}挑）")
     srow = by_path[sib]
     d_old = docs[sib]
-    pred_col = 12 if rule == "v4" else 5        # 落地要落的是"对兄弟账施**本作**判据"的那个预言
+    pred_col = {"v4": 12, "v5": 13}.get(rule, 5)   # 落地要落的是"对兄弟账施**本作**判据"的那个预言
     on_pred = SHORT(rec) == SHORT(srow[pred_col])
     moved, shed, added = [], [], []
     for k in TRAIN_PATH:

@@ -325,6 +325,82 @@ v1 的形状判据只吃**逐图合并 p**（`p_pooled`）。于是 T=1 那一�
         改写成"有两个坐标（同档同宽换列），第二个才承重"。守卫十档当场全部重测：在册 20 本，
         `--decorative` 9→13、`--collateral` 5→7、`--misfeed` 27→35、`--v4blind` 5→7（每一本新账都是
         复算闸① 的新被测对象），其余五档计数不动，`--destroy` 仍 0 红。
+
+第十二发（`SHAPE_RULE = "v5"`）还的是第十一发④ 自己点名的那笔**判据自己的债**，判据写在重跑之前。
+v4 的倒挂腿吃的界是"份额 > 100%"，而份额 = |第一格| ÷ |阶梯顶| 是**两个带噪声的读数之比**：
+在册五本判『倒挂』的账里，有四本的"出界幅度"（= 把两端钉在一起的那条配对步长的均值）小于这条步长
+自己的 CI 半宽，也就是"比顶还伤 1.3 张 / 7.1 张 / 0.7 张"这件事在这台仪器上根本读不出来。
+于是 v4 把 101% 和 82% 分给了两支，而它们是同一个读数。**该改的是界，不是数**（沿用"派生比值有定义域"
+那条口径的第二句：阈值写成"越过一个固定数"时，那个数必须和派生量自己的不确定度比大小）。
+  · v5 相对 v4 **只改这一条腿的触发条件**，其余四支的条件、分支顺序、"有方向"的定义（逐图合并 p<0.05
+    **且**全流同号）逐字不动：
+      1b **倒挂（v5）**：v4 的 1b 全部条件成立（污染型 + 顶在账 + 同号 + |第一格| > |顶|），**且**
+        出界幅度 `gap = |第一格 − 顶|` **> 配对步长 `paired_step_small_to_anchor` 的 CI 半宽**
+        `(hi − lo)/2`。`pair_step` 缺失（None）时这条腿**没原料**⇒ 判『污染型』并打印"出界但没测到"，
+        不许当成界内。
+      界内那本（v4 条件不成立）仍然说份额，一字不变；**v4 条件成立但 CI 检查不过**的那一本判
+      『污染型（有伤害不必有剂量）』，并必须把这件事写在读数里：份额仍然出界（现算 x%）、
+      出界 y 张而仪器半宽 ±z 张 ⇒ 不判倒挂，**同时也不许把 x% 当份额读**（比值仍会被分母推着走）。
+    实现上是一个新开关 `ci_leg`（默认 False ⇒ v4 的复算逐字不变，与 `inverted_leg` 默认 False 同理）：
+    守卫要靠这两个默认值把 v1~v4 的历代判词继续原样复算，否则"喂同一批数字"这件事就没法自证。
+  · **预登记的翻转集合**（此后不许改口；现读全部在册账的 `paired_step_small_to_anchor` 与两格均值算出，
+    写在跑守卫**之前**）：
+      翻（v4『倒挂』→ v5『污染型』）**恰好四本**：
+        `compress_report_v4f_mid_n8_v4.json`      出界 7.1 张 / 半宽 ±10.5 张（CI [−3.4,+17.6]）
+        `compress_report_v4f_mid_n8_hi_v4.json`   出界 7.1 张 / ±10.5 张（同一流同一批格子，只是多两格）
+        `compress_report_v4f_mid_n12_v4.json`     出界 0.7 张 / ±8.9 张（CI [−8.2,+9.5]）
+        `compress_report_v4f_n8_t6_v4.json`       出界 1.3 张 / ±15.5 张（CI [−14.3,+16.8]）
+      不翻**恰好一本**：`compress_report_v4f_mid_n8_t6_v4.json`——出界 29.8 张 > 半宽 ±22.4 张
+        （CI [+7.4,+52.1]）⇒ 它是 v5 之下**全册唯一还站着的倒挂**。
+      其余各本（有阈值 / 测不动 / 反号线 / 界内污染型）判词逐字不动：这条腿嵌在第 1 支内部，
+      结构上碰不到别的支；碰到别的就是实现走样，由 ⑧ 的红报出来。全翻是破坏，一本不翻是装饰。
+  · **落地=同流活重跑那一本**：`--tier 中数据4500 --nseeds 8`（与 `_mid_n8_v4` 同流、同配置、**同阶梯**）
+    → `compress_report_v4f_mid_n8_v5.json`。预言判词 = 『污染型（有伤害不必有剂量）』（即改口），
+    且 14 个训练路径字段必须逐位不动——动了数字的翻案是重训换来的，不是判据换来的（闸⑤）。
+    为什么挑这一本：它是板块那句"倒挂"的出生地（第八发就是为它立的腿），v5 判它退回界内，
+    所以"改口"最贵的一笔账必须落在它身上；`_n12`/`_hi`/`_n8_t6` 三本只做离线复算，不重跑。
+  · **验红落在守卫 `_red_v3.py` 新增的闸⑧**（v5 相对 v4 的翻转集合恰好等于上面那四本，
+    且 `_mid_n8_t6_v4` 必须不翻），配两档专属拆红各钉一端：
+      `--v5blind`  v5 瞎掉那条 CI 腿（= 与 v4 逐字同判）⇒ 翻转集合为空 ⇒ ⑧ 红（装饰）。
+      `--v5strict` 把"半宽"换成"全宽 hi − lo"⇒ `_mid_n8_t6_v4`（29.8 vs 44.7）也跟着翻 ⇒ ⑧ 红（过头）。
+      第二档钉的是**这一个自由度**：分母取半宽还是全宽，是这条腿里唯一没被预言钉死的算术选择，
+      不拆它就成了"实现怎么写都算通过"。
+    同时旧闸要跟着新版本显式接线（第十一发④ 的教训：老"不连坐"闸不会自动获得对新版本的判决权）：
+    ① 的复算表加 v5 一列、⑤ 的"重跑本"谓词与 ②⑦ 的"旧账"谓词共用的那份规则名单改成含 v5，
+    否则新账入库会把闸② 或⑦ 的翻转集合算脏。
+  · 边界照旧声明：这一发**不新增任何独立性维度**（同一批图、同一个老师、同一副学生、同一批 8 条流），
+    买的也不是分辨率，是**判据自己的承重**；所以它不许被写成"倒挂被复证/被推翻"——被改写的只是
+    "什么读数才有资格叫倒挂"这句话。改完之后全册只剩一个倒挂坐标，这是判据变严的**账面上**的结果。
+  · 落地（跑完之后追加，预登记原文一个字不动）：
+      ⓪ **预演跑通、账已删**：`--tier 中数据4500 --nseeds 3`（24.9 秒、18+3 次训练）一次走完整条路径
+        （含训练之后才执行到的五版并排打印），产物 `compress_report_v4f_mid_v5.json` 验完即删、不入库。
+        但预演只覆盖了**界内**那条路径（3 条流那本份额 97% ⇒ 走的是"照旧说份额"），
+        『出界但不承重』那段打印是**活重跑第一次真实执行到的**——它没炸，但"预演"这个词不该被读成"全路径都跑过"。
+      ① **活重跑落在预言上**：`compress_report_v4f_mid_n8_v4.json` 判『污染型·倒挂』，同一批发出去的
+        数字交给 v5 ⇒ **污染型（有伤害不必有剂量）**，判词原文：份额仍出界（现算 118%、比顶多伤 7.1 张），
+        但把两端钉在一起的配对步长自己就是 ±10.5 张（CI [−3.4,+17.6]）⇒ 出界幅度买不动一次改口，
+        而 118% 也**不许当份额读**。守卫闸⑤ 打印：`重跑判词 = 污染型；离线预登记（对 _mid_n8_v4 施 v5）
+        = 污染型 → 落在预言上`、`训练路径逐位：14 个字段全同` ⇒ 改口是判据换来的，一格数字都没动
+        （α=0.05 −45.6 / 顶 −38.5 / 步长 +7.1 CI [−3.4,+17.6]，与 `_n8_v4` 逐字相同）。
+      ② **闸⑧ 离线复算**：在册 21 本里参评 6 本（记录在 v4 名下且阶梯顶在账），翻转集合**恰好**等于预登记
+        那四本（`_mid_n12_v4`、`_mid_n8_hi_v4`、`_mid_n8_v4`、`_n8_t6_v4`），`_mid_n8_t6_v4` 保持倒挂
+        ⇒ 全册**唯一还站着**的倒挂就是它（出界 29.8 > 半宽 22.4）；附带不连坐检查：v4 复算不在第 1 支的
+        那 1 本参评账 v5 判词逐字相同。
+      ③ **两档专属拆红各钉一端，都红**：`--v5blind` 实测 3 条（①＋⑤＋⑧，装饰端——v5 若与 v4 一字不差，
+        ⑧ 的翻转集合是空的，而落地本的档案判词当场复算不出来）；`--v5strict` 实测 2 条（⑧×2，过头端——
+        全宽之下 `_mid_n8_t6_v4` 也跟着翻，翻转集合变五本）。
+      ④ **十二档全部重测后写回守卫头部**：`--decorative` 13→16、`--misfeed` 35→43、`--drift` 3→4、
+        `--v4blind` 7→9、`--v5blind` 1→3（落地本入库后 ①⑤⑥⑧ 各多一个对象），
+        `--collateral` 7、`--sibdrift` 3、`--oldsib` 1、`--laddersib` 2、`--v4loose` 1、`--v5strict` 2 **不动**，
+        `--destroy` 仍 0 红（照旧报成灵敏度测量，不记成通过）。
+      ⑤ **一处自纠，而且它正是那条老纪律的第三次兑现**：我没把"许可证对数"写进预登记（守了"事后计数
+        只写不变量"），但心里按"+1 对"估的——实读 **10 → 13 对**。原因是同流重跑本恰好是**三对**包含关系的
+        中间人：`_mid.json`（3 流×4 格）⊆ 它、它 ⊆ `_n12_v4`（12 流）、它 ⊆ `_mid_n8_hi_v4`（7 格）。
+        **许可证对数跟"这一发买了哪一维"没有单调关系**：上一轮三本 `_t6` 首跑账一对都没多，这一轮一本
+        什么维都没换的账反倒多三对。
+      ⑥ **账面上买到了什么**：一个坐标的判决从『倒挂』退回『污染型』（板块那句"最小剂量比顶还伤"从此
+        只剩中数据 × T=6 一个坐标承重），外加一条**不改数**的口径：界外比值两端都不许读（既不是倒挂也不是份额）。
+        没买到任何独立性——同一批图、同一个老师、同一副学生、同 8 条流、同一列温度。
 """
 from __future__ import annotations
 
@@ -353,10 +429,13 @@ SEEDS12 = SEEDS8 + (808, 1337, 24601, 90210)       # 第九发新买的四条：
                                                     # ⇒ 跨脚本逐位对账仍然只发生在前 8 条上（闸⑥ 的许可证范围）
 PROBE_ALPHA = 0.3                                   # 已在 v4c 档案里的那一格
 P_SIG = 0.05
-SHAPE_RULE = "v4"        # 形状判据版本：v1 只看逐图合并 p，v2 加流级同号腿，v3 让判据吃阶梯顶＋给反号一个正式分支，
-                         # v4 在第 1 支内部给"份额>100%"那个定义域出界一个正式分支（倒挂）
+SHAPE_RULE = "v5"        # 形状判据版本：v1 只看逐图合并 p，v2 加流级同号腿，v3 让判据吃阶梯顶＋给反号一个正式分支，
+                         # v4 在第 1 支内部给"份额>100%"那个定义域出界一个正式分支（倒挂），
+                         # v5 把那条界换成"出界幅度 > 配对步长的 CI 半宽"（第十二发，预登记在文档串里）
+FULL_WIDTH_MODE = False  # 只给守卫的 --v5strict 用：把 v5 那条腿的分母从 CI 半宽换成全宽（hi−lo）。
+                         # 默认 False ⇒ v5 按预登记吃半宽；这一档红钉的是"半宽还是全宽"这个算术选择。
 V6 = HERE / "compress_report_v6_fashion.json"
-RULES_WITH_TOP = ("v3", "v4")     # 把阶梯顶交给判据的版本：v2 及更早压根没看那一格
+RULES_WITH_TOP = ("v3", "v4", "v5")   # 把阶梯顶交给判据的版本：v2 及更早压根没看那一格
 
 DATASETS = {
     "mnist": {"loader": load_split, "teacher_pt": MODELS / "mnist_cnn_fp32.pt"},
@@ -382,11 +461,24 @@ def flow_leg(s: dict, n: int) -> dict:
             "has_direction": bool(s["p_pooled"] < P_SIG and k == n)}
 
 
+def oob_resolution(pair_step: dict | None, full_width: bool = False) -> float | None:
+    """v5 的尺子：把两端钉在一起的那条**配对步长**的 CI 半宽（张）。`pair_step` 缺失时返回 None
+    ——这条腿没有原料，判『污染型』但要打印"出界而没测到"，不许读成界内。
+
+    `full_width=True` 只服务守卫的 `--v5strict`：半宽 / 全宽是这条腿里唯一没被预登记钉死的算术选择，
+    拿同一档红拆它一次，它才是闸而不是实现者的口味。"""
+    if pair_step is None:
+        return None
+    lo, hi = pair_step["ci95_imgs"]
+    return (hi - lo) / (1.0 if full_width else 2.0)
+
+
 def shape_verdict(s_small: dict, s_probe: dict, n: int, dirn: float,
                   a_small: float, a_probe: float, anc_a: float,
                   s_top: dict | None = None, pair_step: dict | None = None, *,
-                  inverted_leg: bool = False) -> tuple:
-    """形状判据 v3/v4（同一台机器，v4 只多一条腿；两版都预登记于重跑之前）：一格**有方向** = 逐图合并 p < 0.05 **且** 全流同号。
+                  inverted_leg: bool = False, ci_leg: bool = False) -> tuple:
+    """形状判据 v3/v4/v5（同一台机器，每往上一版只多一条**默认关掉**的腿；三版都预登记于重跑之前）：
+    一格**有方向** = 逐图合并 p < 0.05 **且** 全流同号。
 
     `s_top=None` 时逐字退化为 v2 的三分支——离线验红就靠这条把已入库档案的 v2 判词复算一遍。
     传进 `s_top`（本发的阶梯顶 α={anc_a}）就是 v3：多一支「反号线」，并让「有阈值」也能由阶梯顶撑起。
@@ -397,6 +489,13 @@ def shape_verdict(s_small: dict, s_probe: dict, n: int, dirn: float,
     是则改判『污染型·倒挂』。**默认关**——离线验红要用它把 v3 的复算保持逐字不变（否则闸① 会把
     "喂同一批数字"这件事复算成另一句话）。为什么只嵌在第 1 支里：反号（第 2 支）与"同号且更大"
     互斥，两支不可能同时亮，所以顺序不动、其余三支的条件也不动。
+
+    `ci_leg=True` 才是 v5（第十二发）：它不动任何一支的条件，只把 v4 那条腿的**触发界**从
+    "份额 > 100%"换成"出界幅度 > 把两端钉在一起的那条配对步长的 CI 半宽"。份额是两个带噪声读数的比，
+    "1.3 张 / 7.1 张"这种出界量在这台仪器上读不出来，于是 v4 把 101% 和 82% 分给了两支、而它们是同一个
+    读数。默认关 ⇒ v4 的复算逐字不变（同一理由：闸① 要能自证喂的是同一批数字）。
+    出界但不承重的那一本判词仍是『污染型』，但读数必须把这件事写进去（份额仍然出界、出界几张、半宽几张），
+    并且**不许把那个百分数当份额读**——界内的账才有资格说"买到 x%"。
 
     为什么「反号线」要排在「有阈值」之前、又要两条件同时才判：v2 的三分支里没有"反向"的位置，
     于是低数据档那一发只能印『测不动』再补一段人写的描述性读数——描述性读数不进判词，下一轮没人能复算它。
@@ -420,9 +519,15 @@ def shape_verdict(s_small: dict, s_probe: dict, n: int, dirn: float,
     top = hi if s_top is None else dict(flow_leg(s_top, n), alpha=anc_a)
     reverse = bool(s_top is not None) and top["has_direction"] and lo["p_pooled"] < P_SIG \
         and s_small["mean_gap_imgs"] * s_top["mean_gap_imgs"] < 0
-    inverted = bool(inverted_leg and s_top is not None and harm_small) and \
+    inverted_v4 = bool(inverted_leg and s_top is not None and harm_small) and \
         s_small["mean_gap_imgs"] * s_top["mean_gap_imgs"] > 0 and \
         abs(s_small["mean_gap_imgs"]) > abs(s_top["mean_gap_imgs"])
+    # v5 的那条腿：出界幅度必须压得过"把两端钉在一起的那条配对步长"自己的 CI 半宽（张）。
+    # 份额 = |第一格| ÷ |顶| 是两个带噪声读数之比，所以"越过 100%"这个界量的是抖动而不是世界。
+    gap_oob = abs(s_small["mean_gap_imgs"] - s_top["mean_gap_imgs"]) if inverted_v4 else 0.0
+    res_oob = oob_resolution(pair_step, full_width=bool(FULL_WIDTH_MODE))
+    inverted = inverted_v4 and (not ci_leg or (res_oob is not None and gap_oob > res_oob))
+    out_unresolved = bool(ci_leg and inverted_v4 and not inverted)   # 出界，但不承重（或没原料）
     if hi["p_pooled"] < P_SIG:
         v1_note = (f"特别注意 α={a_probe:g} 那一格：v1 只看逐图合并 p 会把它读成『有方向』"
                    f"（{hi['p_pooled']:.3g} < 0.05），但它只有 {hi['same_dir_flows']} 条流同号"
@@ -458,6 +563,16 @@ def shape_verdict(s_small: dict, s_probe: dict, n: int, dirn: float,
                    f"逐图合并 p={lo['p_pooled']:.4g}、均值 {s_small['mean_gap_imgs']:+.1f} 张），"
                    f"而它是锚点剂量的 {a_small / anc_a:.0%}——H1 的『按份额掺毒』在最后一块地上也没了："
                    f"软标签一旦进目标函数，坏的是它**在不在**，不是它占多少")
+        if out_unresolved:
+            share_oob = abs(s_small["mean_gap_imgs"]) / abs(s_top["mean_gap_imgs"]) * 100
+            reading += (f"。【v5 的界】份额仍然出界（现算 {share_oob:.0f}%、比阶梯顶 α={anc_a:g} 多伤 "
+                        f"{gap_oob:.1f} 张），但把两端钉在一起的配对步长的分辨率是 "
+                        + ("**没有原料**（这本账没存配对步长 ⇒ 这条腿没测到，不许当成界内）" if res_oob is None else
+                           f"±{res_oob:.1f} 张（CI [{pair_step['ci95_imgs'][0]:+.1f}, "
+                           f"{pair_step['ci95_imgs'][1]:+.1f}]）⇒ 出界幅度买不动一次改口")
+                        + f"。所以这一格读『污染型』不读『倒挂』，而 {share_oob:.0f}% "
+                          f"这个数字此刻**也不许当份额读**：界内的账才有资格说『买到 x%』，"
+                          f"出界的比值只说明两端谁都没被量准")
     elif reverse:
         shape = "反号线（小剂量端与阶梯顶反向：两说都不合）"
         ps = ("" if pair_step is None else
@@ -797,10 +912,13 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
     s_small, s_probe = summary[small], summary[PROBE]
     s_top = summary[ANC] if SHAPE_RULE in RULES_WITH_TOP else None   # v3 起把阶梯顶交给判据
     shape, reading, legs = shape_verdict(s_small, s_probe, len(seeds), dirn, small, PROBE, ANC,
-                                         s_top, pair_step, inverted_leg=(SHAPE_RULE == "v4"))
+                                         s_top, pair_step, inverted_leg=(SHAPE_RULE in ("v4", "v5")),
+                                         ci_leg=(SHAPE_RULE == "v5"))
     v1_shape = shape_verdict_v1(s_small, s_probe, dirn)
     v2_shape = shape_verdict(s_small, s_probe, len(seeds), dirn, small, PROBE, ANC)[0]
     v3_shape = shape_verdict(s_small, s_probe, len(seeds), dirn, small, PROBE, ANC, s_top)[0]
+    v4_shape = shape_verdict(s_small, s_probe, len(seeds), dirn, small, PROBE, ANC,
+                             s_top, pair_step, inverted_leg=True)[0]
     print(f"\n[两关明细] 复现单位是流：合并 p 数的是同一批 10000 张图上的翻牌，流级腿数的是 {len(seeds)} 条流")
     for nm, lg in (("小剂量", legs["small"]), ("闸格", legs["anchor"])):
         print(f"  {nm} α={lg['alpha']:g}  逐图合并 p={lg['p_pooled']:.4g} | 流同号 {lg['same_dir_flows']} "
@@ -817,16 +935,20 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
                  ("  ⇒ 上面那句『测不动』是**判据看不见阶梯顶**造成的，不是这一列真的读不出来：这笔债记进 v3"
                   if top["has_direction"] else "")))
     SHORT = lambda s: s.split("（")[0]                                    # noqa: E731
-    prev_nm = "v3" if SHAPE_RULE == "v4" else "v2"   # 换到东西要相对**前一版**算，不能相对最老那版领功
-    prev = v3_shape if SHAPE_RULE == "v4" else v2_shape
-    print(f"[判据版本] 同一批数字交给四版判词：v1（只看逐图合并 p）{SHORT(v1_shape)} ｜ "
+    PREV = {"v3": ("v2", v2_shape), "v4": ("v3", v3_shape), "v5": ("v4", v4_shape)}
+    prev_nm, prev = PREV.get(SHAPE_RULE, ("v2", v2_shape))   # 换到东西要相对**前一版**算，不能相对最老那版领功
+    print(f"[判据版本] 同一批数字交给五版判词：v1（只看逐图合并 p）{SHORT(v1_shape)} ｜ "
           f"v2（加流级同号腿）{SHORT(v2_shape)} ｜ v3（吃阶梯顶＋反号线）{SHORT(v3_shape)} ｜ "
+          f"v4（份额出界即倒挂）{SHORT(v4_shape)} ｜ "
           f"**{SHAPE_RULE}（本发采用）**{SHORT(shape)} → "
-          + ("四版同判，这一发判据版本不换东西（也无损失）"
-             if len({SHORT(v1_shape), SHORT(v2_shape), SHORT(v3_shape), SHORT(shape)}) == 1 else
+          + ("五版同判，这一发判据版本不换东西（也无损失）"
+             if len({SHORT(v1_shape), SHORT(v2_shape), SHORT(v3_shape), SHORT(v4_shape), SHORT(shape)}) == 1 else
              (f"**{SHAPE_RULE} 相对 {prev_nm} 换到了东西**："
               + ("这一发的份额出了 100% 的定义域，改判倒挂——读数改说『比顶还伤几张』加配对步长 CI"
-                 if SHAPE_RULE == "v4" else "判据这一发看得见阶梯顶（多出来的那格方向或反号进了判词）")
+                 if SHAPE_RULE == "v4" else
+                 ("这一发出界的幅度压不过配对步长自己的 CI 半宽 ⇒ 退回『污染型』，"
+                  "份额那句话仍然不许当份额读" if SHAPE_RULE == "v5" else
+                  "判据这一发看得见阶梯顶（多出来的那格方向或反号进了判词）"))
               if SHORT(prev) != SHORT(shape) else
               f"更早的版本换到了东西，而 {SHAPE_RULE} 与 {prev_nm} 同判（这一发新那条腿不改变结论）")))
     print(f"\n[判决] {shape}：{reading}")
@@ -841,9 +963,19 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
     share = round(abs(s_small["mean_gap_imgs"]) / abs(s_anc["mean_gap_imgs"]) * 100)
     ci_lo, ci_hi = pair_step["ci95_imgs"]
     out_of_domain = same_sign_cells and share > 100      # 份额是 abs/abs：>100% 时这句话不再量任何可读的东西
+    gap_oob = abs(s_small["mean_gap_imgs"] - s_anc["mean_gap_imgs"])
+    res_oob = oob_resolution(pair_step)
+    # v5：出界要有资格改口，得压得过"把两端钉在一起的这一步"自己的 CI 半宽——否则量的是抖动不是世界。
+    oob_loads = out_of_domain and (SHAPE_RULE != "v5" or (res_oob is not None and gap_oob > res_oob))
     print(f"[判决的分量] 阶梯第一格 α={small:g}（锚点剂量的 {small / ANC:.0%}）"
           + (f"就已经买到锚点伤害的 **{share}%**：{s_small['mean_gap_imgs']:+.1f} / {s_anc['mean_gap_imgs']:+.1f} 张"
              if same_sign_cells and not out_of_domain else
+             f"仍然**出界但不承重**（{SHAPE_RULE}）：比阶梯顶 α={ANC:g} 多伤 {gap_oob:.1f} 张，"
+             f"而把两端钉在一起的配对步长 α={small:g}→{ANC:g} 自己的 CI 是 [{ci_lo:+.1f}, {ci_hi:+.1f}]"
+             f"（半宽 ±{res_oob:.1f} 张）⇒ 出界幅度买不动一次改口。"
+             f"于是两句话都不许说：既不能读成『倒挂』（这一步测不出顶比小剂量浅），"
+             f"也不能把 {share}% 当份额读（界外的比值只说明两端谁都没被量准）"
+             if out_of_domain and not oob_loads and res_oob is not None else
              f"比阶梯顶 α={ANC:g} **还伤**：{s_small['mean_gap_imgs']:+.1f} vs {s_anc['mean_gap_imgs']:+.1f} 张。"
              f"『买到锚点伤害的百分之几』这句话在这里出界（现算 {share}%>100%，份额是 abs 比 abs，"
              f"出界后它不量任何可读的东西）⇒ 改口不改数：这一格比顶多伤 "
@@ -923,11 +1055,16 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
                           "verdict_under_v1_rule": v1_shape,
                           "verdict_under_v2_rule": v2_shape,
                           "verdict_under_v3_rule": v3_shape,
+                          "verdict_under_v4_rule": v4_shape,
                           "criterion_cells": [small, PROBE] + ([] if L["gate_is_anchor"] else [ANC]),
                           "two_leg_detail": legs,
                           "first_cell_alpha": small,
                           "first_cell_same_sign_as_anchor": bool(same_sign_cells),
                           "first_cell_share_of_anchor_damage_pct": share,
+                          "oob_gap_imgs": round(gap_oob, 1),
+                          "oob_ci_halfwidth_imgs": (None if res_oob is None else round(res_oob, 1)),
+                          "out_of_domain": bool(out_of_domain),
+                          "inverted_leg_loads": bool(oob_loads),
                           "step_low_imgs": lo_step, "step_low_dose_x": round(PROBE / small, 2),
                           "step_high_imgs": hi_step,
                           "step_high_dose_x": (None if L["gate_is_anchor"] else round(ANC / PROBE, 2))},
@@ -941,7 +1078,10 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
                               "（负截距 + 还在涨），不判污染说与 H1 谁赢；"
                               + ("同一支里新加的『倒挂』也只改口不改数——它把出界的份额话换成张数与配对步长 CI，"
                                  "至于『剂量加回去反而没那么伤』是什么机制，这一发没有读数能判；"
-                                 if SHAPE_RULE == "v4" else "")
+                                 if SHAPE_RULE in ("v4", "v5") else "")
+                              + ("v5 的界是**这条步长自己的 CI 半宽**而不是固定的 100%，所以它的松紧跟着流数走："
+                                 "补流会收窄半宽，今天判『不承重』的账可能明天判『倒挂』——那是分辨率换来的，"
+                                 "不许写成独立性；" if SHAPE_RULE == "v5" else "")
                               + "小剂量端那条流级腿仍是计数，松紧跟着流数走",
                               "每种子每格只训一次：跨种子极差没有二次底" if nseeds == 3 else
                               f"{len(seeds)} 条流各训一次：这是把分辨率做精，新增的不是独立性",

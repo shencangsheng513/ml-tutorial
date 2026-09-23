@@ -87,7 +87,10 @@ def v4b_path(width: int, tier: str) -> Path:
         raise SystemExit(f"档 {tier} 没登记种子底档案名：它要么在第4课那两档的合并账里（那就别新加名字），"
                          f"要么有自己的 v4b 单档账（在这里登记后缀）。"
                          f"悄悄回落到合并账等于拿别的档的底来判这一档")
-    return HERE / (stem + ("" if width != 128 else V4B_SUFFIX.get(tier, "")) + ".json")
+    # 档位后缀**不随宽度消失**：旧写法只在 width==128 时贴，写死的假设是"S64 只跑过满数据档"，
+    # 于是 64×中数据会去读 v4b_s64.json（满数据那本）——那本里真有一个档对的臂，load_anchor 拦不到，
+    # 结果是借别的档的底来判这一档的闸门。老路径逐字不变（64×满数据仍回落 v4b_s64.json）。
+    return HERE / (stem + V4B_SUFFIX.get(tier, "") + ".json")
 
 
 def out_path(width: int, tier: str = TIER) -> Path:

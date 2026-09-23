@@ -152,12 +152,35 @@
      ② v4→v5 的逐字段对账：v4 落盘时 `limitations` 里写死了"三对 / 8 流两对 / 中数据两对"，第四对一进来
        就成了假话 ⇒ v5 把那三处改成从 `out["pairs"]` 现读派生。实测两本档案的差**只在 `limitations`**
        （7 条里 4 条改写），`pairs` 与 `verdict` 全部读数**逐字段相同** ⇒ 这一版升号没动任何读数。
-本脚本 0 次训练，产物 `compress_report_v4h_crosscol_v5.json`（第一版叫 `..._crosscol.json`，第二版
+  ⑫ **E 这一发：第五对跨到 S64 那副学生，顺带把逐 α 判词的引用口径钉成字段**（三件事）：
+     · **第五对** `中数据4500@S64x8流` = `_s64_mid_n8_v5`（T=3）vs `_s64_mid_n8_t6_v5`（T=6），
+       8 条流、CE 臂 8/8 逐位核过（配对前提满池）。斜率差 **−1.0 张 CI [−28.3, +26.3]、5/8 同号、
+       二项 p=0.7266、σ=32.6 ⇒ 走出口 (b)**。这一发的问句是"『加热把 α→0 斜率变陡』跨不跨宽度"，
+       答案是**不跨**：同一个坐标搬到 S64 那副学生身上，连点估计的符号都没保住（S128 三档同值 +27.3）。
+       但它买的是**判别量**（一条流没加、七维一维没换）⇒ 按预登记这句话**永不构成复证**。
+     · **读数本身比出口更有信息**：S64 那一列的逐 α 跨列差**五格全不含 0**，而且幅度几乎是一个常数
+       （α=0.05 −42.8 张 CI [−55.3,−30.2] 起，五格都在 −40 张上下，离 0 最近的一格 10.5 张）
+       ⇒ 判"整段一起平移"：加热在这副学生身上把**整条曲线**往下挪，没有把斜率改陡。
+       S128 同坐标的形态相反——差集中在小剂量端（α=0.05 −28.1 张，顶格 ≈0）。
+     · **口径从注释变成字段**：以前"变陡发生在哪一端"这句话只在打印里，引用时可以挑档；现在每对入库都带
+       `cellwise_edge_to_zero_imgs`（每格 CI 离 0 的最近端距离）与 `tier`/`width`，循环后另有按
+       "档 × 宽度"现读归并的 `cellwise_by_coordinate`（组内几档并列 + `agree` 标志）。**它当场就打印出
+       一句不好听的**：中数据 × S128 那三档判词**不一致**（8 流／12 流判"小剂量端"，16 流判"整段平移"，
+       而 16 流那一格的擦边量只有 **0.5 张**）⇒ "发生在哪一端"这句话**不稳**，引用必须连着流数标签与
+       擦边量一起给，不许挑一档说。上一轮 ⑩ 靠注释坦白的这件事，这一轮变成闸口里的字段。
+       五档拆红（`--red-check`／`--unlink`／`--scramble`／`--poolblind`／`--ceblind`）在第五对入库后
+       全部重跑，RC 仍各红在原来那一道（`--scramble` 那条实测：α=0.05 格均值现算 −72.8 ≠ 档案 −73.8）。
+本脚本 0 次训练，产物 `compress_report_v4h_crosscol_v6.json`（第一版叫 `..._crosscol.json`，第二版
 `..._v2.json` 是因为第三对加了进来，第三版是第十三发 D 把配对前提的覆盖度从 3/8 提到整池，第四版
-`..._v4.json` 加第四对（16 条流），第五版只因为 v4 的 `limitations` 里写死了配对计数——派生物不入库会被
-覆盖，所以每换一次闸口强度或口径就换一次名字，而不是重跑盖掉旧判决；旧四本仍在盘上，可以逐字段对账）。
+`..._v4.json` 加第四对（16 条流），第五版只因为 v4 的 `limitations` 里写死了配对计数，第六版是这一轮
+——加第五对（S64）＋把逐 α 判词的引用口径变成字段；派生物不入库会被覆盖，所以每换一次闸口强度或口径
+就换一次名字，而不是重跑盖掉旧判决；旧五本仍在盘上，可以逐字段对账）。
+v5→v6 的逐字段对账（实测）：老四对的读数**一个都没动**（`steps_within_column`／`slope_diff_paired`／
+`ex_ante_nail_imgs`／两个出口／`flow_pool` 全部逐位相同，值差键为空），新增的只有每对的三个键
+（`tier`／`width`／`cellwise_edge_to_zero_imgs`）、顶层 `cellwise_by_coordinate` 与 `pairs` 里第五对，
+外加 `limitations` 从 7 条涨到 8 条（末条是引用口径）与"按宽度分组"那两条改成现读。
 它是**纯读档的派生物**，不进守卫 `_red_v3.py` 的 `compress_report_v4f*` 在册账名单
-（那八道闸盯的是训练路径与判词，这里没有训练路径）；它自己的守卫就是上面四道检查＋五档拆红，
+（那九道闸盯的是训练路径与判词，这里没有训练路径）；它自己的守卫就是上面四道检查＋五档拆红，
 这一条边界写在 `ml-compress/README.md` 里。
 """
 from __future__ import annotations
@@ -170,9 +193,11 @@ from step4_distill import check_flow_constants, summarize
 from step4f_alpha_curve import SEEDS8, SEEDS12, SEEDS16
 
 HERE = Path(__file__).resolve().parent
-OUT = HERE / "compress_report_v4h_crosscol_v5.json"   # v4→v5：只因为 v4 的 limitations 里写死了"三对/两对"
-                                                      # 计数，第四对（16 条流）一进来就作废 ⇒ 逐字段对账必须
-                                                      # 证明只有 limitations 动过（v4 留盘当基准，不覆盖）
+OUT = HERE / "compress_report_v4h_crosscol_v6.json"   # v5→v6：第十五发 E 把逐 α 判词的**引用口径**定死
+                                                      # （擦边量入库 + 同坐标并列不许合并），并加第五对
+                                                      # （S64 换宽度）⇒ 口径动过就换名，v5 留盘当基准。
+                                                      # v4→v5 那次只因为 v4 的 limitations 写死了"三对/两对"
+                                                      # 计数，第四对（16 条流）一进来就作废。
 POOLS = {8: list(SEEDS8), 12: list(SEEDS12), 16: list(SEEDS16)}
 # 每批的前 8 条就是板块共用的那批；16 那批的前 12 条就是 12 那批（逐位对账线在守卫闸⑥）
 
@@ -186,11 +211,16 @@ PAIRS = {
     # 第十四发那一对：两本都是 16 条流。它与上面两对是**同一坐标的第三次粗细读数**，
     # 不许并排成"三条独立证据"（预登记写在 step4f 头部第十四发那一节）。
     "中数据4500@16流": ("compress_report_v4f_mid_n16_v5.json", "compress_report_v4f_mid_n16_t6_v5.json"),
+    # 第十五发那一对：**换学生宽度**（S64），两本都是 8 条流、同档同任务同流池。
+    # 上面四对全是 S128 ⇒ "斜率差跨不跨宽度"此前是一个没被测过的边界，这一对是它的第一次读数。
+    "中数据4500@S64x8流": ("compress_report_v4f_s64_mid_n8_v5.json",
+                           "compress_report_v4f_s64_mid_n8_t6_v5.json"),
 }
 # 预登记②的算术钉子（抄自两本账各自的 paired_step_small_to_anchor，跑完不许改）。
 # None = 写预登记时这本账还不存在 ⇒ 钉子只能是**算术**（现算的逐流差均值必须等于两本自报步长之差），
 # 不许事后往这个格子里补一个"看起来像预言"的数字。
-EX_ANTE = {"中数据4500": 22.7, "低数据2000": 52.9, "中数据4500@12流": None, "中数据4500@16流": None}
+EX_ANTE = {"中数据4500": 22.7, "低数据2000": 52.9, "中数据4500@12流": None,
+           "中数据4500@16流": None, "中数据4500@S64x8流": None}
 NAIL_TOL = 0.1 + 1e-9        # 预登记②：档案两个均值各自圆到 0.1 ⇒ 两次取整最多差 0.1 张
 
 
@@ -361,7 +391,16 @@ def gate_recalc(b: dict, where: str, collect: bool = False) -> list[str]:
 
 
 def cellwise_verdict(diff: dict, small: float, top: float) -> str:
-    """预登记④：判法写死——只看小剂量格与阶梯顶格这两格的跨列差不含 0 的模式。"""
+    """预登记④：判法写死——只看小剂量格与阶梯顶格这两格的跨列差不含 0 的模式。
+
+    **这一条判词的口径（第十五发 E 项定死，此后不许每补一档流重挑当期答案）**：
+      · 分支只由两格各自的『CI 含不含 0』决定，不看幅度、不看 p、不看第几档流数；
+      · 同一坐标的几档读数（8 / 12 / 16 条流、两副宽度）**并列各判各的**，谁都不是"当期答案"；
+      · 任何一次引用都必须把 `cellwise_edge_to_zero_imgs` 一起带走——擦边翻口（最近端离 0 不到
+        一张量级）这件事只有这个字段能提前暴露，判词本身是二值的、看不见它。
+      · 归并视图由 `cellwise_by_coordinate` 现读生成：同坐标判词不一致 ⇒ 当场打印"这句话不稳"，
+        **不许**人工挑一版写进结论。
+    """
     a, b = excl0(diff[small]), excl0(diff[top])
     if a and not b:
         return "跨列的变化发生在**小剂量端**，两列的顶差不多"
@@ -370,6 +409,13 @@ def cellwise_verdict(diff: dict, small: float, top: float) -> str:
     if a and b:
         return "两格都不含 0 ⇒ 整段一起平移（读不出发生在哪一端）"
     return "两格都含 0 ⇒ 这一列什么都没判"
+
+
+def edge_to_zero(s: dict) -> float:
+    """这条格子的 CI **最近的端到 0 的距离**（张）。它把"翻口是擦边翻的"从注释升级成入库字段：
+    CI [−18.9, −0.5] 与 [−21.5, +2.5] 分别给 0.5 与 2.5，前者翻一次口只需要 0.5 张的移动。"""
+    lo, hi = s["ci95_imgs"]
+    return round(min(abs(lo), abs(hi)), 1)
 
 
 def probe_gates(lo: dict, hi: dict, where: str) -> None:
@@ -548,10 +594,13 @@ def main(mode: str = "") -> None:
                              f" ⇒ 本脚本算错了，这条读数不发（钉子是与账对账，不是预测）")
         exit_slope = "(a) 升格成以流为单位的配对读数" if excl0(slope) else "(b) 仍只是两个点估计之差"
         exit_cell = cellwise_verdict(diff, small, top)
-        out["pairs"][tier] = {"archives": {"T3": n_lo, "T6": n_hi}, "flow_pool": len(pool),
+        out["pairs"][tier] = {"archives": {"T3": n_lo, "T6": n_hi}, "tier": lo["tier"],
+                              "width": lo["width"], "flow_pool": len(pool),
                               "criterion_alphas": [small, top],
                               "ce_pairing_checked": cov, "steps_within_column": steps,
                               "cross_column_cellwise": {f"α={a:g}": s for a, s in diff.items()},
+                              "cellwise_edge_to_zero_imgs": {f"α={a:g}": edge_to_zero(s)
+                                                             for a, s in diff.items()},
                               "slope_diff_paired": slope, "ex_ante_nail_imgs": nail,
                               "exit_slope": exit_slope, "exit_cellwise": exit_cell}
         print(f"\n[{tier}] {len(pool)} 条流 · 配对前提：CE 臂 {cov} 条逐位核过（闸 A 要求整池，缺一条就退出）"
@@ -566,12 +615,34 @@ def main(mode: str = "") -> None:
         for a, s in diff.items():
             print(f"   α={a:<5g} 跨列差 {s['mean_gap_imgs']:+7.1f} 张 CI [{s['ci95_imgs'][0]:+.1f},"
                   f" {s['ci95_imgs'][1]:+.1f}] 同号 {s['same_sign_seeds']}"
-                  f" {'不含 0' if excl0(s) else '跨 0'}")
-        print(f"   逐 α 那一列按预登记④的判法 ⇒ {exit_cell}")
+                  f" {'不含 0' if excl0(s) else '跨 0'}（最近端离 0 {edge_to_zero(s)} 张）")
+        print(f"   逐 α 那一列按预登记④的判法 ⇒ {exit_cell}"
+              f"（引用这句话必须带上上面那两个『离 0 几张』）")
 
     out["verdict"] = ("；".join(f"{t} 的斜率差走出口 {v['exit_slope']}" for t, v in out["pairs"].items())
                       + " ——两档各自判，一升一不升如实分开报")
-    mid = [t for t in out["pairs"] if t.startswith("中数据")]
+    # 逐 α 判词的**同坐标归并视图**（E 项的口径落地处）：按"档 × 宽度"分组，组内几档流数并列，
+    # 判词不一致就当场打印"这句话不稳"——不是挑一版当答案，而是禁止把这几档合并成一句。
+    coord: dict[str, list[str]] = {}
+    for t, v in out["pairs"].items():
+        coord.setdefault(f"{v['tier']} × S{v['width']}", []).append(t)
+    out["cellwise_by_coordinate"] = {}
+    print("\n[逐 α 判词的同坐标归并（口径：并列各判，不一致=这句话不稳，禁止挑一版当答案）]")
+    for k, ts in coord.items():
+        vs = {t: out["pairs"][t]["exit_cellwise"] for t in ts}
+        agree = len(set(vs.values())) == 1
+        out["cellwise_by_coordinate"][k] = {
+            "pairs": ts, "verdicts": vs, "agree": agree,
+            "edges": {t: out["pairs"][t]["cellwise_edge_to_zero_imgs"] for t in ts}}
+        print(f"  {k}：{len(ts)} 档读数" + ("判词一致 ⇒ 这句话可以不带流数标签引用" if agree else
+              "判词不一致 ⇒ 引用『变陡发生在哪一端』必须逐档带标签，不许合并"))
+        if not agree:
+            for t in ts:
+                print(f"      {t}: {vs[t]}（离 0 最近 {min(out['pairs'][t]['cellwise_edge_to_zero_imgs'].values())} 张）")
+    mid = [t for t in out["pairs"] if t.startswith("中数据") and out["pairs"][t]["width"] == 128]
+    by_width: dict[int, list[str]] = {}
+    for t, v in out["pairs"].items():
+        by_width.setdefault(v["width"], []).append(t)
     paid = [f"{t}（{out['pairs'][t]['archives']['T6']}）" for t in out["pairs"]
             if "_n12_" in out["pairs"][t]["archives"]["T6"] or "_n16_" in out["pairs"][t]["archives"]["T6"]]
     cover = "、".join(f"{t} {v['ce_pairing_checked']}" for t, v in out["pairs"].items())
@@ -591,8 +662,15 @@ def main(mode: str = "") -> None:
         "同一批图」，核不到 KL 那一侧——这是配对前提的下界，不是全证",
         "斜率差的点估计由算术钉死（见 prediction_ex_ante_imgs 与每对的 ex_ante_nail_imgs），"
         "所以它不是发现；发现只能是 CI / 同号计数 / 二项 p",
-        f"{len(out['pairs'])} 对读数全部来自 MNIST × S128 这几个坐标、且共用同一个老师与同一批图 ⇒ "
-        "「加热把斜率变陡」跨不跨任务、跨不跨档、跨不跨宽度，本脚本一个字都没说",
+        f"{len(out['pairs'])} 对读数全部来自 MNIST、共用同一个老师与同一批图，按宽度现读分组：" +
+        "、".join(f"S{w} 有 {len(ts)} 对（{'、'.join(ts)}）" for w, ts in sorted(by_width.items())) +
+        "。S64 那一对（第十五发）是『斜率差跨不跨宽度』的第一次读数 ⇒ 这一句从此**说了**，"
+        "但它说的只有『同一批流、同一个老师、换学生宽度』这一层：两副学生吃的是同一批图与同一份软标签，"
+        "所以它不是换数据、也不是换任务。跨任务照旧一个字没说（Fashion 侧没有 T=3/T=6 两本可比）。",
+        "逐 α 那句『变陡发生在哪一端』**同坐标几档判词不一致**时不许合并成一句（现读见 "
+        "`cellwise_by_coordinate`）：那条判法是二值的（只看 CI 含不含 0），而擦边翻口只有 "
+        "`cellwise_edge_to_zero_imgs` 看得见——引用时必须一起带走。定死这条口径的是第十五发 E 项，"
+        "它换的是**引用规矩**，不是数据，也不是判据。",
     ]
     if mode:
         raise SystemExit(f"[验红模式 {mode}] 居然走到了发读数这一步 ⇒ 至少一道闸没拦住，不发不入库")

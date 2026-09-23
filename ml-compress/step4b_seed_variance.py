@@ -270,13 +270,21 @@ if __name__ == "__main__":
                     help="8 = 把这本种子底扩到第4课e/f 那批 8 条流；档案名带 _n8，与 3 条流那本并存不覆盖")
     args = ap.parse_args()
     # 闸门必须在这里、训练之前：out_path() 是流程最后一行，那时才炸就白烧十几分钟 CPU
-    if args.width == 64:
-        raise SystemExit("S64 的种子底已经跑过了（compress_report_v4b_s64.json，满数据档）；"
-                         "--tier 目前只服务 S128 的新档，换宽度请连档案一起核")
+    if args.width == 64 and args.tier in TIERS:
+        # 旧写法在这里一刀切拒绝 --width 64，写死的假设是"S64 只跑过满数据档"。第十五发要在这副
+        # 宽度上造中数据档的底，所以放行条件换成"这个组合会不会撞名/有没有档案名"：撞名由紧接着的
+        # exists() 拦，没登记后缀的档由 out_path() 拦，都不必在这里连坐整副宽度。
+        raise SystemExit(f"--tier {args.tier} 属于 S128 那两档的合并档案，S64 这一副没有它的位置："
+                         f"要老档案就别带 --tier，要新档请先在 OUT_SUFFIX 里登记档案名")
     if args.tier in TIERS:
         raise SystemExit(f"--tier {args.tier} 是第4课那两档之一：它属于合并档案 "
                          f"compress_report_v4b.json（两档一起写）。单跑一档会把另一档的账抹掉——"
                          f"要老档案就别带 --tier")
+    if args.width != 128 and args.tier and not ARCHIVE[args.width].get(args.tier):
+        # 少一道闸必须说在训练之前：这一档在这一副宽度上没有第4课的 committed 读数，于是
+        # "种子 42 逐位复现"那条独立对账线**结构上不存在**，这一本只剩自己的极差底。
+        print(f"[闸缺] S{args.width} × {args.tier} 没有第4课的档案值可逐位对账"
+              f"（ARCHIVE 这一副只登记了 {list(ARCHIVE[args.width])}）⇒ 这一本底没有独立于本课的锚点")
     WIDTH = args.width
     TIER = args.tier
     NSEEDS = args.nseeds

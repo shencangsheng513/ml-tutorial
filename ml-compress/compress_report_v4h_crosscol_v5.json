@@ -1,0 +1,988 @@
+{
+  "quantity": "同一条流池上，T=6 那一列减 T=3 那一列（单位：张/10000，正=T=6 更往多错走）· 每对用的是哪一池见 pairs[*].flow_pool",
+  "seed_pools": {
+    "8": [
+      42,
+      7,
+      2026,
+      11,
+      202,
+      3003,
+      40004,
+      55555
+    ],
+    "12": [
+      42,
+      7,
+      2026,
+      11,
+      202,
+      3003,
+      40004,
+      55555,
+      808,
+      1337,
+      24601,
+      90210
+    ],
+    "16": [
+      42,
+      7,
+      2026,
+      11,
+      202,
+      3003,
+      40004,
+      55555,
+      808,
+      1337,
+      24601,
+      90210,
+      1717,
+      3131,
+      5252,
+      7373
+    ]
+  },
+  "mode": "（正常跑）",
+  "prediction_ex_ante_imgs": {
+    "中数据4500": 22.7,
+    "低数据2000": 52.9,
+    "中数据4500@12流": null,
+    "中数据4500@16流": null
+  },
+  "pairs": {
+    "中数据4500": {
+      "archives": {
+        "T3": "compress_report_v4f_mid_n8_v4.json",
+        "T6": "compress_report_v4f_mid_n8_t6_v4.json"
+      },
+      "flow_pool": 8,
+      "criterion_alphas": [
+        0.05,
+        0.7
+      ],
+      "ce_pairing_checked": "8/8",
+      "steps_within_column": {
+        "T3": {
+          "label": "α=小→顶 配对步长",
+          "n_seeds": 8,
+          "mean_gap_imgs": 7.1,
+          "sd_imgs": 12.5,
+          "se_imgs": 4.4,
+          "ci95_imgs": [
+            -3.4,
+            17.6
+          ],
+          "gaps": [
+            5,
+            -14,
+            4,
+            21,
+            12,
+            26,
+            3,
+            0
+          ],
+          "same_sign_seeds": "6/8（+）",
+          "p_seeds_binomial": 0.2891,
+          "range_imgs": 40,
+          "d4_sigma_hat": 14.0
+        },
+        "T6": {
+          "label": "α=小→顶 配对步长",
+          "n_seeds": 8,
+          "mean_gap_imgs": 29.8,
+          "sd_imgs": 26.8,
+          "se_imgs": 9.5,
+          "ci95_imgs": [
+            7.4,
+            52.1
+          ],
+          "gaps": [
+            17,
+            46,
+            29,
+            7,
+            74,
+            57,
+            9,
+            -1
+          ],
+          "same_sign_seeds": "7/8（+）",
+          "p_seeds_binomial": 0.0703,
+          "range_imgs": 75,
+          "d4_sigma_hat": 26.3
+        }
+      },
+      "cross_column_cellwise": {
+        "α=0.05": {
+          "label": "α=0.05 跨列差",
+          "n_seeds": 8,
+          "mean_gap_imgs": -28.1,
+          "sd_imgs": 16.9,
+          "se_imgs": 6.0,
+          "ci95_imgs": [
+            -42.3,
+            -14.0
+          ],
+          "gaps": [
+            -9,
+            -56,
+            -34,
+            -32,
+            -46,
+            -20,
+            -18,
+            -10
+          ],
+          "same_sign_seeds": "8/8（−）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 47,
+          "d4_sigma_hat": 16.5
+        },
+        "α=0.1": {
+          "label": "α=0.1 跨列差",
+          "n_seeds": 8,
+          "mean_gap_imgs": -7.1,
+          "sd_imgs": 14.0,
+          "se_imgs": 5.0,
+          "ci95_imgs": [
+            -18.9,
+            4.6
+          ],
+          "gaps": [
+            8,
+            -32,
+            -16,
+            -13,
+            -11,
+            6,
+            -7,
+            8
+          ],
+          "same_sign_seeds": "5/8（−）",
+          "p_seeds_binomial": 0.7266,
+          "range_imgs": 40,
+          "d4_sigma_hat": 14.0
+        },
+        "α=0.2": {
+          "label": "α=0.2 跨列差",
+          "n_seeds": 8,
+          "mean_gap_imgs": 8.5,
+          "sd_imgs": 10.6,
+          "se_imgs": 3.7,
+          "ci95_imgs": [
+            -0.3,
+            17.3
+          ],
+          "gaps": [
+            -1,
+            -8,
+            27,
+            7,
+            14,
+            15,
+            7,
+            7
+          ],
+          "same_sign_seeds": "6/8（+）",
+          "p_seeds_binomial": 0.2891,
+          "range_imgs": 35,
+          "d4_sigma_hat": 12.3
+        },
+        "α=0.3": {
+          "label": "α=0.3 跨列差",
+          "n_seeds": 8,
+          "mean_gap_imgs": 5.4,
+          "sd_imgs": 15.5,
+          "se_imgs": 5.5,
+          "ci95_imgs": [
+            -7.6,
+            18.4
+          ],
+          "gaps": [
+            -3,
+            9,
+            1,
+            -23,
+            19,
+            26,
+            -2,
+            16
+          ],
+          "same_sign_seeds": "5/8（+）",
+          "p_seeds_binomial": 0.7266,
+          "range_imgs": 49,
+          "d4_sigma_hat": 17.2
+        },
+        "α=0.7": {
+          "label": "α=0.7 跨列差",
+          "n_seeds": 8,
+          "mean_gap_imgs": -5.5,
+          "sd_imgs": 19.4,
+          "se_imgs": 6.8,
+          "ci95_imgs": [
+            -21.7,
+            10.7
+          ],
+          "gaps": [
+            3,
+            4,
+            -9,
+            -46,
+            16,
+            11,
+            -12,
+            -11
+          ],
+          "same_sign_seeds": "4/8（+）",
+          "p_seeds_binomial": 1.0,
+          "range_imgs": 62,
+          "d4_sigma_hat": 21.8
+        }
+      },
+      "slope_diff_paired": {
+        "label": "斜率差（T6 步长 − T3 步长，按流配对）",
+        "n_seeds": 8,
+        "mean_gap_imgs": 22.6,
+        "sd_imgs": 27.5,
+        "se_imgs": 9.7,
+        "ci95_imgs": [
+          -0.4,
+          45.7
+        ],
+        "gaps": [
+          12,
+          60,
+          25,
+          -14,
+          62,
+          31,
+          6,
+          -1
+        ],
+        "same_sign_seeds": "6/8（+）",
+        "p_seeds_binomial": 0.2891,
+        "range_imgs": 76,
+        "d4_sigma_hat": 26.7
+      },
+      "ex_ante_nail_imgs": 22.7,
+      "exit_slope": "(b) 仍只是两个点估计之差",
+      "exit_cellwise": "跨列的变化发生在**小剂量端**，两列的顶差不多"
+    },
+    "低数据2000": {
+      "archives": {
+        "T3": "compress_report_v4f_low_n8_thin_v3.json",
+        "T6": "compress_report_v4f_low_n8_thin_t6_v4.json"
+      },
+      "flow_pool": 8,
+      "criterion_alphas": [
+        0.05,
+        0.7
+      ],
+      "ce_pairing_checked": "8/8",
+      "steps_within_column": {
+        "T3": {
+          "label": "α=小→顶 配对步长",
+          "n_seeds": 8,
+          "mean_gap_imgs": 48.6,
+          "sd_imgs": 17.9,
+          "se_imgs": 6.3,
+          "ci95_imgs": [
+            33.6,
+            63.6
+          ],
+          "gaps": [
+            57,
+            38,
+            33,
+            30,
+            47,
+            41,
+            58,
+            85
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 55,
+          "d4_sigma_hat": 19.3
+        },
+        "T6": {
+          "label": "α=小→顶 配对步长",
+          "n_seeds": 8,
+          "mean_gap_imgs": 101.5,
+          "sd_imgs": 19.9,
+          "se_imgs": 7.0,
+          "ci95_imgs": [
+            84.9,
+            118.1
+          ],
+          "gaps": [
+            98,
+            96,
+            113,
+            106,
+            72,
+            118,
+            78,
+            131
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 59,
+          "d4_sigma_hat": 20.7
+        }
+      },
+      "cross_column_cellwise": {
+        "α=0.05": {
+          "label": "α=0.05 跨列差",
+          "n_seeds": 8,
+          "mean_gap_imgs": -3.1,
+          "sd_imgs": 24.3,
+          "se_imgs": 8.6,
+          "ci95_imgs": [
+            -23.4,
+            17.2
+          ],
+          "gaps": [
+            26,
+            -32,
+            -28,
+            -31,
+            2,
+            7,
+            5,
+            26
+          ],
+          "same_sign_seeds": "5/8（+）",
+          "p_seeds_binomial": 0.7266,
+          "range_imgs": 58,
+          "d4_sigma_hat": 20.4
+        },
+        "α=0.3": {
+          "label": "α=0.3 跨列差",
+          "n_seeds": 8,
+          "mean_gap_imgs": 50.5,
+          "sd_imgs": 17.5,
+          "se_imgs": 6.2,
+          "ci95_imgs": [
+            35.9,
+            65.1
+          ],
+          "gaps": [
+            51,
+            24,
+            63,
+            48,
+            49,
+            79,
+            31,
+            59
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 55,
+          "d4_sigma_hat": 19.3
+        },
+        "α=0.7": {
+          "label": "α=0.7 跨列差",
+          "n_seeds": 8,
+          "mean_gap_imgs": 49.8,
+          "sd_imgs": 23.0,
+          "se_imgs": 8.1,
+          "ci95_imgs": [
+            30.6,
+            68.9
+          ],
+          "gaps": [
+            67,
+            26,
+            52,
+            45,
+            27,
+            84,
+            25,
+            72
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 59,
+          "d4_sigma_hat": 20.7
+        }
+      },
+      "slope_diff_paired": {
+        "label": "斜率差（T6 步长 − T3 步长，按流配对）",
+        "n_seeds": 8,
+        "mean_gap_imgs": 52.9,
+        "sd_imgs": 23.7,
+        "se_imgs": 8.4,
+        "ci95_imgs": [
+          33.1,
+          72.7
+        ],
+        "gaps": [
+          41,
+          58,
+          80,
+          76,
+          25,
+          77,
+          20,
+          46
+        ],
+        "same_sign_seeds": "8/8（+）",
+        "p_seeds_binomial": 0.0078,
+        "range_imgs": 60,
+        "d4_sigma_hat": 21.1
+      },
+      "ex_ante_nail_imgs": 52.9,
+      "exit_slope": "(a) 升格成以流为单位的配对读数",
+      "exit_cellwise": "跨列的变化发生在**阶梯顶那一端**"
+    },
+    "中数据4500@12流": {
+      "archives": {
+        "T3": "compress_report_v4f_mid_n12_v4.json",
+        "T6": "compress_report_v4f_mid_n12_t6_v5.json"
+      },
+      "flow_pool": 12,
+      "criterion_alphas": [
+        0.05,
+        0.7
+      ],
+      "ce_pairing_checked": "12/12",
+      "steps_within_column": {
+        "T3": {
+          "label": "α=小→顶 配对步长",
+          "n_seeds": 12,
+          "mean_gap_imgs": 0.7,
+          "sd_imgs": 14.0,
+          "se_imgs": 4.0,
+          "ci95_imgs": [
+            -8.2,
+            9.5
+          ],
+          "gaps": [
+            5,
+            -14,
+            4,
+            21,
+            12,
+            26,
+            3,
+            0,
+            -14,
+            -7,
+            -13,
+            -15
+          ],
+          "same_sign_seeds": "6/12（+）",
+          "p_seeds_binomial": 1.0,
+          "range_imgs": 41,
+          "d4_sigma_hat": 12.6
+        },
+        "T6": {
+          "label": "α=小→顶 配对步长",
+          "n_seeds": 12,
+          "mean_gap_imgs": 28.0,
+          "sd_imgs": 22.7,
+          "se_imgs": 6.6,
+          "ci95_imgs": [
+            13.6,
+            42.4
+          ],
+          "gaps": [
+            17,
+            46,
+            29,
+            7,
+            74,
+            57,
+            9,
+            -1,
+            30,
+            35,
+            4,
+            29
+          ],
+          "same_sign_seeds": "11/12（+）",
+          "p_seeds_binomial": 0.0063,
+          "range_imgs": 75,
+          "d4_sigma_hat": 23.0
+        }
+      },
+      "cross_column_cellwise": {
+        "α=0.05": {
+          "label": "α=0.05 跨列差",
+          "n_seeds": 12,
+          "mean_gap_imgs": -36.8,
+          "sd_imgs": 19.7,
+          "se_imgs": 5.7,
+          "ci95_imgs": [
+            -49.3,
+            -24.3
+          ],
+          "gaps": [
+            -9,
+            -56,
+            -34,
+            -32,
+            -46,
+            -20,
+            -18,
+            -10,
+            -44,
+            -48,
+            -54,
+            -71
+          ],
+          "same_sign_seeds": "12/12（−）",
+          "p_seeds_binomial": 0.0005,
+          "range_imgs": 62,
+          "d4_sigma_hat": 19.0
+        },
+        "α=0.1": {
+          "label": "α=0.1 跨列差",
+          "n_seeds": 12,
+          "mean_gap_imgs": -14.3,
+          "sd_imgs": 16.6,
+          "se_imgs": 4.8,
+          "ci95_imgs": [
+            -24.9,
+            -3.8
+          ],
+          "gaps": [
+            8,
+            -32,
+            -16,
+            -13,
+            -11,
+            6,
+            -7,
+            8,
+            -14,
+            -42,
+            -26,
+            -33
+          ],
+          "same_sign_seeds": "9/12（−）",
+          "p_seeds_binomial": 0.146,
+          "range_imgs": 50,
+          "d4_sigma_hat": 15.3
+        },
+        "α=0.2": {
+          "label": "α=0.2 跨列差",
+          "n_seeds": 12,
+          "mean_gap_imgs": -0.8,
+          "sd_imgs": 17.0,
+          "se_imgs": 4.9,
+          "ci95_imgs": [
+            -11.7,
+            10.0
+          ],
+          "gaps": [
+            -1,
+            -8,
+            27,
+            7,
+            14,
+            15,
+            7,
+            7,
+            -6,
+            -27,
+            -28,
+            -17
+          ],
+          "same_sign_seeds": "6/12（+）",
+          "p_seeds_binomial": 1.0,
+          "range_imgs": 55,
+          "d4_sigma_hat": 16.9
+        },
+        "α=0.3": {
+          "label": "α=0.3 跨列差",
+          "n_seeds": 12,
+          "mean_gap_imgs": -1.1,
+          "sd_imgs": 16.2,
+          "se_imgs": 4.7,
+          "ci95_imgs": [
+            -11.4,
+            9.2
+          ],
+          "gaps": [
+            -3,
+            9,
+            1,
+            -23,
+            19,
+            26,
+            -2,
+            16,
+            -5,
+            -15,
+            -24,
+            -12
+          ],
+          "same_sign_seeds": "7/12（−）",
+          "p_seeds_binomial": 0.7744,
+          "range_imgs": 50,
+          "d4_sigma_hat": 15.3
+        },
+        "α=0.7": {
+          "label": "α=0.7 跨列差",
+          "n_seeds": 12,
+          "mean_gap_imgs": -9.5,
+          "sd_imgs": 18.9,
+          "se_imgs": 5.4,
+          "ci95_imgs": [
+            -21.5,
+            2.5
+          ],
+          "gaps": [
+            3,
+            4,
+            -9,
+            -46,
+            16,
+            11,
+            -12,
+            -11,
+            0,
+            -6,
+            -37,
+            -27
+          ],
+          "same_sign_seeds": "7/12（−）",
+          "p_seeds_binomial": 0.7744,
+          "range_imgs": 62,
+          "d4_sigma_hat": 19.0
+        }
+      },
+      "slope_diff_paired": {
+        "label": "斜率差（T6 步长 − T3 步长，按流配对）",
+        "n_seeds": 12,
+        "mean_gap_imgs": 27.3,
+        "sd_imgs": 24.1,
+        "se_imgs": 6.9,
+        "ci95_imgs": [
+          12.0,
+          42.6
+        ],
+        "gaps": [
+          12,
+          60,
+          25,
+          -14,
+          62,
+          31,
+          6,
+          -1,
+          44,
+          42,
+          17,
+          44
+        ],
+        "same_sign_seeds": "10/12（+）",
+        "p_seeds_binomial": 0.0386,
+        "range_imgs": 76,
+        "d4_sigma_hat": 23.3
+      },
+      "ex_ante_nail_imgs": 27.3,
+      "exit_slope": "(a) 升格成以流为单位的配对读数",
+      "exit_cellwise": "跨列的变化发生在**小剂量端**，两列的顶差不多"
+    },
+    "中数据4500@16流": {
+      "archives": {
+        "T3": "compress_report_v4f_mid_n16_v5.json",
+        "T6": "compress_report_v4f_mid_n16_t6_v5.json"
+      },
+      "flow_pool": 16,
+      "criterion_alphas": [
+        0.05,
+        0.7
+      ],
+      "ce_pairing_checked": "16/16",
+      "steps_within_column": {
+        "T3": {
+          "label": "α=小→顶 配对步长",
+          "n_seeds": 16,
+          "mean_gap_imgs": 1.9,
+          "sd_imgs": 12.9,
+          "se_imgs": 3.2,
+          "ci95_imgs": [
+            -4.9,
+            8.8
+          ],
+          "gaps": [
+            5,
+            -14,
+            4,
+            21,
+            12,
+            26,
+            3,
+            0,
+            -14,
+            -7,
+            -13,
+            -15,
+            1,
+            20,
+            1,
+            1
+          ],
+          "same_sign_seeds": "10/16（+）",
+          "p_seeds_binomial": 0.4545,
+          "range_imgs": 41,
+          "d4_sigma_hat": 11.6
+        },
+        "T6": {
+          "label": "α=小→顶 配对步长",
+          "n_seeds": 16,
+          "mean_gap_imgs": 29.2,
+          "sd_imgs": 21.2,
+          "se_imgs": 5.3,
+          "ci95_imgs": [
+            17.9,
+            40.6
+          ],
+          "gaps": [
+            17,
+            46,
+            29,
+            7,
+            74,
+            57,
+            9,
+            -1,
+            30,
+            35,
+            4,
+            29,
+            19,
+            17,
+            41,
+            55
+          ],
+          "same_sign_seeds": "15/16（+）",
+          "p_seeds_binomial": 0.0005,
+          "range_imgs": 75,
+          "d4_sigma_hat": 21.2
+        }
+      },
+      "cross_column_cellwise": {
+        "α=0.05": {
+          "label": "α=0.05 跨列差",
+          "n_seeds": 16,
+          "mean_gap_imgs": -37.0,
+          "sd_imgs": 18.5,
+          "se_imgs": 4.6,
+          "ci95_imgs": [
+            -46.9,
+            -27.1
+          ],
+          "gaps": [
+            -9,
+            -56,
+            -34,
+            -32,
+            -46,
+            -20,
+            -18,
+            -10,
+            -44,
+            -48,
+            -54,
+            -71,
+            -36,
+            -20,
+            -33,
+            -61
+          ],
+          "same_sign_seeds": "16/16（−）",
+          "p_seeds_binomial": 0.0,
+          "range_imgs": 62,
+          "d4_sigma_hat": 17.6
+        },
+        "α=0.1": {
+          "label": "α=0.1 跨列差",
+          "n_seeds": 16,
+          "mean_gap_imgs": -16.1,
+          "sd_imgs": 16.3,
+          "se_imgs": 4.1,
+          "ci95_imgs": [
+            -24.8,
+            -7.4
+          ],
+          "gaps": [
+            8,
+            -32,
+            -16,
+            -13,
+            -11,
+            6,
+            -7,
+            8,
+            -14,
+            -42,
+            -26,
+            -33,
+            -20,
+            -10,
+            -11,
+            -45
+          ],
+          "same_sign_seeds": "13/16（−）",
+          "p_seeds_binomial": 0.0213,
+          "range_imgs": 53,
+          "d4_sigma_hat": 15.0
+        },
+        "α=0.2": {
+          "label": "α=0.2 跨列差",
+          "n_seeds": 16,
+          "mean_gap_imgs": -0.7,
+          "sd_imgs": 14.8,
+          "se_imgs": 3.7,
+          "ci95_imgs": [
+            -8.6,
+            7.2
+          ],
+          "gaps": [
+            -1,
+            -8,
+            27,
+            7,
+            14,
+            15,
+            7,
+            7,
+            -6,
+            -27,
+            -28,
+            -17,
+            7,
+            -4,
+            2,
+            -6
+          ],
+          "same_sign_seeds": "8/16（+）",
+          "p_seeds_binomial": 1.0,
+          "range_imgs": 55,
+          "d4_sigma_hat": 15.6
+        },
+        "α=0.3": {
+          "label": "α=0.3 跨列差",
+          "n_seeds": 16,
+          "mean_gap_imgs": -0.9,
+          "sd_imgs": 15.2,
+          "se_imgs": 3.8,
+          "ci95_imgs": [
+            -9.1,
+            7.2
+          ],
+          "gaps": [
+            -3,
+            9,
+            1,
+            -23,
+            19,
+            26,
+            -2,
+            16,
+            -5,
+            -15,
+            -24,
+            -12,
+            6,
+            -20,
+            -1,
+            13
+          ],
+          "same_sign_seeds": "9/16（−）",
+          "p_seeds_binomial": 0.8036,
+          "range_imgs": 50,
+          "d4_sigma_hat": 14.2
+        },
+        "α=0.7": {
+          "label": "α=0.7 跨列差",
+          "n_seeds": 16,
+          "mean_gap_imgs": -9.7,
+          "sd_imgs": 17.2,
+          "se_imgs": 4.3,
+          "ci95_imgs": [
+            -18.9,
+            -0.5
+          ],
+          "gaps": [
+            3,
+            4,
+            -9,
+            -46,
+            16,
+            11,
+            -12,
+            -11,
+            0,
+            -6,
+            -37,
+            -27,
+            -18,
+            -23,
+            7,
+            -7
+          ],
+          "same_sign_seeds": "10/16（−）",
+          "p_seeds_binomial": 0.4545,
+          "range_imgs": 62,
+          "d4_sigma_hat": 17.6
+        }
+      },
+      "slope_diff_paired": {
+        "label": "斜率差（T6 步长 − T3 步长，按流配对）",
+        "n_seeds": 16,
+        "mean_gap_imgs": 27.3,
+        "sd_imgs": 23.4,
+        "se_imgs": 5.9,
+        "ci95_imgs": [
+          14.8,
+          39.8
+        ],
+        "gaps": [
+          12,
+          60,
+          25,
+          -14,
+          62,
+          31,
+          6,
+          -1,
+          44,
+          42,
+          17,
+          44,
+          18,
+          -3,
+          40,
+          54
+        ],
+        "same_sign_seeds": "13/16（+）",
+        "p_seeds_binomial": 0.0213,
+        "range_imgs": 76,
+        "d4_sigma_hat": 21.5
+      },
+      "ex_ante_nail_imgs": 27.3,
+      "exit_slope": "(a) 升格成以流为单位的配对读数",
+      "exit_cellwise": "两格都不含 0 ⇒ 整段一起平移（读不出发生在哪一端）"
+    }
+  },
+  "verdict": "中数据4500 的斜率差走出口 (b) 仍只是两个点估计之差；低数据2000 的斜率差走出口 (a) 升格成以流为单位的配对读数；中数据4500@12流 的斜率差走出口 (a) 升格成以流为单位的配对读数；中数据4500@16流 的斜率差走出口 (a) 升格成以流为单位的配对读数 ——两档各自判，一升一不升如实分开报",
+  "limitations": [
+    "这一发**读的是判别量**：把「两个点估计相减」换成「逐流配对差」，它本身不换那七维里的任何一维，所以斜率差再干净也**永不构成复证**。唯一的例外在流池上：中数据4500@12流（compress_report_v4f_mid_n12_t6_v5.json）、中数据4500@16流（compress_report_v4f_mid_n16_t6_v5.json） 这几对的 T=6 那本账是 step4f 补流买来的（买的是分辨率）⇒ 那些格里「分辨率」与「判别量」两件事各买各的，不许混着报",
+    "配对前提的覆盖度（每对的 `ce_pairing_checked`）本轮起是**整池**，现读：中数据4500 8/8、低数据2000 8/8、中数据4500@12流 12/12、中数据4500@16流 16/16。来源是每一臂行自己的 `wrong_ce`（CE 与 α 无关），不再是恒等闸名单——薄档只存 3 条恒等闸时那句「其余按同一构造推定」随来源一起作废：现在覆盖不到整池是**退出**，不是报个比例",
+    "中数据那 3 对（中数据4500、中数据4500@12流、中数据4500@16流）是**同一个坐标的粗细几档读数**：粗那档的流池是细那档的前缀（守卫闸⑥ 已把这些格钉成逐位相同）⇒ 几对的斜率差不算几次独立复证，只能并排看收敛",
+    "低数据那一对的两本账跨判据版本（T=3 是 `_v3`、T=6 是 `_v4`）：配的是**训练路径上的逐流 gap**，判据版本只改派生判词不改 gap，所以可比；但这里的「同一把尺子」=同一个训练器，不是同一个判据",
+    "闸 A 只核到 CE 臂那一格：两列的 CE 读数逐位相同，恰恰因为 CE 与 T 无关。它核到「同一次初始化、同一批图」，核不到 KL 那一侧——这是配对前提的下界，不是全证",
+    "斜率差的点估计由算术钉死（见 prediction_ex_ante_imgs 与每对的 ex_ante_nail_imgs），所以它不是发现；发现只能是 CI / 同号计数 / 二项 p",
+    "4 对读数全部来自 MNIST × S128 这几个坐标、且共用同一个老师与同一批图 ⇒ 「加热把斜率变陡」跨不跨任务、跨不跨档、跨不跨宽度，本脚本一个字都没说"
+  ]
+}

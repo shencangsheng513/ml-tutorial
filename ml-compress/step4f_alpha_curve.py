@@ -641,7 +641,9 @@ from pathlib import Path
 import torch
 
 from step1_quantize import MODELS, build_cnn, predict
-from step4_distill import DATA_TIERS, TEACHER_ARCHIVE_ACC, VAL_N, check_flow_constants, logits_of, sign_test_p, train_student
+from step4_distill import (DATA_TIERS, FLOW_SEEDS, SEEDS, SEEDS8, SEEDS12, SEEDS16, SEEDS26,
+                           TEACHER_ARCHIVE_ACC, VAL_N, check_flow_constants, flow_tiers,
+                           logits_of, sign_test_p, train_student)
 from step4e_marginal_recheck import OLD_SEEDS, summarize          # 复现单位是流：CI 用同一套系数表
 from step4c_alpha_T_sweep import ALPHA_ANCHOR, ANCHOR_T, TIER, V4C_SUFFIX, key, load_anchor, out_path, v4b_path
 from step6_fashion_replication import TEACHER_PT, load_fashion
@@ -652,12 +654,8 @@ LADDER = (0.0, 0.05, 0.1, 0.2, 0.3)               # 0 是恒等闸不是臂；0.
 HIGH_LADDER = (0.85, 1.0)                          # 第十发：锚点剂量 0.7 **之上**再铺两格。
                                                    # α=1.0 是纯 KD（CE 权重 1−α 归零），仍在定义域内；
                                                    # α>1 会让 CE 权重变负，那不是"更大的 α"而是另一个目标函数，所以不铺
-SEEDS = (42, 7, 2026)                              # 与第4课b/c 同一批随机流，才能与档案逐位对
-SEEDS8 = SEEDS + (11, 202, 3003, 40004, 55555)     # 第4课e 那五条：老 3 条只对账，新 5 条才是复现
-SEEDS12 = SEEDS8 + (808, 1337, 24601, 90210)       # 第九发新买的四条：只加读数密度，不属于板块共用的那 8 条
-                                                    # ⇒ 跨脚本逐位对账仍然只发生在前 8 条上（闸⑥ 的许可证范围）
-SEEDS16 = SEEDS12 + (1717, 3131, 5252, 7373)       # 第十四发再买四条：同样是"只加密度"，
-                                                    # 名单事先 grep 过全部档案与源码确认从未出现过（换过的种子不叫新流）
+# 复现流名单 SEEDS/SEEDS8/SEEDS12/SEEDS16/SEEDS26 与档位表 FLOW_SEEDS：全部住在 step4_distill
+# （那里是唯一来源，注释里记着每一档是哪一发、按什么规矩现买的）
 PROBE_ALPHA = 0.3                                   # 已在 v4c 档案里的那一格
 P_SIG = 0.05
 SHAPE_RULE = "v5"        # 形状判据版本：v1 只看逐图合并 p，v2 加流级同号腿，v3 让判据吃阶梯顶＋给反号一个正式分支，
@@ -945,10 +943,10 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
     ds = DATASETS[dataset]
     if high and thin:
         raise SystemExit("--ladder-high 与 --thin 互斥：薄阶梯只留判据吃的那几格，而这一发买的正是顶以上那两格")
-    if nseeds not in (3, 8, 12, 16):
-        raise SystemExit("复现流只有四档：3（对账那批）/ 8（板块共用的那批）/ 12（第九发新买四条）/ "
-                         "16（第十四发再买四条，只补分辨率）")
-    seeds = {3: SEEDS, 8: SEEDS8, 12: SEEDS12, 16: SEEDS16}[nseeds]
+    if nseeds not in FLOW_SEEDS:
+        raise SystemExit(f"复现流只有 {sorted(FLOW_SEEDS)} 这几档（3=对账那批 / 8=板块共用那批 / "
+                         f"12=第九发新买四条 / 16=第十四发再买四条 / 26=第十八发为 Fashion 那一发新买十条）")
+    seeds = FLOW_SEEDS[nseeds]
     check_flow_constants(len(seeds))   # 在最贵的事之前：缺系数的 KeyError 会炸在全部训练之后（n=12 白烧 233 秒）
     extra = ("" if nseeds == 3 else f"_n{nseeds}") + ("_thin" if thin else "") + \
             ("" if t_col is None else f"_t{t_col:g}") + ("_hi" if high else "") + f"_{SHAPE_RULE}"
@@ -1337,10 +1335,10 @@ if __name__ == "__main__":
     ap.add_argument("--dataset", choices=tuple(DATASETS), default="mnist",
                     help="换任务：fashion 时温度列/锚点剂量/底全部从 compress_report_v6_fashion.json 现读")
     ap.add_argument("--width", type=int, choices=(128, 64), default=128)
-    ap.add_argument("--nseeds", type=int, choices=(3, 8, 12, 16), default=3,
+    ap.add_argument("--nseeds", type=int, choices=tuple(sorted(FLOW_SEEDS)), default=3,
                     help="3 = 对账那批老流；8 = 加第4课e 那五条（板块共用，老 3 条仍只当逐位对账的锚）；"
-                         "12 = 再加第九发买的四条；16 = 再加第十四发买的四条（两者都只补分辨率，新增的不是独立性）。"
-                         "档案名跟着流数加 _n8/_n12/_n16")
+                         "12 = 再加第九发买的四条；16 = 再加第十四发买的四条；26 = 再加第十八发为 Fashion "
+                         "那一发买的十条（都只补分辨率，新增的不是独立性）。档案名跟着流数加 _n8/_n12/_n16/_n26")
     ap.add_argument("--thin", action="store_true",
                     help="薄阶梯：只跑最小剂量格与锚点格两格（配对步长只吃这两格），"
                          "恒等闸只在老 3 条流上跑；档案名加 _thin")

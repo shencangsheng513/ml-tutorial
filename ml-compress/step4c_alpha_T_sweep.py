@@ -51,8 +51,9 @@ import torch
 import torch.nn as nn
 
 from step1_quantize import MODELS, build_cnn, predict
-from step4_distill import (BS, DATA_TIERS, KD_ALPHA, KD_T, SEED, TIERS, VAL_N, build_mlp,
-                           logits_of, sign_test_p, soft_label_audit, summarize, train_student)
+from step4_distill import (BS, DATA_TIERS, KD_ALPHA, KD_T, SEED, SEEDS, SEEDS8, TIERS, VAL_N,
+                           build_mlp, check_flow_constants, flow_tiers, flows, logits_of,
+                           sign_test_p, soft_label_audit, summarize, train_student)
 from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
@@ -60,8 +61,7 @@ TIER = "满数据8500"                                 # 默认档；--tier 低�
 WIDTH = 128                                         # 默认副；已被第4课b 降级为"不显著"的低数据档不追
 ALPHAS = (0.3, 0.7, 1.0)
 TEMPS = (1.0, 3.0, 6.0)
-SEEDS = (42, 7, 2026)
-SEEDS8 = SEEDS + (11, 202, 3003, 40004, 55555)     # 第4课e/f 那批流：扩种子只能扩这一套，换一批就等于换一把尺
+# SEEDS / SEEDS8 由上面的 from step4_distill import 带进来（名单唯一来源；step6 仍从本模块取 SEEDS）
 NSEEDS = 3                                          # 可被 --nseeds 覆盖
 ALPHA_ANCHOR = KD_ALPHA                             # 0.7：第4课那格的权重分配
 ANCHOR_T = KD_T                                     # 3.0：探针的基准温度，也是锚点格
@@ -77,11 +77,11 @@ V4C_SUFFIX = {"低数据2000": "_low", "中数据4500": "_mid"}
 
 def v4b_path(width: int, tier: str) -> Path:
     """这一档、这一副宽度的种子底档案。S64 只跑过满数据档，所以那本里没有档位后缀。"""
-    if NSEEDS == 8:                                     # 8 条流那本底只覆盖 S128 的两档，别的组合直接拒
+    if NSEEDS > 3:                                      # 补过流的底只覆盖 S128 的两档，别的组合直接拒
         if width != 128 or tier not in TIERS:
-            raise SystemExit(f"--nseeds 8 的种子底档案只有 S128 × {list(TIERS)}（compress_report_v4b_n8.json）；"
+            raise SystemExit(f"--nseeds {NSEEDS} 的种子底档案只有 S128 × {list(TIERS)}（compress_report_v4b_n{NSEEDS}.json）；"
                              f"要测 S{width} 或 {tier}，得先给那一副把那本底扩出来，不许借别档的底")
-        return HERE / "compress_report_v4b_n8.json"
+        return HERE / f"compress_report_v4b_n{NSEEDS}.json"
     stem = "compress_report_v4b" if width == 128 else f"compress_report_v4b_s{width}"
     if tier not in TIERS and tier not in V4B_SUFFIX:
         raise SystemExit(f"档 {tier} 没登记种子底档案名：它要么在第4课那两档的合并账里（那就别新加名字），"
@@ -95,8 +95,8 @@ def v4b_path(width: int, tier: str) -> Path:
 
 def out_path(width: int, tier: str = TIER) -> Path:
     stem = "compress_report_v4c" if width == 128 else f"compress_report_v4c_s{width}"
-    # 流数是这本账的判别维度：不带 _n8 就会把板块一路在用的那本 3 条流的判决无声盖掉
-    return HERE / (stem + V4C_SUFFIX.get(tier, "") + ("_n8" if NSEEDS == 8 else "") + ".json")
+    # 流数是这本账的判别维度：不带 _n{n} 就会把板块一路在用的那本 3 条流的判决无声盖掉
+    return HERE / (stem + V4C_SUFFIX.get(tier, "") + ("" if NSEEDS == 3 else f"_n{NSEEDS}") + ".json")
 
 
 def load_anchor(v4b: Path, width: int, tier: str = TIER) -> dict:
@@ -107,12 +107,12 @@ def load_anchor(v4b: Path, width: int, tier: str = TIER) -> dict:
     伤害基数 +27 张——符号都反了），而"对账"这件事的效力完全来自它比的是档案真值。
     抄一份数字进代码，档案一改就对上老账了——所以档案是唯一来源，这里只负责读。"""
     d = json.loads(v4b.read_text(encoding="utf-8"))
-    if NSEEDS == 8:
-        # 借来的底必须先证明它没换尺子：v4b_n8 自己带那道跨脚本闸，这里读它，不在这里重算
+    if NSEEDS > 3:
+        # 借来的底必须先证明它没换尺子：那本补过流的底自己带那道跨脚本闸，这里读它，不在这里重算
         got = (d.get("cross_script_parity") or {}).get(f"{tier} 老3条流×4项读数")
         if got != "逐位相同":
             raise SystemExit(f"{v4b.name} 里 {tier} 的跨脚本对账不是「逐位相同」（读到 {got!r}）："
-                             f"这本 8 条流的底与 3 条流那本不可并读，先查上游那一发")
+                             f"这本 {NSEEDS} 条流的底与 3 条流那本不可并读，先查上游那一发")
     if int(d["width"]) != width:
         raise SystemExit(f"{v4b.name} 是 S{d['width']} 的报告，不是 S{width}——换宽度请连档案一起换")
     arm_key = f"{tier} 种子{SEEDS[0]}"
@@ -127,12 +127,12 @@ def load_anchor(v4b: Path, width: int, tier: str = TIER) -> dict:
             "gap_imgs": arm["gap_imgs"],            # KD−CE，负=KD 更差，与本课 gap 同号向
             "floor": int(d["verdicts"][tier]["seed_floor_imgs"]["KD"]),
             "floor_ce": int(d["verdicts"][tier]["seed_floor_imgs"]["CE"]),
-            # 8 条流那本底把锚点格的**逐流 gap** 也记着：那一列就是这一课锚点格的同批读数，
-            # 逐位对上 ⇒ 两本账量的是同 8 条随机流，而不只是同一个种子 42
+            # 补过流的那本底把锚点格的**逐流 gap** 也记着：那一列就是这一课锚点格的同批读数，
+            # 逐位对上 ⇒ 两本账量的是同一批随机流，而不只是同一个种子 42
             "paired_gaps": ({"seeds": d["seeds"],
                             "gaps": d["verdicts"][tier]["gaps_imgs"],
                             "label": f"{v4b.name} verdicts.{tier}.gaps_imgs"}
-                            if NSEEDS == 8 else None)}
+                            if NSEEDS > 3 else None)}
 
 
 def h1_pred(gap_imgs: int) -> dict:
@@ -191,7 +191,8 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
     n_data = DATA_TIERS[tier]
     xd, yd = xt_all[:n_data], torch.tensor(yt_all[:n_data])
     soft = logits_of(teacher, xd)                   # 软标签与 T 无关：温度在 loss 里加，全程共用一份
-    seeds = SEEDS if NSEEDS == 3 else SEEDS8
+    seeds = flows(NSEEDS)
+    check_flow_constants(len(seeds))   # 缺系数要在第一次训练之前停：KeyError 会炸在 176 次之后
 
     print(f"teacher+数据就位 | {tier} 训练 {n_data} 张 | 测试 {len(yte)} | 学生 S{width} | "
           f"网格 {len(ALPHAS)}×{len(TEMPS)}×{len(seeds)} = "
@@ -417,7 +418,7 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
                        f"CI [{ci_low[0]:+.1f}, {ci_low[1]:+.1f}]、{low_paired['same_sign_seeds']} 条流同号不含 0 "
                        f"⇒ 伤害没消失；「α→0 伤害就消失」这句反事实仍然不成立。"
                        f"（3 条流那本底只有 {floor} 张的一半量级，同一个读数当时判的是「穿过」）"
-                       if NSEEDS == 8 else f"α→0 方向上伤害没消失（底没穿过但 CI 不含 0：{floor} 张这把尺太粗）")
+                       if NSEEDS > 3 else f"α→0 方向上伤害没消失（底没穿过但 CI 不含 0：{floor} 张这把尺太粗）")
     elif low_floor:
         low_reading = (f"穿过了底但配对 CI 含 0：底是随流数变宽的粗尺、CI 是同一条流内相减的细尺，"
                        "两把不同意时按 CI 读 ⇒ 这一格只能说「说不清」")
@@ -584,8 +585,9 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
                                 if tier == TIER else
                                 f"另一副宽度（S{other}）只造过 {TIER} 一档的底，档位与宽度没法同时换；")
                                + f"compress_report_v4c{'' if width == 64 else '_s64'}.json"
-                                 f"{'_n8' if NSEEDS == 8 else ''}（3 条流那本，各写各的表；"
-                                 "8 条流只做过 S128 满/低两档，跨架构/跨档结论要几份对照着读，"
+                                 f"{'' if NSEEDS == 3 else f'_n{NSEEDS}'}（3 条流那本，各写各的表；"
+                                 f"{'补过流的那几本' if NSEEDS == 3 else f'{NSEEDS} 条流那本'}"
+                                 "只做过 S128 满/低两档，跨架构/跨档结论要几份对照着读，"
                                  "而跨流数只能读配对 CI）"),
                               f"每格 {len(seeds)} 条流，均值本身没有二次底",
                               "权重/温度解耦只在初始一步的一个批次上配平，不是全程配平",
@@ -603,9 +605,9 @@ if __name__ == "__main__":
     ap.add_argument("--tier", choices=tuple(DATA_TIERS), default=TIER,
                     help="数据档位；每档的种子底/锚点档案值从该档自己的 compress_report_v4b*.json 读。"
                          "低数据与中数据目前只有 S128 造过底，配 --width 64 会直接报错")
-    ap.add_argument("--nseeds", type=int, choices=(3, 8), default=3,
-                    help="每个格子几条随机流；8 只服务「老账只有 3 条流」那笔分辨率债，"
-                         "种子底必须换到对应的 compress_report_v4b_n8.json")
+    ap.add_argument("--nseeds", type=int, choices=flow_tiers(), default=3,
+                    help="每个格子几条随机流；补流只服务「老账只有 3 条流」那笔分辨率债，"
+                         "种子底必须换到对应的 compress_report_v4b_n<流数>.json（先跑 step4b --nseeds 同值）")
     args = ap.parse_args()
     NSEEDS = args.nseeds
     # 闸门在训练之前：跑完 80 次训练再发现要覆盖老档案，那一发就白烧了

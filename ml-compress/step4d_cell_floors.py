@@ -42,12 +42,13 @@ S64 53 张 / S128 低数据档 37 张），"是借来的仪器，会低估 T 大
      旧册的档案键叫 `S128 | 满数据8500`，新册同一坐标改叫 `S128 | 满数据8500 | 3 条流`
      （多出的后缀是必需的：同一坐标现在有两本账）。
      旧产物 `compress_report_v4d.json` 是 n=3 那一批的历史读数，**不就地覆盖**，新账另起一名。
-  ③ **这一支买不到 16 条流那本**：`step4c` 的 `--nseeds` 选项只有 (3, 8)，盘上没有 16 条流的九格
-     α×T 账（`_n16` 那两本是 `step4f` 的**一列阶梯**，不是 α×T 网格，喂不进 `analyse()`）。
-     所以开菜单时那句"D 含 16 流档案、零成本换名重跑"是**成本误报**（本轮第二次）：D 的真实范围
-     是"3 条流 ↔ 8 条流并排 + 系数跟着 n 走"，要把 16 条流纳进来得先给 `step4c` 加一档
-     `--nseeds 16` 并付 **176 次训练**（每条流 11 次 = 9 格 KD + 1 CE + 1 配平臂；n=3 那本
-     档案自报 33 次 = 11×3，所以 16 条流是 11×16），那是另一发实验而不是这一支的改名。
+  ③ **16 条流那本在第十七发买到了**：`step4c` 的 `--nseeds` 加了 16 这一档，代价是 **176 次训练**
+     （每条流 11 次 = 9 格 KD + 1 CE + 1 配平臂；n=3 那本档案自报 33 次 = 11×3，所以 16 条流是
+     11×16），产物 `compress_report_v4c_n16.json`。它喂得进 `analyse()`：10 格 × 每格 16 条
+     `per_seed` 配对读数，借来的底 90 张取自 `compress_report_v4b_n16.json`（同坐标同流数）。
+     代价与读数分开记账：这一支本身仍然**零训练、零 API 费**，它只是把已经付过钱的档案换把尺子重读。
+     纳入 16 条流这一本后，Q1「换底翻档」第一次能在**同一坐标的三把尺子**（3/8/16 条流）之间对照，
+     而 Q2「被埋名单」的闸值随 n 收窄（σ̂/√n）——但注意 ③ 的警告照旧：跨流数**不许比翻档条数**。
 
 **同一坐标跨流数不许直接比翻档条数**：借来的底自己也随流数涨（41 → 77 张），每格自己的闸由
 σ̂/√n 给，两本账的"倍数"分母不同。跨流数能对着读的只有各自的配对 CI，这里两栏都报。
@@ -71,6 +72,8 @@ ARCHIVES = (
      "width": 128, "tier": "满数据8500"},
     {"label": "S128 | 满数据8500 | 8 条流", "file": "compress_report_v4c_n8.json",
      "width": 128, "tier": "满数据8500"},
+    {"label": "S128 | 满数据8500 | 16 条流", "file": "compress_report_v4c_n16.json",
+     "width": 128, "tier": "满数据8500"},
     {"label": "S128 | 中数据4500 | 3 条流", "file": "compress_report_v4c_mid.json",
      "width": 128, "tier": "中数据4500"},
     {"label": "S64 | 满数据8500 | 3 条流", "file": "compress_report_v4c_s64.json",
@@ -86,7 +89,7 @@ ARCHIVES = (
 NOTE = {"满数据8500": "配平臂换回的是**伤害**（该档 T↑ 有害）",
         "中数据4500": "该档 T↑ 同样有害，配平臂换回的是伤害",
         "低数据2000": "该档 T 轴已翻号（T↑ 有益），所以配平臂换回 −7.0 张要读成**丢掉 7 张收益**"}
-OUT = HERE / "compress_report_v4d_n8.json"      # 旧名 compress_report_v4d.json 是 n=3 那一批的历史读数，留着不覆盖
+OUT = HERE / "compress_report_v4d_n16.json"      # 前两本 v4d（n=3 的 compress_report_v4d.json、n=8 的 _n8.json）都是历史读数，一律不覆盖
 
 
 def key(a: float, t: float) -> str:
@@ -251,7 +254,7 @@ def main() -> None:
                              "本表只重算闸门，不改判：翻档的判决要么补种子（第4课e）要么降级为措辞"]
     OUT.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\n已存 {OUT.name}（零训练，纯读 {len(report['archives'])}/{len(ARCHIVES)} 份 v4c 档案；"
-          f"旧账 compress_report_v4d.json 保持不动）")
+          f"旧账 compress_report_v4d.json / _v4d_n8.json 保持不动）")
 
 
 if __name__ == "__main__":

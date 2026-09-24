@@ -30,14 +30,14 @@ from pathlib import Path
 import torch
 
 from step1_quantize import MODELS, build_cnn, predict
-from step4_distill import DATA_TIERS, TIERS, VAL_N, logits_of, sign_test_p, train_student
+from step4_distill import (DATA_TIERS, SEEDS, SEEDS8, TIERS, VAL_N, check_flow_constants,
+                           flow_tiers, flows, logits_of, sign_test_p, train_student)
 from step4e_marginal_recheck import summarize          # CI 用全板块同一套 t 系数表，不在这里另刻一把
 from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
 V4 = HERE / "compress_report_v4.json"
-SEEDS = (42, 7, 2026)                             # 42 是第4课那一轮，留着当逐位对账的锚
-SEEDS8 = SEEDS + (11, 202, 3003, 40004, 55555)    # 后五条是第4课e/f 那批流：跨脚本才配得上「同一批随机流」
+# 复现流名单 SEEDS / SEEDS8 / … 住在 step4_distill（唯一来源），由上面的 import 带进来
 NSEEDS = 3                                         # 可被 --nseeds 覆盖
 WIDTH = 128                                        # 可被 --width 覆盖（S64 复现用）
 TIER = ""                                          # 可被 --tier 覆盖；空 = 第4课那两档全跑
@@ -61,8 +61,8 @@ def out_path() -> Path:
         raise SystemExit(f"--tier {TIER!r} 没有登记档案名：它要么该并进合并档案（那别用 --tier），"
                          f"要么该有自己的档案名（在这里登记）。回落成通用文件名等于把两档记进同一本")
     stem = "compress_report_v4b" if WIDTH == 128 else f"compress_report_v4b_s{WIDTH}"
-    # 流数是这本账的判别维度：8 条流那发若写回同名文件，就无声盖掉了板块一路在用的那把 3 点底
-    return HERE / (stem + suffix + ("_n8" if NSEEDS == 8 else "") + ".json")
+    # 流数是这本账的判别维度：补过流那几本若写回同名文件，就无声盖掉了板块一路在用的那把 3 点底
+    return HERE / (stem + suffix + ("" if NSEEDS == 3 else f"_n{NSEEDS}") + ".json")
 
 
 
@@ -93,14 +93,15 @@ def spread(xs: list[int]) -> dict:
 def main() -> None:
     if not (MODELS / "mnist_cnn_fp32.pt").exists():
         raise SystemExit("缺 teacher 权重，先跑 python train_baseline.py")
-    seeds = SEEDS if NSEEDS == 3 else SEEDS8
-    # 8 条流这本账的全部价值在于它能与老账**并起来读**（同一批流、同一顺序）。所以训练之前先立一道
+    seeds = flows(NSEEDS)
+    check_flow_constants(len(seeds))    # 缺系数在这一步就停：KeyError 会炸在 64 次训练之后
+    # 补过流那几本的全部价值在于它们能与老账**并起来读**（同一批流、同一顺序）。所以训练之前先立一道
     # 跨脚本闸：老 3 条流必须与已入库那本逐位相同。不相同只有两种解释——代码漂了，或这批流不是那批流；
     # 两种都不允许把新底报成"同一把尺子量得更精"。
     v4b_ref = HERE / "compress_report_v4b.json"
-    if NSEEDS == 8:
+    if NSEEDS > 3:
         if not v4b_ref.exists():
-            raise SystemExit("--nseeds 8 要拿 compress_report_v4b.json 当跨脚本基准，它不在盘上：先确认老账在不在")
+            raise SystemExit(f"--nseeds {NSEEDS} 要拿 compress_report_v4b.json 当跨脚本基准，它不在盘上：先确认老账在不在")
         ref = json.loads(v4b_ref.read_text(encoding="utf-8"))["arms"]
         for tier in (TIERS if TIER == "" else {TIER: None}):
             for s in SEEDS:
@@ -135,14 +136,14 @@ def main() -> None:
         soft = logits_of(teacher, xd)             # 软标签与随机流无关：各种子共用同一份
         rows = [one_pair(teacher, xd, yd, soft, xv, yv, xte, yte, s) for s in seeds]
         tiers[tier] = rows
-        if NSEEDS == 8:                             # 跨脚本闸：老 3 条流逐位，才配把新 5 条报成"同一把尺量得更精"
+        if NSEEDS > 3:                              # 跨脚本闸：老 3 条流逐位，才配把新买的那几条报成"同一把尺量得更精"
             for r in rows[:len(SEEDS)]:
                 o = ref[f"{tier} 种子{r['seed']}"]
                 four = (r["wrong_ce"], r["wrong_kd"], r["flips"]["broken"], r["flips"]["fixed"])
                 if four != (o["wrong_ce"], o["wrong_kd"], o["flips"]["broken"], o["flips"]["fixed"]):
                     raise SystemExit(f"[跨脚本对账] FAIL {tier} 种子{r['seed']}：本发 {four} vs "
                                      f"{v4b_ref.name} {tuple(o[k] for k in ('wrong_ce', 'wrong_kd')) + (o['flips']['broken'], o['flips']['fixed'])}"
-                                     f"\n老 3 条流没复现老账 → 这 8 条与那 3 条不可并读，先查 train_student/load_split")
+                                     f"\n老 3 条流没复现老账 → 这 {NSEEDS} 条与那 3 条不可并读，先查 train_student/load_split")
             xcheck[f"{tier} 老3条流×4项读数"] = "逐位相同"
         for r in rows:
             if r["seed"] == 42:
@@ -266,8 +267,9 @@ if __name__ == "__main__":
     ap.add_argument("--tier", choices=tuple(DATA_TIERS), default="",
                     help="只复现这一档（给扫参线造种子底）。第4课那两档走默认合并档案，"
                          "不在这里单跑——单跑一次就把另一档的账抹了")
-    ap.add_argument("--nseeds", type=int, choices=(3, 8), default=3,
-                    help="8 = 把这本种子底扩到第4课e/f 那批 8 条流；档案名带 _n8，与 3 条流那本并存不覆盖")
+    ap.add_argument("--nseeds", type=int, choices=flow_tiers(), default=3,
+                    help="8/12/16/26 = 把这本种子底扩到对应那批流（名单见 step4_distill）；"
+                         "档案名带 _n<流数>，与 3 条流那本并存不覆盖")
     args = ap.parse_args()
     # 闸门必须在这里、训练之前：out_path() 是流程最后一行，那时才炸就白烧十几分钟 CPU
     if args.width == 64 and args.tier in TIERS:

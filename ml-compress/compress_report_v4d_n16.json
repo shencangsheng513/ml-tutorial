@@ -1,0 +1,2098 @@
+{
+  "method": "每格配对差值极差 → σ̂=rng/D4[n]（n=该本账自己的流数，系数取自 step4_distill 的册）→ SE=σ̂/√n → 闸门=±2SE；跨格统计量按独立合成（同批流跨格复用 ⇒ 下界，对备择有利）",
+  "d4_divisor_by_n": {
+    "3": 1.693,
+    "5": 2.326,
+    "8": 2.847,
+    "12": 3.258,
+    "16": 3.532,
+    "26": 3.964
+  },
+  "borrowed_floor_source": "第4课b 的 α=0.7/T=3 那一格 KD 臂错图极差",
+  "archives": {
+    "S128 | 满数据8500 | 3 条流": {
+      "width": 128,
+      "borrowed_floor_imgs": 41,
+      "n_flows": 3,
+      "d4_divisor_imgs": 1.693,
+      "own_bars": {
+        "1.0": {
+          "0.3": 8.2,
+          "0.7": 8.9,
+          "1.0": 9.5
+        },
+        "3.0": {
+          "0.3": 37.5,
+          "0.7": 27.3,
+          "1.0": 25.2
+        },
+        "6.0": {
+          "0.3": 29.3,
+          "0.7": 9.5,
+          "1.0": 15.7
+        }
+      },
+      "cells": {
+        "a0.3_T1": {
+          "mean_gap_imgs": 5.3,
+          "paired_range_imgs": 12,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 7.1,
+          "se_mean_imgs": 4.1,
+          "gate_2se_imgs": 8.2,
+          "unpaired_kd_range_imgs": 33,
+          "p_pooled": 0.09291188,
+          "n_seeds": 3
+        },
+        "a0.3_T3": {
+          "mean_gap_imgs": -72.0,
+          "paired_range_imgs": 55,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 32.5,
+          "se_mean_imgs": 18.8,
+          "gate_2se_imgs": 37.5,
+          "unpaired_kd_range_imgs": 56,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "a0.3_T6": {
+          "mean_gap_imgs": -107.3,
+          "paired_range_imgs": 43,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 25.4,
+          "se_mean_imgs": 14.7,
+          "gate_2se_imgs": 29.3,
+          "unpaired_kd_range_imgs": 22,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "a0.7_T1": {
+          "mean_gap_imgs": 9.0,
+          "paired_range_imgs": 13,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 7.7,
+          "se_mean_imgs": 4.4,
+          "gate_2se_imgs": 8.9,
+          "unpaired_kd_range_imgs": 26,
+          "p_pooled": 0.01240364,
+          "n_seeds": 3
+        },
+        "a0.7_T3": {
+          "mean_gap_imgs": -75.0,
+          "paired_range_imgs": 40,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 23.6,
+          "se_mean_imgs": 13.6,
+          "gate_2se_imgs": 27.3,
+          "unpaired_kd_range_imgs": 41,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "a0.7_T6": {
+          "mean_gap_imgs": -118.3,
+          "paired_range_imgs": 14,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 8.3,
+          "se_mean_imgs": 4.8,
+          "gate_2se_imgs": 9.5,
+          "unpaired_kd_range_imgs": 11,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "a1_T1": {
+          "mean_gap_imgs": 9.7,
+          "paired_range_imgs": 14,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 8.3,
+          "se_mean_imgs": 4.8,
+          "gate_2se_imgs": 9.5,
+          "unpaired_kd_range_imgs": 26,
+          "p_pooled": 0.01974094,
+          "n_seeds": 3
+        },
+        "a1_T3": {
+          "mean_gap_imgs": -76.7,
+          "paired_range_imgs": 37,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 21.9,
+          "se_mean_imgs": 12.6,
+          "gate_2se_imgs": 25.2,
+          "unpaired_kd_range_imgs": 38,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "a1_T6": {
+          "mean_gap_imgs": -123.3,
+          "paired_range_imgs": 23,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 13.6,
+          "se_mean_imgs": 7.8,
+          "gate_2se_imgs": 15.7,
+          "unpaired_kd_range_imgs": 4,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "match_T6": {
+          "mean_gap_imgs": -113.0,
+          "paired_range_imgs": 29,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 17.1,
+          "se_mean_imgs": 9.9,
+          "gate_2se_imgs": 19.8,
+          "unpaired_kd_range_imgs": 17,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        }
+      },
+      "readings": [
+        {
+          "statistic": "α 轴斜率（α=1.0 − α=0.3，锚点温度）",
+          "value_imgs": -4.7,
+          "cells": [
+            "a1_T3",
+            "a0.3_T3"
+          ],
+          "borrowed_floor_imgs": 41,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.11,
+          "own_2se_imgs": 45.2,
+          "under_own": false,
+          "ratio_own": 0.1,
+          "flips": false
+        },
+        {
+          "statistic": "判别格 α=1 列内 T 跨度（最高温 − 最低温）",
+          "value_imgs": 133.0,
+          "cells": [
+            "a1_T1",
+            "a1_T6"
+          ],
+          "borrowed_floor_imgs": 41,
+          "under_borrowed": true,
+          "ratio_borrowed": 3.24,
+          "own_2se_imgs": 18.4,
+          "under_own": true,
+          "ratio_own": 7.23,
+          "flips": false
+        },
+        {
+          "statistic": "T 主效应（跨 α 平均，T=6 − T=1）",
+          "value_imgs": -124.3,
+          "cells": [
+            "a0.3_T6",
+            "a0.7_T6",
+            "a1_T6",
+            "a0.3_T1",
+            "a0.7_T1",
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 41,
+          "under_borrowed": true,
+          "ratio_borrowed": 3.03,
+          "own_2se_imgs": 12.6,
+          "under_own": true,
+          "ratio_own": 9.87,
+          "flips": false
+        },
+        {
+          "statistic": "T 逐档 1→3（跨 α 平均）",
+          "value_imgs": -82.6,
+          "cells": [
+            "a0.3_T3",
+            "a0.7_T3",
+            "a1_T3",
+            "a0.3_T1",
+            "a0.7_T1",
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 41,
+          "under_borrowed": true,
+          "ratio_borrowed": 2.01,
+          "own_2se_imgs": 18.4,
+          "under_own": true,
+          "ratio_own": 4.49,
+          "flips": false
+        },
+        {
+          "statistic": "T 逐档 3→6（跨 α 平均）",
+          "value_imgs": -41.7,
+          "cells": [
+            "a0.3_T6",
+            "a0.7_T6",
+            "a1_T6",
+            "a0.3_T3",
+            "a0.7_T3",
+            "a1_T3"
+          ],
+          "borrowed_floor_imgs": 41,
+          "under_borrowed": true,
+          "ratio_borrowed": 1.02,
+          "own_2se_imgs": 21.0,
+          "under_own": true,
+          "ratio_own": 1.99,
+          "flips": false
+        },
+        {
+          "statistic": "不加热只借 argmax（α=1/T=1）",
+          "value_imgs": 9.7,
+          "cells": [
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 41,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.24,
+          "own_2se_imgs": 9.6,
+          "under_own": true,
+          "ratio_own": 1.01,
+          "flips": true
+        },
+        {
+          "statistic": "第4课反事实臂（α=0.3/T=3）",
+          "value_imgs": -72.0,
+          "cells": [
+            "a0.3_T3"
+          ],
+          "borrowed_floor_imgs": 41,
+          "under_borrowed": true,
+          "ratio_borrowed": 1.76,
+          "own_2se_imgs": 37.6,
+          "under_own": true,
+          "ratio_own": 1.91,
+          "flips": false
+        },
+        {
+          "statistic": "配平臂换回的伤害（钉回 KD 梯度 vs 锚点 α=0.7）",
+          "value_imgs": 5.3,
+          "cells": [
+            "match_T6",
+            "a0.7_T6"
+          ],
+          "borrowed_floor_imgs": 41,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.13,
+          "own_2se_imgs": 22.0,
+          "under_own": false,
+          "ratio_own": 0.24,
+          "flips": false
+        }
+      ],
+      "n_flips": 1,
+      "flipped_readings": [
+        "不加热只借 argmax（α=1/T=1）"
+      ],
+      "cells_buried_by_borrowed_floor": {
+        "a0.7_T1": {
+          "mean_gap_imgs": 9.0,
+          "own_2se_imgs": 8.9,
+          "p_pooled": 0.01240364
+        },
+        "a1_T1": {
+          "mean_gap_imgs": 9.7,
+          "own_2se_imgs": 9.5,
+          "p_pooled": 0.01974094
+        }
+      },
+      "bar_spread": {
+        "min_own_2se": 8.2,
+        "max_own_2se": 37.5,
+        "vs_borrowed": [
+          0.2,
+          0.91
+        ]
+      },
+      "tier": "满数据8500",
+      "flows": 3,
+      "file": "compress_report_v4c.json",
+      "note": "配平臂换回的是**伤害**（该档 T↑ 有害）"
+    },
+    "S128 | 满数据8500 | 8 条流": {
+      "width": 128,
+      "borrowed_floor_imgs": 77,
+      "n_flows": 8,
+      "d4_divisor_imgs": 2.847,
+      "own_bars": {
+        "1.0": {
+          "0.3": 4.5,
+          "0.7": 6.0,
+          "1.0": 7.5
+        },
+        "3.0": {
+          "0.3": 15.4,
+          "0.7": 11.9,
+          "1.0": 10.4
+        },
+        "6.0": {
+          "0.3": 14.4,
+          "0.7": 14.2,
+          "1.0": 13.9
+        }
+      },
+      "cells": {
+        "a0.3_T1": {
+          "mean_gap_imgs": 3.9,
+          "paired_range_imgs": 18,
+          "d4_divisor_imgs": 2.847,
+          "sigma_hat_imgs": 6.3,
+          "se_mean_imgs": 2.2,
+          "gate_2se_imgs": 4.5,
+          "unpaired_kd_range_imgs": 84,
+          "p_pooled": 0.04144923,
+          "n_seeds": 8
+        },
+        "a0.3_T3": {
+          "mean_gap_imgs": -66.1,
+          "paired_range_imgs": 62,
+          "d4_divisor_imgs": 2.847,
+          "sigma_hat_imgs": 21.8,
+          "se_mean_imgs": 7.7,
+          "gate_2se_imgs": 15.4,
+          "unpaired_kd_range_imgs": 93,
+          "p_pooled": 0.0,
+          "n_seeds": 8
+        },
+        "a0.3_T6": {
+          "mean_gap_imgs": -94.0,
+          "paired_range_imgs": 58,
+          "d4_divisor_imgs": 2.847,
+          "sigma_hat_imgs": 20.4,
+          "se_mean_imgs": 7.2,
+          "gate_2se_imgs": 14.4,
+          "unpaired_kd_range_imgs": 54,
+          "p_pooled": 0.0,
+          "n_seeds": 8
+        },
+        "a0.7_T1": {
+          "mean_gap_imgs": 6.4,
+          "paired_range_imgs": 24,
+          "d4_divisor_imgs": 2.847,
+          "sigma_hat_imgs": 8.4,
+          "se_mean_imgs": 3.0,
+          "gate_2se_imgs": 6.0,
+          "unpaired_kd_range_imgs": 84,
+          "p_pooled": 0.00450236,
+          "n_seeds": 8
+        },
+        "a0.7_T3": {
+          "mean_gap_imgs": -68.2,
+          "paired_range_imgs": 48,
+          "d4_divisor_imgs": 2.847,
+          "sigma_hat_imgs": 16.9,
+          "se_mean_imgs": 6.0,
+          "gate_2se_imgs": 11.9,
+          "unpaired_kd_range_imgs": 77,
+          "p_pooled": 0.0,
+          "n_seeds": 8
+        },
+        "a0.7_T6": {
+          "mean_gap_imgs": -97.6,
+          "paired_range_imgs": 57,
+          "d4_divisor_imgs": 2.847,
+          "sigma_hat_imgs": 20.0,
+          "se_mean_imgs": 7.1,
+          "gate_2se_imgs": 14.2,
+          "unpaired_kd_range_imgs": 52,
+          "p_pooled": 0.0,
+          "n_seeds": 8
+        },
+        "a1_T1": {
+          "mean_gap_imgs": 7.4,
+          "paired_range_imgs": 30,
+          "d4_divisor_imgs": 2.847,
+          "sigma_hat_imgs": 10.5,
+          "se_mean_imgs": 3.7,
+          "gate_2se_imgs": 7.5,
+          "unpaired_kd_range_imgs": 87,
+          "p_pooled": 0.00579605,
+          "n_seeds": 8
+        },
+        "a1_T3": {
+          "mean_gap_imgs": -72.0,
+          "paired_range_imgs": 42,
+          "d4_divisor_imgs": 2.847,
+          "sigma_hat_imgs": 14.8,
+          "se_mean_imgs": 5.2,
+          "gate_2se_imgs": 10.4,
+          "unpaired_kd_range_imgs": 84,
+          "p_pooled": 0.0,
+          "n_seeds": 8
+        },
+        "a1_T6": {
+          "mean_gap_imgs": -104.1,
+          "paired_range_imgs": 56,
+          "d4_divisor_imgs": 2.847,
+          "sigma_hat_imgs": 19.7,
+          "se_mean_imgs": 7.0,
+          "gate_2se_imgs": 13.9,
+          "unpaired_kd_range_imgs": 52,
+          "p_pooled": 0.0,
+          "n_seeds": 8
+        },
+        "match_T6": {
+          "mean_gap_imgs": -94.0,
+          "paired_range_imgs": 57,
+          "d4_divisor_imgs": 2.847,
+          "sigma_hat_imgs": 20.0,
+          "se_mean_imgs": 7.1,
+          "gate_2se_imgs": 14.2,
+          "unpaired_kd_range_imgs": 56,
+          "p_pooled": 0.0,
+          "n_seeds": 8
+        }
+      },
+      "readings": [
+        {
+          "statistic": "α 轴斜率（α=1.0 − α=0.3，锚点温度）",
+          "value_imgs": -5.9,
+          "cells": [
+            "a1_T3",
+            "a0.3_T3"
+          ],
+          "borrowed_floor_imgs": 77,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.08,
+          "own_2se_imgs": 18.6,
+          "under_own": false,
+          "ratio_own": 0.32,
+          "flips": false
+        },
+        {
+          "statistic": "判别格 α=1 列内 T 跨度（最高温 − 最低温）",
+          "value_imgs": 111.5,
+          "cells": [
+            "a1_T1",
+            "a1_T6"
+          ],
+          "borrowed_floor_imgs": 77,
+          "under_borrowed": true,
+          "ratio_borrowed": 1.45,
+          "own_2se_imgs": 15.8,
+          "under_own": true,
+          "ratio_own": 7.06,
+          "flips": false
+        },
+        {
+          "statistic": "T 主效应（跨 α 平均，T=6 − T=1）",
+          "value_imgs": -104.5,
+          "cells": [
+            "a0.3_T6",
+            "a0.7_T6",
+            "a1_T6",
+            "a0.3_T1",
+            "a0.7_T1",
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 77,
+          "under_borrowed": true,
+          "ratio_borrowed": 1.36,
+          "own_2se_imgs": 9.0,
+          "under_own": true,
+          "ratio_own": 11.61,
+          "flips": false
+        },
+        {
+          "statistic": "T 逐档 1→3（跨 α 平均）",
+          "value_imgs": -74.7,
+          "cells": [
+            "a0.3_T3",
+            "a0.7_T3",
+            "a1_T3",
+            "a0.3_T1",
+            "a0.7_T1",
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 77,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.97,
+          "own_2se_imgs": 8.2,
+          "under_own": true,
+          "ratio_own": 9.11,
+          "flips": true
+        },
+        {
+          "statistic": "T 逐档 3→6（跨 α 平均）",
+          "value_imgs": -29.8,
+          "cells": [
+            "a0.3_T6",
+            "a0.7_T6",
+            "a1_T6",
+            "a0.3_T3",
+            "a0.7_T3",
+            "a1_T3"
+          ],
+          "borrowed_floor_imgs": 77,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.39,
+          "own_2se_imgs": 11.0,
+          "under_own": true,
+          "ratio_own": 2.71,
+          "flips": true
+        },
+        {
+          "statistic": "不加热只借 argmax（α=1/T=1）",
+          "value_imgs": 7.4,
+          "cells": [
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 77,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.1,
+          "own_2se_imgs": 7.4,
+          "under_own": false,
+          "ratio_own": 1.0,
+          "flips": false
+        },
+        {
+          "statistic": "第4课反事实臂（α=0.3/T=3）",
+          "value_imgs": -66.1,
+          "cells": [
+            "a0.3_T3"
+          ],
+          "borrowed_floor_imgs": 77,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.86,
+          "own_2se_imgs": 15.4,
+          "under_own": true,
+          "ratio_own": 4.29,
+          "flips": true
+        },
+        {
+          "statistic": "配平臂换回的伤害（钉回 KD 梯度 vs 锚点 α=0.7）",
+          "value_imgs": 3.6,
+          "cells": [
+            "match_T6",
+            "a0.7_T6"
+          ],
+          "borrowed_floor_imgs": 77,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.05,
+          "own_2se_imgs": 20.0,
+          "under_own": false,
+          "ratio_own": 0.18,
+          "flips": false
+        }
+      ],
+      "n_flips": 3,
+      "flipped_readings": [
+        "T 逐档 1→3（跨 α 平均）",
+        "T 逐档 3→6（跨 α 平均）",
+        "第4课反事实臂（α=0.3/T=3）"
+      ],
+      "cells_buried_by_borrowed_floor": {
+        "a0.3_T3": {
+          "mean_gap_imgs": -66.1,
+          "own_2se_imgs": 15.4,
+          "p_pooled": 0.0
+        },
+        "a0.7_T1": {
+          "mean_gap_imgs": 6.4,
+          "own_2se_imgs": 6.0,
+          "p_pooled": 0.00450236
+        },
+        "a0.7_T3": {
+          "mean_gap_imgs": -68.2,
+          "own_2se_imgs": 11.9,
+          "p_pooled": 0.0
+        },
+        "a1_T3": {
+          "mean_gap_imgs": -72.0,
+          "own_2se_imgs": 10.4,
+          "p_pooled": 0.0
+        }
+      },
+      "bar_spread": {
+        "min_own_2se": 4.5,
+        "max_own_2se": 15.4,
+        "vs_borrowed": [
+          0.06,
+          0.2
+        ]
+      },
+      "tier": "满数据8500",
+      "flows": 8,
+      "file": "compress_report_v4c_n8.json",
+      "note": "配平臂换回的是**伤害**（该档 T↑ 有害）"
+    },
+    "S128 | 满数据8500 | 16 条流": {
+      "width": 128,
+      "borrowed_floor_imgs": 90,
+      "n_flows": 16,
+      "d4_divisor_imgs": 3.532,
+      "own_bars": {
+        "1.0": {
+          "0.3": 3.4,
+          "0.7": 3.5,
+          "1.0": 4.2
+        },
+        "3.0": {
+          "0.3": 8.8,
+          "0.7": 8.8,
+          "1.0": 9.1
+        },
+        "6.0": {
+          "0.3": 12.0,
+          "0.7": 12.5,
+          "1.0": 11.7
+        }
+      },
+      "cells": {
+        "a0.3_T1": {
+          "mean_gap_imgs": 1.8,
+          "paired_range_imgs": 24,
+          "d4_divisor_imgs": 3.532,
+          "sigma_hat_imgs": 6.8,
+          "se_mean_imgs": 1.7,
+          "gate_2se_imgs": 3.4,
+          "unpaired_kd_range_imgs": 96,
+          "p_pooled": 0.17024822,
+          "n_seeds": 16
+        },
+        "a0.3_T3": {
+          "mean_gap_imgs": -73.3,
+          "paired_range_imgs": 62,
+          "d4_divisor_imgs": 3.532,
+          "sigma_hat_imgs": 17.6,
+          "se_mean_imgs": 4.4,
+          "gate_2se_imgs": 8.8,
+          "unpaired_kd_range_imgs": 111,
+          "p_pooled": 0.0,
+          "n_seeds": 16
+        },
+        "a0.3_T6": {
+          "mean_gap_imgs": -97.6,
+          "paired_range_imgs": 85,
+          "d4_divisor_imgs": 3.532,
+          "sigma_hat_imgs": 24.1,
+          "se_mean_imgs": 6.0,
+          "gate_2se_imgs": 12.0,
+          "unpaired_kd_range_imgs": 81,
+          "p_pooled": 0.0,
+          "n_seeds": 16
+        },
+        "a0.7_T1": {
+          "mean_gap_imgs": 4.4,
+          "paired_range_imgs": 25,
+          "d4_divisor_imgs": 3.532,
+          "sigma_hat_imgs": 7.1,
+          "se_mean_imgs": 1.8,
+          "gate_2se_imgs": 3.5,
+          "unpaired_kd_range_imgs": 87,
+          "p_pooled": 0.00609374,
+          "n_seeds": 16
+        },
+        "a0.7_T3": {
+          "mean_gap_imgs": -74.6,
+          "paired_range_imgs": 62,
+          "d4_divisor_imgs": 3.532,
+          "sigma_hat_imgs": 17.6,
+          "se_mean_imgs": 4.4,
+          "gate_2se_imgs": 8.8,
+          "unpaired_kd_range_imgs": 90,
+          "p_pooled": 0.0,
+          "n_seeds": 16
+        },
+        "a0.7_T6": {
+          "mean_gap_imgs": -100.0,
+          "paired_range_imgs": 88,
+          "d4_divisor_imgs": 3.532,
+          "sigma_hat_imgs": 24.9,
+          "se_mean_imgs": 6.2,
+          "gate_2se_imgs": 12.5,
+          "unpaired_kd_range_imgs": 90,
+          "p_pooled": 0.0,
+          "n_seeds": 16
+        },
+        "a1_T1": {
+          "mean_gap_imgs": 6.1,
+          "paired_range_imgs": 30,
+          "d4_divisor_imgs": 3.532,
+          "sigma_hat_imgs": 8.5,
+          "se_mean_imgs": 2.1,
+          "gate_2se_imgs": 4.2,
+          "unpaired_kd_range_imgs": 87,
+          "p_pooled": 0.00108637,
+          "n_seeds": 16
+        },
+        "a1_T3": {
+          "mean_gap_imgs": -75.5,
+          "paired_range_imgs": 64,
+          "d4_divisor_imgs": 3.532,
+          "sigma_hat_imgs": 18.1,
+          "se_mean_imgs": 4.5,
+          "gate_2se_imgs": 9.1,
+          "unpaired_kd_range_imgs": 90,
+          "p_pooled": 0.0,
+          "n_seeds": 16
+        },
+        "a1_T6": {
+          "mean_gap_imgs": -103.9,
+          "paired_range_imgs": 83,
+          "d4_divisor_imgs": 3.532,
+          "sigma_hat_imgs": 23.5,
+          "se_mean_imgs": 5.9,
+          "gate_2se_imgs": 11.7,
+          "unpaired_kd_range_imgs": 71,
+          "p_pooled": 0.0,
+          "n_seeds": 16
+        },
+        "match_T6": {
+          "mean_gap_imgs": -98.1,
+          "paired_range_imgs": 82,
+          "d4_divisor_imgs": 3.532,
+          "sigma_hat_imgs": 23.2,
+          "se_mean_imgs": 5.8,
+          "gate_2se_imgs": 11.6,
+          "unpaired_kd_range_imgs": 78,
+          "p_pooled": 0.0,
+          "n_seeds": 16
+        }
+      },
+      "readings": [
+        {
+          "statistic": "α 轴斜率（α=1.0 − α=0.3，锚点温度）",
+          "value_imgs": -2.2,
+          "cells": [
+            "a1_T3",
+            "a0.3_T3"
+          ],
+          "borrowed_floor_imgs": 90,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.02,
+          "own_2se_imgs": 12.6,
+          "under_own": false,
+          "ratio_own": 0.17,
+          "flips": false
+        },
+        {
+          "statistic": "判别格 α=1 列内 T 跨度（最高温 − 最低温）",
+          "value_imgs": 110.0,
+          "cells": [
+            "a1_T1",
+            "a1_T6"
+          ],
+          "borrowed_floor_imgs": 90,
+          "under_borrowed": true,
+          "ratio_borrowed": 1.22,
+          "own_2se_imgs": 12.6,
+          "under_own": true,
+          "ratio_own": 8.73,
+          "flips": false
+        },
+        {
+          "statistic": "T 主效应（跨 α 平均，T=6 − T=1）",
+          "value_imgs": -104.6,
+          "cells": [
+            "a0.3_T6",
+            "a0.7_T6",
+            "a1_T6",
+            "a0.3_T1",
+            "a0.7_T1",
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 90,
+          "under_borrowed": true,
+          "ratio_borrowed": 1.16,
+          "own_2se_imgs": 7.2,
+          "under_own": true,
+          "ratio_own": 14.53,
+          "flips": false
+        },
+        {
+          "statistic": "T 逐档 1→3（跨 α 平均）",
+          "value_imgs": -78.6,
+          "cells": [
+            "a0.3_T3",
+            "a0.7_T3",
+            "a1_T3",
+            "a0.3_T1",
+            "a0.7_T1",
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 90,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.87,
+          "own_2se_imgs": 5.6,
+          "under_own": true,
+          "ratio_own": 14.03,
+          "flips": true
+        },
+        {
+          "statistic": "T 逐档 3→6（跨 α 平均）",
+          "value_imgs": -26.0,
+          "cells": [
+            "a0.3_T6",
+            "a0.7_T6",
+            "a1_T6",
+            "a0.3_T3",
+            "a0.7_T3",
+            "a1_T3"
+          ],
+          "borrowed_floor_imgs": 90,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.29,
+          "own_2se_imgs": 8.6,
+          "under_own": true,
+          "ratio_own": 3.03,
+          "flips": true
+        },
+        {
+          "statistic": "不加热只借 argmax（α=1/T=1）",
+          "value_imgs": 6.1,
+          "cells": [
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 90,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.07,
+          "own_2se_imgs": 4.2,
+          "under_own": true,
+          "ratio_own": 1.45,
+          "flips": true
+        },
+        {
+          "statistic": "第4课反事实臂（α=0.3/T=3）",
+          "value_imgs": -73.3,
+          "cells": [
+            "a0.3_T3"
+          ],
+          "borrowed_floor_imgs": 90,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.81,
+          "own_2se_imgs": 8.8,
+          "under_own": true,
+          "ratio_own": 8.33,
+          "flips": true
+        },
+        {
+          "statistic": "配平臂换回的伤害（钉回 KD 梯度 vs 锚点 α=0.7）",
+          "value_imgs": 1.9,
+          "cells": [
+            "match_T6",
+            "a0.7_T6"
+          ],
+          "borrowed_floor_imgs": 90,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.02,
+          "own_2se_imgs": 17.0,
+          "under_own": false,
+          "ratio_own": 0.11,
+          "flips": false
+        }
+      ],
+      "n_flips": 4,
+      "flipped_readings": [
+        "T 逐档 1→3（跨 α 平均）",
+        "T 逐档 3→6（跨 α 平均）",
+        "不加热只借 argmax（α=1/T=1）",
+        "第4课反事实臂（α=0.3/T=3）"
+      ],
+      "cells_buried_by_borrowed_floor": {
+        "a0.3_T3": {
+          "mean_gap_imgs": -73.3,
+          "own_2se_imgs": 8.8,
+          "p_pooled": 0.0
+        },
+        "a0.7_T1": {
+          "mean_gap_imgs": 4.4,
+          "own_2se_imgs": 3.5,
+          "p_pooled": 0.00609374
+        },
+        "a0.7_T3": {
+          "mean_gap_imgs": -74.6,
+          "own_2se_imgs": 8.8,
+          "p_pooled": 0.0
+        },
+        "a1_T1": {
+          "mean_gap_imgs": 6.1,
+          "own_2se_imgs": 4.2,
+          "p_pooled": 0.00108637
+        },
+        "a1_T3": {
+          "mean_gap_imgs": -75.5,
+          "own_2se_imgs": 9.1,
+          "p_pooled": 0.0
+        }
+      },
+      "bar_spread": {
+        "min_own_2se": 3.4,
+        "max_own_2se": 12.5,
+        "vs_borrowed": [
+          0.04,
+          0.14
+        ]
+      },
+      "tier": "满数据8500",
+      "flows": 16,
+      "file": "compress_report_v4c_n16.json",
+      "note": "配平臂换回的是**伤害**（该档 T↑ 有害）"
+    },
+    "S128 | 中数据4500 | 3 条流": {
+      "width": 128,
+      "borrowed_floor_imgs": 20,
+      "n_flows": 3,
+      "d4_divisor_imgs": 1.693,
+      "own_bars": {
+        "1.0": {
+          "0.3": 15.0,
+          "0.7": 10.2,
+          "1.0": 15.0
+        },
+        "3.0": {
+          "0.3": 13.6,
+          "0.7": 23.9,
+          "1.0": 22.5
+        },
+        "6.0": {
+          "0.3": 16.4,
+          "0.7": 15.7,
+          "1.0": 22.5
+        }
+      },
+      "cells": {
+        "a0.3_T1": {
+          "mean_gap_imgs": 4.0,
+          "paired_range_imgs": 22,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 13.0,
+          "se_mean_imgs": 7.5,
+          "gate_2se_imgs": 15.0,
+          "unpaired_kd_range_imgs": 42,
+          "p_pooled": 0.2513221,
+          "n_seeds": 3
+        },
+        "a0.3_T3": {
+          "mean_gap_imgs": -48.3,
+          "paired_range_imgs": 20,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 11.8,
+          "se_mean_imgs": 6.8,
+          "gate_2se_imgs": 13.6,
+          "unpaired_kd_range_imgs": 27,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "a0.3_T6": {
+          "mean_gap_imgs": -46.0,
+          "paired_range_imgs": 24,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 14.2,
+          "se_mean_imgs": 8.2,
+          "gate_2se_imgs": 16.4,
+          "unpaired_kd_range_imgs": 34,
+          "p_pooled": 2.85e-06,
+          "n_seeds": 3
+        },
+        "a0.7_T1": {
+          "mean_gap_imgs": 6.3,
+          "paired_range_imgs": 15,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 8.9,
+          "se_mean_imgs": 5.1,
+          "gate_2se_imgs": 10.2,
+          "unpaired_kd_range_imgs": 42,
+          "p_pooled": 0.11265742,
+          "n_seeds": 3
+        },
+        "a0.7_T3": {
+          "mean_gap_imgs": -47.3,
+          "paired_range_imgs": 35,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 20.7,
+          "se_mean_imgs": 11.9,
+          "gate_2se_imgs": 23.9,
+          "unpaired_kd_range_imgs": 20,
+          "p_pooled": 3e-08,
+          "n_seeds": 3
+        },
+        "a0.7_T6": {
+          "mean_gap_imgs": -48.0,
+          "paired_range_imgs": 23,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 13.6,
+          "se_mean_imgs": 7.8,
+          "gate_2se_imgs": 15.7,
+          "unpaired_kd_range_imgs": 33,
+          "p_pooled": 6.17e-06,
+          "n_seeds": 3
+        },
+        "a1_T1": {
+          "mean_gap_imgs": 11.7,
+          "paired_range_imgs": 22,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 13.0,
+          "se_mean_imgs": 7.5,
+          "gate_2se_imgs": 15.0,
+          "unpaired_kd_range_imgs": 65,
+          "p_pooled": 0.01129155,
+          "n_seeds": 3
+        },
+        "a1_T3": {
+          "mean_gap_imgs": -48.0,
+          "paired_range_imgs": 33,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 19.5,
+          "se_mean_imgs": 11.3,
+          "gate_2se_imgs": 22.5,
+          "unpaired_kd_range_imgs": 14,
+          "p_pooled": 5e-08,
+          "n_seeds": 3
+        },
+        "a1_T6": {
+          "mean_gap_imgs": -56.0,
+          "paired_range_imgs": 33,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 19.5,
+          "se_mean_imgs": 11.3,
+          "gate_2se_imgs": 22.5,
+          "unpaired_kd_range_imgs": 28,
+          "p_pooled": 2.7e-07,
+          "n_seeds": 3
+        },
+        "match_T6": {
+          "mean_gap_imgs": -49.0,
+          "paired_range_imgs": 21,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 12.4,
+          "se_mean_imgs": 7.2,
+          "gate_2se_imgs": 14.3,
+          "unpaired_kd_range_imgs": 40,
+          "p_pooled": 1.51e-06,
+          "n_seeds": 3
+        }
+      },
+      "readings": [
+        {
+          "statistic": "α 轴斜率（α=1.0 − α=0.3，锚点温度）",
+          "value_imgs": 0.3,
+          "cells": [
+            "a1_T3",
+            "a0.3_T3"
+          ],
+          "borrowed_floor_imgs": 20,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.01,
+          "own_2se_imgs": 26.4,
+          "under_own": false,
+          "ratio_own": 0.01,
+          "flips": false
+        },
+        {
+          "statistic": "判别格 α=1 列内 T 跨度（最高温 − 最低温）",
+          "value_imgs": 67.7,
+          "cells": [
+            "a1_T1",
+            "a1_T6"
+          ],
+          "borrowed_floor_imgs": 20,
+          "under_borrowed": true,
+          "ratio_borrowed": 3.39,
+          "own_2se_imgs": 27.2,
+          "under_own": true,
+          "ratio_own": 2.49,
+          "flips": false
+        },
+        {
+          "statistic": "T 主效应（跨 α 平均，T=6 − T=1）",
+          "value_imgs": -57.3,
+          "cells": [
+            "a0.3_T6",
+            "a0.7_T6",
+            "a1_T6",
+            "a0.3_T1",
+            "a0.7_T1",
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 20,
+          "under_borrowed": true,
+          "ratio_borrowed": 2.87,
+          "own_2se_imgs": 13.2,
+          "under_own": true,
+          "ratio_own": 4.34,
+          "flips": false
+        },
+        {
+          "statistic": "T 逐档 1→3（跨 α 平均）",
+          "value_imgs": -55.2,
+          "cells": [
+            "a0.3_T3",
+            "a0.7_T3",
+            "a1_T3",
+            "a0.3_T1",
+            "a0.7_T1",
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 20,
+          "under_borrowed": true,
+          "ratio_borrowed": 2.76,
+          "own_2se_imgs": 14.2,
+          "under_own": true,
+          "ratio_own": 3.89,
+          "flips": false
+        },
+        {
+          "statistic": "T 逐档 3→6（跨 α 平均）",
+          "value_imgs": -2.1,
+          "cells": [
+            "a0.3_T6",
+            "a0.7_T6",
+            "a1_T6",
+            "a0.3_T3",
+            "a0.7_T3",
+            "a1_T3"
+          ],
+          "borrowed_floor_imgs": 20,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.11,
+          "own_2se_imgs": 16.0,
+          "under_own": false,
+          "ratio_own": 0.13,
+          "flips": false
+        },
+        {
+          "statistic": "不加热只借 argmax（α=1/T=1）",
+          "value_imgs": 11.7,
+          "cells": [
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 20,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.58,
+          "own_2se_imgs": 15.0,
+          "under_own": false,
+          "ratio_own": 0.78,
+          "flips": false
+        },
+        {
+          "statistic": "第4课反事实臂（α=0.3/T=3）",
+          "value_imgs": -48.3,
+          "cells": [
+            "a0.3_T3"
+          ],
+          "borrowed_floor_imgs": 20,
+          "under_borrowed": true,
+          "ratio_borrowed": 2.42,
+          "own_2se_imgs": 13.6,
+          "under_own": true,
+          "ratio_own": 3.55,
+          "flips": false
+        },
+        {
+          "statistic": "配平臂换回的伤害（钉回 KD 梯度 vs 锚点 α=0.7）",
+          "value_imgs": -1.0,
+          "cells": [
+            "match_T6",
+            "a0.7_T6"
+          ],
+          "borrowed_floor_imgs": 20,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.05,
+          "own_2se_imgs": 21.2,
+          "under_own": false,
+          "ratio_own": 0.05,
+          "flips": false
+        }
+      ],
+      "n_flips": 0,
+      "flipped_readings": [],
+      "cells_buried_by_borrowed_floor": {},
+      "bar_spread": {
+        "min_own_2se": 10.2,
+        "max_own_2se": 23.9,
+        "vs_borrowed": [
+          0.51,
+          1.19
+        ]
+      },
+      "tier": "中数据4500",
+      "flows": 3,
+      "file": "compress_report_v4c_mid.json",
+      "note": "该档 T↑ 同样有害，配平臂换回的是伤害"
+    },
+    "S64 | 满数据8500 | 3 条流": {
+      "width": 64,
+      "borrowed_floor_imgs": 53,
+      "n_flows": 3,
+      "d4_divisor_imgs": 1.693,
+      "own_bars": {
+        "1.0": {
+          "0.3": 6.1,
+          "0.7": 6.1,
+          "1.0": 6.1
+        },
+        "3.0": {
+          "0.3": 17.1,
+          "0.7": 31.4,
+          "1.0": 19.8
+        },
+        "6.0": {
+          "0.3": 10.9,
+          "0.7": 18.4,
+          "1.0": 12.3
+        }
+      },
+      "cells": {
+        "a0.3_T1": {
+          "mean_gap_imgs": 2.7,
+          "paired_range_imgs": 9,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 5.3,
+          "se_mean_imgs": 3.1,
+          "gate_2se_imgs": 6.1,
+          "unpaired_kd_range_imgs": 30,
+          "p_pooled": 0.37415171,
+          "n_seeds": 3
+        },
+        "a0.3_T3": {
+          "mean_gap_imgs": -76.3,
+          "paired_range_imgs": 25,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 14.8,
+          "se_mean_imgs": 8.5,
+          "gate_2se_imgs": 17.1,
+          "unpaired_kd_range_imgs": 48,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "a0.3_T6": {
+          "mean_gap_imgs": -134.3,
+          "paired_range_imgs": 16,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 9.5,
+          "se_mean_imgs": 5.5,
+          "gate_2se_imgs": 10.9,
+          "unpaired_kd_range_imgs": 39,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "a0.7_T1": {
+          "mean_gap_imgs": 4.3,
+          "paired_range_imgs": 9,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 5.3,
+          "se_mean_imgs": 3.1,
+          "gate_2se_imgs": 6.1,
+          "unpaired_kd_range_imgs": 32,
+          "p_pooled": 0.19797914,
+          "n_seeds": 3
+        },
+        "a0.7_T3": {
+          "mean_gap_imgs": -77.3,
+          "paired_range_imgs": 46,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 27.2,
+          "se_mean_imgs": 15.7,
+          "gate_2se_imgs": 31.4,
+          "unpaired_kd_range_imgs": 53,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "a0.7_T6": {
+          "mean_gap_imgs": -145.0,
+          "paired_range_imgs": 27,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 15.9,
+          "se_mean_imgs": 9.2,
+          "gate_2se_imgs": 18.4,
+          "unpaired_kd_range_imgs": 42,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "a1_T1": {
+          "mean_gap_imgs": 8.0,
+          "paired_range_imgs": 9,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 5.3,
+          "se_mean_imgs": 3.1,
+          "gate_2se_imgs": 6.1,
+          "unpaired_kd_range_imgs": 33,
+          "p_pooled": 0.03378818,
+          "n_seeds": 3
+        },
+        "a1_T3": {
+          "mean_gap_imgs": -82.0,
+          "paired_range_imgs": 29,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 17.1,
+          "se_mean_imgs": 9.9,
+          "gate_2se_imgs": 19.8,
+          "unpaired_kd_range_imgs": 36,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "a1_T6": {
+          "mean_gap_imgs": -148.3,
+          "paired_range_imgs": 18,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 10.6,
+          "se_mean_imgs": 6.1,
+          "gate_2se_imgs": 12.3,
+          "unpaired_kd_range_imgs": 26,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "match_T6": {
+          "mean_gap_imgs": -132.3,
+          "paired_range_imgs": 44,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 26.0,
+          "se_mean_imgs": 15.0,
+          "gate_2se_imgs": 30.0,
+          "unpaired_kd_range_imgs": 59,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        }
+      },
+      "readings": [
+        {
+          "statistic": "α 轴斜率（α=1.0 − α=0.3，锚点温度）",
+          "value_imgs": -5.7,
+          "cells": [
+            "a1_T3",
+            "a0.3_T3"
+          ],
+          "borrowed_floor_imgs": 53,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.11,
+          "own_2se_imgs": 26.0,
+          "under_own": false,
+          "ratio_own": 0.22,
+          "flips": false
+        },
+        {
+          "statistic": "判别格 α=1 列内 T 跨度（最高温 − 最低温）",
+          "value_imgs": 156.3,
+          "cells": [
+            "a1_T1",
+            "a1_T6"
+          ],
+          "borrowed_floor_imgs": 53,
+          "under_borrowed": true,
+          "ratio_borrowed": 2.95,
+          "own_2se_imgs": 13.6,
+          "under_own": true,
+          "ratio_own": 11.49,
+          "flips": false
+        },
+        {
+          "statistic": "T 主效应（跨 α 平均，T=6 − T=1）",
+          "value_imgs": -147.5,
+          "cells": [
+            "a0.3_T6",
+            "a0.7_T6",
+            "a1_T6",
+            "a0.3_T1",
+            "a0.7_T1",
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 53,
+          "under_borrowed": true,
+          "ratio_borrowed": 2.78,
+          "own_2se_imgs": 9.0,
+          "under_own": true,
+          "ratio_own": 16.39,
+          "flips": false
+        },
+        {
+          "statistic": "T 逐档 1→3（跨 α 平均）",
+          "value_imgs": -83.5,
+          "cells": [
+            "a0.3_T3",
+            "a0.7_T3",
+            "a1_T3",
+            "a0.3_T1",
+            "a0.7_T1",
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 53,
+          "under_borrowed": true,
+          "ratio_borrowed": 1.58,
+          "own_2se_imgs": 14.0,
+          "under_own": true,
+          "ratio_own": 5.97,
+          "flips": false
+        },
+        {
+          "statistic": "T 逐档 3→6（跨 α 平均）",
+          "value_imgs": -64.0,
+          "cells": [
+            "a0.3_T6",
+            "a0.7_T6",
+            "a1_T6",
+            "a0.3_T3",
+            "a0.7_T3",
+            "a1_T3"
+          ],
+          "borrowed_floor_imgs": 53,
+          "under_borrowed": true,
+          "ratio_borrowed": 1.21,
+          "own_2se_imgs": 16.0,
+          "under_own": true,
+          "ratio_own": 4.0,
+          "flips": false
+        },
+        {
+          "statistic": "不加热只借 argmax（α=1/T=1）",
+          "value_imgs": 8.0,
+          "cells": [
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 53,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.15,
+          "own_2se_imgs": 6.2,
+          "under_own": true,
+          "ratio_own": 1.29,
+          "flips": true
+        },
+        {
+          "statistic": "第4课反事实臂（α=0.3/T=3）",
+          "value_imgs": -76.3,
+          "cells": [
+            "a0.3_T3"
+          ],
+          "borrowed_floor_imgs": 53,
+          "under_borrowed": true,
+          "ratio_borrowed": 1.44,
+          "own_2se_imgs": 17.0,
+          "under_own": true,
+          "ratio_own": 4.49,
+          "flips": false
+        },
+        {
+          "statistic": "配平臂换回的伤害（钉回 KD 梯度 vs 锚点 α=0.7）",
+          "value_imgs": 12.7,
+          "cells": [
+            "match_T6",
+            "a0.7_T6"
+          ],
+          "borrowed_floor_imgs": 53,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.24,
+          "own_2se_imgs": 35.2,
+          "under_own": false,
+          "ratio_own": 0.36,
+          "flips": false
+        }
+      ],
+      "n_flips": 1,
+      "flipped_readings": [
+        "不加热只借 argmax（α=1/T=1）"
+      ],
+      "cells_buried_by_borrowed_floor": {
+        "a1_T1": {
+          "mean_gap_imgs": 8.0,
+          "own_2se_imgs": 6.1,
+          "p_pooled": 0.03378818
+        }
+      },
+      "bar_spread": {
+        "min_own_2se": 6.1,
+        "max_own_2se": 31.4,
+        "vs_borrowed": [
+          0.12,
+          0.59
+        ]
+      },
+      "tier": "满数据8500",
+      "flows": 3,
+      "file": "compress_report_v4c_s64.json",
+      "note": "配平臂换回的是**伤害**（该档 T↑ 有害）"
+    },
+    "S64 | 中数据4500 | 3 条流": {
+      "width": 64,
+      "borrowed_floor_imgs": 52,
+      "n_flows": 3,
+      "d4_divisor_imgs": 1.693,
+      "own_bars": {
+        "1.0": {
+          "0.3": 15.0,
+          "0.7": 2.0,
+          "1.0": 12.3
+        },
+        "3.0": {
+          "0.3": 23.9,
+          "0.7": 19.8,
+          "1.0": 8.9
+        },
+        "6.0": {
+          "0.3": 9.5,
+          "0.7": 25.2,
+          "1.0": 32.7
+        }
+      },
+      "cells": {
+        "a0.3_T1": {
+          "mean_gap_imgs": -3.7,
+          "paired_range_imgs": 22,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 13.0,
+          "se_mean_imgs": 7.5,
+          "gate_2se_imgs": 15.0,
+          "unpaired_kd_range_imgs": 33,
+          "p_pooled": 0.36336326,
+          "n_seeds": 3
+        },
+        "a0.3_T3": {
+          "mean_gap_imgs": -77.0,
+          "paired_range_imgs": 35,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 20.7,
+          "se_mean_imgs": 11.9,
+          "gate_2se_imgs": 23.9,
+          "unpaired_kd_range_imgs": 54,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "a0.3_T6": {
+          "mean_gap_imgs": -107.0,
+          "paired_range_imgs": 14,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 8.3,
+          "se_mean_imgs": 4.8,
+          "gate_2se_imgs": 9.5,
+          "unpaired_kd_range_imgs": 40,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "a0.7_T1": {
+          "mean_gap_imgs": 6.0,
+          "paired_range_imgs": 3,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 1.8,
+          "se_mean_imgs": 1.0,
+          "gate_2se_imgs": 2.0,
+          "unpaired_kd_range_imgs": 47,
+          "p_pooled": 0.19733842,
+          "n_seeds": 3
+        },
+        "a0.7_T3": {
+          "mean_gap_imgs": -78.3,
+          "paired_range_imgs": 29,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 17.1,
+          "se_mean_imgs": 9.9,
+          "gate_2se_imgs": 19.8,
+          "unpaired_kd_range_imgs": 52,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "a0.7_T6": {
+          "mean_gap_imgs": -132.7,
+          "paired_range_imgs": 37,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 21.9,
+          "se_mean_imgs": 12.6,
+          "gate_2se_imgs": 25.2,
+          "unpaired_kd_range_imgs": 10,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "a1_T1": {
+          "mean_gap_imgs": 3.0,
+          "paired_range_imgs": 18,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 10.6,
+          "se_mean_imgs": 6.1,
+          "gate_2se_imgs": 12.3,
+          "unpaired_kd_range_imgs": 53,
+          "p_pooled": 0.60339724,
+          "n_seeds": 3
+        },
+        "a1_T3": {
+          "mean_gap_imgs": -82.0,
+          "paired_range_imgs": 13,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 7.7,
+          "se_mean_imgs": 4.4,
+          "gate_2se_imgs": 8.9,
+          "unpaired_kd_range_imgs": 36,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "a1_T6": {
+          "mean_gap_imgs": -138.0,
+          "paired_range_imgs": 48,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 28.4,
+          "se_mean_imgs": 16.4,
+          "gate_2se_imgs": 32.7,
+          "unpaired_kd_range_imgs": 13,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        },
+        "match_T6": {
+          "mean_gap_imgs": -126.3,
+          "paired_range_imgs": 37,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 21.9,
+          "se_mean_imgs": 12.6,
+          "gate_2se_imgs": 25.2,
+          "unpaired_kd_range_imgs": 16,
+          "p_pooled": 0.0,
+          "n_seeds": 3
+        }
+      },
+      "readings": [
+        {
+          "statistic": "α 轴斜率（α=1.0 − α=0.3，锚点温度）",
+          "value_imgs": -5.0,
+          "cells": [
+            "a1_T3",
+            "a0.3_T3"
+          ],
+          "borrowed_floor_imgs": 52,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.1,
+          "own_2se_imgs": 25.4,
+          "under_own": false,
+          "ratio_own": 0.2,
+          "flips": false
+        },
+        {
+          "statistic": "判别格 α=1 列内 T 跨度（最高温 − 最低温）",
+          "value_imgs": 141.0,
+          "cells": [
+            "a1_T1",
+            "a1_T6"
+          ],
+          "borrowed_floor_imgs": 52,
+          "under_borrowed": true,
+          "ratio_borrowed": 2.71,
+          "own_2se_imgs": 35.0,
+          "under_own": true,
+          "ratio_own": 4.03,
+          "flips": false
+        },
+        {
+          "statistic": "T 主效应（跨 α 平均，T=6 − T=1）",
+          "value_imgs": -127.7,
+          "cells": [
+            "a0.3_T6",
+            "a0.7_T6",
+            "a1_T6",
+            "a0.3_T1",
+            "a0.7_T1",
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 52,
+          "under_borrowed": true,
+          "ratio_borrowed": 2.46,
+          "own_2se_imgs": 15.6,
+          "under_own": true,
+          "ratio_own": 8.18,
+          "flips": false
+        },
+        {
+          "statistic": "T 逐档 1→3（跨 α 平均）",
+          "value_imgs": -80.9,
+          "cells": [
+            "a0.3_T3",
+            "a0.7_T3",
+            "a1_T3",
+            "a0.3_T1",
+            "a0.7_T1",
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 52,
+          "under_borrowed": true,
+          "ratio_borrowed": 1.56,
+          "own_2se_imgs": 12.6,
+          "under_own": true,
+          "ratio_own": 6.42,
+          "flips": false
+        },
+        {
+          "statistic": "T 逐档 3→6（跨 α 平均）",
+          "value_imgs": -46.8,
+          "cells": [
+            "a0.3_T6",
+            "a0.7_T6",
+            "a1_T6",
+            "a0.3_T3",
+            "a0.7_T3",
+            "a1_T3"
+          ],
+          "borrowed_floor_imgs": 52,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.9,
+          "own_2se_imgs": 17.8,
+          "under_own": true,
+          "ratio_own": 2.63,
+          "flips": true
+        },
+        {
+          "statistic": "不加热只借 argmax（α=1/T=1）",
+          "value_imgs": 3.0,
+          "cells": [
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 52,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.06,
+          "own_2se_imgs": 12.2,
+          "under_own": false,
+          "ratio_own": 0.25,
+          "flips": false
+        },
+        {
+          "statistic": "第4课反事实臂（α=0.3/T=3）",
+          "value_imgs": -77.0,
+          "cells": [
+            "a0.3_T3"
+          ],
+          "borrowed_floor_imgs": 52,
+          "under_borrowed": true,
+          "ratio_borrowed": 1.48,
+          "own_2se_imgs": 23.8,
+          "under_own": true,
+          "ratio_own": 3.24,
+          "flips": false
+        },
+        {
+          "statistic": "配平臂换回的伤害（钉回 KD 梯度 vs 锚点 α=0.7）",
+          "value_imgs": 6.4,
+          "cells": [
+            "match_T6",
+            "a0.7_T6"
+          ],
+          "borrowed_floor_imgs": 52,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.12,
+          "own_2se_imgs": 35.6,
+          "under_own": false,
+          "ratio_own": 0.18,
+          "flips": false
+        }
+      ],
+      "n_flips": 1,
+      "flipped_readings": [
+        "T 逐档 3→6（跨 α 平均）"
+      ],
+      "cells_buried_by_borrowed_floor": {
+        "a0.7_T1": {
+          "mean_gap_imgs": 6.0,
+          "own_2se_imgs": 2.0,
+          "p_pooled": 0.19733842
+        }
+      },
+      "bar_spread": {
+        "min_own_2se": 2.0,
+        "max_own_2se": 32.7,
+        "vs_borrowed": [
+          0.04,
+          0.63
+        ]
+      },
+      "tier": "中数据4500",
+      "flows": 3,
+      "file": "compress_report_v4c_s64_mid.json",
+      "note": "该档 T↑ 同样有害，配平臂换回的是伤害"
+    },
+    "S128 | 低数据2000 | 3 条流": {
+      "width": 128,
+      "borrowed_floor_imgs": 37,
+      "n_flows": 3,
+      "d4_divisor_imgs": 1.693,
+      "own_bars": {
+        "1.0": {
+          "0.3": 5.5,
+          "0.7": 6.8,
+          "1.0": 15.7
+        },
+        "3.0": {
+          "0.3": 19.1,
+          "0.7": 8.2,
+          "1.0": 13.0
+        },
+        "6.0": {
+          "0.3": 21.8,
+          "0.7": 31.4,
+          "1.0": 37.5
+        }
+      },
+      "cells": {
+        "a0.3_T1": {
+          "mean_gap_imgs": 2.7,
+          "paired_range_imgs": 8,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 4.7,
+          "se_mean_imgs": 2.7,
+          "gate_2se_imgs": 5.5,
+          "unpaired_kd_range_imgs": 29,
+          "p_pooled": 0.50851318,
+          "n_seeds": 3
+        },
+        "a0.3_T3": {
+          "mean_gap_imgs": 9.0,
+          "paired_range_imgs": 28,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 16.5,
+          "se_mean_imgs": 9.5,
+          "gate_2se_imgs": 19.1,
+          "unpaired_kd_range_imgs": 53,
+          "p_pooled": 0.31479134,
+          "n_seeds": 3
+        },
+        "a0.3_T6": {
+          "mean_gap_imgs": 55.0,
+          "paired_range_imgs": 32,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 18.9,
+          "se_mean_imgs": 10.9,
+          "gate_2se_imgs": 21.8,
+          "unpaired_kd_range_imgs": 14,
+          "p_pooled": 1.87e-06,
+          "n_seeds": 3
+        },
+        "a0.7_T1": {
+          "mean_gap_imgs": 9.3,
+          "paired_range_imgs": 10,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 5.9,
+          "se_mean_imgs": 3.4,
+          "gate_2se_imgs": 6.8,
+          "unpaired_kd_range_imgs": 25,
+          "p_pooled": 0.07987403,
+          "n_seeds": 3
+        },
+        "a0.7_T3": {
+          "mean_gap_imgs": 21.3,
+          "paired_range_imgs": 12,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 7.1,
+          "se_mean_imgs": 4.1,
+          "gate_2se_imgs": 8.2,
+          "unpaired_kd_range_imgs": 37,
+          "p_pooled": 0.03044803,
+          "n_seeds": 3
+        },
+        "a0.7_T6": {
+          "mean_gap_imgs": 69.7,
+          "paired_range_imgs": 46,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 27.2,
+          "se_mean_imgs": 15.7,
+          "gate_2se_imgs": 31.4,
+          "unpaired_kd_range_imgs": 22,
+          "p_pooled": 1e-08,
+          "n_seeds": 3
+        },
+        "a1_T1": {
+          "mean_gap_imgs": 15.3,
+          "paired_range_imgs": 23,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 13.6,
+          "se_mean_imgs": 7.8,
+          "gate_2se_imgs": 15.7,
+          "unpaired_kd_range_imgs": 28,
+          "p_pooled": 0.01573294,
+          "n_seeds": 3
+        },
+        "a1_T3": {
+          "mean_gap_imgs": 21.3,
+          "paired_range_imgs": 19,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 11.2,
+          "se_mean_imgs": 6.5,
+          "gate_2se_imgs": 13.0,
+          "unpaired_kd_range_imgs": 27,
+          "p_pooled": 0.03567047,
+          "n_seeds": 3
+        },
+        "a1_T6": {
+          "mean_gap_imgs": 71.7,
+          "paired_range_imgs": 55,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 32.5,
+          "se_mean_imgs": 18.8,
+          "gate_2se_imgs": 37.5,
+          "unpaired_kd_range_imgs": 20,
+          "p_pooled": 1e-08,
+          "n_seeds": 3
+        },
+        "match_T6": {
+          "mean_gap_imgs": 62.7,
+          "paired_range_imgs": 49,
+          "d4_divisor_imgs": 1.693,
+          "sigma_hat_imgs": 28.9,
+          "se_mean_imgs": 16.7,
+          "gate_2se_imgs": 33.4,
+          "unpaired_kd_range_imgs": 25,
+          "p_pooled": 1.1e-07,
+          "n_seeds": 3
+        }
+      },
+      "readings": [
+        {
+          "statistic": "α 轴斜率（α=1.0 − α=0.3，锚点温度）",
+          "value_imgs": 12.3,
+          "cells": [
+            "a1_T3",
+            "a0.3_T3"
+          ],
+          "borrowed_floor_imgs": 37,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.33,
+          "own_2se_imgs": 23.0,
+          "under_own": false,
+          "ratio_own": 0.53,
+          "flips": false
+        },
+        {
+          "statistic": "判别格 α=1 列内 T 跨度（最高温 − 最低温）",
+          "value_imgs": 56.4,
+          "cells": [
+            "a1_T6",
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 37,
+          "under_borrowed": true,
+          "ratio_borrowed": 1.52,
+          "own_2se_imgs": 40.8,
+          "under_own": true,
+          "ratio_own": 1.38,
+          "flips": false
+        },
+        {
+          "statistic": "T 主效应（跨 α 平均，T=6 − T=1）",
+          "value_imgs": 56.4,
+          "cells": [
+            "a0.3_T6",
+            "a0.7_T6",
+            "a1_T6",
+            "a0.3_T1",
+            "a0.7_T1",
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 37,
+          "under_borrowed": true,
+          "ratio_borrowed": 1.52,
+          "own_2se_imgs": 18.8,
+          "under_own": true,
+          "ratio_own": 3.0,
+          "flips": false
+        },
+        {
+          "statistic": "T 逐档 1→3（跨 α 平均）",
+          "value_imgs": 8.1,
+          "cells": [
+            "a0.3_T3",
+            "a0.7_T3",
+            "a1_T3",
+            "a0.3_T1",
+            "a0.7_T1",
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 37,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.22,
+          "own_2se_imgs": 10.0,
+          "under_own": false,
+          "ratio_own": 0.81,
+          "flips": false
+        },
+        {
+          "statistic": "T 逐档 3→6（跨 α 平均）",
+          "value_imgs": 48.3,
+          "cells": [
+            "a0.3_T6",
+            "a0.7_T6",
+            "a1_T6",
+            "a0.3_T3",
+            "a0.7_T3",
+            "a1_T3"
+          ],
+          "borrowed_floor_imgs": 37,
+          "under_borrowed": true,
+          "ratio_borrowed": 1.3,
+          "own_2se_imgs": 19.6,
+          "under_own": true,
+          "ratio_own": 2.46,
+          "flips": false
+        },
+        {
+          "statistic": "不加热只借 argmax（α=1/T=1）",
+          "value_imgs": 15.3,
+          "cells": [
+            "a1_T1"
+          ],
+          "borrowed_floor_imgs": 37,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.41,
+          "own_2se_imgs": 15.6,
+          "under_own": false,
+          "ratio_own": 0.98,
+          "flips": false
+        },
+        {
+          "statistic": "第4课反事实臂（α=0.3/T=3）",
+          "value_imgs": 9.0,
+          "cells": [
+            "a0.3_T3"
+          ],
+          "borrowed_floor_imgs": 37,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.24,
+          "own_2se_imgs": 19.0,
+          "under_own": false,
+          "ratio_own": 0.47,
+          "flips": false
+        },
+        {
+          "statistic": "配平臂换回的伤害（钉回 KD 梯度 vs 锚点 α=0.7）",
+          "value_imgs": -7.0,
+          "cells": [
+            "match_T6",
+            "a0.7_T6"
+          ],
+          "borrowed_floor_imgs": 37,
+          "under_borrowed": false,
+          "ratio_borrowed": 0.19,
+          "own_2se_imgs": 45.8,
+          "under_own": false,
+          "ratio_own": 0.15,
+          "flips": false
+        }
+      ],
+      "n_flips": 0,
+      "flipped_readings": [],
+      "cells_buried_by_borrowed_floor": {
+        "a0.7_T1": {
+          "mean_gap_imgs": 9.3,
+          "own_2se_imgs": 6.8,
+          "p_pooled": 0.07987403
+        },
+        "a0.7_T3": {
+          "mean_gap_imgs": 21.3,
+          "own_2se_imgs": 8.2,
+          "p_pooled": 0.03044803
+        },
+        "a1_T3": {
+          "mean_gap_imgs": 21.3,
+          "own_2se_imgs": 13.0,
+          "p_pooled": 0.03567047
+        }
+      },
+      "bar_spread": {
+        "min_own_2se": 5.5,
+        "max_own_2se": 37.5,
+        "vs_borrowed": [
+          0.15,
+          1.01
+        ]
+      },
+      "tier": "低数据2000",
+      "flows": 3,
+      "file": "compress_report_v4c_low.json",
+      "note": "该档 T 轴已翻号（T↑ 有益），所以配平臂换回 −7.0 张要读成**丢掉 7 张收益**"
+    }
+  },
+  "limitations": [
+    "每格自己的底由**该本账自己的流数**条配对差值算：3 条流时极差是 σ 的粗估（±约 40%）且没有二次底；8 条流时 σ̂ 本身仍是「一次极差 ÷ 册上系数」，不是对分布的估计",
+    "同一坐标并排的 3 条流 / 8 条流两本账**不能比翻档条数**：借来的底随流数涨（41 → 77 张），每格自己的闸是 σ̂/√n，两栏分母不同；跨流数只能各读各的配对 CI",
+    "同批流跨格复用 ⇒ 跨格统计量的 SE 是下界，倍数(己)偏乐观",
+    "逐图 p_pooled 同审计②：种子间翻牌不独立，只当方向参考",
+    "刻度只到『过不过自己的闸』，没做多重比较校正（每本账 9 条判决一起看）",
+    "S64 × 中数据4500 那一本的底（52 张）来自第4课b 同坐标那本，而那一本自己声明『没有第4课的档案值可逐位对账』⇒ 这一列的底没有独立于本课的锚点，换底翻档的解释力比另外几本弱一档",
+    "本表只重算闸门，不改判：翻档的判决要么补种子（第4课e）要么降级为措辞"
+  ]
+}

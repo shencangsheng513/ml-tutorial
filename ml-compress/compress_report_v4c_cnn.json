@@ -1,0 +1,859 @@
+{
+  "tier": "满数据8500",
+  "width": 128,
+  "student_arch": "cnn",
+  "alphas": [
+    0.3,
+    0.7,
+    1.0
+  ],
+  "temps": [
+    1.0,
+    3.0,
+    6.0
+  ],
+  "seeds": [
+    42,
+    7,
+    2026
+  ],
+  "n_seeds_arg": 3,
+  "test_n": 10000,
+  "train_fit_n": 8500,
+  "anchor_hyperparams": {
+    "alpha": 0.7,
+    "T": 3.0
+  },
+  "anchor_archive_from": "compress_report_v4b_cnn.json",
+  "seed_floor_imgs_from_v4b": 9,
+  "seed_floor_imgs_detail": {
+    "gate_used_kd_arm": 9,
+    "ce_arm": 31,
+    "note": "被门控量是 KD−CE 之差；CE 底更大时，介于两数之间的读数按保守底就不显著"
+  },
+  "soft_label_audit_by_T": {
+    "a1_T1": {
+      "T": 1.0,
+      "原始": {
+        "T": 1.0,
+        "mean_top1": 0.9948,
+        "pct_top1_gt_0.99": 93.3,
+        "mean_margin_top1_top2": 0.9902,
+        "mean_p2": 0.0046
+      },
+      "除以T": {
+        "T": 1.0,
+        "mean_top1": 0.9948,
+        "pct_top1_gt_0.99": 93.3,
+        "mean_margin_top1_top2": 0.9902,
+        "mean_p2": 0.0046
+      }
+    },
+    "a1_T3": {
+      "T": 3.0,
+      "原始": {
+        "T": 3.0,
+        "mean_top1": 0.9948,
+        "pct_top1_gt_0.99": 93.3,
+        "mean_margin_top1_top2": 0.9902,
+        "mean_p2": 0.0046
+      },
+      "除以T": {
+        "T": 3.0,
+        "mean_top1": 0.9249,
+        "pct_top1_gt_0.99": 23.1,
+        "mean_margin_top1_top2": 0.884,
+        "mean_p2": 0.041
+      }
+    },
+    "a1_T6": {
+      "T": 6.0,
+      "原始": {
+        "T": 6.0,
+        "mean_top1": 0.9948,
+        "pct_top1_gt_0.99": 93.3,
+        "mean_margin_top1_top2": 0.9902,
+        "mean_p2": 0.0046
+      },
+      "除以T": {
+        "T": 6.0,
+        "mean_top1": 0.69,
+        "pct_top1_gt_0.99": 0.0,
+        "mean_margin_top1_top2": 0.5871,
+        "mean_p2": 0.1029
+      }
+    }
+  },
+  "gradient_probe": {
+    "t2_tolerance_pct": 15.0,
+    "matched_temps": [
+      6.0
+    ],
+    "unmatchable_temps": [
+      1.0
+    ],
+    "by_T": {
+      "1.0": {
+        "g_ce": 0.27143,
+        "g_kd_unit": 0.27055,
+        "kd_share_at_anchor_alpha": 0.699,
+        "g_kd_drift_vs_anchor_pct": -66.6,
+        "alpha_to_match_anchor": 2.093,
+        "matchable": false
+      },
+      "3.0": {
+        "g_ce": 0.27143,
+        "g_kd_unit": 0.80891,
+        "kd_share_at_anchor_alpha": 0.874,
+        "g_kd_drift_vs_anchor_pct": 0.0,
+        "alpha_to_match_anchor": 0.7,
+        "matchable": true
+      },
+      "6.0": {
+        "g_ce": 0.27143,
+        "g_kd_unit": 1.3738,
+        "kd_share_at_anchor_alpha": 0.922,
+        "g_kd_drift_vs_anchor_pct": 69.8,
+        "alpha_to_match_anchor": 0.412,
+        "matchable": true
+      }
+    }
+  },
+  "predictions_ex_ante": {
+    "H1_alpha_axis": [
+      {
+        "alpha": 0.3,
+        "h1_gap_imgs": 3,
+        "h1_expect_T_flat": "该 α 三个 T 之差 ≤ 种子底 9 张"
+      },
+      {
+        "alpha": 0.7,
+        "h1_gap_imgs": 6,
+        "h1_expect_T_flat": "该 α 三个 T 之差 ≤ 种子底 9 张"
+      },
+      {
+        "alpha": 1.0,
+        "h1_gap_imgs": 9,
+        "h1_expect_T_flat": "该 α 三个 T 之差 ≤ 种子底 9 张"
+      }
+    ],
+    "H1_alpha_max_T_column_flat": true,
+    "H2_alpha_max_T_column_rises": true,
+    "H1_pred_gap_imgs": {
+      "0.3": 3,
+      "0.7": 6,
+      "1.0": 9
+    }
+  },
+  "parity_anchor": {
+    "this_run": {
+      "acc": 0.968,
+      "wrong": 320,
+      "broken": 69,
+      "fixed": 75
+    },
+    "archive": {
+      "acc": 0.968,
+      "wrong": 320,
+      "broken": 69,
+      "fixed": 75
+    },
+    "ce_acc_this_run": 0.9674,
+    "ce_acc_archive": 0.9674
+  },
+  "cross_script_gap_parity": {
+    "verdict": "这一发没有可借的逐流账（3 条流那本底只记极差，不记逐流 gap）",
+    "flow_order_matches": null
+  },
+  "ce_ref_by_seed": {
+    "42": {
+      "acc": 0.9674,
+      "wrong": 326
+    },
+    "7": {
+      "acc": 0.9672,
+      "wrong": 328
+    },
+    "2026": {
+      "acc": 0.9703,
+      "wrong": 297
+    }
+  },
+  "grid": {
+    "a0.3_T1": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 0.3,
+          "T": 1.0,
+          "wrong_kd": 323,
+          "wrong_ce": 326,
+          "acc_kd": 0.9677,
+          "gap_imgs": 3,
+          "broken": 18,
+          "fixed": 21,
+          "p_sign": 0.749259
+        },
+        {
+          "seed": 7,
+          "alpha": 0.3,
+          "T": 1.0,
+          "wrong_kd": 326,
+          "wrong_ce": 328,
+          "acc_kd": 0.9674,
+          "gap_imgs": 2,
+          "broken": 30,
+          "fixed": 32,
+          "p_sign": 0.899076
+        },
+        {
+          "seed": 2026,
+          "alpha": 0.3,
+          "T": 1.0,
+          "wrong_kd": 294,
+          "wrong_ce": 297,
+          "acc_kd": 0.9706,
+          "gap_imgs": 3,
+          "broken": 17,
+          "fixed": 20,
+          "p_sign": 0.742829
+        }
+      ],
+      "gaps_imgs": [
+        3,
+        2,
+        3
+      ],
+      "mean_gap_imgs": 2.7,
+      "range_imgs": 1,
+      "same_dir_as_h1": 0,
+      "pooled": {
+        "broken": 65,
+        "fixed": 73
+      },
+      "p_pooled": 0.55141328
+    },
+    "a0.3_T3": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 0.3,
+          "T": 3.0,
+          "wrong_kd": 320,
+          "wrong_ce": 326,
+          "acc_kd": 0.968,
+          "gap_imgs": 6,
+          "broken": 56,
+          "fixed": 62,
+          "p_sign": 0.645497
+        },
+        {
+          "seed": 7,
+          "alpha": 0.3,
+          "T": 3.0,
+          "wrong_kd": 314,
+          "wrong_ce": 328,
+          "acc_kd": 0.9686,
+          "gap_imgs": 14,
+          "broken": 41,
+          "fixed": 55,
+          "p_sign": 0.184286
+        },
+        {
+          "seed": 2026,
+          "alpha": 0.3,
+          "T": 3.0,
+          "wrong_kd": 326,
+          "wrong_ce": 297,
+          "acc_kd": 0.9674,
+          "gap_imgs": -29,
+          "broken": 75,
+          "fixed": 46,
+          "p_sign": 0.010611
+        }
+      ],
+      "gaps_imgs": [
+        6,
+        14,
+        -29
+      ],
+      "mean_gap_imgs": -3.0,
+      "range_imgs": 43,
+      "same_dir_as_h1": 1,
+      "pooled": {
+        "broken": 172,
+        "fixed": 163
+      },
+      "p_pooled": 0.66211261
+    },
+    "a0.3_T6": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 0.3,
+          "T": 6.0,
+          "wrong_kd": 286,
+          "wrong_ce": 326,
+          "acc_kd": 0.9714,
+          "gap_imgs": 40,
+          "broken": 63,
+          "fixed": 103,
+          "p_sign": 0.002369
+        },
+        {
+          "seed": 7,
+          "alpha": 0.3,
+          "T": 6.0,
+          "wrong_kd": 295,
+          "wrong_ce": 328,
+          "acc_kd": 0.9705,
+          "gap_imgs": 33,
+          "broken": 66,
+          "fixed": 99,
+          "p_sign": 0.012496
+        },
+        {
+          "seed": 2026,
+          "alpha": 0.3,
+          "T": 6.0,
+          "wrong_kd": 317,
+          "wrong_ce": 297,
+          "acc_kd": 0.9683,
+          "gap_imgs": -20,
+          "broken": 92,
+          "fixed": 72,
+          "p_sign": 0.137662
+        }
+      ],
+      "gaps_imgs": [
+        40,
+        33,
+        -20
+      ],
+      "mean_gap_imgs": 17.7,
+      "range_imgs": 60,
+      "same_dir_as_h1": 1,
+      "pooled": {
+        "broken": 221,
+        "fixed": 274
+      },
+      "p_pooled": 0.01933603
+    },
+    "a0.7_T1": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 0.7,
+          "T": 1.0,
+          "wrong_kd": 328,
+          "wrong_ce": 326,
+          "acc_kd": 0.9672,
+          "gap_imgs": -2,
+          "broken": 23,
+          "fixed": 21,
+          "p_sign": 0.880396
+        },
+        {
+          "seed": 7,
+          "alpha": 0.7,
+          "T": 1.0,
+          "wrong_kd": 329,
+          "wrong_ce": 328,
+          "acc_kd": 0.9671,
+          "gap_imgs": -1,
+          "broken": 23,
+          "fixed": 22,
+          "p_sign": 1.0
+        },
+        {
+          "seed": 2026,
+          "alpha": 0.7,
+          "T": 1.0,
+          "wrong_kd": 294,
+          "wrong_ce": 297,
+          "acc_kd": 0.9706,
+          "gap_imgs": 3,
+          "broken": 21,
+          "fixed": 24,
+          "p_sign": 0.765992
+        }
+      ],
+      "gaps_imgs": [
+        -2,
+        -1,
+        3
+      ],
+      "mean_gap_imgs": 0.0,
+      "range_imgs": 5,
+      "same_dir_as_h1": 2,
+      "pooled": {
+        "broken": 67,
+        "fixed": 67
+      },
+      "p_pooled": 1.0
+    },
+    "a0.7_T3": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 0.7,
+          "T": 3.0,
+          "wrong_kd": 320,
+          "wrong_ce": 326,
+          "acc_kd": 0.968,
+          "gap_imgs": 6,
+          "broken": 69,
+          "fixed": 75,
+          "p_sign": 0.67707
+        },
+        {
+          "seed": 7,
+          "alpha": 0.7,
+          "T": 3.0,
+          "wrong_kd": 311,
+          "wrong_ce": 328,
+          "acc_kd": 0.9689,
+          "gap_imgs": 17,
+          "broken": 74,
+          "fixed": 91,
+          "p_sign": 0.212786
+        },
+        {
+          "seed": 2026,
+          "alpha": 0.7,
+          "T": 3.0,
+          "wrong_kd": 315,
+          "wrong_ce": 297,
+          "acc_kd": 0.9685,
+          "gap_imgs": -18,
+          "broken": 71,
+          "fixed": 53,
+          "p_sign": 0.12651
+        }
+      ],
+      "gaps_imgs": [
+        6,
+        17,
+        -18
+      ],
+      "mean_gap_imgs": 1.7,
+      "range_imgs": 35,
+      "same_dir_as_h1": 1,
+      "pooled": {
+        "broken": 214,
+        "fixed": 219
+      },
+      "p_pooled": 0.84759183
+    },
+    "a0.7_T6": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 0.7,
+          "T": 6.0,
+          "wrong_kd": 274,
+          "wrong_ce": 326,
+          "acc_kd": 0.9726,
+          "gap_imgs": 52,
+          "broken": 70,
+          "fixed": 122,
+          "p_sign": 0.000215
+        },
+        {
+          "seed": 7,
+          "alpha": 0.7,
+          "T": 6.0,
+          "wrong_kd": 291,
+          "wrong_ce": 328,
+          "acc_kd": 0.9709,
+          "gap_imgs": 37,
+          "broken": 78,
+          "fixed": 115,
+          "p_sign": 0.009382
+        },
+        {
+          "seed": 2026,
+          "alpha": 0.7,
+          "T": 6.0,
+          "wrong_kd": 314,
+          "wrong_ce": 297,
+          "acc_kd": 0.9686,
+          "gap_imgs": -17,
+          "broken": 92,
+          "fixed": 75,
+          "p_sign": 0.215552
+        }
+      ],
+      "gaps_imgs": [
+        52,
+        37,
+        -17
+      ],
+      "mean_gap_imgs": 24.0,
+      "range_imgs": 69,
+      "same_dir_as_h1": 1,
+      "pooled": {
+        "broken": 240,
+        "fixed": 312
+      },
+      "p_pooled": 0.00248064
+    },
+    "a1_T1": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 1.0,
+          "T": 1.0,
+          "wrong_kd": 318,
+          "wrong_ce": 326,
+          "acc_kd": 0.9682,
+          "gap_imgs": 8,
+          "broken": 26,
+          "fixed": 34,
+          "p_sign": 0.366294
+        },
+        {
+          "seed": 7,
+          "alpha": 1.0,
+          "T": 1.0,
+          "wrong_kd": 328,
+          "wrong_ce": 328,
+          "acc_kd": 0.9672,
+          "gap_imgs": 0,
+          "broken": 28,
+          "fixed": 28,
+          "p_sign": 1.0
+        },
+        {
+          "seed": 2026,
+          "alpha": 1.0,
+          "T": 1.0,
+          "wrong_kd": 291,
+          "wrong_ce": 297,
+          "acc_kd": 0.9709,
+          "gap_imgs": 6,
+          "broken": 26,
+          "fixed": 32,
+          "p_sign": 0.511842
+        }
+      ],
+      "gaps_imgs": [
+        8,
+        0,
+        6
+      ],
+      "mean_gap_imgs": 4.7,
+      "range_imgs": 8,
+      "same_dir_as_h1": 0,
+      "pooled": {
+        "broken": 80,
+        "fixed": 94
+      },
+      "p_pooled": 0.32437347
+    },
+    "a1_T3": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 1.0,
+          "T": 3.0,
+          "wrong_kd": 293,
+          "wrong_ce": 326,
+          "acc_kd": 0.9707,
+          "gap_imgs": 33,
+          "broken": 60,
+          "fixed": 93,
+          "p_sign": 0.009454
+        },
+        {
+          "seed": 7,
+          "alpha": 1.0,
+          "T": 3.0,
+          "wrong_kd": 316,
+          "wrong_ce": 328,
+          "acc_kd": 0.9684,
+          "gap_imgs": 12,
+          "broken": 84,
+          "fixed": 96,
+          "p_sign": 0.412351
+        },
+        {
+          "seed": 2026,
+          "alpha": 1.0,
+          "T": 3.0,
+          "wrong_kd": 319,
+          "wrong_ce": 297,
+          "acc_kd": 0.9681,
+          "gap_imgs": -22,
+          "broken": 76,
+          "fixed": 54,
+          "p_sign": 0.065086
+        }
+      ],
+      "gaps_imgs": [
+        33,
+        12,
+        -22
+      ],
+      "mean_gap_imgs": 7.7,
+      "range_imgs": 55,
+      "same_dir_as_h1": 1,
+      "pooled": {
+        "broken": 220,
+        "fixed": 243
+      },
+      "p_pooled": 0.30657528
+    },
+    "a1_T6": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 1.0,
+          "T": 6.0,
+          "wrong_kd": 283,
+          "wrong_ce": 326,
+          "acc_kd": 0.9717,
+          "gap_imgs": 43,
+          "broken": 74,
+          "fixed": 117,
+          "p_sign": 0.002287
+        },
+        {
+          "seed": 7,
+          "alpha": 1.0,
+          "T": 6.0,
+          "wrong_kd": 280,
+          "wrong_ce": 328,
+          "acc_kd": 0.972,
+          "gap_imgs": 48,
+          "broken": 74,
+          "fixed": 122,
+          "p_sign": 0.000746
+        },
+        {
+          "seed": 2026,
+          "alpha": 1.0,
+          "T": 6.0,
+          "wrong_kd": 325,
+          "wrong_ce": 297,
+          "acc_kd": 0.9675,
+          "gap_imgs": -28,
+          "broken": 102,
+          "fixed": 74,
+          "p_sign": 0.041525
+        }
+      ],
+      "gaps_imgs": [
+        43,
+        48,
+        -28
+      ],
+      "mean_gap_imgs": 21.0,
+      "range_imgs": 76,
+      "same_dir_as_h1": 1,
+      "pooled": {
+        "broken": 250,
+        "fixed": 313
+      },
+      "p_pooled": 0.00891617
+    },
+    "match_T6": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 0.412,
+          "T": 6.0,
+          "wrong_kd": 286,
+          "wrong_ce": 326,
+          "acc_kd": 0.9714,
+          "gap_imgs": 40,
+          "broken": 68,
+          "fixed": 108,
+          "p_sign": 0.003172
+        },
+        {
+          "seed": 7,
+          "alpha": 0.412,
+          "T": 6.0,
+          "wrong_kd": 282,
+          "wrong_ce": 328,
+          "acc_kd": 0.9718,
+          "gap_imgs": 46,
+          "broken": 67,
+          "fixed": 113,
+          "p_sign": 0.000751
+        },
+        {
+          "seed": 2026,
+          "alpha": 0.412,
+          "T": 6.0,
+          "wrong_kd": 327,
+          "wrong_ce": 297,
+          "acc_kd": 0.9673,
+          "gap_imgs": -30,
+          "broken": 102,
+          "fixed": 72,
+          "p_sign": 0.027626
+        }
+      ],
+      "gaps_imgs": [
+        40,
+        46,
+        -30
+      ],
+      "mean_gap_imgs": 18.7,
+      "range_imgs": 76,
+      "same_dir_as_h1": 1,
+      "pooled": {
+        "broken": 237,
+        "fixed": 293
+      },
+      "p_pooled": 0.0168107
+    }
+  },
+  "verdicts": {
+    "H1_alpha_axis": {
+      "pred": {
+        "0.3": 3,
+        "0.7": 6,
+        "1.0": 9
+      },
+      "measured_anchor_T": {
+        "0.3": -3.0,
+        "0.7": 1.7,
+        "1.0": 7.7
+      },
+      "alpha_slope_imgs": 10.7,
+      "abs_error_vs_pred": [
+        6.0,
+        4.3,
+        1.3
+      ],
+      "monotone_worse_with_alpha": false,
+      "slope_beats_seed_floor": true
+    },
+    "H1_or_H2_alpha_max_T_column": {
+      "measured": {
+        "1.0": 4.7,
+        "3.0": 7.7,
+        "6.0": 21.0
+      },
+      "T_span_imgs": 16.3,
+      "T_max_minus_T_min_imgs": 16.3,
+      "flat_as_H1_says": false,
+      "rises_as_H2_says": true
+    },
+    "T_main_effect": {
+      "T_max_minus_T_min_pooled_over_alpha": 18.4,
+      "beats_seed_floor": true,
+      "seed_floor_gate_is_n_dependent": "底 9 张是 3 条流的 max−min，换流数不可比（compress_report_v4b_cnn.json）；跨流数只能读 paired_per_flow",
+      "paired_per_flow": {
+        "label": "T6−T1（每流先配对再按 α 平均）",
+        "n_seeds": 3,
+        "mean_gap_imgs": 18.4,
+        "sd_imgs": 38.3,
+        "se_imgs": 22.1,
+        "ci95_imgs": [
+          -76.6,
+          113.5
+        ],
+        "gaps": [
+          42.0,
+          39.0,
+          -25.7
+        ],
+        "same_sign_seeds": "2/3（+）",
+        "p_seeds_binomial": 1.0,
+        "range_imgs": 67.7,
+        "d4_sigma_hat": 40.0
+      },
+      "adjacent_steps": {
+        "1→3": {
+          "imgs": -0.3,
+          "in_seed_floor_units": 0.03
+        },
+        "3→6": {
+          "imgs": 18.8,
+          "in_seed_floor_units": 2.09
+        }
+      },
+      "axis_noun": "收益",
+      "where_the_effect_lives": "3→6"
+    },
+    "pure_KD_low_T_vs_CE": {
+      "mean_gap_imgs": 4.7,
+      "vs_floor": 0.52,
+      "sign": "KD 更好",
+      "counts_as_effect": false
+    },
+    "alpha_03_at_anchor_T": {
+      "mean_gap_imgs": -3.0,
+      "vs_floor": 0.33,
+      "survives_seed": false,
+      "paired_per_flow": {
+        "label": "α=0.3/T=3 按流配对",
+        "n_seeds": 3,
+        "mean_gap_imgs": -3.0,
+        "sd_imgs": 22.9,
+        "se_imgs": 13.2,
+        "ci95_imgs": [
+          -59.8,
+          53.8
+        ],
+        "gaps": [
+          6,
+          14,
+          -29
+        ],
+        "same_sign_seeds": "2/3（+）",
+        "p_seeds_binomial": 1.0,
+        "range_imgs": 43,
+        "d4_sigma_hat": 25.4
+      },
+      "paired_ci_excludes_zero": false,
+      "yardsticks_agree": true,
+      "reading": "这句反事实在本档用不上：锚点格自身 +1.7 张也在底（9 张）以内，α=0.3 与 α=0.7 都还没和纯 CE 分出胜负，所以「往 α→0 走会怎样」在本档是两个不显著读数之间的比较"
+    },
+    "grid_extremes": {
+      "best": {
+        "cell": "a0.7_T6",
+        "mean_gap_imgs": 24.0
+      },
+      "worst": {
+        "cell": "a0.3_T3",
+        "mean_gap_imgs": -3.0
+      },
+      "cells_beating_ce": [
+        "a0.3_T1",
+        "a0.3_T6",
+        "a0.7_T3",
+        "a0.7_T6",
+        "a1_T1",
+        "a1_T3",
+        "a1_T6"
+      ],
+      "n_cells": 9
+    },
+    "weight_or_temperature": {
+      "per_T": {
+        "6.0": {
+          "alpha_matched": 0.412,
+          "gap_at_anchor_alpha": 24.0,
+          "gap_gradient_matched": 18.7,
+          "damage_recovered_imgs": -5.3
+        }
+      },
+      "mean_damage_recovered_imgs": -5.3,
+      "axis_noun": "收益",
+      "weight_explains_the_T_dose": false,
+      "reading": "本档 T 轴是收益：钉回梯度（降 α）后收益只动了 -5.3 张，在底（9 张）以内 → 收益也不是「T² 顺带抬权重」买来的：把权重降回去，收益没跟着降；它跟着温度本身走——低数据下真被摊软的目标分布确实给学生带了东西"
+    }
+  },
+  "limitations": [
+    "种子底借自第4课b 的 α=0.7/T=3 一格；第4课d 已逐格量过自己的配对误差棒（借来的底对单格读数偏大，±2SE 又因跨格共用随机流是下界）",
+    "只扫 满数据8500 + 学生族 cnn；本族没有宽度旋钮，『跨不跨宽度』这句在本族无定义；跨族那一维由 --arch 自己承担。另一档的底要另跑 step4b --arch cnn --tier <档>，那一本的账该叫 compress_report_v4c_cnn.json（名字是算出来的，在不在盘上以 ls 为准）；（3 条流那本，各写各的表；补过流的那几本只做过 S128 满/低两档，跨架构/跨档结论要几份对照着读，而跨流数只能读配对 CI）",
+    "每格 3 条流，均值本身没有二次底",
+    "权重/温度解耦只在初始一步的一个批次上配平，不是全程配平",
+    "p_pooled 偏乐观（多条流共用同一批测试图（极差型种子底还随流数变宽））"
+  ]
+}

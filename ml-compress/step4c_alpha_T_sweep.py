@@ -104,23 +104,37 @@ V4B_SUFFIX_CNN = {"低数据2000": "_low"}
 V4C_SUFFIX = {"低数据2000": "_low", "中数据4500": "_mid"}
 
 
-def v4b_path(width: int, tier: str) -> Path:
-    """这一档、这一副宽度、**这一族**的种子底档案。S64 只跑过满数据档，所以那本里没有档位后缀。"""
-    if NSEEDS > 3:                                      # 补过流的底只覆盖 S128 的两档，别的组合直接拒
-        if width != 128 or tier not in TIERS:
-            raise SystemExit(f"--nseeds {NSEEDS} 的种子底档案只有 S128 × {list(TIERS)}（compress_report_v4b_n{NSEEDS}.json）；"
-                             f"要测 S{width} 或 {tier}，得先给那一副把那本底扩出来，不许借别档的底")
-        return HERE / f"compress_report_v4b{FAMILY_SUFFIX[ARCH]}_n{NSEEDS}.json"
+def v4b_path(width: int, tier: str, nseeds: int | None = None) -> Path:
+    """这一档、这一副宽度、**这一族**、**这一个流数**的种子底档案。S64 只跑过满数据档，所以那本里没有档位后缀。
+
+    第廿三发查出的定向缺陷（本轮修）：流数原先读的是**本模块的全局 `NSEEDS`**，而 `--nseeds` 只落在
+    `step4f` 自己那份 argparse 上 ⇒ 从 step4f 调进来时这里永远是 3，于是流数大于 3 的账全在借 3 条流的底，
+    而守卫闸⑨ 比的正是这个函数算出的名字（实现与闸同源 ⇒ 结构性看不见这件事）。
+    现在流数由调用方**显式传**：同流数的那本底不在盘上就**在第一次训练之前拒跑**，不许回落到别的流数
+    （借来的底自己随流数涨，跨流数只能各读各的配对 CI——这是第6课b 就记过、当时只写在散文里的口径）。
+    """
+    n = NSEEDS if nseeds is None else int(nseeds)
     stem = "compress_report_v4b" + FAMILY_SUFFIX[ARCH] + ("" if width == 128 else f"_s{width}")
     suffix = dict(V4B_SUFFIX, **(V4B_SUFFIX_CNN if ARCH == "cnn" else {}))
     if tier not in TIERS and tier not in suffix:
         raise SystemExit(f"档 {tier} 没登记种子底档案名：它要么在第4课那两档的合并账里（那就别新加名字），"
                          f"要么有自己的 v4b 单档账（在这里登记后缀）。"
                          f"悄悄回落到合并账等于拿别的档的底来判这一档")
+    base = stem + suffix.get(tier, "")
+    if n > 3:                                      # 补过流的底：名字必须带上流数，缺档就拒，不回落
+        p = HERE / (base + f"_n{n}.json")
+        if not p.exists():
+            raise SystemExit(f"缺 {p.name}——{n} 条流的账必须读 {n} 条流的底（族={ARCH} × 档={tier} × "
+                             f"S{width}）。先跑 python step4b_seed_variance.py --arch {ARCH} --tier {tier} "
+                             f"--nseeds {n}"
+                             + ("" if width == 128 else f" --width {width}")
+                             + f" 把那一本底造出来；借 {base}.json（3 条流）= 借别的流数的底，"
+                               f"而借来的底自己随流数涨，两本账的 vs_floor 不可横比")
+        return p
     # 档位后缀**不随宽度消失**：旧写法只在 width==128 时贴，写死的假设是"S64 只跑过满数据档"，
     # 于是 64×中数据会去读 v4b_s64.json（满数据那本）——那本里真有一个档对的臂，load_anchor 拦不到，
     # 结果是借别的档的底来判这一档的闸门。老路径逐字不变（64×满数据仍回落 v4b_s64.json）。
-    return HERE / (stem + suffix.get(tier, "") + ".json")
+    return HERE / (base + ".json")
 
 
 def out_path(width: int, tier: str = TIER) -> Path:
@@ -149,20 +163,25 @@ def scope_note(width: int, tier: str, other: int) -> str:
             "补过流的那几本只做过 S128 满/低两档，跨架构/跨档结论要几份对照着读，而跨流数只能读配对 CI）")
 
 
-def load_anchor(v4b: Path, width: int, tier: str = TIER) -> dict:
+def load_anchor(v4b: Path, width: int, tier: str = TIER, nseeds: int | None = None) -> dict:
     """锚点档案值 + 种子底 + H1 的伤害基数，三样全从第4课b 那一副宽度、那一档的报告读。
+
+    `nseeds` 与 `v4b_path` 同一个来源（调用方显式传）：本函数里那两处"补过流才做"的检查原先读的也是
+    模块全局，于是从 step4f 调进来时**恒为假** ⇒ "这本底必须先证明它没换尺子"那道跨脚本对账
+    从来没有为 8/12/16/26 条流的账跑过一次。同一个根因的两张脸，一起修。
 
     为什么不写第二套字面量：换一副宽度这些数字**全都变**（S64 的锚是 0.9224/776/128/73、
     伤害基数 −55 张、底 53 张），换一档数据也全变（S128 低数据档的锚是 0.9072/928、
     伤害基数 +27 张——符号都反了），而"对账"这件事的效力完全来自它比的是档案真值。
     抄一份数字进代码，档案一改就对上老账了——所以档案是唯一来源，这里只负责读。"""
+    n = NSEEDS if nseeds is None else int(nseeds)
     d = json.loads(v4b.read_text(encoding="utf-8"))
-    if NSEEDS > 3:
+    if n > 3:
         # 借来的底必须先证明它没换尺子：那本补过流的底自己带那道跨脚本闸，这里读它，不在这里重算
         got = (d.get("cross_script_parity") or {}).get(f"{tier} 老3条流×4项读数")
         if got != "逐位相同":
             raise SystemExit(f"{v4b.name} 里 {tier} 的跨脚本对账不是「逐位相同」（读到 {got!r}）："
-                             f"这本 {NSEEDS} 条流的底与 3 条流那本不可并读，先查上游那一发")
+                             f"这本 {n} 条流的底与 3 条流那本不可并读，先查上游那一发")
     if int(d["width"]) != width:
         raise SystemExit(f"{v4b.name} 是 S{d['width']} 的报告，不是 S{width}——换宽度请连档案一起换")
     if d.get("student_arch", "mlp") != ARCH:
@@ -181,12 +200,15 @@ def load_anchor(v4b: Path, width: int, tier: str = TIER) -> dict:
             "gap_imgs": arm["gap_imgs"],            # KD−CE，负=KD 更差，与本课 gap 同号向
             "floor": int(d["verdicts"][tier]["seed_floor_imgs"]["KD"]),
             "floor_ce": int(d["verdicts"][tier]["seed_floor_imgs"]["CE"]),
+            # 这本底**自己**记了几条流（按值读，不看文件名）：调用方把它抄进自己的档案，
+            # 于是"账是 N 条流、底是 M 条流"这件事从"要跳去读那本底才知道"变成盘上一个可对账的字段。
+            "n_floor_seeds": len(d["seeds"]) if isinstance(d.get("seeds"), list) else None,
             # 补过流的那本底把锚点格的**逐流 gap** 也记着：那一列就是这一课锚点格的同批读数，
             # 逐位对上 ⇒ 两本账量的是同一批随机流，而不只是同一个种子 42
             "paired_gaps": ({"seeds": d["seeds"],
                             "gaps": d["verdicts"][tier]["gaps_imgs"],
                             "label": f"{v4b.name} verdicts.{tier}.gaps_imgs"}
-                            if NSEEDS > 3 else None)}
+                            if n > 3 else None)}
 
 
 def h1_pred(gap_imgs: int) -> dict:

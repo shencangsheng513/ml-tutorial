@@ -867,6 +867,94 @@ v4 的倒挂腿吃的界是"份额 > 100%"，而份额 = |第一格| ÷ |阶梯�
         以及"本族两档同号"这个负答案；七维一维都没换、流数没动 ⇒ **既不叫复证也不叫新增独立性**。
         没买到的是机制（软标签形状 vs 权重尺度这件事在 CNN 学生上依旧没有读数；第4课j 那发钉的是 MLP 学生
         × T=3/T=6 那一格，换族不重跑它）与本族满数据档那一格（前置缺，见 ⑤）。
+
+  第廿四发（板块计数；`--arch cnn --tier 满数据8500 --nseeds 8 --thin --t 6` →
+  `compress_report_v4f_cnn_n8_thin_t6_v5.json`）——**预登记，开跑前写；事后只许追加"落地"**。
+  问句（只有一句）：**第廿三发那句"『符号随数据量决定』是 × MLP 学生的性质"，它是从一对档（中↔低）
+  读出来的——把它压到 MLP 那一侧的到底是哪一端？补上 CNN 的满数据档，本族三档就齐了，
+  而 MLP 三档里唯一与 CNN 尚无对照的那一端正是满数据（MLP 满数据 = 『污染型·倒挂』、α=0.05 −98.9 张）。**
+  为什么是这一格：第廿三发落地②(限二) 明写过"这句话只到中↔低这一对不翻，不许写成翻转点在本族不存在"，
+  而落地⑤ 记下本族满数据档**前置全空**。它同时也是第廿三发那条成本自纠欠下的那一格（①② 两发只造了低数据档）。
+  **价签（先查前置再报数；实付与预言分开记）**：现读盘上 cnn 名下只有 `v4b_cnn_mid`(+`_n8`) /
+  `v4b_cnn_low`(+`_n8`) / `v4c_cnn_mid` / `v4c_cnn_low` / 两本 `v4f_cnn_*t6_v5` ⇒ **满数据档三道前置全空**；
+  流数来源已在第廿四发 C 里修好（`v4b_path` 现按调用方传入的流数定向，缺同流数的底**当场拒绝而不是回落 3 流**），
+  所以这一回的 ② 是**硬前置**（借 3 流那本 = 跑不动，不再是静默借底）。形态仍是同形四发链：
+    ① `step4b --arch cnn --tier 满数据8500`（1 档 × 3 条流 × CE/KD 两臂）= **6 次** → `v4b_cnn.json`
+       （CNN 族没有"合并账"这一形态，那是第廿三发落地⑤ 那条自纠，这里照它的实测写而不是照它的预言写）
+    ② `step4b --arch cnn --tier 满数据8500 --nseeds 8`（1 档 × 8 条流 × 2 臂）= **16 次** → `v4b_cnn_n8.json`
+       （④ 的底**必须**来自这本——C 修完之后这是硬约束，且守卫闸⑨ 腿B 会当场核）
+    ③ `step4c --arch cnn --tier 满数据8500`（3 条流 ×（9 格 + 1 副 CE 参考））= **33 次** → `v4c_cnn.json`
+       （④ 的跨脚本闸格来源）
+    ④ 本发（8 条流 ×（薄三格 + CE）+ 老 3 条流各一次恒等闸）= **32 + 3 次**
+    = 入库链 **90 次**；另加"先预演再真跑"那一趟固定动作：④ 用 `--nseeds 3` 走通
+      （**3 × 4 + 3 = 15 次**，账验完即删、不入库）⇒ **整链预计实付 105 次训练、零 API 费**。
+  出口（判据 **v5 一个字不动**：本发不进判据、也不给判据加腿；薄阶梯、T=6 那一列、底读②自己那本）：
+    (a) 与 MLP 满数据同侧（两端同负 = 『污染型』或『污染型·倒挂』）⇒ **"满数据端 KD 有害"跨族**，
+        于是第廿三发那句收窄要**按端拆开写**：低数据端的符号不跨族、满数据端的符号跨族，
+        "符号由数据量决定"在 CNN 上不是整条不成立而是**只在低数据端不成立**。
+    (b) 与 CNN 低数据端同号（α=0.05 为正 = KD 有益）⇒ 本族三档的阶梯顶/小剂量端**都不翻**，
+        那句"数据量决定符号"从此**整条**收窄成"……× MLP 学生"（这是 (a) 的反面，两者只落其一）。
+    (c) 主格与顶格都测不动（两条 CI 全含 0）⇒ 记成"这一格买不到答案"，欠账照旧挂着
+        （不许把"没测出"写成"没有"，第十七发那条写法）。
+    (d) 判『反号线』（小剂量与阶梯顶反向）⇒ 本族第三个形状词、也是"本族形状随档变"的**第三次**兑现；
+        这一支不推翻 (a)/(b) 任何一句（它说的是形状不是符号），但要把"符号"与"形状"两句分开报。
+  必须同时披露的两条边界：① **薄阶梯 + T=6 + 8 条流**这一组合在本族只量过两档（中/低），
+    第三档到手只构成"本族档轴铺满"，**不构成复证**：七维一维都没换（同一副学生、同一个老师、同一批流）；
+    ② 本发**只留 8 流那一本**，预演那趟（15 次）验完即删 ⇒ "一根新轴的第一发不许被引用成读数"
+    这条规矩在这里仍由"预演账删掉"保证，与第廿三发落地⑥ 同一形态（那一发顺手算了"3 流那一趟不可能
+    产出反例"，本发若不做同等的算术检查就要在落地里写明没做）。
+
+  ——**落地**（开跑后只追加，预登记原文一字未改）：
+  ① **实付 = 预言，逐格对上**：① 6 + ② 16 + ③ 33 + ④ (32+3) = 入库 **90 次**，预演 **15 次**
+     ⇒ 整链实付 **105 次训练、零 API 费**（板块第一次价签不用自纠；规矩没变，只是这次先查了前置）。
+     但**前置里有一处不是"盘上缺账"而是"代码缺一行"**：`step4b_seed_variance.OUT_SUFFIX` 从未登记
+     满数据档（第4课那一档住在合并账里），于是 `--arch cnn --tier 满数据8500` 在**训练之前**就被
+     "没有登记档案名"拦下 ⇒ 零训练预检 `_preflight_d.py` 抓到的不是读数而是这一格。修法是一行登记表
+     （空后缀，家族位 `_cnn` 已经把它与 MLP 的合并账分开），且预检当场核了三件事：写盘名与 `v4b_path`
+     的读数名逐字相同、MLP 走同一档仍被合并档案闸拦在训练前（真跑 CLI，rc=1）、两本新账自记的
+     (族, 流数, 档) 与文件名一致。**"先查前置再报价"这条规矩本轮兑现的方式是：报价之前先跑不动。**
+  ② **读数**（`compress_report_v4f_cnn_n8_thin_t6_v5.json`，8 条流、T=6 那一列、薄三格）：
+     α=0.05 = **−16.2 张**（6/8 同号、p_flows=0.289、过底 38 的 0.43 倍）｜ α=0.3 = +11.8 ｜
+     α=0.7 = +13.2 ｜ **配对步长 α=0.05→0.7 = +29.5 张、CI [18.1, 40.9]、8/8 同号、二项 p=0.0078**。
+     判词五版同判『测不动（这一发没判决）』；`out_of_domain=False`、`inverted_leg_loads=False`、
+     `first_cell_same_sign_as_anchor=**False**`（两端反号）。底 38 张来自 `v4b_cnn_n8.json` 自己那本
+     （`floor_from` 与 `floor_flow_count=8` 都对得上）⇒ **C 修完的那条硬约束在这一发第一次被真跑兑现**
+     （借 3 流那本会直接跑不动，不再是静默借底）。
+  ③ **四个出口一个都没原样兑现，而且不是"落空"这么简单**：
+     (a) 要"两端同负" ⇒ 锚点是 +13.2，落空；(b) 要"α=0.05 与 CNN 低数据端同号（正）" ⇒ 它是 −16.2，落空；
+     (c) 要"两条 CI 全含 0" ⇒ 判词那一半兑现（两端都测不动），CI 那一半不兑现（配对步长不含 0）；
+     (d) 要判『反号线』⇒ **符号层兑现、判词层不兑现**（`first_cell_same_sign_as_anchor=False`，
+     但形状词是『测不动』不是『反号线』，因为反号线要求某一端先有方向）。
+     ⇒ **预登记的出口集合对这一格不穷尽**：它把"两端反号"与"两端测不动"当成互斥的格子，
+     而这一格同时是这两件事。按老规矩这一条只追加、不改上面预登记的原文
+     （第十七发那条"不许把没测出写成没有"在这里的反面用法：**也不许把"没在集合里"改写成"世界错了"**）。
+  ④ **免费对账线**（给新算式找一处能复现在册数字的地方）：配对步长逐流差均值 **29.5** 与
+     两端均值之差 13.2 − (−16.2) = **29.4** 差 0.1 张 ⇒ 与第廿三发那条口径一致
+     （字段 `oob_gap_imgs` 走两端均值差、`paired.mean` 走逐流差均值，两种走法本就差一个舍入），
+     这一格是那条口径**第三次**在一本新账上对上。另记一条：④ 打印的锚点格"三种子均值 +24.0 张"
+     出自 ③ 那本 `v4c_cnn.json`（**3 条流**），与本档 α=0.7 的 +13.2（8 条流）**不是同一个数**
+     ⇒ "跨流数只能各读各的、不可横比"这句第6课b 就写过的口径，本轮第一次由一本真账被迫报出来。
+  ⑤ **这一格买到 / 没买到**：买到的是**本族档轴铺满**（低/中/满三档齐），以及一条现读的点估计——
+     α=0.05 那一端 CNN 减 MLP 在三档分别 **+103.6 / +74.4 / +82.7 张**（低 −_low_n8_thin_t6_v4 −22.0、
+     中 `_mid_n8_t6_v5` −73.8、满 `_n8_t6_v4` −98.9，全是同 8 条流、同 T=6、同 S128 的在册账）
+     ⇒ 三档同向、量级相近，看起来像一条"**近似档无关的跨族偏移**"。**它只是点估计**：逐流配对、CI、
+     同号由第廿五发（`step4l`）现算，本发不据它写任何"跨族有害/有益"的句子。
+     没买到的是方向判定（判词测不动）与任何独立性：七维一维都没换、流数没动 ⇒ 既不叫复证也不叫新增独立性。
+  ⑥ **边界②的算术检查做了，不是口头**：预演那 15 次的三格是 [−12.7, +17.7, +24.0]，
+     与 8 流的 [−16.2, +11.8, +13.2] **同向**（小剂量端负、往上翻正）⇒ 预演没给出反例，
+     也没被引用成读数——账已删除，盘上这一格只有 8 流那一本（`ls` 可核：无 `v4f_cnn_thin_t6_v5.json`）。
+  ⑦ **⑤ 那笔欠账已付（第廿五发，零训练）**：`step4l_soft_shape_family.py` 把这三档同向的点估计买成了
+     逐流配对读数——满数据 × α=0.05 那一格 **offset = +82.6 张、CI [59.3, 106.0]、8/8 同号**，九格（三档 ×
+     α∈{0.05,0.3,0.7}）**全部 CI 不含 0、全部 8/8**（+63.0 ~ +110.9 张），且 T=1 那一列处处测不出、
+     九条 `offset(T=6)−offset(T=1)` 全部不含 0 ⇒ 出口 (a)「**这份形状 × 这个学生族**的交互」兑现，
+     "近似档无关的跨族偏移"这句话从此带误差棒，但**"档无关"三个字仍未判定**（三档同号不是档无关）。
+     口径记在这里免得下次当成两个读数打架：⑤ 报 **+82.7**（两端各自舍入再相减）、step4l 报 **+82.6**
+     （逐流差再取均值）⇒ 差 0.1 张是**双舍入**。同一形状盘上已有两处先例（`_mid_n16_t6_v5` 的 29.2 / 29.3、
+     本档落地④ 的 29.5 / 29.4）⇒ **不排"第几次兑现"**：落地④ 那个"第三次"数的是整条双舍入链，而第廿五发那条
+     82.7/82.6 照同一链已是第四次、照"两种走法同一坐标"这一 narrower 口径才是第二次 ⇒ **同一个 0.1 有两套基数**，
+     README 第廿四发那条已在盘中就地自纠（〔第二十五发自纠〕），第廿五发与 `step4l` 落地⑤ 一律不报序数；
+     从此只点名先例。
+     **两个数都留在盘上，谁引用谁带口径。**
 """
 from __future__ import annotations
 
@@ -1145,14 +1233,14 @@ def check_t(t: float, grid: dict, where: str) -> float:
 
 
 def setup(dataset: str, width: int, tier: str, extra: str = "",
-          t_col: float | None = None) -> dict:
+          t_col: float | None = None, nseeds: int = 3) -> dict:
     """六样读数（温度列 / 锚点剂量 / 闸格 / 该档的底 / 锚点伤害 / 产物名）全从**那一本账**现读。
 
     为什么必须现读而不是各写一套：Fashion 那本账没有 T=3、也没有 α=0.3——把 MNIST 的两个常量
     抄过来，会得到一个不存在的锚点格和一格对不上的闸（而"对不上的闸"是最坏的一种绿）。
     账本字段布局的差异只允许出现在这一个函数里。"""
     if dataset == "mnist":
-        v4b, v4c = v4b_path(width, tier), v4c_name(width, tier)
+        v4b, v4c = v4b_path(width, tier, nseeds), v4c_name(width, tier)
         missing = [p.name for p in (v4b, v4c) if not p.exists()]
         if missing:
             raise SystemExit(f"缺 {'、'.join(missing)}——底和 α={PROBE_ALPHA} 基准全从这两本读，"
@@ -1165,7 +1253,9 @@ def setup(dataset: str, width: int, tier: str, extra: str = "",
         # 改成读本格现读的阶梯顶（不借 3 条流的档案读数）。少这一格，那两句话与 v3 的第三格都没有原料。
         lad = LADDER + (anc_a,)
         t = ANCHOR_T if t_col is None else t_col
-        floor, floor_kind, floor_from = load_anchor(v4b, width, tier)["floor"], "v4b 的 KD 臂跨种子极差", v4b.name
+        _anch = load_anchor(v4b, width, tier, nseeds)
+        floor, floor_kind, floor_from = _anch["floor"], "v4b 的 KD 臂跨种子极差", v4b.name
+        floor_flow = _anch["n_floor_seeds"]
         grid, anchor_from = arch["grid"], v4c.name
         t = check_t(t, grid, v4c.name)
         out = HERE / v4c.name.replace("v4c", "v4f").replace(".json", f"{extra}.json")
@@ -1183,6 +1273,10 @@ def setup(dataset: str, width: int, tier: str, extra: str = "",
         anc_a = min(float(x) for x in d["alphas"])  # 那本账里最小的 α 就是锚点剂量（0.7）
         gate_a, lad = anc_a, LADDER + (anc_a,)      # 没有 α=0.3 可对账 ⇒ 闸落在锚点格上
         floor, floor_kind, floor_from = int(pt["own_floor_imgs"]), "该档自己的底（第4课g 规矩）", V6.name
+        # 这一支本轮只把"底是几流的书"**落成可见字段**，不做拒跑：v6 那本底没有按流数分册的形态，
+        # 要求同流数等于先给 step6 加 --nseeds（另一发的钱）。所以 Fashion 名下那 10 本照旧借 3 条流的底，
+        # 但从这一发起那件事在盘上读得到，不再只写在散文里。
+        floor_flow = len(d["seeds"]) if isinstance(d.get("seeds"), list) else None
         grid, anchor_from = pt["grid"], f"{V6.name} 的 {tier}"
         t = check_t(t, grid, V6.name)
         rows_of = lambda k: pt["raw_rows"][k]                          # noqa: E731
@@ -1200,7 +1294,8 @@ def setup(dataset: str, width: int, tier: str, extra: str = "",
             "teacher_acc": (float(d["teacher"]["test_acc"]) if dataset == "fashion" else TEACHER_ARCHIVE_ACC),
             "anchor_mean": float(grid[key(anc_a, t)]["mean_gap_imgs"]),
             "gate_rows": gate, "anchor_rows": rows_of(key(anc_a, t)), "gate_mean": round(sum(r["gap_imgs"] for r in gate) / len(gate), 1),
-            "floor": floor, "floor_kind": floor_kind, "floor_from": floor_from, "anchor_from": anchor_from,
+            "floor": floor, "floor_kind": floor_kind, "floor_from": floor_from,
+            "floor_flow_count": floor_flow, "anchor_from": anchor_from,
             "peers": peers, "out": out,
             "gate_is_anchor": bool(gate_a == anc_a), "grid_keys": sorted(grid)}
 
@@ -1229,7 +1324,7 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
             ("" if t_col is None else f"_t{t_col:g}") + ("_hi" if high else "") + f"_{SHAPE_RULE}"
     if not ds["teacher_pt"].exists():
         raise SystemExit(f"缺 {ds['teacher_pt'].name}——这一课的老师权重只能复用，别现造")
-    L = setup(dataset, width, tier, extra, t_col)
+    L = setup(dataset, width, tier, extra, t_col, nseeds)
     T, LAD, PROBE, ANC = L["t"], L["ladder"], L["gate_alpha"], L["anchor_alpha"]
     if thin:
         # 薄阶梯：只留判决真正吃的那几格（最小剂量 + 锚点，外加**跨脚本闸格**），恒等闸只在老 3 条流上跑。
@@ -1270,8 +1365,11 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
     h1_line = {a: round(a / ANC * anchor_mean) for a in LAD if a > 0}
     print(f"[{dataset} · {tier} · S{width}] 训练 {DATA_TIERS[tier]} 张 | 测试 {len(yte)} | "
           f"α 阶梯 {LAD} @ T={T:g} | {len(seeds)} 条流")
-    print(f"[仪器] 底（{L['floor_from']} 的{L['floor_kind']}）= {floor} 张；"
-          f"锚点格 α={ANC:g}/T={T:g} 三种子均值 {anchor_mean:+.1f} 张（{L['anchor_from']}）")
+    print(f"[仪器] 底（{L['floor_from']} 的{L['floor_kind']}）= {floor} 张，"
+          f"那本底自己记 {L['floor_flow_count']} 条流"
+          + ("" if L["floor_flow_count"] == len(seeds) else
+             f"** ≠ 这一发的 {len(seeds)} 条流 ⇒ 这本在借别的流数的底，vs_floor 与同档同族但流数相同的账不可横比**")
+          + f"；锚点格 α={ANC:g}/T={T:g} 三种子均值 {anchor_mean:+.1f} 张（{L['anchor_from']}）")
     print(f"[仪器] α={PROBE:g} 档案读数（跨脚本对账基准）：均值 {probe['mean_gap_imgs']:+.1f} 张，"
           f"逐种子 {[r['gap_imgs'] for r in probe['per_seed']]}")
     if L["gate_is_anchor"]:
@@ -1564,7 +1662,8 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
               "paired_step_anchor_to_max": hi_pair,
               "t_column_override": t_col, "thin_ladder": bool(thin), "identity_gate_seeds": len(id_gate),
               "gate_is_anchor": L["gate_is_anchor"], "teacher_acc": L["teacher_acc"],
-              "floor_from": L["floor_from"], "floor_kind": L["floor_kind"], "seed_floor_imgs": floor,
+              "floor_from": L["floor_from"], "floor_kind": L["floor_kind"],
+              "floor_flow_count": L["floor_flow_count"], "seed_floor_imgs": floor,
               "anchor_mean_from": L["anchor_from"], "anchor_mean_gap_imgs": anchor_mean,
               "predictions_ex_ante": {"H1_line_through_origin": h1_line,
                                       "contamination_pred": f"α={LAD[1]:g} 即接近 {anchor_mean:+.1f} 张"},

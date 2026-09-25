@@ -1,0 +1,2881 @@
+{
+  "quantity": "跨族偏移（CNN 学生 − MLP 学生，同一份软标签）跟不跟软标签的温度走：先逐流配对，再看它在 T=1 / T=3 / T=6 三列上各是多少",
+  "pays": "step4f_alpha_curve.py 落地⑤（『逐流配对、CI、同号由第廿五发现算』那句欠账）",
+  "sign_convention": "gap_imgs = wrong_ce − wrong_kd（正 = KD 比 CE 少错 = 收益）；offset = gap_cnn − gap_mlp（正 = CNN 这一族从同一份软标签里多获益）",
+  "gates": {
+    "闸I_配对资格": "8 对账两两同序且等于登记处（3 条流、8 条流）",
+    "闸II_逐流恒等式": "II-a 594 行 gap==wrong_ce−wrong_kd 逐位；II-b 54 次配对的逐流序列 == 按种子号各自查档再逐位相减的重算序列（红 0 条）",
+    "闸III_同档同宽家族位": "16 本全部 S128、档位等于配方点名（红 0 条）；7 本没记 `student_arch`（打印，不补默认）",
+    "闸IV_形状互锁": "两族 15 格体检逐位相同（3 对 3 流 + 2 对 8 流 × T∈{1,3,6}；段② 的前置·乙）+ 现算（中数据4500 × 4500 张 × T∈{1,3,6} × 4 量）逐位相同 + 老师精度 0.9798",
+    "闸VI_共流嵌套性": "8 流两对 vs 同档 3 流两对：共有流 × 共有格共 120 行 × 3 字段逐位相同（红 0 条）；0 行算『没测到』不算通过（段② 的前置·甲）",
+    "闸V_来源": "每个数带 (档案名, 格名, 流名单)，见各格 `provenance` 与 `offset_by_seed`"
+  },
+  "reading_A_paired_T6_8flows": {
+    "低数据2000": {
+      "α=0.05": {
+        "label": "低数据2000 × α=0.05 × T=6：CNN gap − MLP gap（逐流配对，8 条流）",
+        "n_seeds": 8,
+        "mean_gap_imgs": 103.6,
+        "sd_imgs": 30.6,
+        "se_imgs": 10.8,
+        "ci95_imgs": [
+          78.1,
+          129.2
+        ],
+        "gaps": [
+          112,
+          113,
+          140,
+          92,
+          49,
+          93,
+          143,
+          87
+        ],
+        "same_sign_seeds": "8/8（+）",
+        "p_seeds_binomial": 0.0078,
+        "range_imgs": 94,
+        "d4_sigma_hat": 33.0,
+        "ci_excludes_zero": true,
+        "mean_cnn": 81.6,
+        "mean_mlp": -22.0,
+        "offset_by_seed": {
+          "42": 112,
+          "7": 113,
+          "2026": 140,
+          "11": 92,
+          "202": 49,
+          "3003": 93,
+          "40004": 143,
+          "55555": 87
+        },
+        "provenance": {
+          "cnn": "compress_report_v4f_cnn_low_n8_thin_t6_v5.json",
+          "mlp": "compress_report_v4f_low_n8_thin_t6_v4.json",
+          "cell": "α0.05",
+          "flows": [
+            42,
+            7,
+            2026,
+            11,
+            202,
+            3003,
+            40004,
+            55555
+          ],
+          "n": 8
+        }
+      },
+      "α=0.3": {
+        "label": "低数据2000 × α=0.3 × T=6：CNN gap − MLP gap（逐流配对，8 条流）",
+        "n_seeds": 8,
+        "mean_gap_imgs": 75.5,
+        "sd_imgs": 33.6,
+        "se_imgs": 11.9,
+        "ci95_imgs": [
+          47.4,
+          103.6
+        ],
+        "gaps": [
+          117,
+          87,
+          84,
+          26,
+          46,
+          48,
+          119,
+          77
+        ],
+        "same_sign_seeds": "8/8（+）",
+        "p_seeds_binomial": 0.0078,
+        "range_imgs": 93,
+        "d4_sigma_hat": 32.7,
+        "ci_excludes_zero": true,
+        "mean_cnn": 135.6,
+        "mean_mlp": 60.1,
+        "offset_by_seed": {
+          "42": 117,
+          "7": 87,
+          "2026": 84,
+          "11": 26,
+          "202": 46,
+          "3003": 48,
+          "40004": 119,
+          "55555": 77
+        },
+        "provenance": {
+          "cnn": "compress_report_v4f_cnn_low_n8_thin_t6_v5.json",
+          "mlp": "compress_report_v4f_low_n8_thin_t6_v4.json",
+          "cell": "α0.3",
+          "flows": [
+            42,
+            7,
+            2026,
+            11,
+            202,
+            3003,
+            40004,
+            55555
+          ],
+          "n": 8
+        }
+      },
+      "α=0.7": {
+        "label": "低数据2000 × α=0.7 × T=6：CNN gap − MLP gap（逐流配对，8 条流）",
+        "n_seeds": 8,
+        "mean_gap_imgs": 63.0,
+        "sd_imgs": 28.8,
+        "se_imgs": 10.2,
+        "ci95_imgs": [
+          38.9,
+          87.1
+        ],
+        "gaps": [
+          90,
+          78,
+          75,
+          25,
+          63,
+          46,
+          102,
+          25
+        ],
+        "same_sign_seeds": "8/8（+）",
+        "p_seeds_binomial": 0.0078,
+        "range_imgs": 77,
+        "d4_sigma_hat": 27.0,
+        "ci_excludes_zero": true,
+        "mean_cnn": 142.5,
+        "mean_mlp": 79.5,
+        "offset_by_seed": {
+          "42": 90,
+          "7": 78,
+          "2026": 75,
+          "11": 25,
+          "202": 63,
+          "3003": 46,
+          "40004": 102,
+          "55555": 25
+        },
+        "provenance": {
+          "cnn": "compress_report_v4f_cnn_low_n8_thin_t6_v5.json",
+          "mlp": "compress_report_v4f_low_n8_thin_t6_v4.json",
+          "cell": "α0.7",
+          "flows": [
+            42,
+            7,
+            2026,
+            11,
+            202,
+            3003,
+            40004,
+            55555
+          ],
+          "n": 8
+        }
+      }
+    },
+    "中数据4500": {
+      "α=0.05": {
+        "label": "中数据4500 × α=0.05 × T=6：CNN gap − MLP gap（逐流配对，8 条流）",
+        "n_seeds": 8,
+        "mean_gap_imgs": 74.4,
+        "sd_imgs": 33.3,
+        "se_imgs": 11.8,
+        "ci95_imgs": [
+          46.6,
+          102.2
+        ],
+        "gaps": [
+          79,
+          65,
+          34,
+          108,
+          104,
+          111,
+          23,
+          71
+        ],
+        "same_sign_seeds": "8/8（+）",
+        "p_seeds_binomial": 0.0078,
+        "range_imgs": 88,
+        "d4_sigma_hat": 30.9,
+        "ci_excludes_zero": true,
+        "mean_cnn": 0.6,
+        "mean_mlp": -73.8,
+        "offset_by_seed": {
+          "42": 79,
+          "7": 65,
+          "2026": 34,
+          "11": 108,
+          "202": 104,
+          "3003": 111,
+          "40004": 23,
+          "55555": 71
+        },
+        "provenance": {
+          "cnn": "compress_report_v4f_cnn_mid_n8_t6_v5.json",
+          "mlp": "compress_report_v4f_mid_n8_t6_v5.json",
+          "cell": "α0.05",
+          "flows": [
+            42,
+            7,
+            2026,
+            11,
+            202,
+            3003,
+            40004,
+            55555
+          ],
+          "n": 8
+        }
+      },
+      "α=0.3": {
+        "label": "中数据4500 × α=0.3 × T=6：CNN gap − MLP gap（逐流配对，8 条流）",
+        "n_seeds": 8,
+        "mean_gap_imgs": 94.8,
+        "sd_imgs": 23.5,
+        "se_imgs": 8.3,
+        "ci95_imgs": [
+          75.1,
+          114.4
+        ],
+        "gaps": [
+          125,
+          89,
+          80,
+          108,
+          90,
+          119,
+          51,
+          96
+        ],
+        "same_sign_seeds": "8/8（+）",
+        "p_seeds_binomial": 0.0078,
+        "range_imgs": 74,
+        "d4_sigma_hat": 26.0,
+        "ci_excludes_zero": true,
+        "mean_cnn": 53.5,
+        "mean_mlp": -41.2,
+        "offset_by_seed": {
+          "42": 125,
+          "7": 89,
+          "2026": 80,
+          "11": 108,
+          "202": 90,
+          "3003": 119,
+          "40004": 51,
+          "55555": 96
+        },
+        "provenance": {
+          "cnn": "compress_report_v4f_cnn_mid_n8_t6_v5.json",
+          "mlp": "compress_report_v4f_mid_n8_t6_v5.json",
+          "cell": "α0.3",
+          "flows": [
+            42,
+            7,
+            2026,
+            11,
+            202,
+            3003,
+            40004,
+            55555
+          ],
+          "n": 8
+        }
+      },
+      "α=0.7": {
+        "label": "中数据4500 × α=0.7 × T=6：CNN gap − MLP gap（逐流配对，8 条流）",
+        "n_seeds": 8,
+        "mean_gap_imgs": 96.1,
+        "sd_imgs": 26.5,
+        "se_imgs": 9.4,
+        "ci95_imgs": [
+          74.0,
+          118.3
+        ],
+        "gaps": [
+          128,
+          103,
+          68,
+          125,
+          68,
+          108,
+          62,
+          107
+        ],
+        "same_sign_seeds": "8/8（+）",
+        "p_seeds_binomial": 0.0078,
+        "range_imgs": 66,
+        "d4_sigma_hat": 23.2,
+        "ci_excludes_zero": true,
+        "mean_cnn": 52.1,
+        "mean_mlp": -44.0,
+        "offset_by_seed": {
+          "42": 128,
+          "7": 103,
+          "2026": 68,
+          "11": 125,
+          "202": 68,
+          "3003": 108,
+          "40004": 62,
+          "55555": 107
+        },
+        "provenance": {
+          "cnn": "compress_report_v4f_cnn_mid_n8_t6_v5.json",
+          "mlp": "compress_report_v4f_mid_n8_t6_v5.json",
+          "cell": "α0.7",
+          "flows": [
+            42,
+            7,
+            2026,
+            11,
+            202,
+            3003,
+            40004,
+            55555
+          ],
+          "n": 8
+        }
+      }
+    },
+    "满数据8500": {
+      "α=0.05": {
+        "label": "满数据8500 × α=0.05 × T=6：CNN gap − MLP gap（逐流配对，8 条流）",
+        "n_seeds": 8,
+        "mean_gap_imgs": 82.6,
+        "sd_imgs": 27.9,
+        "se_imgs": 9.9,
+        "ci95_imgs": [
+          59.3,
+          106.0
+        ],
+        "gaps": [
+          99,
+          87,
+          86,
+          123,
+          66,
+          51,
+          107,
+          42
+        ],
+        "same_sign_seeds": "8/8（+）",
+        "p_seeds_binomial": 0.0078,
+        "range_imgs": 81,
+        "d4_sigma_hat": 28.5,
+        "ci_excludes_zero": true,
+        "mean_cnn": -16.2,
+        "mean_mlp": -98.9,
+        "offset_by_seed": {
+          "42": 99,
+          "7": 87,
+          "2026": 86,
+          "11": 123,
+          "202": 66,
+          "3003": 51,
+          "40004": 107,
+          "55555": 42
+        },
+        "provenance": {
+          "cnn": "compress_report_v4f_cnn_n8_thin_t6_v5.json",
+          "mlp": "compress_report_v4f_n8_t6_v4.json",
+          "cell": "α0.05",
+          "flows": [
+            42,
+            7,
+            2026,
+            11,
+            202,
+            3003,
+            40004,
+            55555
+          ],
+          "n": 8
+        }
+      },
+      "α=0.3": {
+        "label": "满数据8500 × α=0.3 × T=6：CNN gap − MLP gap（逐流配对，8 条流）",
+        "n_seeds": 8,
+        "mean_gap_imgs": 105.8,
+        "sd_imgs": 28.5,
+        "se_imgs": 10.1,
+        "ci95_imgs": [
+          81.9,
+          129.6
+        ],
+        "gaps": [
+          123,
+          146,
+          106,
+          131,
+          96,
+          91,
+          100,
+          53
+        ],
+        "same_sign_seeds": "8/8（+）",
+        "p_seeds_binomial": 0.0078,
+        "range_imgs": 93,
+        "d4_sigma_hat": 32.7,
+        "ci_excludes_zero": true,
+        "mean_cnn": 11.8,
+        "mean_mlp": -94.0,
+        "offset_by_seed": {
+          "42": 123,
+          "7": 146,
+          "2026": 106,
+          "11": 131,
+          "202": 96,
+          "3003": 91,
+          "40004": 100,
+          "55555": 53
+        },
+        "provenance": {
+          "cnn": "compress_report_v4f_cnn_n8_thin_t6_v5.json",
+          "mlp": "compress_report_v4f_n8_t6_v4.json",
+          "cell": "α0.3",
+          "flows": [
+            42,
+            7,
+            2026,
+            11,
+            202,
+            3003,
+            40004,
+            55555
+          ],
+          "n": 8
+        }
+      },
+      "α=0.7": {
+        "label": "满数据8500 × α=0.7 × T=6：CNN gap − MLP gap（逐流配对，8 条流）",
+        "n_seeds": 8,
+        "mean_gap_imgs": 110.9,
+        "sd_imgs": 34.4,
+        "se_imgs": 12.2,
+        "ci95_imgs": [
+          82.1,
+          139.7
+        ],
+        "gaps": [
+          162,
+          158,
+          107,
+          111,
+          96,
+          76,
+          111,
+          66
+        ],
+        "same_sign_seeds": "8/8（+）",
+        "p_seeds_binomial": 0.0078,
+        "range_imgs": 96,
+        "d4_sigma_hat": 33.7,
+        "ci_excludes_zero": true,
+        "mean_cnn": 13.2,
+        "mean_mlp": -97.6,
+        "offset_by_seed": {
+          "42": 162,
+          "7": 158,
+          "2026": 107,
+          "11": 111,
+          "202": 96,
+          "3003": 76,
+          "40004": 111,
+          "55555": 66
+        },
+        "provenance": {
+          "cnn": "compress_report_v4f_cnn_n8_thin_t6_v5.json",
+          "mlp": "compress_report_v4f_n8_t6_v4.json",
+          "cell": "α0.7",
+          "flows": [
+            42,
+            7,
+            2026,
+            11,
+            202,
+            3003,
+            40004,
+            55555
+          ],
+          "n": 8
+        }
+      }
+    }
+  },
+  "reading_B_offset_vs_T_3flows": {
+    "低数据2000": {
+      "offset_by_cell": {
+        "α=0.3,T=1": {
+          "label": "低数据2000 × α=0.3 × T=1：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 11.0,
+          "sd_imgs": 5.6,
+          "se_imgs": 3.2,
+          "ci95_imgs": [
+            -2.8,
+            24.8
+          ],
+          "gaps": [
+            5,
+            16,
+            12
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 11,
+          "d4_sigma_hat": 6.5,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": 5,
+            "7": 16,
+            "2026": 12
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low.json",
+            "mlp": "compress_report_v4c_low.json",
+            "cell": "a0.3_T1",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=0.3,T=3": {
+          "label": "低数据2000 × α=0.3 × T=3：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 70.3,
+          "sd_imgs": 31.7,
+          "se_imgs": 18.3,
+          "ci95_imgs": [
+            -8.3,
+            149.0
+          ],
+          "gaps": [
+            92,
+            34,
+            85
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 58,
+          "d4_sigma_hat": 34.3,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": 92,
+            "7": 34,
+            "2026": 85
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low.json",
+            "mlp": "compress_report_v4c_low.json",
+            "cell": "a0.3_T3",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=0.3,T=6": {
+          "label": "低数据2000 × α=0.3 × T=6：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 96.0,
+          "sd_imgs": 18.2,
+          "se_imgs": 10.5,
+          "ci95_imgs": [
+            50.7,
+            141.3
+          ],
+          "gaps": [
+            117,
+            87,
+            84
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 33,
+          "d4_sigma_hat": 19.5,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 117,
+            "7": 87,
+            "2026": 84
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low.json",
+            "mlp": "compress_report_v4c_low.json",
+            "cell": "a0.3_T6",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=0.7,T=1": {
+          "label": "低数据2000 × α=0.7 × T=1：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 17.3,
+          "sd_imgs": 7.6,
+          "se_imgs": 4.4,
+          "ci95_imgs": [
+            -1.6,
+            36.3
+          ],
+          "gaps": [
+            9,
+            24,
+            19
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 15,
+          "d4_sigma_hat": 8.9,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": 9,
+            "7": 24,
+            "2026": 19
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low.json",
+            "mlp": "compress_report_v4c_low.json",
+            "cell": "a0.7_T1",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=0.7,T=3": {
+          "label": "低数据2000 × α=0.7 × T=3：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 81.0,
+          "sd_imgs": 27.5,
+          "se_imgs": 15.9,
+          "ci95_imgs": [
+            12.6,
+            149.4
+          ],
+          "gaps": [
+            109,
+            54,
+            80
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 55,
+          "d4_sigma_hat": 32.5,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 109,
+            "7": 54,
+            "2026": 80
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low.json",
+            "mlp": "compress_report_v4c_low.json",
+            "cell": "a0.7_T3",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=0.7,T=6": {
+          "label": "低数据2000 × α=0.7 × T=6：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 81.0,
+          "sd_imgs": 7.9,
+          "se_imgs": 4.6,
+          "ci95_imgs": [
+            61.3,
+            100.7
+          ],
+          "gaps": [
+            90,
+            78,
+            75
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 15,
+          "d4_sigma_hat": 8.9,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 90,
+            "7": 78,
+            "2026": 75
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low.json",
+            "mlp": "compress_report_v4c_low.json",
+            "cell": "a0.7_T6",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=1,T=1": {
+          "label": "低数据2000 × α=1 × T=1：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 12.3,
+          "sd_imgs": 15.9,
+          "se_imgs": 9.2,
+          "ci95_imgs": [
+            -27.3,
+            52.0
+          ],
+          "gaps": [
+            -6,
+            20,
+            23
+          ],
+          "same_sign_seeds": "2/3（+）",
+          "p_seeds_binomial": 1.0,
+          "range_imgs": 29,
+          "d4_sigma_hat": 17.1,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": -6,
+            "7": 20,
+            "2026": 23
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low.json",
+            "mlp": "compress_report_v4c_low.json",
+            "cell": "a1_T1",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=1,T=3": {
+          "label": "低数据2000 × α=1 × T=3：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 88.0,
+          "sd_imgs": 17.1,
+          "se_imgs": 9.9,
+          "ci95_imgs": [
+            45.5,
+            130.5
+          ],
+          "gaps": [
+            104,
+            70,
+            90
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 34,
+          "d4_sigma_hat": 20.1,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 104,
+            "7": 70,
+            "2026": 90
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low.json",
+            "mlp": "compress_report_v4c_low.json",
+            "cell": "a1_T3",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=1,T=6": {
+          "label": "低数据2000 × α=1 × T=6：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 87.7,
+          "sd_imgs": 11.0,
+          "se_imgs": 6.4,
+          "ci95_imgs": [
+            60.3,
+            115.0
+          ],
+          "gaps": [
+            99,
+            87,
+            77
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 22,
+          "d4_sigma_hat": 13.0,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 99,
+            "7": 87,
+            "2026": 77
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low.json",
+            "mlp": "compress_report_v4c_low.json",
+            "cell": "a1_T6",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        }
+      },
+      "t_slope_paired": {
+        "α=0.3": {
+          "label": "低数据2000 × α=0.3：offset(T=6) − offset(T=1)（按流配对）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 85.0,
+          "sd_imgs": 23.4,
+          "se_imgs": 13.5,
+          "ci95_imgs": [
+            26.9,
+            143.1
+          ],
+          "gaps": [
+            112,
+            71,
+            72
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 41,
+          "d4_sigma_hat": 24.2,
+          "ci_excludes_zero": true
+        },
+        "α=0.7": {
+          "label": "低数据2000 × α=0.7：offset(T=6) − offset(T=1)（按流配对）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 63.7,
+          "sd_imgs": 15.0,
+          "se_imgs": 8.7,
+          "ci95_imgs": [
+            26.3,
+            101.0
+          ],
+          "gaps": [
+            81,
+            54,
+            56
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 27,
+          "d4_sigma_hat": 15.9,
+          "ci_excludes_zero": true
+        },
+        "α=1": {
+          "label": "低数据2000 × α=1：offset(T=6) − offset(T=1)（按流配对）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 75.3,
+          "sd_imgs": 26.5,
+          "se_imgs": 15.3,
+          "ci95_imgs": [
+            9.5,
+            141.2
+          ],
+          "gaps": [
+            105,
+            67,
+            54
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 51,
+          "d4_sigma_hat": 30.1,
+          "ci_excludes_zero": true
+        }
+      }
+    },
+    "中数据4500": {
+      "offset_by_cell": {
+        "α=0.3,T=1": {
+          "label": "中数据4500 × α=0.3 × T=1：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": -0.7,
+          "sd_imgs": 10.1,
+          "se_imgs": 5.8,
+          "ci95_imgs": [
+            -25.7,
+            24.3
+          ],
+          "gaps": [
+            -2,
+            10,
+            -10
+          ],
+          "same_sign_seeds": "2/3（−）",
+          "p_seeds_binomial": 1.0,
+          "range_imgs": 20,
+          "d4_sigma_hat": 11.8,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": -2,
+            "7": 10,
+            "2026": -10
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_mid.json",
+            "mlp": "compress_report_v4c_mid.json",
+            "cell": "a0.3_T1",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=0.3,T=3": {
+          "label": "中数据4500 × α=0.3 × T=3：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 52.7,
+          "sd_imgs": 15.9,
+          "se_imgs": 9.2,
+          "ci95_imgs": [
+            13.0,
+            92.3
+          ],
+          "gaps": [
+            71,
+            42,
+            45
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 29,
+          "d4_sigma_hat": 17.1,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 71,
+            "7": 42,
+            "2026": 45
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_mid.json",
+            "mlp": "compress_report_v4c_mid.json",
+            "cell": "a0.3_T3",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=0.3,T=6": {
+          "label": "中数据4500 × α=0.3 × T=6：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 98.0,
+          "sd_imgs": 23.8,
+          "se_imgs": 13.7,
+          "ci95_imgs": [
+            38.8,
+            157.2
+          ],
+          "gaps": [
+            125,
+            89,
+            80
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 45,
+          "d4_sigma_hat": 26.6,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 125,
+            "7": 89,
+            "2026": 80
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_mid.json",
+            "mlp": "compress_report_v4c_mid.json",
+            "cell": "a0.3_T6",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=0.7,T=1": {
+          "label": "中数据4500 × α=0.7 × T=1：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 2.3,
+          "sd_imgs": 8.1,
+          "se_imgs": 4.7,
+          "ci95_imgs": [
+            -17.7,
+            22.4
+          ],
+          "gaps": [
+            11,
+            1,
+            -5
+          ],
+          "same_sign_seeds": "2/3（+）",
+          "p_seeds_binomial": 1.0,
+          "range_imgs": 16,
+          "d4_sigma_hat": 9.5,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": 11,
+            "7": 1,
+            "2026": -5
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_mid.json",
+            "mlp": "compress_report_v4c_mid.json",
+            "cell": "a0.7_T1",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=0.7,T=3": {
+          "label": "中数据4500 × α=0.7 × T=3：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 56.7,
+          "sd_imgs": 37.6,
+          "se_imgs": 21.7,
+          "ci95_imgs": [
+            -36.9,
+            150.2
+          ],
+          "gaps": [
+            100,
+            38,
+            32
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 68,
+          "d4_sigma_hat": 40.2,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": 100,
+            "7": 38,
+            "2026": 32
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_mid.json",
+            "mlp": "compress_report_v4c_mid.json",
+            "cell": "a0.7_T3",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=0.7,T=6": {
+          "label": "中数据4500 × α=0.7 × T=6：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 99.7,
+          "sd_imgs": 30.1,
+          "se_imgs": 17.4,
+          "ci95_imgs": [
+            24.8,
+            174.5
+          ],
+          "gaps": [
+            128,
+            103,
+            68
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 60,
+          "d4_sigma_hat": 35.4,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 128,
+            "7": 103,
+            "2026": 68
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_mid.json",
+            "mlp": "compress_report_v4c_mid.json",
+            "cell": "a0.7_T6",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=1,T=1": {
+          "label": "中数据4500 × α=1 × T=1：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 3.7,
+          "sd_imgs": 11.1,
+          "se_imgs": 6.4,
+          "ci95_imgs": [
+            -23.8,
+            31.1
+          ],
+          "gaps": [
+            14,
+            -8,
+            5
+          ],
+          "same_sign_seeds": "2/3（+）",
+          "p_seeds_binomial": 1.0,
+          "range_imgs": 22,
+          "d4_sigma_hat": 13.0,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": 14,
+            "7": -8,
+            "2026": 5
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_mid.json",
+            "mlp": "compress_report_v4c_mid.json",
+            "cell": "a1_T1",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=1,T=3": {
+          "label": "中数据4500 × α=1 × T=3：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 54.3,
+          "sd_imgs": 40.5,
+          "se_imgs": 23.4,
+          "ci95_imgs": [
+            -46.3,
+            155.0
+          ],
+          "gaps": [
+            98,
+            47,
+            18
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 80,
+          "d4_sigma_hat": 47.3,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": 98,
+            "7": 47,
+            "2026": 18
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_mid.json",
+            "mlp": "compress_report_v4c_mid.json",
+            "cell": "a1_T3",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=1,T=6": {
+          "label": "中数据4500 × α=1 × T=6：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 106.0,
+          "sd_imgs": 39.3,
+          "se_imgs": 22.7,
+          "ci95_imgs": [
+            8.3,
+            203.7
+          ],
+          "gaps": [
+            142,
+            112,
+            64
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 78,
+          "d4_sigma_hat": 46.1,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 142,
+            "7": 112,
+            "2026": 64
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_mid.json",
+            "mlp": "compress_report_v4c_mid.json",
+            "cell": "a1_T6",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        }
+      },
+      "t_slope_paired": {
+        "α=0.3": {
+          "label": "中数据4500 × α=0.3：offset(T=6) − offset(T=1)（按流配对）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 98.7,
+          "sd_imgs": 25.1,
+          "se_imgs": 14.5,
+          "ci95_imgs": [
+            36.2,
+            161.1
+          ],
+          "gaps": [
+            127,
+            79,
+            90
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 48,
+          "d4_sigma_hat": 28.4,
+          "ci_excludes_zero": true
+        },
+        "α=0.7": {
+          "label": "中数据4500 × α=0.7：offset(T=6) − offset(T=1)（按流配对）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 97.3,
+          "sd_imgs": 22.4,
+          "se_imgs": 12.9,
+          "ci95_imgs": [
+            41.8,
+            152.9
+          ],
+          "gaps": [
+            117,
+            102,
+            73
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 44,
+          "d4_sigma_hat": 26.0,
+          "ci_excludes_zero": true
+        },
+        "α=1": {
+          "label": "中数据4500 × α=1：offset(T=6) − offset(T=1)（按流配对）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 102.3,
+          "sd_imgs": 37.7,
+          "se_imgs": 21.8,
+          "ci95_imgs": [
+            8.6,
+            196.1
+          ],
+          "gaps": [
+            128,
+            120,
+            59
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 69,
+          "d4_sigma_hat": 40.8,
+          "ci_excludes_zero": true
+        }
+      }
+    },
+    "满数据8500": {
+      "offset_by_cell": {
+        "α=0.3,T=1": {
+          "label": "满数据8500 × α=0.3 × T=1：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": -2.7,
+          "sd_imgs": 6.0,
+          "se_imgs": 3.5,
+          "ci95_imgs": [
+            -17.6,
+            12.3
+          ],
+          "gaps": [
+            3,
+            -2,
+            -9
+          ],
+          "same_sign_seeds": "2/3（−）",
+          "p_seeds_binomial": 1.0,
+          "range_imgs": 12,
+          "d4_sigma_hat": 7.1,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": 3,
+            "7": -2,
+            "2026": -9
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn.json",
+            "mlp": "compress_report_v4c.json",
+            "cell": "a0.3_T1",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=0.3,T=3": {
+          "label": "满数据8500 × α=0.3 × T=3：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 69.0,
+          "sd_imgs": 6.9,
+          "se_imgs": 4.0,
+          "ci95_imgs": [
+            51.8,
+            86.2
+          ],
+          "gaps": [
+            73,
+            61,
+            73
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 12,
+          "d4_sigma_hat": 7.1,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 73,
+            "7": 61,
+            "2026": 73
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn.json",
+            "mlp": "compress_report_v4c.json",
+            "cell": "a0.3_T3",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=0.3,T=6": {
+          "label": "满数据8500 × α=0.3 × T=6：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 125.0,
+          "sd_imgs": 20.1,
+          "se_imgs": 11.6,
+          "ci95_imgs": [
+            75.1,
+            174.9
+          ],
+          "gaps": [
+            123,
+            146,
+            106
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 40,
+          "d4_sigma_hat": 23.6,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 123,
+            "7": 146,
+            "2026": 106
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn.json",
+            "mlp": "compress_report_v4c.json",
+            "cell": "a0.3_T6",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=0.7,T=1": {
+          "label": "满数据8500 × α=0.7 × T=1：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": -9.0,
+          "sd_imgs": 5.2,
+          "se_imgs": 3.0,
+          "ci95_imgs": [
+            -21.9,
+            3.9
+          ],
+          "gaps": [
+            -12,
+            -3,
+            -12
+          ],
+          "same_sign_seeds": "3/3（−）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 9,
+          "d4_sigma_hat": 5.3,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": -12,
+            "7": -3,
+            "2026": -12
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn.json",
+            "mlp": "compress_report_v4c.json",
+            "cell": "a0.7_T1",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=0.7,T=3": {
+          "label": "满数据8500 × α=0.7 × T=3：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 76.7,
+          "sd_imgs": 7.1,
+          "se_imgs": 4.1,
+          "ci95_imgs": [
+            59.0,
+            94.3
+          ],
+          "gaps": [
+            69,
+            78,
+            83
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 14,
+          "d4_sigma_hat": 8.3,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 69,
+            "7": 78,
+            "2026": 83
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn.json",
+            "mlp": "compress_report_v4c.json",
+            "cell": "a0.7_T3",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=0.7,T=6": {
+          "label": "满数据8500 × α=0.7 × T=6：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 142.3,
+          "sd_imgs": 30.7,
+          "se_imgs": 17.7,
+          "ci95_imgs": [
+            66.2,
+            218.5
+          ],
+          "gaps": [
+            162,
+            158,
+            107
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 55,
+          "d4_sigma_hat": 32.5,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 162,
+            "7": 158,
+            "2026": 107
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn.json",
+            "mlp": "compress_report_v4c.json",
+            "cell": "a0.7_T6",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=1,T=1": {
+          "label": "满数据8500 × α=1 × T=1：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": -5.0,
+          "sd_imgs": 4.4,
+          "se_imgs": 2.5,
+          "ci95_imgs": [
+            -15.8,
+            5.8
+          ],
+          "gaps": [
+            -3,
+            -2,
+            -10
+          ],
+          "same_sign_seeds": "3/3（−）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 8,
+          "d4_sigma_hat": 4.7,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": -3,
+            "7": -2,
+            "2026": -10
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn.json",
+            "mlp": "compress_report_v4c.json",
+            "cell": "a1_T1",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=1,T=3": {
+          "label": "满数据8500 × α=1 × T=3：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 84.3,
+          "sd_imgs": 18.8,
+          "se_imgs": 10.9,
+          "ci95_imgs": [
+            37.6,
+            131.1
+          ],
+          "gaps": [
+            106,
+            72,
+            75
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 34,
+          "d4_sigma_hat": 20.1,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 106,
+            "7": 72,
+            "2026": 75
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn.json",
+            "mlp": "compress_report_v4c.json",
+            "cell": "a1_T3",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        },
+        "α=1,T=6": {
+          "label": "满数据8500 × α=1 × T=6：跨族配对偏移（3 条流）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 144.3,
+          "sd_imgs": 37.1,
+          "se_imgs": 21.4,
+          "ci95_imgs": [
+            52.2,
+            236.5
+          ],
+          "gaps": [
+            152,
+            177,
+            104
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 73,
+          "d4_sigma_hat": 43.1,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 152,
+            "7": 177,
+            "2026": 104
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn.json",
+            "mlp": "compress_report_v4c.json",
+            "cell": "a1_T6",
+            "flows": [
+              42,
+              7,
+              2026
+            ],
+            "n": 3
+          }
+        }
+      },
+      "t_slope_paired": {
+        "α=0.3": {
+          "label": "满数据8500 × α=0.3：offset(T=6) − offset(T=1)（按流配对）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 127.7,
+          "sd_imgs": 17.8,
+          "se_imgs": 10.3,
+          "ci95_imgs": [
+            83.5,
+            171.9
+          ],
+          "gaps": [
+            120,
+            148,
+            115
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 33,
+          "d4_sigma_hat": 19.5,
+          "ci_excludes_zero": true
+        },
+        "α=0.7": {
+          "label": "满数据8500 × α=0.7：offset(T=6) − offset(T=1)（按流配对）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 151.3,
+          "sd_imgs": 28.7,
+          "se_imgs": 16.6,
+          "ci95_imgs": [
+            79.9,
+            222.7
+          ],
+          "gaps": [
+            174,
+            161,
+            119
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 55,
+          "d4_sigma_hat": 32.5,
+          "ci_excludes_zero": true
+        },
+        "α=1": {
+          "label": "满数据8500 × α=1：offset(T=6) − offset(T=1)（按流配对）",
+          "n_seeds": 3,
+          "mean_gap_imgs": 149.3,
+          "sd_imgs": 32.9,
+          "se_imgs": 19.0,
+          "ci95_imgs": [
+            67.7,
+            231.0
+          ],
+          "gaps": [
+            155,
+            179,
+            114
+          ],
+          "same_sign_seeds": "3/3（+）",
+          "p_seeds_binomial": 0.25,
+          "range_imgs": 65,
+          "d4_sigma_hat": 38.4,
+          "ci_excludes_zero": true
+        }
+      }
+    }
+  },
+  "reading_B2_offset_vs_T_8flows": {
+    "低数据2000": {
+      "offset_by_cell": {
+        "α=0.3,T=1": {
+          "label": "低数据2000 × α=0.3 × T=1：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 5.6,
+          "sd_imgs": 11.5,
+          "se_imgs": 4.0,
+          "ci95_imgs": [
+            -3.9,
+            15.2
+          ],
+          "gaps": [
+            5,
+            16,
+            12,
+            -9,
+            -8,
+            0,
+            24,
+            5
+          ],
+          "same_sign_seeds": "5/8（+）",
+          "p_seeds_binomial": 0.7266,
+          "range_imgs": 33,
+          "d4_sigma_hat": 11.6,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": 5,
+            "7": 16,
+            "2026": 12,
+            "11": -9,
+            "202": -8,
+            "3003": 0,
+            "40004": 24,
+            "55555": 5
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low_n8.json",
+            "mlp": "compress_report_v4c_low_n8.json",
+            "cell": "a0.3_T1",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        },
+        "α=0.3,T=3": {
+          "label": "低数据2000 × α=0.3 × T=3：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 66.2,
+          "sd_imgs": 32.5,
+          "se_imgs": 11.5,
+          "ci95_imgs": [
+            39.1,
+            93.4
+          ],
+          "gaps": [
+            92,
+            34,
+            85,
+            27,
+            47,
+            88,
+            115,
+            42
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 88,
+          "d4_sigma_hat": 30.9,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 92,
+            "7": 34,
+            "2026": 85,
+            "11": 27,
+            "202": 47,
+            "3003": 88,
+            "40004": 115,
+            "55555": 42
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low_n8.json",
+            "mlp": "compress_report_v4c_low_n8.json",
+            "cell": "a0.3_T3",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        },
+        "α=0.3,T=6": {
+          "label": "低数据2000 × α=0.3 × T=6：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 75.5,
+          "sd_imgs": 33.6,
+          "se_imgs": 11.9,
+          "ci95_imgs": [
+            47.4,
+            103.6
+          ],
+          "gaps": [
+            117,
+            87,
+            84,
+            26,
+            46,
+            48,
+            119,
+            77
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 93,
+          "d4_sigma_hat": 32.7,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 117,
+            "7": 87,
+            "2026": 84,
+            "11": 26,
+            "202": 46,
+            "3003": 48,
+            "40004": 119,
+            "55555": 77
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low_n8.json",
+            "mlp": "compress_report_v4c_low_n8.json",
+            "cell": "a0.3_T6",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        },
+        "α=0.7,T=1": {
+          "label": "低数据2000 × α=0.7 × T=1：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 2.5,
+          "sd_imgs": 32.6,
+          "se_imgs": 11.5,
+          "ci95_imgs": [
+            -24.8,
+            29.8
+          ],
+          "gaps": [
+            9,
+            24,
+            19,
+            -42,
+            -27,
+            15,
+            53,
+            -31
+          ],
+          "same_sign_seeds": "5/8（+）",
+          "p_seeds_binomial": 0.7266,
+          "range_imgs": 95,
+          "d4_sigma_hat": 33.4,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": 9,
+            "7": 24,
+            "2026": 19,
+            "11": -42,
+            "202": -27,
+            "3003": 15,
+            "40004": 53,
+            "55555": -31
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low_n8.json",
+            "mlp": "compress_report_v4c_low_n8.json",
+            "cell": "a0.7_T1",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        },
+        "α=0.7,T=3": {
+          "label": "低数据2000 × α=0.7 × T=3：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 58.2,
+          "sd_imgs": 37.4,
+          "se_imgs": 13.2,
+          "ci95_imgs": [
+            27.0,
+            89.5
+          ],
+          "gaps": [
+            109,
+            54,
+            80,
+            18,
+            42,
+            62,
+            99,
+            2
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 107,
+          "d4_sigma_hat": 37.6,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 109,
+            "7": 54,
+            "2026": 80,
+            "11": 18,
+            "202": 42,
+            "3003": 62,
+            "40004": 99,
+            "55555": 2
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low_n8.json",
+            "mlp": "compress_report_v4c_low_n8.json",
+            "cell": "a0.7_T3",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        },
+        "α=0.7,T=6": {
+          "label": "低数据2000 × α=0.7 × T=6：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 63.0,
+          "sd_imgs": 28.8,
+          "se_imgs": 10.2,
+          "ci95_imgs": [
+            38.9,
+            87.1
+          ],
+          "gaps": [
+            90,
+            78,
+            75,
+            25,
+            63,
+            46,
+            102,
+            25
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 77,
+          "d4_sigma_hat": 27.0,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 90,
+            "7": 78,
+            "2026": 75,
+            "11": 25,
+            "202": 63,
+            "3003": 46,
+            "40004": 102,
+            "55555": 25
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low_n8.json",
+            "mlp": "compress_report_v4c_low_n8.json",
+            "cell": "a0.7_T6",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        },
+        "α=1,T=1": {
+          "label": "低数据2000 × α=1 × T=1：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": -2.5,
+          "sd_imgs": 31.7,
+          "se_imgs": 11.2,
+          "ci95_imgs": [
+            -29.0,
+            24.0
+          ],
+          "gaps": [
+            -6,
+            20,
+            23,
+            -31,
+            -40,
+            17,
+            39,
+            -42
+          ],
+          "same_sign_seeds": "4/8（+）",
+          "p_seeds_binomial": 1.0,
+          "range_imgs": 81,
+          "d4_sigma_hat": 28.5,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": -6,
+            "7": 20,
+            "2026": 23,
+            "11": -31,
+            "202": -40,
+            "3003": 17,
+            "40004": 39,
+            "55555": -42
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low_n8.json",
+            "mlp": "compress_report_v4c_low_n8.json",
+            "cell": "a1_T1",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        },
+        "α=1,T=3": {
+          "label": "低数据2000 × α=1 × T=3：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 64.4,
+          "sd_imgs": 33.0,
+          "se_imgs": 11.7,
+          "ci95_imgs": [
+            36.8,
+            91.9
+          ],
+          "gaps": [
+            104,
+            70,
+            90,
+            16,
+            51,
+            68,
+            95,
+            21
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 88,
+          "d4_sigma_hat": 30.9,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 104,
+            "7": 70,
+            "2026": 90,
+            "11": 16,
+            "202": 51,
+            "3003": 68,
+            "40004": 95,
+            "55555": 21
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low_n8.json",
+            "mlp": "compress_report_v4c_low_n8.json",
+            "cell": "a1_T3",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        },
+        "α=1,T=6": {
+          "label": "低数据2000 × α=1 × T=6：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 59.2,
+          "sd_imgs": 32.8,
+          "se_imgs": 11.6,
+          "ci95_imgs": [
+            31.8,
+            86.7
+          ],
+          "gaps": [
+            99,
+            87,
+            77,
+            21,
+            48,
+            38,
+            89,
+            15
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 84,
+          "d4_sigma_hat": 29.5,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 99,
+            "7": 87,
+            "2026": 77,
+            "11": 21,
+            "202": 48,
+            "3003": 38,
+            "40004": 89,
+            "55555": 15
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_low_n8.json",
+            "mlp": "compress_report_v4c_low_n8.json",
+            "cell": "a1_T6",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        }
+      },
+      "t_slope_paired": {
+        "α=0.3": {
+          "label": "低数据2000 × α=0.3：offset(T=6) − offset(T=1)（按流配对）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 69.9,
+          "sd_imgs": 25.0,
+          "se_imgs": 8.8,
+          "ci95_imgs": [
+            49.0,
+            90.7
+          ],
+          "gaps": [
+            112,
+            71,
+            72,
+            35,
+            54,
+            48,
+            95,
+            72
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 77,
+          "d4_sigma_hat": 27.0,
+          "ci_excludes_zero": true
+        },
+        "α=0.7": {
+          "label": "低数据2000 × α=0.7：offset(T=6) − offset(T=1)（按流配对）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 60.5,
+          "sd_imgs": 18.6,
+          "se_imgs": 6.6,
+          "ci95_imgs": [
+            45.0,
+            76.0
+          ],
+          "gaps": [
+            81,
+            54,
+            56,
+            67,
+            90,
+            31,
+            49,
+            56
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 59,
+          "d4_sigma_hat": 20.7,
+          "ci_excludes_zero": true
+        },
+        "α=1": {
+          "label": "低数据2000 × α=1：offset(T=6) − offset(T=1)（按流配对）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 61.8,
+          "sd_imgs": 25.5,
+          "se_imgs": 9.0,
+          "ci95_imgs": [
+            40.4,
+            83.1
+          ],
+          "gaps": [
+            105,
+            67,
+            54,
+            52,
+            88,
+            21,
+            50,
+            57
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 84,
+          "d4_sigma_hat": 29.5,
+          "ci_excludes_zero": true
+        }
+      }
+    },
+    "满数据8500": {
+      "offset_by_cell": {
+        "α=0.3,T=1": {
+          "label": "满数据8500 × α=0.3 × T=1：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 0.5,
+          "sd_imgs": 10.8,
+          "se_imgs": 3.8,
+          "ci95_imgs": [
+            -8.5,
+            9.5
+          ],
+          "gaps": [
+            3,
+            -2,
+            -9,
+            25,
+            -4,
+            -7,
+            3,
+            -5
+          ],
+          "same_sign_seeds": "5/8（−）",
+          "p_seeds_binomial": 0.7266,
+          "range_imgs": 34,
+          "d4_sigma_hat": 11.9,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": 3,
+            "7": -2,
+            "2026": -9,
+            "11": 25,
+            "202": -4,
+            "3003": -7,
+            "40004": 3,
+            "55555": -5
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_n8.json",
+            "mlp": "compress_report_v4c_n8.json",
+            "cell": "a0.3_T1",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        },
+        "α=0.3,T=3": {
+          "label": "满数据8500 × α=0.3 × T=3：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 58.0,
+          "sd_imgs": 24.7,
+          "se_imgs": 8.7,
+          "ci95_imgs": [
+            37.3,
+            78.7
+          ],
+          "gaps": [
+            73,
+            61,
+            73,
+            79,
+            61,
+            44,
+            70,
+            3
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 76,
+          "d4_sigma_hat": 26.7,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 73,
+            "7": 61,
+            "2026": 73,
+            "11": 79,
+            "202": 61,
+            "3003": 44,
+            "40004": 70,
+            "55555": 3
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_n8.json",
+            "mlp": "compress_report_v4c_n8.json",
+            "cell": "a0.3_T3",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        },
+        "α=0.3,T=6": {
+          "label": "满数据8500 × α=0.3 × T=6：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 105.8,
+          "sd_imgs": 28.5,
+          "se_imgs": 10.1,
+          "ci95_imgs": [
+            81.9,
+            129.6
+          ],
+          "gaps": [
+            123,
+            146,
+            106,
+            131,
+            96,
+            91,
+            100,
+            53
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 93,
+          "d4_sigma_hat": 32.7,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 123,
+            "7": 146,
+            "2026": 106,
+            "11": 131,
+            "202": 96,
+            "3003": 91,
+            "40004": 100,
+            "55555": 53
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_n8.json",
+            "mlp": "compress_report_v4c_n8.json",
+            "cell": "a0.3_T6",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        },
+        "α=0.7,T=1": {
+          "label": "满数据8500 × α=0.7 × T=1：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": -1.1,
+          "sd_imgs": 13.0,
+          "se_imgs": 4.6,
+          "ci95_imgs": [
+            -12.0,
+            9.7
+          ],
+          "gaps": [
+            -12,
+            -3,
+            -12,
+            12,
+            0,
+            -7,
+            24,
+            -11
+          ],
+          "same_sign_seeds": "5/8（−）",
+          "p_seeds_binomial": 0.7266,
+          "range_imgs": 36,
+          "d4_sigma_hat": 12.6,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": -12,
+            "7": -3,
+            "2026": -12,
+            "11": 12,
+            "202": 0,
+            "3003": -7,
+            "40004": 24,
+            "55555": -11
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_n8.json",
+            "mlp": "compress_report_v4c_n8.json",
+            "cell": "a0.7_T1",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        },
+        "α=0.7,T=3": {
+          "label": "满数据8500 × α=0.7 × T=3：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 61.2,
+          "sd_imgs": 22.3,
+          "se_imgs": 7.9,
+          "ci95_imgs": [
+            42.6,
+            79.9
+          ],
+          "gaps": [
+            69,
+            78,
+            83,
+            74,
+            52,
+            40,
+            75,
+            19
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 64,
+          "d4_sigma_hat": 22.5,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 69,
+            "7": 78,
+            "2026": 83,
+            "11": 74,
+            "202": 52,
+            "3003": 40,
+            "40004": 75,
+            "55555": 19
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_n8.json",
+            "mlp": "compress_report_v4c_n8.json",
+            "cell": "a0.7_T3",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        },
+        "α=0.7,T=6": {
+          "label": "满数据8500 × α=0.7 × T=6：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 110.9,
+          "sd_imgs": 34.4,
+          "se_imgs": 12.2,
+          "ci95_imgs": [
+            82.1,
+            139.7
+          ],
+          "gaps": [
+            162,
+            158,
+            107,
+            111,
+            96,
+            76,
+            111,
+            66
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 96,
+          "d4_sigma_hat": 33.7,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 162,
+            "7": 158,
+            "2026": 107,
+            "11": 111,
+            "202": 96,
+            "3003": 76,
+            "40004": 111,
+            "55555": 66
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_n8.json",
+            "mlp": "compress_report_v4c_n8.json",
+            "cell": "a0.7_T6",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        },
+        "α=1,T=1": {
+          "label": "满数据8500 × α=1 × T=1：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": -1.8,
+          "sd_imgs": 13.1,
+          "se_imgs": 4.6,
+          "ci95_imgs": [
+            -12.7,
+            9.2
+          ],
+          "gaps": [
+            -3,
+            -2,
+            -10,
+            21,
+            -8,
+            -11,
+            15,
+            -16
+          ],
+          "same_sign_seeds": "6/8（−）",
+          "p_seeds_binomial": 0.2891,
+          "range_imgs": 37,
+          "d4_sigma_hat": 13.0,
+          "ci_excludes_zero": false,
+          "offset_by_seed": {
+            "42": -3,
+            "7": -2,
+            "2026": -10,
+            "11": 21,
+            "202": -8,
+            "3003": -11,
+            "40004": 15,
+            "55555": -16
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_n8.json",
+            "mlp": "compress_report_v4c_n8.json",
+            "cell": "a1_T1",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        },
+        "α=1,T=3": {
+          "label": "满数据8500 × α=1 × T=3：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 70.6,
+          "sd_imgs": 21.0,
+          "se_imgs": 7.4,
+          "ci95_imgs": [
+            53.1,
+            88.2
+          ],
+          "gaps": [
+            106,
+            72,
+            75,
+            77,
+            53,
+            64,
+            83,
+            35
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 71,
+          "d4_sigma_hat": 24.9,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 106,
+            "7": 72,
+            "2026": 75,
+            "11": 77,
+            "202": 53,
+            "3003": 64,
+            "40004": 83,
+            "55555": 35
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_n8.json",
+            "mlp": "compress_report_v4c_n8.json",
+            "cell": "a1_T3",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        },
+        "α=1,T=6": {
+          "label": "满数据8500 × α=1 × T=6：跨族配对偏移（8 条流）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 112.6,
+          "sd_imgs": 39.3,
+          "se_imgs": 13.9,
+          "ci95_imgs": [
+            79.8,
+            145.5
+          ],
+          "gaps": [
+            152,
+            177,
+            104,
+            122,
+            97,
+            93,
+            109,
+            47
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 130,
+          "d4_sigma_hat": 45.7,
+          "ci_excludes_zero": true,
+          "offset_by_seed": {
+            "42": 152,
+            "7": 177,
+            "2026": 104,
+            "11": 122,
+            "202": 97,
+            "3003": 93,
+            "40004": 109,
+            "55555": 47
+          },
+          "provenance": {
+            "cnn": "compress_report_v4c_cnn_n8.json",
+            "mlp": "compress_report_v4c_n8.json",
+            "cell": "a1_T6",
+            "flows": [
+              42,
+              7,
+              2026,
+              11,
+              202,
+              3003,
+              40004,
+              55555
+            ],
+            "n": 8
+          }
+        }
+      },
+      "t_slope_paired": {
+        "α=0.3": {
+          "label": "满数据8500 × α=0.3：offset(T=6) − offset(T=1)（按流配对）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 105.2,
+          "sd_imgs": 25.4,
+          "se_imgs": 9.0,
+          "ci95_imgs": [
+            84.0,
+            126.5
+          ],
+          "gaps": [
+            120,
+            148,
+            115,
+            106,
+            100,
+            98,
+            97,
+            58
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 90,
+          "d4_sigma_hat": 31.6,
+          "ci_excludes_zero": true
+        },
+        "α=0.7": {
+          "label": "满数据8500 × α=0.7：offset(T=6) − offset(T=1)（按流配对）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 112.0,
+          "sd_imgs": 36.7,
+          "se_imgs": 13.0,
+          "ci95_imgs": [
+            81.3,
+            142.7
+          ],
+          "gaps": [
+            174,
+            161,
+            119,
+            99,
+            96,
+            83,
+            87,
+            77
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 97,
+          "d4_sigma_hat": 34.1,
+          "ci_excludes_zero": true
+        },
+        "α=1": {
+          "label": "满数据8500 × α=1：offset(T=6) − offset(T=1)（按流配对）",
+          "n_seeds": 8,
+          "mean_gap_imgs": 114.4,
+          "sd_imgs": 36.4,
+          "se_imgs": 12.9,
+          "ci95_imgs": [
+            84.0,
+            144.8
+          ],
+          "gaps": [
+            155,
+            179,
+            114,
+            101,
+            105,
+            104,
+            94,
+            63
+          ],
+          "same_sign_seeds": "8/8（+）",
+          "p_seeds_binomial": 0.0078,
+          "range_imgs": 116,
+          "d4_sigma_hat": 40.7,
+          "ci_excludes_zero": true
+        }
+      }
+    }
+  },
+  "section2_power_check": {
+    "buys": "上面 docstring 落地⑧ 第 3 笔：q=0 里『效应为 0』与『3 条流测不动』分不开",
+    "q8_T1_cells_out_of_zero": 0,
+    "denominator": "6 格（2 档 × α∈{0.3,0.7,1.0} 的 T=1 列）——不是读法 B 的 9 格，中数据档两族都没有 8 流网格",
+    "half_width_ratio_8_over_3": {
+      "低数据2000 × α=0.3": 0.692,
+      "低数据2000 × α=0.7": 1.441,
+      "低数据2000 × α=1": 0.668,
+      "满数据8500 × α=0.3": 0.602,
+      "满数据8500 × α=0.7": 0.841,
+      "满数据8500 × α=1": 1.014
+    },
+    "half_width_ratio_median": 0.766,
+    "ex_ante_expected_ratio": 0.337,
+    "precondition_甲_嵌套": "过（比了 120 行、红 0 条）",
+    "precondition_乙_形状互锁": "闸 IV 已含 8 流两对（15 格逐位相同）",
+    "precondition_丙_半宽变窄": "不过（逐格 {'低数据2000 × α=0.3': 0.692, '低数据2000 × α=0.7': 1.441, '低数据2000 × α=1': 0.668, '满数据8500 × α=0.3': 0.602, '满数据8500 × α=0.7': 0.841, '满数据8500 × α=1': 1.014}）",
+    "exit": "(u) 前置不过 ⇒ 本段只报数，不产出任何话。甲红 0 条（比了 120 行）、丙半宽比 {'低数据2000 × α=0.3': 0.692, '低数据2000 × α=0.7': 1.441, '低数据2000 × α=1': 0.668, '满数据8500 × α=0.3': 0.602, '满数据8500 × α=0.7': 0.841, '满数据8500 × α=1': 1.014} ⇒ 两把尺子要么不嵌套、要么加宽没换来更窄的区间，'8 流仍然测不出'这句话没有凭据（这一段没测到，不叫通过）",
+    "verdict": "(u) 前置不过 ⇒ 本段只报数，不产出任何话。甲红 0 条（比了 120 行）、丙半宽比 {'低数据2000 × α=0.3': 0.692, '低数据2000 × α=0.7': 1.441, '低数据2000 × α=1': 0.668, '满数据8500 × α=0.3': 0.602, '满数据8500 × α=0.7': 0.841, '满数据8500 × α=1': 1.014} ⇒ 两把尺子要么不嵌套、要么加宽没换来更窄的区间，'8 流仍然测不出'这句话没有凭据（这一段没测到，不叫通过）",
+    "T6_column_8flows_descriptive": 6,
+    "not_a_re_verdict": "R1：这一段不重开出口——`exit`/`verdict` 两个顶层键与 v1 逐字相同，段② 只住在这一个独立键里"
+  },
+  "counts": {
+    "p_A_cells_out_of_zero": 9,
+    "p_A_cells_total": 9,
+    "q_B_T1_cells_out_of_zero": 0,
+    "q_B_T1_cells_total": 9,
+    "B_T6_cells_out_of_zero_descriptive": 9,
+    "q8_B2_T1_cells_out_of_zero": 0,
+    "q8_B2_T1_cells_total": 6,
+    "nested_rows_compared": 120
+  },
+  "shape_identity": {
+    "两族软标签体检逐位相同": "15/15 格（3 对 3 流 + 2 对 8 流 × T∈{1,3,6}）",
+    "老师在这个拟合集上的精度": 0.9798
+  },
+  "v2_increment": "v2 相对 v1 只多了段② 那几位（reading_B2_offset_vs_T_8flows、section2_power_check、counts 里三枚 q8/嵌套计数、gates 里的闸VI）＋闸 IV 的参评对数（3 对→5 对）与由此带动的活计数（II-a 行数 / II-b 次数 / 本数）。`quantity`、`pays`、`sign_convention`、`exit`、`verdict`、`reading_A_paired_T6_8flows`、`reading_B_offset_vs_T_3flows` 与 v1 逐字段相同⇒ 除这些位之外任何一处不相同，就是这段升版把判决碰着了",
+  "exit": "(a) 交互成立：q=0（T=1 那一列 9 格处处测不出）、p=9（T=6 那一列 9 格里 9 格测得出），而闸 IV 已把两族的软标签形状钉成同一份 ⇒ 那条跨族差既不是『CNN 天生抗蒸馏』、也不是『两族读到的形状不同』，是**这份形状 × 这个学生族**的交互",
+  "verdict": "(a) 交互成立：q=0（T=1 那一列 9 格处处测不出）、p=9（T=6 那一列 9 格里 9 格测得出），而闸 IV 已把两族的软标签形状钉成同一份 ⇒ 那条跨族差既不是『CNN 天生抗蒸馏』、也不是『两族读到的形状不同』，是**这份形状 × 这个学生族**的交互",
+  "cost": {
+    "arm_trainings": 0,
+    "total": 0,
+    "api_fee": 0,
+    "note": "纯读档 + 一次老师前向：16 本在册账的原始错图数逐流相减，不训练任何学生。但段② 不是免费的：它吃的三本 8 流 v4c 网格（`compress_report_v4c_cnn_n8.json` / `compress_report_v4c_cnn_low_n8.json` / `compress_report_v4c_low_n8.json`）是 step4c 那 88×3 = 264 次训练换来的，训练数记在那一发，不记在本脚本"
+  },
+  "limitations": [
+    "两把尺子不许横比：读法 A 是 8 条流、读法 B 是 3 条流，σ̂ 与 CI 半宽都不同；B 只回答『偏移跟不跟 T 走』，不回答『偏移是多少张』——后者只由 A 报",
+    "『形状同一份』由闸 IV 钉（读档 + 现算）。它排除的是『两族读的不是同一批软标签』这一支，不排除『同一份形状对不同架构作用不同』——恰恰后者是本发的读数对象",
+    "本发不新增任何独立性维度：七维（档/宽/族/任务/老师/温度列/流数）一维都没换，换的是**归因**（把点估计买成配对读数）⇒ 既不叫复证也不叫翻案",
+    "读法 B 的温度只有三个点且带并列 ⇒ 这里不报相关系数：3 点、带 ties 的 Spearman ρ 在任何预登记口径下都够不着判定门槛，报了就是给噪声配一个数字",
+    "出口 (a) 只数『CI 不含 0 的格数』；不含 0 的格落在哪一档、三档是否同号，全部写在 `reading_A_paired_T6_8flows` 里由读者自己看，本发不据它另立一句判词",
+    "阶梯三对里有 2 对的 MLP 本记的是 v4 时代的判据（compress_report_v4f_low_n8_thin_t6_v4.json、compress_report_v4f_n8_t6_v4.json）：它们的 `student_arch` 字段是缺的 ⇒ 家族位这件事只由文件名定；本发只取它们的原始错图数（`wrong_ce`/`wrong_kd`/`gap_imgs` 与判据版本无关），**不取它们的判词** ⇒ 谁引用这一格的形状判词，不许把 v4 账与 v5 账混作一版（档案里没有'这本在 v5 之下怎么判'的字段，守卫也没替它复算过）",
+    "段② 只把**流数**这一维从 3 加宽到 8，档/宽/族/任务/老师/温度列一维都没换 ⇒ 它加强的是读法 B 那条结论的**功效**，不是它的外部效度；而且 q8 的分母是 6 格（中数据档两族都没有 8 流网格）——与 q 的 9 格不许比大小，只许各自报数",
+    "(i) 那一支只**削弱**不证伪『3 条流测不动』：8 条流仍可能功效不足（判据只要求半宽比 < 1，没要求窄到能测出某个预先指定的效应量）⇒ 谁要把 q=0 读成『T=1 处跨族差为 0』，那是把『更宽的尺子也量不出』读成『量为 0』"
+  ],
+  "red_modes": {
+    "--tierblind": "把低数据档的 MLP 阶梯换成中数据档那本（流名单仍相同）⇒ 只有闸 III 该红，且闸 I 必须全绿（两腿分离）",
+    "--unpair": "把配对里 CNN 那一侧整体错开一位 ⇒ 只有闸 II-b 该红；II-a、闸 I、闸 III 全绿（实测不变的只有**点估计与两族各自的逐侧均值**——CI 端点会跟着配对移动，所以看得见它的仍然是逐流序列；预登记那句'CI 宽度不动'是断言过头，见落地⑥）",
+    "--nest": "（v2 新增，钉闸 VI）把满数据档 8 流 CNN 那本 `match_T6` 里种子 42 的 `wrong_ce` 在内存里 +1 ⇒ 只有闸 VI 该红：那一格既不进读法 A/B 的 9 个 α×T 格（所以 II-a 看不见它），也不动档/宽/族/流名单（所以闸 I、III 看不见它）"
+  }
+}

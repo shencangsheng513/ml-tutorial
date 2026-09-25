@@ -129,7 +129,9 @@ from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
 # v2 = v1 + 顶层 `seeds`（本课用的那 8 条流的名字直接落档）。老档 v1 原样留盘，逐字段对着读。
-OUT = HERE / "compress_report_v4i_mechanism_v2.json"
+# v3 = v2 + `repro_scan_T3_ladder` 每一格带上 summarize 的原始载荷（含逐流 gaps）：
+#      v2 那 10 条 CI 只有三个别名键，档案里没有原料 ⇒ 守卫复算不了 = 口径外。老档 v1/v2 留盘对账。
+OUT = HERE / "compress_report_v4i_mechanism_v3.json"
 
 TIER, WIDTH = "中数据4500", 128
 SMALL, T_LO, T_HI = 0.05, 3.0, 6.0
@@ -314,7 +316,8 @@ def repro_scan(target: dict, ladder: dict, seeds: list[int]) -> dict:
     out = {}
     for a, cell in sorted(ladder["cells"].items()):
         s = summarize([target[sd] - cell[sd] for sd in seeds], f"目标 − T3@α={a:g}")
-        out[f"α={a:g}"] = {"residual_imgs": s["mean_gap_imgs"], "ci95_imgs": s["ci95_imgs"],
+        out[f"α={a:g}"] = {**s,
+                           "residual_imgs": s["mean_gap_imgs"], "ci95_imgs": s["ci95_imgs"],
                            "same_sign": s["same_sign_seeds"], "p": s["p_seeds_binomial"],
                            "reproduces": bool(s["ci95_imgs"][0] <= 0 <= s["ci95_imgs"][1])}
     return out
@@ -485,6 +488,12 @@ def main(teacherblind: bool = False, t2claim: bool = False, scramble: bool = Fal
            "repro_scan_T3_ladder": scan, "share_of_nail": frac, "exit": exit_rule,
            "verdict": exit_rule,
            "limitations": [
+               "v3 相对 v2 只在 `repro_scan_T3_ladder` 的每一格里带上 summarize 的原始载荷"
+               "（`gaps`/`n_seeds`/`sd_imgs`/`se_imgs`/`range_imgs`/`d4_sigma_hat` 与那三个别名键的原件）："
+               "v2 那 5 格只落了 `residual_imgs`/`ci95_imgs`/`same_sign` 三个别名 ⇒ 档案里没有逐流序列，"
+               "守卫拿到 CI 却复算不了它，这批读数当时在口径外。补上之后每一格都必须能从自己的 gaps "
+               "逐字段重现（守卫闸⑭）。除这些键之外 v3 与 v2 必须逐字段相同——那句相同是本轮 B"
+               "『派生账的 CI 无闸』那笔账的收据，不是顺手改的借口。",
                "v2 相对 v1 只多一个顶层键 `seeds`：v1 只记了流池大小与两本来源账，"
                "『这一发用的是哪批流』要跳一跳（去那两本里读）才拿得到，守卫闸⑩ 的档案侧扫描因此看不见它。"
                "补上名字之后两本账除这个键之外必须逐字段相同——这一条是本轮 D 那笔仪器欠账的收据。",

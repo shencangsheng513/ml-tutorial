@@ -1,0 +1,338 @@
+{
+  "quantity": "α=0.05 那一格的跨列之差（T=6 列 − T=3 列，gap 单位=CE错图−KD错图，负=T=6 多错）拆成『权重通道』与『内容通道』两条候选各吃多少",
+  "seeds": [
+    42,
+    7,
+    2026,
+    11,
+    202,
+    3003,
+    40004,
+    55555
+  ],
+  "coordinate": {
+    "tier": "中数据4500",
+    "width": 128,
+    "flow_pool": 8,
+    "cell": "α=0.05",
+    "temps": [
+      3.0,
+      6.0
+    ],
+    "archives": [
+      "compress_report_v4f_mid_n8_v4.json",
+      "compress_report_v4f_mid_n8_t6_v4.json"
+    ],
+    "probe_baseline": "compress_report_v4c_mid.json",
+    "nail_archive": "compress_report_v4h_crosscol_v6.json"
+  },
+  "sign_correction": "第4课h 的 `quantity` 字段与 docstring 落地④ 把这句话写成『T=6 少错 28 张』，方向反了；本课逐位复算两本账的 gap 与那条跨列差之后按『多错 28 张』修正（数字未动，旧档案 v1~v6 的字段文本按『入库不改』原样留着）",
+  "decomposition": "α 固定 ⇒ (1−α)·CE 那半的权重与 T 无关（被构造排除）；剩下的两个通道：①KD 项力度 α·‖∇(T²KL)‖（T² 补偿不精确 ⇒ 换 T 顺带换权重）②软标签形状（argmax 与 T 无关，只有配比变）。二者穷尽，所以出口是二分的。",
+  "gates": {
+    "teacher_acc_recomputed": 0.9798,
+    "teacher_acc_archives": 0.9798,
+    "ce_minus_number_checked": "8/8"
+  },
+  "probe_by_T": {
+    "1.0": {
+      "batch0": {
+        "g_ce": 0.49343,
+        "g_kd_unit": 0.48723
+      },
+      "batches": [
+        {
+          "g_ce": 0.49343,
+          "g_kd_unit": 0.48723
+        },
+        {
+          "g_ce": 0.56465,
+          "g_kd_unit": 0.5635
+        },
+        {
+          "g_ce": 0.56578,
+          "g_kd_unit": 0.56311
+        },
+        {
+          "g_ce": 0.53349,
+          "g_kd_unit": 0.53083
+        },
+        {
+          "g_ce": 0.54829,
+          "g_kd_unit": 0.54792
+        }
+      ]
+    },
+    "3.0": {
+      "batch0": {
+        "g_ce": 0.49343,
+        "g_kd_unit": 1.41276
+      },
+      "batches": [
+        {
+          "g_ce": 0.49343,
+          "g_kd_unit": 1.41276
+        },
+        {
+          "g_ce": 0.56465,
+          "g_kd_unit": 1.59821
+        },
+        {
+          "g_ce": 0.56578,
+          "g_kd_unit": 1.60042
+        },
+        {
+          "g_ce": 0.53349,
+          "g_kd_unit": 1.53693
+        },
+        {
+          "g_ce": 0.54829,
+          "g_kd_unit": 1.57586
+        }
+      ]
+    },
+    "6.0": {
+      "batch0": {
+        "g_ce": 0.49343,
+        "g_kd_unit": 2.26708
+      },
+      "batches": [
+        {
+          "g_ce": 0.49343,
+          "g_kd_unit": 2.26708
+        },
+        {
+          "g_ce": 0.56465,
+          "g_kd_unit": 2.45095
+        },
+        {
+          "g_ce": 0.56578,
+          "g_kd_unit": 2.5618
+        },
+        {
+          "g_ce": 0.53349,
+          "g_kd_unit": 2.43482
+        },
+        {
+          "g_ce": 0.54829,
+          "g_kd_unit": 2.48092
+        }
+      ]
+    }
+  },
+  "soft_label_audit_by_T": {
+    "1.0": {
+      "T": 1.0,
+      "mean_top1": 0.9949,
+      "pct_top1_gt_0.99": 93.1,
+      "mean_margin_top1_top2": 0.9904,
+      "mean_p2": 0.0045
+    },
+    "3.0": {
+      "T": 3.0,
+      "mean_top1": 0.9257,
+      "pct_top1_gt_0.99": 23.7,
+      "mean_margin_top1_top2": 0.8847,
+      "mean_p2": 0.0409
+    },
+    "6.0": {
+      "T": 6.0,
+      "mean_top1": 0.6921,
+      "pct_top1_gt_0.99": 0.0,
+      "mean_margin_top1_top2": 0.5892,
+      "mean_p2": 0.1028
+    }
+  },
+  "weight_channel": {
+    "alpha_star": 0.08,
+    "alpha_star_batches": [
+      0.0802,
+      0.0767,
+      0.08,
+      0.0792,
+      0.0787
+    ],
+    "batch_spread": 0.0036,
+    "textbook_T2_says": 0.05,
+    "measured_vs_textbook": 0.0302,
+    "segment": [
+      0.05,
+      0.1
+    ],
+    "slope_imgs_per_alpha": -168.0,
+    "share_imgs": -5.1,
+    "segment_step_paired": {
+      "label": "α=0.05→0.1 段内步长（share 的不确定度来源）",
+      "n_seeds": 8,
+      "mean_gap_imgs": -8.4,
+      "sd_imgs": 7.3,
+      "se_imgs": 2.6,
+      "ci95_imgs": [
+        -14.5,
+        -2.2
+      ],
+      "gaps": [
+        -8,
+        -14,
+        6,
+        -13,
+        -12,
+        -5,
+        -4,
+        -17
+      ],
+      "same_sign_seeds": "7/8（−）",
+      "p_seeds_binomial": 0.0703,
+      "range_imgs": 23,
+      "d4_sigma_hat": 8.1
+    }
+  },
+  "content_channel": {
+    "mean_kl_pT3_given_pT6_nats": 0.205022,
+    "imgs_p_true_drops_gt_0.1": 4093,
+    "imgs_dist_changed": 4500,
+    "pool_n": 4500,
+    "teacher_wrong_imgs_on_pool": 10
+  },
+  "geo_twin": {
+    "target": "α=0.05×T6",
+    "cells": {
+      "α=0.05×T3": {
+        "rel_dist": 0.0806,
+        "cos": 0.99892,
+        "near_kin": true
+      },
+      "α=0.1×T3": {
+        "rel_dist": 0.0378,
+        "cos": 0.99936,
+        "near_kin": true
+      },
+      "α=0.2×T3": {
+        "rel_dist": 0.1735,
+        "cos": 0.99946,
+        "near_kin": false
+      },
+      "α=0.3×T3": {
+        "rel_dist": 0.3325,
+        "cos": 0.99903,
+        "near_kin": false
+      },
+      "α=0.7×T3": {
+        "rel_dist": 0.9745,
+        "cos": 0.99625,
+        "near_kin": false
+      },
+      "α=0.1×T6": {
+        "rel_dist": 0.1565,
+        "cos": 0.9989,
+        "near_kin": false
+      },
+      "α=0.2×T6": {
+        "rel_dist": 0.4695,
+        "cos": 0.99375,
+        "near_kin": false
+      },
+      "α=0.3×T6": {
+        "rel_dist": 0.7825,
+        "cos": 0.98813,
+        "near_kin": false
+      },
+      "α=0.7×T6": {
+        "rel_dist": 2.0345,
+        "cos": 0.97217,
+        "near_kin": false
+      }
+    },
+    "nearest": "α=0.1×T3",
+    "nearest_rel_dist": 0.0378,
+    "tol": 0.1
+  },
+  "nail_cross_column": {
+    "label": "α=0.05 跨列差（T6−T3，按流配对）",
+    "n_seeds": 8,
+    "mean_gap_imgs": -28.1,
+    "sd_imgs": 16.9,
+    "se_imgs": 6.0,
+    "ci95_imgs": [
+      -42.3,
+      -14.0
+    ],
+    "gaps": [
+      -9,
+      -56,
+      -34,
+      -32,
+      -46,
+      -20,
+      -18,
+      -10
+    ],
+    "same_sign_seeds": "8/8（−）",
+    "p_seeds_binomial": 0.0078,
+    "range_imgs": 47,
+    "d4_sigma_hat": 16.5
+  },
+  "repro_scan_T3_ladder": {
+    "α=0.05": {
+      "residual_imgs": -28.1,
+      "ci95_imgs": [
+        -42.3,
+        -14.0
+      ],
+      "same_sign": "8/8（−）",
+      "p": 0.0078,
+      "reproduces": false
+    },
+    "α=0.1": {
+      "residual_imgs": -19.8,
+      "ci95_imgs": [
+        -34.7,
+        -4.8
+      ],
+      "same_sign": "7/8（−）",
+      "p": 0.0703,
+      "reproduces": false
+    },
+    "α=0.2": {
+      "residual_imgs": -23.9,
+      "ci95_imgs": [
+        -33.0,
+        -14.8
+      ],
+      "same_sign": "8/8（−）",
+      "p": 0.0078,
+      "reproduces": false
+    },
+    "α=0.3": {
+      "residual_imgs": -27.1,
+      "ci95_imgs": [
+        -38.2,
+        -16.0
+      ],
+      "same_sign": "8/8（−）",
+      "p": 0.0078,
+      "reproduces": false
+    },
+    "α=0.7": {
+      "residual_imgs": -35.2,
+      "ci95_imgs": [
+        -50.4,
+        -20.1
+      ],
+      "same_sign": "8/8（−）",
+      "p": 0.0078,
+      "reproduces": false
+    }
+  },
+  "share_of_nail": 0.181,
+  "exit": "(b) 大头在**内容通道**：share -5.1 张（18%），且 T=3 全阶梯没有一格能复现（最近的一格 α=0.1 仍差 -19.8 张 CI [-34.7, -4.8]，0/5 格含 0）⇒ 权重与分配在 T=3 上穷尽也复现不出那一格的伤害",
+  "verdict": "(b) 大头在**内容通道**：share -5.1 张（18%），且 T=3 全阶梯没有一格能复现（最近的一格 α=0.1 仍差 -19.8 张 CI [-34.7, -4.8]，0/5 格含 0）⇒ 权重与分配在 T=3 上穷尽也复现不出那一格的伤害",
+  "limitations": [
+    "v2 相对 v1 只多一个顶层键 `seeds`：v1 只记了流池大小与两本来源账，『这一发用的是哪批流』要跳一跳（去那两本里读）才拿得到，守卫闸⑩ 的档案侧扫描因此看不见它。补上名字之后两本账除这个键之外必须逐字段相同——这一条是本轮 D 那笔仪器欠账的收据。",
+    "这一发买的是**判别量**：没加流、没换那七维里任何一维、没长 α 格 ⇒ 出口 (b) 说『大头在内容通道』是**排除法**给的归因，不是测出来的归因。",
+    "内容通道没有换算仪器：KL(p_T3‖p_T6) 的单位是 nat，不是张。要把它变成测量需要一发训练（把 α·‖∇(T²KL)‖ 钉死、只换 T；阶梯 5 格 × 8 条流 = **40 次训练**，本脚本一次都没付）。",
+    "探针的一切读数都发生在**初始那一步、第 0 批（128 张）**：‖∇‖、α*、总梯度夹角都是「起点几何」，不是训练动力学（与第4课c 自我审计④ 同一条）。批次散布只报了 5 批，它约束的是 α* 的稳定性，不约束『前 600 步的平均力度』。",
+    "权重通道那一格用的是**局部斜率**（夹住 α* 的那一段），而 T=3 那条阶梯在 α=0.1 之后非单调（0.1 最差、0.2 回升）⇒ share 只在 α∈[0.05,0.1] 这一小段内合法，不许拿它去解释高剂量段。段内步长自己的 CI 就是 share 的不确定度。",
+    "读数只属于**一个坐标**（中数据4500 × S128 × 那 8 条流 × α=0.05）：满数据档与低数据档、S64 那副学生、Fashion 上同样那句话各自要各自的账，本课一个字都没碰。",
+    "两本阶梯账跨判据版本（T=3 记在 `_v4`、T=6 记在 `_v4`；探针基准来自 3 条流那本 v4c）：配的是训练路径上的逐流 gap，判据版本只改派生判词不改 gap ⇒ 可比，但『同一把尺子』在这里指同一个训练器，不指同一个判据。"
+  ]
+}

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """v3/v4/v5 形状判据的离线验红（零训练）：把已入库的 v4f 档案按 v1/v2/v3/v4/v5 各算一遍，看翻转集合落在哪。
 
-十二道闸（沿用第四发的规矩：一道闸只钉一件修复，红要知道是哪件修复没装上；
-  ⑪ 是第二十发的"口径等价闸"，⑫ 是第二十一发的"档案文本闸"，⑨ 的家族位也在第二十一发接上——换模型族那一发）：
+十三道闸（沿用第四发的规矩：一道闸只钉一件修复，红要知道是哪件修复没装上；
+  ⑪ 是第二十发的"口径等价闸"，⑫ 是第二十一发的"档案文本闸"，⑨ 的家族位也在第二十一发接上——换模型族那一发；
+  ⑬ 是本轮菜单 C 补上的"入口闸"——它判的是脚本能不能打开，不判读数）：
   ① 复算自证     每本档案**记录在案**的那句判词 = 产出它那一版的复算值（钉"喂的是同一批数字"）
   ② 翻转集合     v3 相对 v2 只许翻掉预登记的那一本（钉"v3 不是装饰，也不是连坐"）
   ③ 只翻该翻的   那一本必须从 测不动 翻到 反号线（钉翻的是对的方向）
@@ -104,10 +105,67 @@
                  **反面要如实说**：本轮"修漏 f 的脚本"自己误伤过三本没坏的账（措辞从"欠估"变成"仍是欠估"）——
                  那一处不留花括号、也不改数 ⇒ 腿 A、腿 B 都抓不到它，这类只改措辞的误伤当前只有
                  `git diff` 加人眼这一道防线。**别把它记成有闸。**
+  ⑬ 入口闸（每个  带开关的脚本跑一次 `--help`，退出码必须是 0。钉的是第十八发撞到、此后一直挂着的那笔仪器债：
+     带开关的脚本  `step5_second_teacher.py --help` **自那行帮助文本写下起就没通过过**（argparse 把 help 整串
+     都必须打得开）做 `%` 插值，帮助文本里写 `50%` 必须写成 `50%%`），而守卫是 import 模块、不走 argparse
+                 ⇒ 前十二道闸对"打开就炸"零反应：它不在任何训练路径上，只在"想知道这个脚本有哪些开关"那一步。
+                 被测清单**按值现读**（源码里出现 `add_argument` 就算），新加一个带开关的脚本自动进清单。
+                 专属拆红 `--helpblind`：生成一个只有 argparse 的**合成**脚本、help 串里放一个裸 %
+                 （与那处崩溃同形状）⇒ 实测红 **1** 条，且打印明写"注入体不在真账清单里"——
+                 这一档证明的是检测器会对 rc≠0 出声，真账现在全绿由上面那行绿色计数说。
+                 **代价如实记在这里**：`--help` 要走一遍 torch 的 import，单次实测 **6.3 秒 / 本**；
+                 11 本、4 并发下这一档两次实测 **24.7 / 18.2 秒**（同机、同清单，差在并发争抢），
+                 守卫整轮从上一版的 18.2 秒涨到实测 **31~37 秒**。
 
 自我拆红（每条各拆一道闸，跑了不红的模式=那条闸没测到，不许拿它当通过。下面全是**本轮实测**，
 不是预期——规矩是实测再写回这张表，写死的计数只对"当前在册的那几本"成立：
 
+**【第二十三发·CNN 第二坐标（低数据2000 × T=6）＋第二十二发（step4j）一并入库】在册 34 本（v4f 名下，+1）、
+全册 86 本（+6：`v4b_cnn_low`、`v4b_cnn_low_n8`、`v4c_cnn_low`、`v4f_cnn_low_n8_thin_t6_v5`、
+`v4i_mechanism_v2`、`v4j_matched_n8`），正常模式 rc=0 / 0 条红，二十一档全部重跑（逐档现读红数）**：
+misfeed **99**、decorative 27、collateral **15**、v4blind 13、v5strict 13、famblind **16**、
+unformatted **10**、v4loose **8**、drift 5、borrowfloor **6**、v5blind 4、sibdrift 3、laddersib 2、
+flowcopy 2、ciasym 2、oldsib 1、g5drop 1、ciunread 1、wrongcount 1、helpblind 1、destroy 0。
+**与下面那张【第二十一发】表相比：涨六档、十四档一位没动、`--destroy` 照旧 0 红（只算灵敏度）。**
+先记第二笔诚实账：**那张表到现在又腐烂了两批发**（第二十二发入库的是 `v4j` 与 `v4i_v2`，两本都不在
+`compress_report_v4f*` 这条 glob 里 ⇒ 判据侧计数原地，但 ⑫ 的"全册"分母从 80 涨到 86）
+⇒ "加账就得整张重测"这条老教训第 N+1 次兑现，而**没重测的表不是旧数据，是假数据**。
+逐档归因（现读 grep 失败名单、按本点名，不猜）：
+- **涨：misfeed 94→99（+5）——这五条全部点名新那本 `_cnn_low_n8_thin_t6_v5`**，而且它**推翻了下表那条盲区**：
+  第二十一发写的是"CNN 账在 `--misfeed` 上零红 ⇒ ① 在 CNN 上不承重"。真相是那句话的适用范围是
+  **那两本的判词**（『有阈值』）：反号喂进『有阈值』的账，复算还是『有阈值』；而这一本判『污染型』，
+  反号喂进去复算成『有阈值 / 测不动』⇒ ① 当场点它五次名（v1~v4 并排列各一次 + 本发判词一次）。
+  **可迁移：一条"某类账不承重"的盲区断言，如果它的证据只是同类账的样本，那它判的是那几本的判词，不是那一族。**
+- **涨：famblind 12→16（+4）** —— ⑨ 由 4 条变 6 条、⑤ 由 2 条变 4 条，各 +2：新那本 CNN 账在摘掉家族位后
+  同时被"名字与 `student_arch` 不同族"和"底回落成 MLP 那本"两条腿点名，并被当成 MLP 重跑本（⑤ 的判词与
+  训练路径各一条）。⑥ 仍 6 条：这本**没有**少流的同族老账可被严格包含（`--nseeds 3` 预演账按预登记删掉了）
+  ⇒ 闸⑥ 许可证 **27 → 27 对，一对没多**（"对数与买了哪一维无单调关系"第七次现读，这次落在 +0 上）。
+- **涨：unformatted 8→10（+2）** —— 两条都是注入腿：新入库的 `v4b_cnn_low` 与 `v4b_cnn_low_n8` 各带那句
+  『种子底由 N 个点』⇒ ⑫ 的"带那句"名单从 8 本涨到 **10 本**，正常模式下这 10 本的 N 与各自 `len(seeds)`
+  全等（现读"对不上的有 0 本"）。这一档的红数涨**只说明被测对象变多**，不说明现在有人漏 f。
+- **涨：v4loose 7→8（+1）** —— 松腿第一次落在**换族 × 换档**那一侧的界内账上：这本份额 57%、档案记『污染型』、
+  "忘掉同号且更大"一装上就复算成『污染型·倒挂』⇒ 那条腿的被测对象维度集合又长一个。
+- **涨：collateral 14→15（+1）** / **涨：borrowfloor 5→6（+1）** —— 前者是新那本的 v3 并排列（"第 2 支挪前＋
+  忘掉反号"会把它读成反号线）；后者是 ⑨ 那条读档来源腿第一次点到 CNN 低数据档那本（旧写法连档都不认）。
+- **十四档没动**（decorative 27、v4blind 13、v5strict 13、v5blind 4、drift 5、sibdrift 3、laddersib 2、
+  flowcopy 2、ciasym 2、oldsib 1、g5drop 1、ciunread 1、wrongcount 1、helpblind 1）：本轮没换判据、没动流名单、
+  没改系数册 ⇒ 按老规矩这句**不许当通过**，它只说明这几档的被测集合本轮没变大。
+**其余各闸现读（全部本轮实测，替代下表同名数字）**：闸① 复算 **34/34** 本通过；闸④ 板块在册『污染型』
+**22 → 23 本**逐字保持；闸⑤ 候选 **26 本 = 逐位核过 6 + 首跑/无更低版本前账 20**（新那本进的是**首跑**那一列，
+不误伤）；闸⑥ **27 对**；闸⑨ 参评 **23 → 24 本**；闸⑩ 模块侧 10 项、档案侧 **80 → 86 条**名单全等；
+闸⑪ 参评 **29 → 30 本**、其中自带双记账的 **3 → 4 本**（新那本写了 `ci_leg_reading`，九项与守卫复算逐字段相同）；
+闸⑫ 全册 **86 本 / 展开 3049 条字符串字段 / 10 本带那句 / 0 本对不上**；闸⑬ 现读清单 **11 → 12 本**、
+退出码 0 的 12 本。**墙钟要如实报**：同一档（⑬）本轮三次实测 **56.8 秒 / 30.9 秒 / 19.6 秒**（同机、同清单、4 并发；
+最后一次整轮 25 秒、rc=0），比下表记的 24.7 / 18.2 秒又宽了一倍 ⇒ 这一档的成本**不是常数**，写死的秒数和写死的计数一样会腐；
+本轮只报"三个可核读数"，不报倍数。
+闸⑧ 现读：v5 名下判『倒挂』的账 **4 本 / 归并 1 个坐标**（`mlp族 × 中数据4500 × S128 × T=6.0`）——
+**与下表同值、没涨**，因为新那本 CNN 界内不进名单 ⇒ 那是"唯一坐标"这句话的第八次现读复核。
+
+（下表【第二十一发】是**过去时**：它记的在册 33 本、misfeed 94、famblind 12、unformatted 8、v4loose 7、
+borrowfloor 5、collateral 14、⑥ 27 对、⑨ 23 本、⑩ 80 条、⑪ 29 本/3 本双记账、⑫ 80 本/2872 字段/8 本带那句、
+⑬ 11 本 都已被上面那张表替代；留着是因为它的**逐档归因**（尤其那条 misfeed 盲区）是被第二十三发推翻的对象，
+删掉它就没有人知道自己错在哪。**其中"misfeed 对 CNN 账零红 ⇒ ① 在 CNN 上不承重"那一句已作废**，
+作废的理由写在上面第一条归因里。）
 **【第二十一发·换模型族】在册 33 本，正常模式 rc=0 / 0 条红，二十档全部重跑（逐档现读红数）**：
 misfeed **94**、decorative **27**、collateral **14**、v4blind **13**、v5strict **13**、famblind **12**（新）、
 unformatted **8**（新）、v4loose 7、drift 5、borrowfloor **5**、v5blind 4、sibdrift 3、laddersib 2、
@@ -309,11 +367,19 @@ v1/v2/v3/v4 并排列各一次＋本发判词一次），所以 `--misfeed` 58�
                 这一档钉的是**守卫自己那句计数**：上一版它印"已重跑 25 本"，而同一轮输出里有 19 本
                 被自己打印成"该配置首跑、闸⑤ 不管"——计数与退出路径分家之后，那句自证就成了谎。
                 修法是让两个数由同一个循环产出、末尾做守恒；没有这一档，"守恒"也只是句注释）
+  --helpblind   生成一个只有 argparse 的合成脚本、它的 help 串里放一个裸 %（= 第十八发那处 `step5 --help`
+                崩溃的同一形状），塞进闸⑬ 的被测清单 → 实测 **1 条红**：⑬。
+                打印里明写"注入体不在真账清单里"：这一档测的是**检测器会不会对 rc≠0 出声**，
+                真账现在能不能打开由同一档上一行那个绿色计数说（两者混成一句就是拿合成注入给真账背书）。
 """
 import json
 import glob
+import os
 import re
+import subprocess
 import sys
+import time
+from concurrent.futures import ThreadPoolExecutor
 
 import step4f_alpha_curve as sf
 from step4f_alpha_curve import shape_verdict as _orig_sv, shape_verdict_v1
@@ -1092,6 +1158,64 @@ if MODE == "--wrongcount":
     if any(f.startswith("闸⑫") and "占位符" in f for f in fails):
         fails.append("闸⑫（拆红模式 --wrongcount）腿 A 也红了：注入进去的还是花括号形状 ⇒ 两腿没分离，"
                      "这一档其实只是 --unformatted 的重复，它没有带来新被测对象")
+
+# 闸⑬：脚本"能不能打开"——每个带开关的脚本跑一次 `--help`，退出码必须是 0。
+# 来历：第十八发撞到 `step5_second_teacher.py --help` **自那行帮助文本写下起就没通过过**
+#   （argparse 把 help 整串做 `%` 插值，帮助文本里写 `50%` 必须写 `50%%`）。这类崩溃不在任何训练路径上，
+#   而守卫是 import 模块、不走 argparse ⇒ 前十二道闸对它零反应：改了判据的崩、读档的崩都拦不到"打开就炸"。
+# 这一档判的是**入口**不判读数 ⇒ 它不产生任何新的对账，也不许被读成"某句话被复证"。
+# 被测清单按值现读（源码里出现 add_argument 就算），名单不写死：新加一个带开关的脚本自动进清单。
+print("\n[闸⑬ 每个带开关的脚本 --help 都能打开（退出码 0）]")
+HELP_SCRIPTS = [p for p in sorted(glob.glob("step*.py"))
+                if "add_argument" in open(p, encoding="utf-8").read()]
+PROBE = "_help_probe_v3red.py"
+
+
+def _help_rc(script):
+    r = subprocess.run([sys.executable, "-u", script, "--help"],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
+    return script, r.returncode, (r.stderr or "")
+
+
+n13 = 0
+_t13 = time.monotonic()
+try:
+    if MODE == "--helpblind":
+        open(PROBE, "w", encoding="utf-8").write(
+            "# -*- coding: utf-8 -*-\n"
+            "import argparse\n"
+            "p = argparse.ArgumentParser()\n"
+            "p.add_argument('--x', help='覆盖率达到 50%、就这一句')\n"
+            "p.parse_args()\n")
+        print(f"  （拆红注入）生成 {PROBE}：一个只有 argparse 的合成脚本，help 串里放一个裸 % "
+              "（第十八发那处崩溃的同一形状）⇒ 它必须打不开")
+    targets = HELP_SCRIPTS + ([PROBE] if MODE == "--helpblind" else [])
+    with ThreadPoolExecutor(max_workers=4) as ex:
+        results = list(ex.map(_help_rc, targets))
+    for script, rc, err in sorted(results):
+        n13 += 1
+        if rc != 0:
+            tail = (err.strip().splitlines() or ["（无 stderr）"])[-1]
+            fails.append(f"闸⑬ {script}：--help 退出码 {rc}（不是 0）⇒ 这个脚本的开关清单打不开，"
+                         f"报错最后一行：{tail}")
+            print(f"  {script} → **红**：rc={rc}")
+    if n13 == 0:
+        fails.append("闸⑬ 清单里一个带开关的脚本都没读到 ⇒ 扫描器没展开，这一档等于没测到，不许记成通过")
+    else:
+        green = n13 - sum(1 for f in fails if f.startswith("闸⑬"))
+        print(f"  现读清单 {n13} 本（源码含 add_argument），退出码 0 的 {max(green, 0)} 本，"
+              f"墙钟 {time.monotonic() - _t13:.1f} 秒（4 并发）")
+    if MODE == "--helpblind":
+        if not any(f.startswith("闸⑬") and PROBE in f for f in fails):
+            fails.append(f"闸⑬（拆红模式 --helpblind）注入的 {PROBE} 一条都没抓到 ⇒ 这一档恒绿，"
+                         "它对『帮助文本里有裸 %』零反应，拦不住下一次同类崩溃（此档等于没测到）")
+        else:
+            print(f"  must-catch 兑现：注入体 {PROBE} 被这一档点名（**它是合成脚本、不在那 {len(HELP_SCRIPTS)} "
+                  "本真账里** ⇒ 这一档证明的是检测器会对 rc≠0 出声，不证明真账里现在有人打不开——"
+                  "上面那行绿色计数说的才是真账）")
+finally:
+    if MODE == "--helpblind" and os.path.exists(PROBE):
+        os.remove(PROBE)
 
 print(f"\n模式：{MODE or '（正常验红）'}")
 if fails:

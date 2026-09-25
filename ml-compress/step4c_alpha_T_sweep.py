@@ -91,10 +91,16 @@ ARCH = "mlp"                                        # 学生架构族；--arch c
 FAMILY_SUFFIX = {"mlp": "", "cnn": "_cnn"}          # 档案名里的家族位：借别的族的底=换尺子，所以名字必须带上它
 
 
-# 种子底档案的位置：**第4课那两档记在同一本合并账里**（step4b 默认跑法一次写两档，
+# 种子底档案的位置：**MLP 族第4课那两档记在同一本合并账里**（step4b 默认跑法一次写两档，
 # 换档名会读到一本不存在的档案，而 step4b 又拒绝单跑这两档——两头堵死）。
 # 只有第4课没跑过的档（中数据4500）才有自己的一本。输出名不一样：v4c 每档各写各的表。
+# （cnn 族是这条历史的例外，见下面第二张表。）
 V4B_SUFFIX = {"中数据4500": "_mid"}
+# 上面那张"回落合并账"的表只描述 MLP 族的历史（第4课两档共写一本 compress_report_v4b.json）。
+# cnn 族没有合并账：step4b 对那一族在训练前就拒绝默认跑法，所以它每一档都有自己的本子，
+# 名字由 step4b 的 OUT_SUFFIX 说了算（那里登记了 _low）。这里不跟上，`--arch cnn --tier 低数据2000`
+# 会去读一本不存在的合并账——照样炸在训练前，但报的原因是"先跑 step4b"，而真正的缺口是名字。
+V4B_SUFFIX_CNN = {"低数据2000": "_low"}
 V4C_SUFFIX = {"低数据2000": "_low", "中数据4500": "_mid"}
 
 
@@ -106,14 +112,15 @@ def v4b_path(width: int, tier: str) -> Path:
                              f"要测 S{width} 或 {tier}，得先给那一副把那本底扩出来，不许借别档的底")
         return HERE / f"compress_report_v4b{FAMILY_SUFFIX[ARCH]}_n{NSEEDS}.json"
     stem = "compress_report_v4b" + FAMILY_SUFFIX[ARCH] + ("" if width == 128 else f"_s{width}")
-    if tier not in TIERS and tier not in V4B_SUFFIX:
+    suffix = dict(V4B_SUFFIX, **(V4B_SUFFIX_CNN if ARCH == "cnn" else {}))
+    if tier not in TIERS and tier not in suffix:
         raise SystemExit(f"档 {tier} 没登记种子底档案名：它要么在第4课那两档的合并账里（那就别新加名字），"
                          f"要么有自己的 v4b 单档账（在这里登记后缀）。"
                          f"悄悄回落到合并账等于拿别的档的底来判这一档")
     # 档位后缀**不随宽度消失**：旧写法只在 width==128 时贴，写死的假设是"S64 只跑过满数据档"，
     # 于是 64×中数据会去读 v4b_s64.json（满数据那本）——那本里真有一个档对的臂，load_anchor 拦不到，
     # 结果是借别的档的底来判这一档的闸门。老路径逐字不变（64×满数据仍回落 v4b_s64.json）。
-    return HERE / (stem + V4B_SUFFIX.get(tier, "") + ".json")
+    return HERE / (stem + suffix.get(tier, "") + ".json")
 
 
 def out_path(width: int, tier: str = TIER) -> Path:

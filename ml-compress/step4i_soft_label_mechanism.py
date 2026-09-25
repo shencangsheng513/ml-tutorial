@@ -128,7 +128,8 @@ from step4c_alpha_T_sweep import term_grad_norms
 from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
-OUT = HERE / "compress_report_v4i_mechanism.json"
+# v2 = v1 + 顶层 `seeds`（本课用的那 8 条流的名字直接落档）。老档 v1 原样留盘，逐字段对着读。
+OUT = HERE / "compress_report_v4i_mechanism_v2.json"
 
 TIER, WIDTH = "中数据4500", 128
 SMALL, T_LO, T_HI = 0.05, 3.0, 6.0
@@ -464,6 +465,7 @@ def main(teacherblind: bool = False, t2claim: bool = False, scramble: bool = Fal
         raise SystemExit(f"[验红模式 {mode}] 居然走到了发读数这一步 ⇒ 至少一道闸没拦住，不发不入库")
     out = {"quantity": "α=0.05 那一格的跨列之差（T=6 列 − T=3 列，gap 单位=CE错图−KD错图，"
                        "负=T=6 多错）拆成『权重通道』与『内容通道』两条候选各吃多少",
+           "seeds": [int(s) for s in lo["seeds"]],
            "coordinate": {"tier": TIER, "width": WIDTH, "flow_pool": len(lo["seeds"]),
                           "cell": f"α={SMALL:g}", "temps": [T_LO, T_HI],
                           "archives": [ALPHA3, ALPHA6], "probe_baseline": V4C, "nail_archive": V4H},
@@ -483,6 +485,9 @@ def main(teacherblind: bool = False, t2claim: bool = False, scramble: bool = Fal
            "repro_scan_T3_ladder": scan, "share_of_nail": frac, "exit": exit_rule,
            "verdict": exit_rule,
            "limitations": [
+               "v2 相对 v1 只多一个顶层键 `seeds`：v1 只记了流池大小与两本来源账，"
+               "『这一发用的是哪批流』要跳一跳（去那两本里读）才拿得到，守卫闸⑩ 的档案侧扫描因此看不见它。"
+               "补上名字之后两本账除这个键之外必须逐字段相同——这一条是本轮 D 那笔仪器欠账的收据。",
                "这一发买的是**判别量**：没加流、没换那七维里任何一维、没长 α 格 ⇒ 出口 (b) 说"
                "『大头在内容通道』是**排除法**给的归因，不是测出来的归因。",
                "内容通道没有换算仪器：KL(p_T3‖p_T6) 的单位是 nat，不是张。要把它变成测量需要一发训练"

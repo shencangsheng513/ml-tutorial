@@ -97,7 +97,9 @@ ARCHIVE = {128: {"满数据8500": {"CE": 0.9326, "KD": 0.9263}, "低数据2000":
 
 # 单档复现的档案名。第4课那两档**故意不在这里**：它们的账本是一份合并档案（两档都在里面），
 # 允许 --tier 单跑写回同名文件，就等于让一次单档运行把另一档的账抹掉。
-OUT_SUFFIX = {"中数据4500": "_mid"}
+# _low 只服务 cnn 族：MLP 那一族走 --tier 会先被下面那道"合并档案"闸拦掉（那里它仍是两档共本），
+# 而 cnn 族压根没有合并档案（默认跑法在训练前就退出），所以它每一档都必须有自己的本子。
+OUT_SUFFIX = {"中数据4500": "_mid", "低数据2000": "_low"}
 # 学生架构是这本账的判别变量，后缀只在这一个函数里出现（两处名字各写一套就是第二把尺子）。
 # mlp 不贴后缀：板块那 30 本账的名字是历史，改一次名就等于把所有在册账的身份全换掉。
 FAMILY_SUFFIX = {"mlp": "", "cnn": "_cnn"}
@@ -406,7 +408,7 @@ if __name__ == "__main__":
         # exists() 拦，没登记后缀的档由 out_path() 拦，都不必在这里连坐整副宽度。
         raise SystemExit(f"--tier {args.tier} 属于 S128 那两档的合并档案，S64 这一副没有它的位置："
                          f"要老档案就别带 --tier，要新档请先在 OUT_SUFFIX 里登记档案名")
-    if args.tier in TIERS:
+    if args.tier in TIERS and ARCH == "mlp":
         raise SystemExit(f"--tier {args.tier} 是第4课那两档之一：它属于合并档案 "
                          f"compress_report_v4b.json（两档一起写）。单跑一档会把另一档的账抹掉——"
                          f"要老档案就别带 --tier")

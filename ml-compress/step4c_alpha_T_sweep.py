@@ -41,6 +41,27 @@ H1 的伤害基数、种子底三样全都跟着宽度走，S64 那一份是 0.9
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py --tier 低数据2000
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py --tier 中数据4500
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py --nseeds 8
+  # 第二十一发（换模型族，独立性第八维）：把这张 α×T 表搬到"学生与老师同族"的那一族上
+  PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4c_alpha_T_sweep.py --arch cnn --tier 中数据4500
+
+  【第二十一发 · 落地】产物 `compress_report_v4c_cnn_mid.json`，**33 次训练** = `len(seeds) × (10 格 + 1 副 CE 参考)`
+  （10 格 = 3 个 α × 3 个 T 再加 `match_T6` 那一格配平臂；那 1 副 CE 是每流一份的参考臂，
+  预登记价签把它算漏过一次 ⇒ 本轮整链成本自纠为 132 次，见 step4f 文档串同发那段）。
+    · **本族自己的机制读数**（梯度探针在学生参数上 backward，所以它跟着族变，这正是"本族算出来的"意思）：
+      单位 KD 力度 g_kd_unit 在 T=1/3/6 = **0.18637 / 0.56808 / 1.06921**（CE 侧 g_ce = 0.19106），
+      锚点剂量下的 KD 份额 0.695 / 0.874 / 0.929 ⇒ 要匹配锚点力度：T=6 需要 **α\*=0.372**、T=3 恰好 0.7、
+      **T=1 根本配不上**（α\*=2.134 > 1，`unmatchable_temps=[1.0]`、`matched_temps=[6.0]`）。
+    · **一条免费的对照，比上面那条更值得记**：同一张表里**老师侧**那批读数（`soft_label_audit_by_T`：
+      T=1 原始 top1>0.99 占 93.1%、除以 T 之后 T=6 的 mean_top1 掉到 0.6921…）在 CNN 学生这本与 MLP 学生
+      那本之间**逐字段相同**（现读相等 = True），而**学生侧**的 `gradient_probe` 两本不同
+      （g_ce 0.19106 vs 0.49343）⇒ "软标签暗知识多少"那批量不住在学生里、"梯度有多大"那一批住。
+      这一发没有为这句话花一次训练，它是换族顺手掉出来的凭据（板块那条"机制探针与学生几何无关、换族不重跑"
+      的纪律从此不是口头承诺）。
+    · **事故一处（在花钱之前，零训练也照样炸）**：第一趟跑到 234 行那句带 `⚠` 的打印时
+      `UnicodeEncodeError` 崩在 cp936 控制台上，而 stderr 走的是块缓冲重定向 ⇒ **日志 0 字节**，
+      事后看起来像"进程根本没起来"。根因不是代码，是没带 `PYTHONIOENCODING=utf-8 PYTHONUTF8=1`。
+    · **不变量兑现**：`--arch cnn --width 64` 在训练前 `SystemExit`（CNN 与老师同架构，hidden 这一维在它
+      身上没有对应物），实测 0 次训练、零落盘 —— 报错比默默按 128 算诚实。
 """
 from __future__ import annotations
 
@@ -51,8 +72,8 @@ import torch
 import torch.nn as nn
 
 from step1_quantize import MODELS, build_cnn, predict
-from step4_distill import (BS, DATA_TIERS, KD_ALPHA, KD_T, SEED, SEEDS, SEEDS8, TIERS, VAL_N,
-                           build_mlp, check_flow_constants, flow_tiers, flows, logits_of,
+from step4_distill import (BS, DATA_TIERS, KD_ALPHA, KD_T, SEED, SEEDS, SEEDS8, STUDENT_ARCHS, TIERS, VAL_N,
+                           build_student, check_flow_constants, flow_tiers, flows, logits_of,
                            sign_test_p, soft_label_audit, summarize, train_student)
 from train_baseline import load_split
 
@@ -66,6 +87,8 @@ NSEEDS = 3                                          # 可被 --nseeds 覆盖
 ALPHA_ANCHOR = KD_ALPHA                             # 0.7：第4课那格的权重分配
 ANCHOR_T = KD_T                                     # 3.0：探针的基准温度，也是锚点格
 T2_TOL = 0.15                                       # KD 梯度范数随 T 漂移超过 ±15% 就算 T 轴被污染
+ARCH = "mlp"                                        # 学生架构族；--arch cnn 是第八维（换族），键与 step4b 同一份
+FAMILY_SUFFIX = {"mlp": "", "cnn": "_cnn"}          # 档案名里的家族位：借别的族的底=换尺子，所以名字必须带上它
 
 
 # 种子底档案的位置：**第4课那两档记在同一本合并账里**（step4b 默认跑法一次写两档，
@@ -76,13 +99,13 @@ V4C_SUFFIX = {"低数据2000": "_low", "中数据4500": "_mid"}
 
 
 def v4b_path(width: int, tier: str) -> Path:
-    """这一档、这一副宽度的种子底档案。S64 只跑过满数据档，所以那本里没有档位后缀。"""
+    """这一档、这一副宽度、**这一族**的种子底档案。S64 只跑过满数据档，所以那本里没有档位后缀。"""
     if NSEEDS > 3:                                      # 补过流的底只覆盖 S128 的两档，别的组合直接拒
         if width != 128 or tier not in TIERS:
             raise SystemExit(f"--nseeds {NSEEDS} 的种子底档案只有 S128 × {list(TIERS)}（compress_report_v4b_n{NSEEDS}.json）；"
                              f"要测 S{width} 或 {tier}，得先给那一副把那本底扩出来，不许借别档的底")
-        return HERE / f"compress_report_v4b_n{NSEEDS}.json"
-    stem = "compress_report_v4b" if width == 128 else f"compress_report_v4b_s{width}"
+        return HERE / f"compress_report_v4b{FAMILY_SUFFIX[ARCH]}_n{NSEEDS}.json"
+    stem = "compress_report_v4b" + FAMILY_SUFFIX[ARCH] + ("" if width == 128 else f"_s{width}")
     if tier not in TIERS and tier not in V4B_SUFFIX:
         raise SystemExit(f"档 {tier} 没登记种子底档案名：它要么在第4课那两档的合并账里（那就别新加名字），"
                          f"要么有自己的 v4b 单档账（在这里登记后缀）。"
@@ -94,9 +117,29 @@ def v4b_path(width: int, tier: str) -> Path:
 
 
 def out_path(width: int, tier: str = TIER) -> Path:
-    stem = "compress_report_v4c" if width == 128 else f"compress_report_v4c_s{width}"
+    stem = "compress_report_v4c" + FAMILY_SUFFIX[ARCH] + ("" if width == 128 else f"_s{width}")
     # 流数是这本账的判别维度：不带 _n{n} 就会把板块一路在用的那本 3 条流的判决无声盖掉
     return HERE / (stem + V4C_SUFFIX.get(tier, "") + ("" if NSEEDS == 3 else f"_n{NSEEDS}") + ".json")
+
+
+def scope_note(width: int, tier: str, other: int) -> str:
+    """limitations 里那句"判决范围只到这一档 × 这一副学生"——名字全部由 out_path 现算。
+
+    为什么单独成一个函数：换族之后"另一副学生"这件事在 MLP 那族是**换宽度**、在 cnn 那族**无定义**
+    （它与老师同架构，没有宽度旋钮）。同一句话在两族里指的不是同一个对照，写在一处才核得清。"""
+    sib = out_path(other if ARCH == "mlp" else width, TIER).name      # 对照那一本叫什么，族内现算
+    if ARCH == "cnn":
+        cross = ("本族没有宽度旋钮，『跨不跨宽度』这句在本族无定义；跨族那一维由 --arch 自己承担。"
+                 f"另一档的底要另跑 step4b --arch cnn --tier <档>，那一本的账该叫 {sib}"
+                 "（名字是算出来的，在不在盘上以 ls 为准）；")
+    elif tier == TIER:
+        cross = f"其余档位各自补扫（每档要先有 step4b --tier 造的种子底），另一副宽度是 {sib}；"
+    else:
+        cross = (f"另一副宽度（S{other}）只造过 {TIER} 一档的底，档位与宽度没法同时换；对照是 {sib}；")
+    which = (f"S{width}" if ARCH == "mlp" else "学生族 cnn")
+    tables = ("3 条流那本，各写各的表" if NSEEDS == 3 else f"{NSEEDS} 条流那本")
+    return (f"只扫 {tier} + {which}；{cross}（{tables}；"
+            "补过流的那几本只做过 S128 满/低两档，跨架构/跨档结论要几份对照着读，而跨流数只能读配对 CI）")
 
 
 def load_anchor(v4b: Path, width: int, tier: str = TIER) -> dict:
@@ -115,6 +158,10 @@ def load_anchor(v4b: Path, width: int, tier: str = TIER) -> dict:
                              f"这本 {NSEEDS} 条流的底与 3 条流那本不可并读，先查上游那一发")
     if int(d["width"]) != width:
         raise SystemExit(f"{v4b.name} 是 S{d['width']} 的报告，不是 S{width}——换宽度请连档案一起换")
+    if d.get("student_arch", "mlp") != ARCH:
+        raise SystemExit(f"{v4b.name} 记的学生架构是 {d.get('student_arch', 'mlp')}，本课是 {ARCH}："
+                         f"档案名里的家族位与档案内容对不上（名字带 _cnn 却记着 mlp 的臂，或反之）——"
+                         f"借来的底必须连族一起对，否则这一档的闸门量的是别的族")
     arm_key = f"{tier} 种子{SEEDS[0]}"
     if arm_key not in d["arms"]:
         raise SystemExit(f"{v4b.name} 里没有 {arm_key} 这一格（该档案只有 "
@@ -144,15 +191,17 @@ def key(a: float, t: float) -> str:
     return f"a{a:g}_T{t:g}"
 
 
-def term_grad_norms(xd, yd, soft, t: float, width: int, seed: int = SEED) -> dict:
+def term_grad_norms(xd, yd, soft, t: float, width: int, seed: int = SEED, arch: str | None = None) -> dict:
     """零训练探针：同一副初始权重、同一批数据，把 loss 两项各自 backward，
     量它们真正作用到学生参数上的梯度 L2 范数（KL 按标准写法带 T² 补偿）。
 
     为什么训练前必须量这个：α 和 T 不是正交的两个旋钮——T² 这个补偿因子只要不精确，
     升 T 就会顺带把 KD 项的**有效权重**抬起来。那样"温度越高越坏"里就掺着
-    "权重分配越偏越坏"（H1 借温度之名发生），事后再也分不开。"""
+    "权重分配越偏越坏"（H1 借温度之名发生），事后再也分不开。
+
+    `arch` 默认读模块全局：探针必须与本课训练的是**同一副学生**，否则它给的是别的几何的结论。"""
     torch.manual_seed(seed)
-    m = build_mlp(width)
+    m = build_student(width, arch=ARCH if arch is None else arch)
     gen = torch.Generator().manual_seed(seed)
     idx = torch.randint(0, len(xd), (BS,), generator=gen)
     z = m(xd[idx])
@@ -194,8 +243,10 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
     seeds = flows(NSEEDS)
     check_flow_constants(len(seeds))   # 缺系数要在第一次训练之前停：KeyError 会炸在 176 次之后
 
-    print(f"teacher+数据就位 | {tier} 训练 {n_data} 张 | 测试 {len(yte)} | 学生 S{width} | "
-          f"网格 {len(ALPHAS)}×{len(TEMPS)}×{len(seeds)} = "
+    print(f"teacher+数据就位 | {tier} 训练 {n_data} 张 | 测试 {len(yte)} | 学生 "
+          f"{ARCH if ARCH == 'mlp' else 'cnn（与老师同架构，无宽度旋钮）'}"
+          + (f" S{width} | " if ARCH == "mlp" else " | ")
+          + f"网格 {len(ALPHAS)}×{len(TEMPS)}×{len(seeds)} = "
           f"{len(ALPHAS) * len(TEMPS) * len(seeds)} 次 KD + {len(seeds)} 次 CE 对照")
     print(f"[仪器] 锚点档案值来自 {v4b.name}：α={ALPHA_ANCHOR}/T={ANCHOR_T:g}/种子{SEEDS[0]} "
           f"KD {ANCHOR_KD['acc']}/错{ANCHOR_KD['wrong']}/坏{ANCHOR_KD['broken']}/正{ANCHOR_KD['fixed']}，"
@@ -282,14 +333,14 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
     cells: dict[str, list[dict]] = {k: [] for k, _, _ in specs}
     print(f"\n[开跑] 每个种子一副 CE + {len(specs)} 副 KD（同种子同初始权重、同批次流，只差目标函数）：")
     for seed in seeds:
-        ce, _ = train_student(width, xd, yd, soft, "CE", xv, yv, seed=seed)
+        ce, _ = train_student(width, xd, yd, soft, "CE", xv, yv, seed=seed, arch=ARCH)
         ce_pred = predict(ce, xte, False)
         ce_wrong = int((ce_pred != yte).sum())
         ce_ref[seed] = {"acc": round(1 - ce_wrong / len(yte), 4), "wrong": ce_wrong}
         line = [f"  种子 {seed:<5} CE 错 {ce_wrong} 张"]
         mline = []
         for k, a, t in specs:
-            m, _ = train_student(width, xd, yd, soft, "KD", xv, yv, seed=seed, alpha=a, t=t)
+            m, _ = train_student(width, xd, yd, soft, "KD", xv, yv, seed=seed, alpha=a, t=t, arch=ARCH)
             p = predict(m, xte, False)
             wrong = int((p != yte).sum())
             broken = int(((ce_pred == yte) & (p != yte)).sum())
@@ -553,7 +604,8 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
           "这一格按「不可配平」记账而不是悄悄删掉。")
 
     other = 64 if width == 128 else 128
-    report = {"tier": tier, "width": width, "alphas": list(ALPHAS), "temps": list(TEMPS),
+    report = {"tier": tier, "width": width, "student_arch": ARCH,
+              "alphas": list(ALPHAS), "temps": list(TEMPS),
               "seeds": list(seeds), "n_seeds_arg": NSEEDS, "test_n": int(len(yte)), "train_fit_n": cut,
               "anchor_hyperparams": {"alpha": ALPHA_ANCHOR, "T": ANCHOR_T},
               "anchor_archive_from": v4b.name,
@@ -580,15 +632,7 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
               "ce_ref_by_seed": ce_ref, "grid": grid, "verdicts": verdicts,
               "limitations": ["种子底借自第4课b 的 α=0.7/T=3 一格；第4课d 已逐格量过自己的配对误差棒"
                               "（借来的底对单格读数偏大，±2SE 又因跨格共用随机流是下界）",
-                              (f"只扫 {tier} + S{width}；" +
-                               ("其余档位各自补扫（每档要先有 step4b --tier 造的种子底），另一副宽度是"
-                                if tier == TIER else
-                                f"另一副宽度（S{other}）只造过 {TIER} 一档的底，档位与宽度没法同时换；")
-                               + f"compress_report_v4c{'' if width == 64 else '_s64'}.json"
-                                 f"{'' if NSEEDS == 3 else f'_n{NSEEDS}'}（3 条流那本，各写各的表；"
-                                 f"{'补过流的那几本' if NSEEDS == 3 else f'{NSEEDS} 条流那本'}"
-                                 "只做过 S128 满/低两档，跨架构/跨档结论要几份对照着读，"
-                                 "而跨流数只能读配对 CI）"),
+                              scope_note(width, tier, other),
                               f"每格 {len(seeds)} 条流，均值本身没有二次底",
                               "权重/温度解耦只在初始一步的一个批次上配平，不是全程配平",
                               "p_pooled 偏乐观（多条流共用同一批测试图（极差型种子底还随流数变宽））"]}
@@ -600,6 +644,9 @@ if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser(description="α×T 扫参归因（默认 S128+满数据；--width 64 测跨架构，"
                                              "--tier 低数据2000 测跨数据量）")
+    ap.add_argument("--arch", choices=STUDENT_ARCHS, default=ARCH,
+                    help="学生架构族（第八维）：cnn 让学生与老师同架构。档案名里的家族位、"
+                         "读哪一本种子底、梯度探针用哪副学生全跟着这个开关走")
     ap.add_argument("--width", type=int, choices=(128, 64), default=WIDTH,
                     help="学生宽度；锚点档案值/伤害基数/种子底都从该宽度的 compress_report_v4b*.json 读")
     ap.add_argument("--tier", choices=tuple(DATA_TIERS), default=TIER,
@@ -609,7 +656,12 @@ if __name__ == "__main__":
                     help="每个格子几条随机流；补流只服务「老账只有 3 条流」那笔分辨率债，"
                          "种子底必须换到对应的 compress_report_v4b_n<流数>.json（先跑 step4b --nseeds 同值）")
     args = ap.parse_args()
+    ARCH = args.arch
     NSEEDS = args.nseeds
+    if ARCH == "cnn" and args.width != 128:
+        raise SystemExit(f"--arch cnn 配 --width {args.width}：CNN 学生与老师同架构，hidden 这一维在它身上"
+                         f"无定义（换学生大小这件事在本族没有对应物）。宽度旋钮只对 --arch mlp 有定义——"
+                         f"要测『换副小的学生』那一维就用 --width {args.width}（MLP 族），别把它当成族")
     # 闸门在训练之前：跑完 80 次训练再发现要覆盖老档案，那一发就白烧了
     if out_path(args.width, args.tier).exists():
         raise SystemExit(f"{out_path(args.width, args.tier).name} 已入库（判决档案不覆盖重跑）；"

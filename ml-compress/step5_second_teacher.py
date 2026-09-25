@@ -64,7 +64,8 @@ import torch.nn as nn
 
 from step1_quantize import MODELS, build_cnn, payload_kb, predict
 from step3_prune import channel_importance, fine_tune, keep_indices, rebuild
-from step4_distill import TIERS, VAL_N, logits_of, sign_test_p, soft_label_audit, train_student
+from step4_distill import (TIERS, VAL_N, D4 as D4_TABLE, flows, logits_of,
+                           sign_test_p, soft_label_audit, train_student)
 from step4c_alpha_T_sweep import v4b_path
 from step4c_alpha_T_sweep import out_path as v4c_path
 from train_baseline import load_split
@@ -73,8 +74,10 @@ HERE = Path(__file__).resolve().parent
 WIDTH = 128                                    # 默认副；--width 64 叠上"换宽度"这一维
 ALPHAS = (0.7, 1.0)                            # 只留两档：本课的判别量是 T 的**符号**，两档够定符号
 TEMPS = (1.0, 3.0, 6.0)
-SEEDS = (42, 7, 2026)                          # 与第4课c 同一批种子：CE 锚可逐位对账
-D4 = 1.693                                     # n=3 正态极差期望，极差 → σ̂（第4课d 的公式）
+SEEDS = flows(3)                               # 与第4课c 同一批种子：名单唯一来源在册，本课不抄副本
+# 极差→σ̂ 的换算系数也**不抄第二份**：它自己是流数的函数，写死成 1.693 就是第4课d 那个 bug 的形状
+# （本课只跑 3 条流所以现在数值相同，但换流数时它会静默朝错误的一侧变松）。
+D4 = D4_TABLE[len(SEEDS)]
 # 每一行是一把**不同的刀**（不是换种子）：换老师要换的是知识源。B 就是第3课那把，
 # 它的档案（compress_report_v5*.json）已经入库，所以这一行的剂量/文件名一动，旧账就对不上了。
 TEACHERS = {"B": (0.5, "mnist_cnn_pruned50.pt", "第3课手术刀（NetU L1 剪 conv2 50% + 微调 8 epoch，种子 42）"),
@@ -528,7 +531,7 @@ if __name__ == "__main__":
     ap.add_argument("--width", type=int, choices=(128, 64), default=WIDTH,
                     help="学生宽度；老师 A 的 T 主效应、种子底、CE 锚全从该宽度的 v4b/v4c 档案读")
     ap.add_argument("--teacher", choices=tuple(ALL_TEACHERS), default="B",
-                    help="哪把刀造的老师：B=剪 50%、C=剪 20%（都是剪枝剂量），"
+                    help="哪把刀造的老师：B=剪 50%%、C=剪 20%%（都是剪枝剂量），"
                          "D=不动刀、只把训练轮数从 20 砍到 3（欠训练）；档案名跟着老师走")
     args = ap.parse_args()
     main(args.width, args.teacher)

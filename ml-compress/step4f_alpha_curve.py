@@ -630,6 +630,143 @@ v4 的倒挂腿吃的界是"份额 > 100%"，而份额 = |第一格| ÷ |阶梯�
      它自己那一发买的是"斜率差跨不跨宽度"，读数是 S64 上 −1.0 张、出口 (b)）。**没有**买第二张老师的图、
      第二份数据集、第二个判据 ⇒ 倒挂"不跨宽度"这句的外延只到"这两副学生"，跨不跨任务、换老师后成不成立，
      本轮一个字都没说。
+
+第二十发（板块计数；`--tier 中数据4500 --t 6 --nseeds 8` → `compress_report_v4f_mid_n8_t6_v5.json`）
+还的是第十二发自己写在预登记里的那笔**口径债**：v5 那条 CI 腿的分母，取半宽还是全宽。
+
+  · **债的形状**：第十二发预登记说"半宽 / 全宽是这条腿里唯一没被预言钉死的算术选择"，然后给了一档
+    `--v5strict` 拆红来证明**这个选择是承重的**（全宽之下 `_mid_n8_t6_v4` 那本唯一站着的倒挂也跟着翻）。
+    但那道闸只证明了"选哪个有后果"，**没有证明"为什么是半宽"** ——一个只有后果、没有理由的自由度，
+    下次接手的人只能照抄，照抄就是口味。这笔债不是"要不要补一次流"，是"这条腿到底在测什么"。
+  · **开跑前的一次性体检（零训练，现读 26 本 v4f 账里全部记了配对步长的 27 条步长）**：
+      ① 每条步长的 CI 中点离自己的点估计**最多偏 0.05 张**（= 一位小数的舍入量级，一条都不更大）
+        ⇒ 档案里那两条界确实是 `均值 ± t·se` 的**对称**区间；
+      ② 「|出界幅度| > CI 半宽」与「配对步长 CI 不含 0」这两问**27/27 同判，0 反例**；
+      ③ 换成全宽（`hi − lo`）当尺子，有 **7 条步长**从"承重"掉成"不承重"
+        （含 `_mid_n8_t6_v4` 那条 29.8 vs 44.7、`_mid_n12_t6_v5`、`_s64_mid_n8_v5`、`_s64_mid_n8_t6_v5`、
+        两本 Fashion 与 `n8_v3`）——这一条只说明全宽有后果，不说明它有含义。
+    ⇒ ①② 合起来把那个"自由度"消掉了：**在半宽 = 对称区间的前提下，v5 那条腿不是口味，它就是
+    "把两端钉在一起的这一步，自己的置信区间不含 0"的另一种写法**。全宽没有这条等价：`|m| > hi − lo`
+    说的是"CI 的下界比 −|m| 还低"，板块里没有任何一句话要用这个命题。所以债的还法是**把分母钉回那条命题**，
+    而不是在两个数之间选一个。
+  · **要立的不变量（只写这一条，事后计数不入本段）**：*v5 的 CI 腿在每本账上必须与"配对步长 CI 不含 0"
+    同判，而它成立的前提（CI 以点估计为中点）必须在档案里当场可核，不许靠注释里那句"我们是这么算的"。*
+    体检是**我此刻手跑的旁路脚本**，旁路脚本拦不住下一次改动 ⇒ ①② 两句要变成常驻闸。
+  · **三段付费**：
+      ① 本段（预登记，写在跑之前）；
+      ② 新常驻闸 + 它自己的专属拆红：守卫 `_red_v3.py` 加一道**口径等价闸**，参评对象是"记了配对步长的
+        每一本"（不是闸⑧ 那 6 本，两闸参评集合不同这件事要打印出来，否则数错了没人知道）。它核两件事：
+        对称性（中点偏移 ≤ 舍入容差）与等价性（两种判法逐本同判）；**参评条数为 0 时算红，不算通过**。
+        专属拆红往档案里注入一条**非对称** CI（只动一端）⇒ 对称腿必须红；两判法分歧那条腿也要红。
+        半宽换成全宽的既有档 `--v5strict` 从此红在**等价**上而不是红在"判词变了"上——这是它第一次有理由。
+        同时判词一侧要把这条腿的两份读数以字段形式写进档案（出界几张 / 半宽几张 / CI 是否含 0 / 中点偏移几张），
+        否则常驻闸只能核我手算的旁路，核不到训练路径。
+      ③ **同流活重跑**：`--tier 中数据4500 --t 6 --nseeds 8` —— 48 臂 + 恒等闸 8 次 = **56 次训练**、纯本地零
+        API 费（墙钟现读后写进落地段，不在这里报）。挑这一本有三个理由：它是**全册唯一在半宽下站着、
+        在全宽下倒下**的那本倒挂（口径债的案发现场）；它至今只有 `_v4` 一本，`_v5` 这个配置名不在盘上，
+        不覆盖任何在册账；它与 `_v4` 同档、同宽、同列、同 8 条流，所以"逐位不动"是可核的而不是祈使的。
+  · **预言（此后不许改口，事后只能追加"落地"段）**：新账判『污染型·倒挂』**维持**，且与 `_mid_n8_t6_v4`
+    的 14 个训练路径字段**逐位相同**（α=0.05 −73.8 / 顶 −44.0 / 步长 +29.8 CI [+7.4,+52.1]）。
+    为什么不是预言一个数：这一发**什么都没换**（同一批图、同一批流、同一列温度、同一副学生、同一版判词的
+    判决逻辑），所以判词翻了必须当**事故**查——要么代码漂了，要么"逐位不动"这句话是假的。
+    新那本的常驻闸读数应当是：中点偏移 = 舍入量级、两判法同判、全宽那一份读数**照写但不参与判决**。
+  · **边界**：这一发**不新增独立性维度、不买分辨率**（流数、图、老师、学生、温度列全同），买的是
+    **判据自己那条腿的口径**——与第十二发同类，价签也同类：它能让"唯一倒挂"这句更有理由，
+    不能让它更结实。要让它更结实只有一条路，就是再买流数，而那笔账第十四发已经买到 n=16（出界 29.2
+    张 = 半宽 11.35 的 2.58 倍），本轮不重复承诺。
+
+  · **落地（段③ 已付，此后只追加不改口）**：`compress_report_v4f_mid_n8_t6_v5.json` 已入库。
+      ① **预言兑现**：判词仍是『污染型·倒挂（最小剂量比阶梯顶还伤）』；三个头条数字与 `_mid_n8_t6_v4`
+        逐位相同——α=0.05 **−73.8 张**、阶梯顶 **−44.0 张**、配对步长 **+29.8 张 CI [+7.4, +52.1]**。
+        恒等闸 8/8 `bit_identical`、α=0.3/0.7 跨脚本对账 6/6 `match`。
+      ② **"逐位不动"量到了叶子级**（这一步是事后补的口径，比预登记那句更强）：两本账各 28 个顶层字段、
+        共 **638 个共享叶子**，其中 **635 个逐字相同**，不同的只有 **3 处**：`verdict.shape_rule`（v4→v5，
+        这就是这一发本身）+ 两句 `limitations` 里点了判据版本名的那串字。**一处读数都没动**。
+      ③ **一个必须点破的巧合**：预登记那句"14 个训练路径字段逐位相同"里的 14 是 `TRAIN_PATH` 的**字段数**
+        （14 项，它们的叶子全在②那 635 里 ⇒ 那句为真）；实测新账比老账**多出的叶子也恰好是 14 个**
+        （9 个 `verdict.ci_leg_reading` 双记账 + 5 个只有 v4/v5 才写的 verdict 级字段：
+        `verdict_under_v4_rule` / `oob_gap_imgs` / `oob_ci_halfwidth_imgs` / `out_of_domain` /
+        `inverted_leg_loads`）。**两个 14 不是同一个 14**：前者是名单长度，后者是新增叶子数，
+        而 14 个字段的叶子数远多于 14。写在一起是为了下次接手时不把这两件事并成一句。
+      ④ **常驻闸（段②）实测**：`_red_v3.py` 正常模式 rc=0、**0 条红**，闸⑪ 参评 27 条配对步长、
+        其中 **1 本**自带 `ci_leg_reading` 且与守卫复算**逐字段相同**（就是这一本）。
+        顺带一条真读数：档案里 `oob_ci_halfwidth_imgs` 22.4 与双记账 `ci_halfwidth_imgs` 22.35 差 0.05，
+        前者是判词侧一位小数舍入后的值、后者是未舍入的原值 ⇒ 两处**不是同一个字面量**，守卫核的是复算。
+      ⑤ **两档专属拆红（段②）实测，红数随新账入库而变（照第十五发那条纪律现读重写）**：
+        `--ciasym`（把参评账的 CI 上端 +40 张）注入后红 **2** 条——对称腿 + 两判法分歧；入库前那一趟是 3 条，
+        多出来那条是"全场没有一本自带双记账"的恒红，现在有了这一本，它**按设计消掉了**。
+        `--ciunread`（抹掉双记账）红 **1** 条，正是"至少一本自带双记账"那句；入库前 2 条同理。
+        `--v5strict`（分母换全宽）红 **13** 条（入库前 11）：多的是这一本新账的等价腿与判词腿，
+        参评集合多一本就多一条——**这条腿从此有了案发现场的现行犯**：全宽之下 `load_by_fullwidth: false`
+        被写在档案里，而判词仍承重 ⇒ 守卫打印出"实现与它声称的命题分家"。
+      ⑥ **墙钟（用文件时间戳核，不用记忆）**：`_run_d_seg3.log` 建立 15:06:32 → 账本写入 15:08:41 =
+        **2 分 09 秒**（56 次训练、纯本地零 API 费）。
+      ⑦ **这一发买到的一句话**：那条 CI 腿现在**有名字**（`ci_leg_reading`）、**有常驻闸**（闸⑪）、
+        **有自己的拆红**（`--ciasym` / `--ciunread`），而且它与"配对步长 CI 不含 0"的等价关系在 27 条步长上
+        逐本核过。它**没有**买到任何新的独立性——"唯一倒挂"这句话的强度还是第十四发那把尺子量出来的。
+
+第二十一发（板块计数；`--arch cnn --tier 中数据4500 --t 6` → 3 条流那本
+`compress_report_v4f_cnn_mid_t6_v5.json`（18 + 恒等闸 3 = **21 次训练**）与补到 8 条流那本
+`compress_report_v4f_cnn_mid_n8_t6_v5.json`（48 + 恒等闸 8 = **56 次训练**），纯 CPU、零 API 费）
+买的是独立性第八维——**换学生架构族**。前一发（第十九发）把"倒挂跨不跨任务"买成否证之后，板块欠的
+下一句是"它跨不跨**几何**"：MLP 从来是本板块唯一的学生形状，而老师一直是 CNN，所以这一发把学生换成
+与老师**同族**的形状，顺手消掉"学生比老师矮一头"这个从头混到尾的混杂。
+
+  · **预登记（写在跑之前，此后只追加"落地"）**：问句是"KD 输掉的那批张数是不是 MLP 这个特定几何的产物"。
+    只买地板（本族自己的种子底）与逐流配对 CI，**不买机制解释**——step4i 那一批量在 logits/梯度层面，
+    与学生几何无关，换族不重跑它。要立的不变量三条：
+      ① CNN 学生与老师同架构、`build_cnn()` 不接受 hidden ⇒ **本族没有宽度旋钮**，
+        `--arch cnn --width 64` 必须在训练前退出，不许默默按 128 算（第十五发那条"特判泛化"的反面：
+        一个自由度在这一族根本没有对应物时，报错比容错诚实）；
+      ② 本族**没有"第4课历史判决"可对**（30 本在册账当时连学生架构这个字段都没有）⇒ 底、闸格、CE 参考
+        全部现造，跨脚本数值对账只对本族第一本账生效（家族闸）；
+      ③ 判词照旧由 `SHAPE_RULE` 从数字里挑，人不许先选形状；负答案也要连着钉住它的那条步长的宽度一起报。
+  · **落地**：
+      ① **答案是"不跟"**：8 条流那本判『有阈值（H1 半活）』——α=0.05 = **+0.6 张**（合并 p=0.905、
+        流级 5/8、p_flows=0.727 ⇒ 方向根本没出）、阶梯顶 α=0.7 = **+52.1 张**（8/8、p=0.00781）
+        ⇒ 份额 **1%**、`out_of_domain=False`、`inverted_leg_loads=False`、v1..v4 并排列没有一版判成倒挂。
+        **负答案的承重必须单独报**：钉住它的配对步长是 **+51.5 张 CI [35.3, +67.7]、8/8 同号**
+        （σ 19.4、半宽 16.2 ⇒ **这一步的均值是它自己半宽的 3.2 倍**）。**这一句从前写的是"出界幅度是半宽的
+        3.2 倍"，那是错的并已就地改掉**：这本 `out_of_domain=False`，51.5 张是**步长本身**不是出界幅度，
+        而档案里 `verdict.oob_gap_imgs` 无条件写正数（现读：13 本带这个字段的 v4f 账里 **8 本**是"界内仍写着
+        正数"，两本 CNN 账 51.5 / 71.0 都在其中）⇒ 按板块那条"倍数只在 `out_of_domain=True` 时有定义"，
+        写"出界"会凭空造出一条界外的倒挂。少了这半句，"不跟"就可以被读成"没判动"——
+        第十六发那条纪律在同一条问句上换了个对象重演：**换任务那一发**（Fashion）买到的是"半宽 56 张
+        ⇒ 93% 与 130% 同一个读数"，**换族这一发**（CNN）买到的是"半宽 16.2 张 ⇒ 1% 就是 1%"。
+      ② **一发之内否证了自己上一本的读数**：3 条流那本判『反号线』（α=0.05 = **−19.3 张**，逐图 p=0.0036
+        却只有 2/3 同号；步长 +71.0 张 CI [42.8, +99.2]），补到 8 条流同一格变 **+0.6 张**、判词改『有阈值』。
+        关键不是"翻案"，是这两本之间**老三条流的 gap 逐位重现**（`[2, −28, −32]` 一字未动，守卫闸⑥
+        那 15 格逐位对账核的正是这件事）⇒ 改口的原因是**那两个负号本来就只住在 3 条流里**。
+        所以 3 条流那本不是白跑：它是一张**在册反例**，写着"如果只跑 3 条流会把噪声形状写成 CNN 的性质"。
+      ③ **闸门全在本族现造、并且全部现读通过**：α=0 恒等闸 **8/8** `bit_identical`；跨脚本对账 **6/6**
+        （α=0.3 / α=0.7 × 三条老流逐位命中 `compress_report_v4c_cnn_mid.json`，那本 9 格 + `match_T6`
+        一格 = 10 格，正是这一发的闸格来源）；step4c 的锚点格 α=0.7/T=3 复算 **307 错图 / acc 0.9693 /
+        翻坏 59 / 翻正 96**，与它自己读的底账 `compress_report_v4b_cnn_mid.json` **四件套逐位相同**
+        （`parity_anchor`）——**对账对象是本族底账而不是第4课那本**，档案里 `parity_no_archive` 明写着
+        "这两臂没有第4课档案可对"；底 = 本族 KD 臂跨种子极差 **63 张**（CE 臂 30 张），
+        `floor_from` 指向 `_v4b_cnn_mid` = 守卫闸⑨ 那条家族位第一次真的接上。
+      ④ **三处启动事故，全在本地、不花钱**（这一发真正的教学量在这里）：
+        (a) **cp936 崩在打印上、日志 0 字节**——`step4c_alpha_T_sweep.py:234` 那句带 `⚠` 的打印
+        `UnicodeEncodeError`，而 stderr 走块缓冲重定向 ⇒ 事后打开日志**一个字都没有**，看起来像"进程没起来"。
+        根因不是代码是没带 `PYTHONIOENCODING=utf-8 PYTHONUTF8=1`（板块记忆里那条第 N 次兑现）。
+        (b) **`nohup ... &` 随工具调用进程树一起死**——8 条流那趟跑到**第 7 条流**被杀
+        （`_run_cnn_v4f_killed1.log` 停在 7/8，留档当反例），改回"长跑只用后台任务"才跑完。
+        (c) **第二次跑的时间无法归因**——账直到 23:20:24 才落下，而同期本机 `Get-CimInstance` 现读有
+        **21 个并存 python 进程**、空闲内存 1.36G/16.47G ⇒ 只报定性（被别人的负载压着，**没动任何别人的进程**）；
+        上一版文档在这里写过"慢 14 倍"，那个倍数**算不出来**（重跑复用了同一个日志名，起点时间戳被覆盖）⇒ 已删。
+        **成本自纠（第七次）**：预登记价签写"整链 v4b→v4c→v4f 约 95 次"，实付 **132 次** =
+        `6 + 16 + 33 + 21 + 56`，漏的是三发链每一发自带的 CE 参考臂与恒等闸。
+      ⑤ **一发修出来的文本 bug，比它修的读数更贵**：`step4b_seed_variance.py:326` 那句 `limitations` 少了
+        `f` 前缀 ⇒ **五本已入库档案**印着字面量 `{len(seeds)}`，而**没有任何一个数字因此变红**：坏掉的恰好是
+        唯一那句告诉后来人"该信到什么程度"的话。修它的脚本第一版把整句 `PAT.sub` 吞掉、第二版修好五本却
+        **把三本从来没坏的账改了措辞**（"欠估"→"仍是欠估"），那三本已用 `git diff -U0` 逐行回滚。守卫从此有
+        **闸⑫**（腿 A 扫未渲染占位符 / 腿 B 核那句里的 N 与该本自己的 `len(seeds)`）+ 两档专属拆红
+        `--unformatted`（红 **8** 条）与 `--wrongcount`（红 **1** 条，并验两腿分离）；**但"只改措辞"那一类
+        两腿都抓不到**，那一类只有 `git diff` 加人眼——这句话写在闸的注释里，不写成判词。
+      ⑥ **这一发买到的与没买到的**：买到的是"那条倒挂住在哪一族的几何里"这个负答案，以及归并键上的
+        **家族位**（守卫现读 `mlp族 × 中数据4500 × S128 × T=6.0 ⇒ 4 本账`）；没买到的是新的老师、
+        新的数据集、新的判据版本，也**没有**给 `--misfeed` 那档买到 CNN 被测对象（本族两本在它上面零红，
+        是一条记在文档里的盲区，不记成有闸）。
 """
 from __future__ import annotations
 
@@ -646,10 +783,12 @@ from step4_distill import (DATA_TIERS, FLOW_SEEDS, SEEDS, SEEDS8, SEEDS12, SEEDS
                            logits_of, sign_test_p, train_student)
 from step4e_marginal_recheck import OLD_SEEDS, summarize          # 复现单位是流：CI 用同一套系数表
 from step4c_alpha_T_sweep import ALPHA_ANCHOR, ANCHOR_T, TIER, V4C_SUFFIX, key, load_anchor, out_path, v4b_path
+import step4c_alpha_T_sweep as v4c_mod      # 家族开关在 step4c 那边：档案名/底/锚点格都从那几个路径函数读
 from step6_fashion_replication import TEACHER_PT, load_fashion
 from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
+# 学生架构族的唯一真值住在 v4c_mod.ARCH（档案名/底/锚点格/训练/档案字段全读它），本课不再养第二个全局
 LADDER = (0.0, 0.05, 0.1, 0.2, 0.3)               # 0 是恒等闸不是臂；0.3 是跨脚本闸
 HIGH_LADDER = (0.85, 1.0)                          # 第十发：锚点剂量 0.7 **之上**再铺两格。
                                                    # α=1.0 是纯 KD（CE 权重 1−α 归零），仍在定义域内；
@@ -663,6 +802,9 @@ SHAPE_RULE = "v5"        # 形状判据版本：v1 只看逐图合并 p，v2 加
                          # v5 把那条界换成"出界幅度 > 配对步长的 CI 半宽"（第十二发，预登记在文档串里）
 FULL_WIDTH_MODE = False  # 只给守卫的 --v5strict 用：把 v5 那条腿的分母从 CI 半宽换成全宽（hi−lo）。
                          # 默认 False ⇒ v5 按预登记吃半宽；这一档红钉的是"半宽还是全宽"这个算术选择。
+CI_CENTER_TOL = 0.1      # "CI 以点估计为中点"的容差（张）：档案里均值与两端各是一位小数，中点最多漂两倍舍入。
+                         # 它是 `ci_is_centered` 与守卫那道口径等价闸**共用**的一把尺子——两处各写一个数，
+                         # 就等于允许闸与实现 disagree 而没人报警（第二十发）。
 V6 = HERE / "compress_report_v6_fashion.json"
 RULES_WITH_TOP = ("v3", "v4", "v5")   # 把阶梯顶交给判据的版本：v2 及更早压根没看那一格
 
@@ -700,6 +842,32 @@ def oob_resolution(pair_step: dict | None, full_width: bool = False) -> float | 
         return None
     lo, hi = pair_step["ci95_imgs"]
     return (hi - lo) / (1.0 if full_width else 2.0)
+
+
+def ci_leg_reading(pair_step: dict | None, gap_oob: float) -> dict | None:
+    """把 v5 那条腿**到底在测什么**写成档案里可独立复算的读数（第二十发：那条腿的分母不是口味）。
+
+    它一个字也不改判词——它的存在是为了让守卫能拿原始 `ci95_imgs` 复算一遍这里写的每个数，
+    两边不一致就是"实现与它声称的命题分家"。三份读数的分工：`load_by_halfwidth` 是判词实际吃的，
+    `ci_excludes_zero` 是这条腿**声称**在测的那条命题，两者在对称区间上逐字等价（第二十发开跑前对当时
+    全部在册步长做过体检：0 反例，中点偏移最大 0.05 张 = 一位小数的舍入），所以等价本身要按值核，
+    而它成立的前提（区间以点估计为中点）也要当场可核——那一句不许只活在注释里。
+    `load_by_fullwidth` 照写不参与判决：它是 `--v5strict` 那档拆红的靶子，也是"全宽有后果、
+    但没有哪句话要用它"的现读证据。"""
+    if pair_step is None or pair_step.get("mean_gap_imgs") is None:
+        return None
+    lo, hi = (float(pair_step["ci95_imgs"][0]), float(pair_step["ci95_imgs"][1]))
+    m = float(pair_step["mean_gap_imgs"])
+    off = abs((lo + hi) / 2 - m)
+    return {"oob_gap_imgs": round(gap_oob, 1),
+            "step_mean_imgs": m,
+            "ci_halfwidth_imgs": round((hi - lo) / 2, 2),
+            "ci_fullwidth_imgs": round(hi - lo, 2),
+            "ci_excludes_zero": bool(lo > 0 or hi < 0),
+            "load_by_halfwidth": bool(gap_oob > (hi - lo) / 2),
+            "load_by_fullwidth": bool(gap_oob > hi - lo),
+            "ci_midpoint_offset_imgs": round(off, 2),
+            "ci_is_centered": bool(off <= CI_CENTER_TOL)}
 
 
 def shape_verdict(s_small: dict, s_probe: dict, n: int, dirn: float,
@@ -939,8 +1107,17 @@ def setup(dataset: str, width: int, tier: str, extra: str = "",
 
 def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
          nseeds: int = 3, thin: bool = False, t_col: float | None = None,
-         high: bool = False) -> None:
+         high: bool = False, arch: str | None = None) -> None:
     ds = DATASETS[dataset]
+    arch = v4c_mod.ARCH if arch is None else arch      # 唯一真值住在 step4c（守卫也从这里注入）
+    if arch == "cnn" and dataset != "mnist":
+        raise SystemExit(f"--arch cnn 配 --dataset {dataset}：族×任务这一格不是顺手加个 if 就能来的——"
+                         f"换任务那条路径读的是 step6 那本账，而那本账**全是 MLP 学生的臂**（"
+                         f"给它换族等于借 MLP 的底判 CNN 的阶梯）。要买这一格，先按族把那一档的底造出来")
+    if arch == "cnn" and width != 128:
+        raise SystemExit(f"--arch cnn 配 --width {width}：CNN 学生与老师同架构，宽度这一维在它身上无定义"
+                         f"（跨不跨宽度那一发是 MLP 族的 S128 vs S64）——两个判别变量被这一个开关混成了一次")
+    v4c_mod.ARCH = arch
     if high and thin:
         raise SystemExit("--ladder-high 与 --thin 互斥：薄阶梯只留判据吃的那几格，而这一发买的正是顶以上那两格")
     if nseeds not in FLOW_SEEDS:
@@ -1011,7 +1188,7 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
     id_gate, probe_gate = [], []
     print("\n[开跑] 每个种子一副 CE + 阶梯各一副（同起点同批次流）：")
     for seed in seeds:
-        mce, _ = train_student(width, xd, yd, soft, "CE", xv, yv, seed=seed)
+        mce, _ = train_student(width, xd, yd, soft, "CE", xv, yv, seed=seed, arch=arch)
         pe = predict(mce, xte, False)
         ce_pred[seed] = pe
         ce_wrong = int((pe != yte).sum())
@@ -1020,7 +1197,7 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
             if a == 0.0 and thin and seed not in SEEDS:
                 continue                     # 薄阶梯：接线证明在老 3 条上跑过就够（它不随种子变）
             if a == 0.0:                       # 恒等闸：这一格不许当臂用，它测的是接线
-                m0, _ = train_student(width, xd, yd, soft, "KD", xv, yv, seed=seed, alpha=0.0, t=T)
+                m0, _ = train_student(width, xd, yd, soft, "KD", xv, yv, seed=seed, alpha=0.0, t=T, arch=arch)
                 p0 = predict(m0, xte, False)
                 n_diff = int((p0 != pe).sum())
                 id_gate.append({"seed": seed, "wrong": int((p0 != yte).sum()),
@@ -1028,7 +1205,7 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
                                 "bit_identical": bool(n_diff == 0 and int((p0 != yte).sum()) == ce_wrong)})
                 line.append(f"a0(恒等):差{n_diff}")
                 continue
-            m, _ = train_student(width, xd, yd, soft, "KD", xv, yv, seed=seed, alpha=a, t=T)
+            m, _ = train_student(width, xd, yd, soft, "KD", xv, yv, seed=seed, alpha=a, t=T, arch=arch)
             p = predict(m, xte, False)
             wrong = int((p != yte).sum())
             broken = int(((pe == yte) & (p != yte)).sum())
@@ -1217,6 +1394,18 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
              f"『买到锚点伤害的百分之几』这句话在这里不适用（份额是 abs 比 abs，反号时它会把『方向相反』"
              f"读成『买到了 {share}%』）。改看配对步长：α={small:g}→{ANC:g} 走 {pair_step['mean_gap_imgs']:+.1f} 张"
              f"（CI [{ci_lo:+.1f}, {ci_hi:+.1f}]）"))
+    if SHAPE_RULE == "v5" and pair_step is not None:
+        r = ci_leg_reading(pair_step, gap_oob)
+        print(f"[口径自证 分母不是口味] 这条腿吃的界是半宽 ±{r['ci_halfwidth_imgs']:.2f} 张"
+              f"（出界幅度 {r['oob_gap_imgs']:.1f} 张 ⇒ {'承重' if r['load_by_halfwidth'] else '不承重'}），"
+              f"而它声称测的是「配对步长 CI [{ci_lo:+.1f}, {ci_hi:+.1f}] 不含 0」"
+              f"⇒ 两问**{'同判' if r['load_by_halfwidth'] == r['ci_excludes_zero'] else '分歧：等价断了'}**；"
+              f"等价的前提当场可核：CI 中点离点估计 {r['ci_midpoint_offset_imgs']:.2f} 张"
+              f"（容差 {CI_CENTER_TOL:g} 张 = 档案一位小数的两倍舍入）⇒ "
+              f"{'对称区间在场' if r['ci_is_centered'] else '**区间不对称，半宽不再是那个 margin**'}。"
+              f"另记一份不参与判决的读数：全宽 {r['ci_fullwidth_imgs']:.2f} 张 ⇒ 按它判则"
+              f"{'承重' if r['load_by_fullwidth'] else '不承重'}——换尺子有后果，但板块没有任何一句话要用"
+              f"「|均值| > 全宽」这条命题，所以它不是候选口径（第二十发）。")
     if L["gate_is_anchor"]:
         print(f"[判决的边界] α={small:g}→{PROBE:g}（剂量 ×{PROBE / small:.0f}）再走 {lo_step:+.1f} 张；"
               f"往上没有第二格可看——闸格就是锚点格，所以这一发判的是『0~{PROBE:g} 这一段陡不陡』，"
@@ -1266,7 +1455,9 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
               f"{L['teacher_acc']}，MNIST 那副 {TEACHER_ARCHIVE_ACC}）、以及那本账里可用的温度列。"
               "所以这一发判的是『污染型伤害在第二个任务上还在不在』，不是『污染型伤害与 MNIST 无关』。")
 
-    report = {"dataset": dataset, "tier": tier, "width": width, "temps_fixed": T, "ladder": list(LAD),
+    report = {"dataset": dataset, "tier": tier, "width": width, "student_arch": arch,
+              "student_tag": f"S{width}" if arch == "mlp" else "CNN学生（无宽度旋钮）",
+              "temps_fixed": T, "ladder": list(LAD),
               "seeds": list(seeds), "probe_alpha": PROBE, "anchor_alpha": ANC,
               "paired_step_small_to_anchor": pair_step,
               "ladder_high": list(HIGH_LADDER) if high else None,
@@ -1293,6 +1484,7 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
                           "first_cell_share_of_anchor_damage_pct": share,
                           "oob_gap_imgs": round(gap_oob, 1),
                           "oob_ci_halfwidth_imgs": (None if res_oob is None else round(res_oob, 1)),
+                          "ci_leg_reading": ci_leg_reading(pair_step, gap_oob),
                           "out_of_domain": bool(out_of_domain),
                           "inverted_leg_loads": bool(oob_loads),
                           "step_low_imgs": lo_step, "step_low_dose_x": round(PROBE / small, 2),
@@ -1318,8 +1510,14 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
                               f"只扫 T={T:g} 一列，其余温度上的剂量响应未测",
                               "小 α 各格均值本就低于底（H1 的预测就是这个量级），"
                               "判决依赖逐图配对检验而非重训抖动",
-                              f"只 {tier}+S{width}：跨档/跨架构要各自带 --tier/--width 重跑，"
-                              "档案不同不能混读"]
+                              (f"只 {tier}+S{width}：跨档/跨架构要各自带 --tier/--width 重跑，"
+                               "档案不同不能混读" if arch == "mlp" else
+                               # 第二十一发：这句模板在 CNN 账上是错的——本族没有宽度旋钮，
+                               # 而"跨架构"恰恰是这一发自己买的那一维
+                               f"只 {tier}×{arch} 族：本族学生与老师同架构，没有宽度旋钮"
+                               f"（--width 会当场退出），所以『跨不跨宽度』这句在本族无定义；"
+                               f"跨档要另带 --tier 重跑（底也得按族重造），跨族要带 --arch，"
+                               "档案不同不能混读")]
               + ([] if dataset == "mnist" else
                  ["换任务同时换了任务难度/老师干湿/那本账里可用的温度列：判的是『第二个任务上还在』，"
                   "不是『与 MNIST 无关』",
@@ -1334,6 +1532,9 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="α→0 剂量曲线（默认 MNIST S128+满数据，T=3 一列）")
     ap.add_argument("--dataset", choices=tuple(DATASETS), default="mnist",
                     help="换任务：fashion 时温度列/锚点剂量/底全部从 compress_report_v6_fashion.json 现读")
+    ap.add_argument("--arch", choices=("mlp", "cnn"), default=v4c_mod.ARCH,
+                    help="学生架构族（第八维）：cnn 让学生与老师同架构；档案名、种子底、锚点格全按族分叉"
+                    "（族×任务、族×宽度两格本发不卖，见 main 里那两道零训练闸）")
     ap.add_argument("--width", type=int, choices=(128, 64), default=128)
     ap.add_argument("--nseeds", type=int, choices=tuple(sorted(FLOW_SEEDS)), default=3,
                     help="3 = 对账那批老流；8 = 加第4课e 那五条（板块共用，老 3 条仍只当逐位对账的锚）；"
@@ -1353,4 +1554,4 @@ if __name__ == "__main__":
                     help="数据档位；底与跨脚本闸基准都从那一档（那一本任务）自己的账里读，缺格就退出")
     args = ap.parse_args()
     main(args.dataset, args.width, args.tier, nseeds=args.nseeds, thin=args.thin, t_col=args.t,
-         high=args.ladder_high)
+         high=args.ladder_high, arch=args.arch)

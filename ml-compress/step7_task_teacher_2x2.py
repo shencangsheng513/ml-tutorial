@@ -20,9 +20,11 @@ import json
 import math
 from pathlib import Path
 
+from step4_distill import T95, flows
+
 HERE = Path(__file__).resolve().parent
-SEEDS = [42, 7, 2026, 11, 202, 3003, 40004, 55555]      # 四本账共用的随机流名单
-T95 = 2.365                                              # 双侧 95%，df=7
+SEEDS = list(flows(8))                        # 四本账共用的随机流名单：唯一出处是登记处
+T95 = T95[len(SEEDS)]                         # 双侧 95%，df=n−1：系数跟着同一档名单走
 OUT = HERE / "compress_report_v7_interaction.json"
 LOW_TIER = "低数据2000"
 PAIRS = (("MNIST", "A", "D"), ("Fashion", "A", "dry"))   # 同任务内配对的两副老师

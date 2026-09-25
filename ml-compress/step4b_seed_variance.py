@@ -20,6 +20,50 @@
   # 第八发：把这本种子底本身扩到第4课e/f 那批 8 条流（老 3 条先与 compress_report_v4b.json 逐位对账，
   # 档案名带 _n8 与老账并存）——板块一路用 3 个点的极差当闸门，这一发就是还那笔粗估债：
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4b_seed_variance.py --nseeds 8
+  # 第二十一发（板块计数）：第十九发之后欠的那条外推轴——换模型族（第八维），
+  #   学生从 MLP 换成老师同族的 CNN。下面整段是**开跑前的预登记**，事后不改一个字。
+  # 【预登记 · 只写不变量，读数事后现报】
+  # 买什么：前七维买的是"同一副学生换个条件"（数据档/温度/α/宽度/流/标签/链），
+  #   学生架构从来是常量。这一发把 MLP 这层地板换掉，检验"KD 输掉的张数"是不是
+  #   MLP 这个特定几何的产物——如果是，换族后符号或量级应当翻；如果不是，它就成了
+  #   一条与架构无关的观察。**这一发只买地板和逐流配对 CI，不买机制解释**：
+  #   机制那一路（step4i）的量都是 logits/梯度层面的，与学生的几何无关，换族不重跑它。
+  # 盘上有没有底：查过——30 本在册账**没有任何一本记录学生架构**（档案里没有这个字段），
+  #   也不存在 v4b_cnn* 这类账本。所以 CNN 这一发没有"复现"可言，只有"第一次落账"，
+  #   故 --arch cnn 时提前把跨脚本数值对账撤到只对新学生族的第一本账生效（家族闸）。
+  # 实测价签（同一台机器、同一份数据、CPU，跑一次测一次，不是估的）：
+  #   MLP S128 学生 101,770 参数 / CE 臂 2.55s / KD 臂 2.84s
+  #   CNN 学生     105,866 参数 / CE 臂 24.94s / KD 臂 25.28s  ← 参数只多 4%，墙钟 8.8×
+  #   CNN 没有宽度旋钮（build_cnn 不接受 hidden）→ --arch cnn 时 --width 无定义，
+  #   所以 --arch cnn --width 64 必须当场退出，不能默默按 128 算。
+  # 链条：这一发只跑 step4b（n=3 是 6 次训练、n=8 是 16 次）。完整链 v4b→v4c→v4f 约 95 次
+  #   训练、按上面价签约 40 分钟——那两本是否补，等这一本的地板数字出来再决定，不预先承诺。
+  # 四个拆红开关各自该红在哪道闸（红点不唯一 = 那道检查没在生效）：
+  #   --arch cnn --width 64   → 训练前退出，0 次训练
+  #   --arch cnn --blankrun   → 空账闸（不落盘），0 次训练
+  #   --arch cnn --blindcommit → 仪器对账（数值），12 次训练
+  #   --arch cnn --blindfamily → 跨脚本数值闸，16 次训练
+  PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4b_seed_variance.py --arch cnn --tier 中数据4500 --nseeds 3
+  # 【落地 · 两本都入了库，此后只追加不改口】
+  #   compress_report_v4b_cnn_mid.json（3 条流，6 次训练）与 compress_report_v4b_cnn_mid_n8.json
+  #   （8 条流，16 次训练）。跨种子的 KD−CE 之差：n=3 是 [37, −13, 4] 张（极差 50），
+  #   n=8 是 [37, −13, 4, 51, 26, 42, 5, 25] 张（极差 64、7/8 同号、pooled p=1.11e-06）。
+  #   底（极差型）：n=3 为 KD 63 / CE 30，n=8 为 KD 83 / CE 103 —— 同一条"极差随流数机械变宽"
+  #   在本族照样成立，所以 gap_over_floor 只能在同一本账内部读（这本档案里那句 `floor_is_n_dependent`
+  #   就是干这件事的），拿 3 条流与 8 条流两本的比值互相翻案就是拿 n 当效应。
+  #   **本族第一对"补流不改老读数"的凭据**：`cross_script_parity` 现读"老3条流×4项读数 逐位相同"，
+  #   也就是上面那条不变量真的落到了盘上（守卫闸⑥ 从此有跨族那一对 15 格可核）。
+  #   **本族没有第4课历史判决可对**这件事是档案自己说的：`parity_no_archive` = ["中数据4500 CE",
+  #   "中数据4500 KD"]、`parity_seed42_vs_archive` 是空字典 ⇒ 别去这两个字段里找"跨脚本逐位相同"，
+  #   这一族的对账线在别处（α=0 恒等闸 + step4c/step4f 之间的 6/6 那两格）。
+  #   上面预登记里那三个注入开关（--blankrun / --blindcommit / --blindfamily）**本轮未复测**：
+  #   这一发真跑的只有正常两本 + `--arch cnn --width 64` 那一档（训练前退出，实测 0 次训练）。
+  #   它们是给下一次改动的红档，本轮没跑就不要引用它们的"预期红数"当实测。
+  #   修 bug 一处：这一本文件的 limitations 第一句曾少一个 `f` 前缀（`step4b_seed_variance.py:326`），
+  #   于是**五本已入库档案**里印着字面量 `{len(seeds)}` 而不是数字——没有任何数字因此变红，坏掉的
+  #   恰好是唯一那句告诉后来人"这个底欠估到什么程度"的话。守卫由此新增**闸⑫**（腿 A 扫未渲染占位符、
+  #   腿 B 核那句里的 N 与该本自己的 `len(seeds)`），专属拆红 `--unformatted`（实测红 8 条）与
+  #   `--wrongcount`（实测红 1 条，且验两腿分离）。**修它的脚本自己也误伤过一次**：见 README 第二十一发。
 """
 from __future__ import annotations
 
@@ -30,8 +74,9 @@ from pathlib import Path
 import torch
 
 from step1_quantize import MODELS, build_cnn, predict
-from step4_distill import (DATA_TIERS, SEEDS, SEEDS8, TIERS, VAL_N, check_flow_constants,
-                           flow_tiers, flows, logits_of, sign_test_p, train_student)
+from step4_distill import (DATA_TIERS, SEEDS, SEEDS8, STUDENT_ARCHS, TIERS, VAL_N,
+                           check_flow_constants, flow_tiers, flows, logits_of, sign_test_p,
+                           train_student)
 from step4e_marginal_recheck import summarize          # CI 用全板块同一套 t 系数表，不在这里另刻一把
 from train_baseline import load_split
 
@@ -40,6 +85,9 @@ V4 = HERE / "compress_report_v4.json"
 # 复现流名单 SEEDS / SEEDS8 / … 住在 step4_distill（唯一来源），由上面的 import 带进来
 NSEEDS = 3                                         # 可被 --nseeds 覆盖
 WIDTH = 128                                        # 可被 --width 覆盖（S64 复现用）
+ARCH = "mlp"                                       # 可被 --arch 覆盖；cnn = 换模型族那一发（学生与老师同架构）
+# 三个拆红开关：各自撤掉家族化改造里的一道检查，只用来证明"那道检查真在生效"，不参与任何读数
+BLANK_RUN = BLIND_COMMIT = BLIND_FAMILY = False
 TIER = ""                                          # 可被 --tier 覆盖；空 = 第4课那两档全跑
 # 第4课档案值（committed run）——种子 42 必须逐位复现，否则说明本课改坏了 train_student
 # 低数据档第4课只在 S128 上配对，所以 64 这一副里只有满数据档可查
@@ -50,9 +98,13 @@ ARCHIVE = {128: {"满数据8500": {"CE": 0.9326, "KD": 0.9263}, "低数据2000":
 # 单档复现的档案名。第4课那两档**故意不在这里**：它们的账本是一份合并档案（两档都在里面），
 # 允许 --tier 单跑写回同名文件，就等于让一次单档运行把另一档的账抹掉。
 OUT_SUFFIX = {"中数据4500": "_mid"}
+# 学生架构是这本账的判别变量，后缀只在这一个函数里出现（两处名字各写一套就是第二把尺子）。
+# mlp 不贴后缀：板块那 30 本账的名字是历史，改一次名就等于把所有在册账的身份全换掉。
+FAMILY_SUFFIX = {"mlp": "", "cnn": "_cnn"}
 
 
-def out_path() -> Path:
+def book_name(nseeds: int) -> Path:
+    """这一族、这一档、这副宽度、这条流数的那本账叫什么名字——唯一来源。"""
     if TIER == "":
         suffix = ""
     elif TIER in OUT_SUFFIX:
@@ -62,15 +114,34 @@ def out_path() -> Path:
                          f"要么该有自己的档案名（在这里登记）。回落成通用文件名等于把两档记进同一本")
     stem = "compress_report_v4b" if WIDTH == 128 else f"compress_report_v4b_s{WIDTH}"
     # 流数是这本账的判别维度：补过流那几本若写回同名文件，就无声盖掉了板块一路在用的那把 3 点底
-    return HERE / (stem + suffix + ("" if NSEEDS == 3 else f"_n{NSEEDS}") + ".json")
+    return HERE / (stem + FAMILY_SUFFIX[ARCH] + suffix
+                   + ("" if nseeds == 3 else f"_n{nseeds}") + ".json")
+
+
+def out_path() -> Path:
+    return book_name(NSEEDS)
+
+
+def ref_path() -> Path:
+    """跨脚本对账的基准：**同一族、同一档、同一副宽度**那本 3 条流的账。
+
+    旧写法把文件名写死成 `compress_report_v4b.json`（合并账，只有满数据与低数据两档），
+    于是 `--tier 中数据4500 --nseeds 8` 这个组合根本没有基准——它会在训练之后才炸
+    "没有记录可比"。这一支此前从未跑到过（板块从没给 mid 那本补过流数），
+    换模型族那一发第一次要跑它，所以先把基准名接到 book_name(3) 上。"""
+    base = book_name(3)
+    if BLIND_FAMILY:            # 拆红专用：把基准强行接回 MLP 那本，模拟"名字接错家族"
+        base = base.with_name(base.name.replace(FAMILY_SUFFIX[ARCH], ""))
+    return base
 
 
 
 def one_pair(teacher: torch.nn.Module, xd, yd, soft, xv, yv, xte, yte, seed: int) -> dict:
-    """一个种子内的 CE/KD 配对：与第4课同款（同种子重播初始化 + 私有 Generator 批次流）。"""
+    """一个种子内的 CE/KD 配对：与第4课同款（同种子重播初始化 + 私有 Generator 批次流）。
+    两臂共用同一个 ARCH ⇒ 换学生架构不改"CE 与 KD 只差一个目标函数"这条配对定义。"""
     preds = {}
     for mode in ("CE", "KD"):
-        m, _ = train_student(WIDTH, xd, yd, soft, mode, xv, yv, seed=seed)
+        m, _ = train_student(WIDTH, xd, yd, soft, mode, xv, yv, seed=seed, arch=ARCH)
         preds[mode] = predict(m, xte, False)
     ce, kd = preds["CE"], preds["KD"]
     acc = {k: float((p == yte).mean()) for k, p in preds.items()}
@@ -90,6 +161,22 @@ def spread(xs: list[int]) -> dict:
             "mean": round(sum(xs) / len(xs), 2)}
 
 
+def committed(tier: str) -> dict | None:
+    """第4课那一轮的 committed 精度值（种子 42 逐位对账用）。
+
+    它**只对 mlp 学生存在**：ARCHIVE 里那些数是 S128/S64 那两副 MLP 跑出来的，换一副架构
+    就没有任何数可比。按家族分叉写在这一个函数里，是为了让"这一本没有独立于本课的锚点"
+    成为算出来的事实，而不是靠人在 main 里记得每处都加 if。"""
+    if ARCH == "mlp" or BLIND_COMMIT:      # 后者是拆红专用：假装忘了按家族分叉
+        return ARCHIVE[WIDTH].get(tier)
+    return None
+
+
+def stu_tag() -> str:
+    """这一本的学生叫什么：宽度旋钮只对 MLP 有定义，CNN 那一副没有"多宽"这件事。"""
+    return f"S{WIDTH}" if ARCH == "mlp" else "CNN学生（无宽度旋钮）"
+
+
 def main() -> None:
     if not (MODELS / "mnist_cnn_fp32.pt").exists():
         raise SystemExit("缺 teacher 权重，先跑 python train_baseline.py")
@@ -98,11 +185,18 @@ def main() -> None:
     # 补过流那几本的全部价值在于它们能与老账**并起来读**（同一批流、同一顺序）。所以训练之前先立一道
     # 跨脚本闸：老 3 条流必须与已入库那本逐位相同。不相同只有两种解释——代码漂了，或这批流不是那批流；
     # 两种都不允许把新底报成"同一把尺子量得更精"。
-    v4b_ref = HERE / "compress_report_v4b.json"
+    v4b_ref = ref_path()
     if NSEEDS > 3:
         if not v4b_ref.exists():
-            raise SystemExit(f"--nseeds {NSEEDS} 要拿 compress_report_v4b.json 当跨脚本基准，它不在盘上：先确认老账在不在")
-        ref = json.loads(v4b_ref.read_text(encoding="utf-8"))["arms"]
+            raise SystemExit(f"--nseeds {NSEEDS} 要拿 {v4b_ref.name} 当跨脚本基准，它不在盘上：先确认那一族那一档的 3 条流底在不在")
+        ref_doc = json.loads(v4b_ref.read_text(encoding="utf-8"))
+        # 家族对账放在数值对账之前：基准那本自己记着它是哪一族（老账没这个字段=mlp 那族）。
+        # 这一道是零训练的，先拦掉才轮得到下面那烧十几分钟的数值闸——两道闸各管一段。
+        ref_arch = ref_doc.get("student_arch", "mlp")
+        if ref_arch != ARCH and not BLIND_FAMILY:
+            raise SystemExit(f"[家族对账] {v4b_ref.name} 记的学生架构是 {ref_arch}，本课是 {ARCH}："
+                             f"跨脚本基准必须同族，否则老 3 条流本来就对不上，红的是接错线不是代码漂")
+        ref = ref_doc["arms"]
         for tier in (TIERS if TIER == "" else {TIER: None}):
             for s in SEEDS:
                 if f"{tier} 种子{s}" not in ref:
@@ -115,8 +209,10 @@ def main() -> None:
     teacher.eval()
 
     selected = TIERS if TIER == "" else {TIER: DATA_TIERS[TIER]}
-    archivable = any(ARCHIVE[WIDTH].get(t) for t in selected)
-    print(f"[先立仪器] "
+    archivable = any(committed(t) for t in selected)
+    print(f"[先立仪器] 学生架构 = {ARCH}"
+          + ("（宽度旋钮只对 MLP 学生有定义，CNN 学生那一副没有宽度可言）" if ARCH == "cnn" else f" · S{WIDTH}")
+          + "。"
           + ("种子 42 必须逐位复现第4课那一轮，否则是本课把 train_student 改坏了："
              f"对照 {V4.name}（committed）" if archivable else
              f"本次只跑 {TIER}（第4课没有这一档的档案）→ 对账栏无值可比，"
@@ -126,12 +222,13 @@ def main() -> None:
     tiers: dict[str, list[dict]] = {}
     xcheck: dict[str, str] = {}
     for tier, n_data in selected.items():
-        arch = ARCHIVE[WIDTH].get(tier)
+        arch = committed(tier)
         if arch is None and TIER == "":
             continue        # 默认跑法只跑第4课配过对的那几档，不往合并档案里塞新档
         if arch is None:
-            print(f"  [{tier}] 第4课没跑过这一档（S{WIDTH}）→ 没有可逐位对账的档案值，"
-                  f"parity 记 n/a；本课在这里只产**种子底**，不产复现")
+            print(f"  [{tier}] 学生架构 {ARCH} 在第4课没有 committed 读数"
+                  f"（{'S64 低数据档第4课本就没跑' if ARCH == 'mlp' else '那本账全是 MLP 学生的'}）"
+                  f"→ 没有可逐位对账的档案值，parity 记 n/a；本课在这里只产**种子底**，不产复现")
         xd, yd = xt_all[:n_data], torch.tensor(yt_all[:n_data])
         soft = logits_of(teacher, xd)             # 软标签与随机流无关：各种子共用同一份
         rows = [one_pair(teacher, xd, yd, soft, xv, yv, xte, yte, s) for s in seeds]
@@ -141,9 +238,10 @@ def main() -> None:
                 o = ref[f"{tier} 种子{r['seed']}"]
                 four = (r["wrong_ce"], r["wrong_kd"], r["flips"]["broken"], r["flips"]["fixed"])
                 if four != (o["wrong_ce"], o["wrong_kd"], o["flips"]["broken"], o["flips"]["fixed"]):
-                    raise SystemExit(f"[跨脚本对账] FAIL {tier} 种子{r['seed']}：本发 {four} vs "
+                    raise SystemExit(f"[跨脚本对账] FAIL {tier} 种子{r['seed']}：本发（学生架构 {ARCH}）{four} vs "
                                      f"{v4b_ref.name} {tuple(o[k] for k in ('wrong_ce', 'wrong_kd')) + (o['flips']['broken'], o['flips']['fixed'])}"
-                                     f"\n老 3 条流没复现老账 → 这 {NSEEDS} 条与那 3 条不可并读，先查 train_student/load_split")
+                                     f"\n老 3 条流没复现老账 → 这 {NSEEDS} 条与那 3 条不可并读，"
+                                     f"先查 train_student/load_split 有没有被改坏（基准那本已由上面那道家族闸核过）")
             xcheck[f"{tier} 老3条流×4项读数"] = "逐位相同"
         for r in rows:
             if r["seed"] == 42:
@@ -153,7 +251,7 @@ def main() -> None:
                         parity_na.append(f"{tier} {mode}")
                     else:
                         parity[f"{tier} {mode}"] = (v == arch[mode], v, arch[mode])
-        print(f"\n[{tier} · S{WIDTH}] {len(seeds)} 个随机流下的 KD−CE 配对（10000 张，翻牌逐图算）：")
+        print(f"\n[{tier} · {stu_tag()}] {len(seeds)} 个随机流下的 KD−CE 配对（10000 张，翻牌逐图算）：")
         for r in rows:
             ok = "  ←第4课那一轮" if (r["seed"] == 42 and arch) else ""
             print(f"  种子 {r['seed']:<5} CE {r['acc_ce']:.4f}（错 {r['wrong_ce']}） | "
@@ -197,7 +295,7 @@ def main() -> None:
         v["floor_is_n_dependent"] = (
             f"底是 max−min 型统计量，随流数机械变宽：n={len(seeds)} 时它必然 ≥ n=3 时的值，"
             f"所以 gap_over_floor 这个比值**跨本不可比**，换流数的那一发不能用它翻案或定案")
-        v["paired_gap"] = summarize(gaps, f"{tier} · S{WIDTH} 按流配对")
+        v["paired_gap"] = summarize(gaps, f"{tier} · {stu_tag()} 按流配对")
         pg = v["paired_gap"]
         print(f"\n[判决 {tier}] gap 跨种子 {v['gaps_imgs']} 张 → 极差 {v['gap_spread']['range']} 张、"
               f"均值 {v['gap_spread']['mean']:+.1f} 张")
@@ -238,14 +336,15 @@ def main() -> None:
           f"不能当第二个独立复现。真正干净的复现统计只有上面那行「{len(seeds)} 个种子同向」。")
 
     report = {"seeds": list(seeds), "cross_script_parity": xcheck, "width": WIDTH, "test_n": int(len(yte)),
+              "student_arch": ARCH, "student_tag": stu_tag(),
               "tier_arg": TIER or "默认（第4课两档）", "n_seeds_arg": NSEEDS,
               "parity_no_archive": parity_na,
               "train_fit_n": cut, "parity_seed42_vs_archive":
                   {k: {"match": v[0], "this_run": v[1], "archive": v[2]} for k, v in parity.items()},
               "arms": {f"{t} 种子{s}": r for t, rows in tiers.items() for s, r in zip(seeds, rows)},
               "verdicts": verdicts,
-              "limitations": ["每种子只训一次：种子底由 {len(seeds)} 个点的极差估，仍是欠估",
-                              f"只复现了 S{WIDTH} + 档位 {list(tiers)}；"
+              "limitations": [f"每种子只训一次：种子底由 {len(seeds)} 个点的极差估，仍是欠估",
+                              f"只复现了 {stu_tag()} + 档位 {list(tiers)}；"
                               f"其余臂（{'S64 满数据' if WIDTH == 128 else '低数据档 S64 本就没跑'}）未换种子",
                               "α/T 未扫参（本课只测随机流；扫参见 step4c_alpha_T_sweep.py）",
                               "p_pooled 偏乐观：多个种子共用同一批 10000 张测试图，翻牌事件跨种子不独立",
@@ -256,6 +355,10 @@ def main() -> None:
             f"{'、'.join(parity_na)} 没有第4课档案可对：这一档只产种子底，"
             f"「换随机流还同向吗」这件事对它没有历史判决可复核")
     n_train = len(seeds) * 2 * len(tiers)
+    if not tiers:
+        raise SystemExit(f"[空账闸] 这一轮没有任何一档产出臂行（tiers 空）→ {out_path().name} 不能落盘。"
+                         f"它是「{'--arch cnn 必须带 --tier' if ARCH == 'cnn' else '默认跑法只跑有档案那几档'}」"
+                         f"那道提前闸的备份：提前闸被撤掉时，这里必须红，否则写出去的是一本没有读数的账")
     out_path().write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\n已存 {out_path().name}（{n_train} 次训练，10000 张全量测试，纯 CPU，零 API 费）")
 
@@ -270,8 +373,33 @@ if __name__ == "__main__":
     ap.add_argument("--nseeds", type=int, choices=flow_tiers(), default=3,
                     help="8/12/16/26 = 把这本种子底扩到对应那批流（名单见 step4_distill）；"
                          "档案名带 _n<流数>，与 3 条流那本并存不覆盖")
+    ap.add_argument("--arch", choices=STUDENT_ARCHS, default="mlp",
+                    help="学生架构。cnn = 换模型族那一发：学生换成与老师**同架构**的那副 CNN；"
+                         "此时 --width 无定义，且必须带 --tier（默认合并账是 MLP 的读数）")
+    ap.add_argument("--blankrun", action="store_true",
+                    help="**拆红专用**：撤掉「cnn 不许走默认合并跑法」那道提前闸 ⇒ 该由写盘前的空账闸接住"
+                         "（两道闸互为备份，红在第二道上）")
+    ap.add_argument("--blindcommit", action="store_true",
+                    help="**拆红专用**：让 committed() 无视家族，把 MLP 的档案值当成 cnn 的锚点 ⇒ 只有仪器对账该红")
+    ap.add_argument("--blindfamily", action="store_true",
+                    help="**拆红专用**：把跨脚本对账的基准强行回落到 MLP 那本 ⇒ 老 3 条流"
+                         "对不上账，证明基准名真的按家族走而不是恰好都能对上")
     args = ap.parse_args()
+    ARCH = args.arch
+    BLANK_RUN, BLIND_COMMIT, BLIND_FAMILY = args.blankrun, args.blindcommit, args.blindfamily
     # 闸门必须在这里、训练之前：out_path() 是流程最后一行，那时才炸就白烧十几分钟 CPU
+    if ARCH == "cnn" and args.width != 128:
+        raise SystemExit("--arch cnn 没有宽度可言：build_cnn() 是固定架构，"
+                         f"--width {args.width} 会让档案名（_s{args.width}_cnn）指着一个与 _cnn 完全同实验的对象"
+                         "——两本名字不同的账共用一个身份，正是这个板块在 v4b_path 上摔过的那一类错")
+    if ARCH == "cnn" and args.tier == "" and not (BLANK_RUN or BLIND_COMMIT):
+        raise SystemExit("--arch cnn 不能走默认合并跑法（要带 --tier）：合并档案 "
+                         f"{(HERE / 'compress_report_v4b.json').name} 那两档全是 MLP 学生的 committed 读数，"
+                         f"换架构以后无值可对，默认跑法只会产出一本空账")
+        # 两档拆红各自撤掉这道闸，但红点不同，正好量出两道备份各管一段：
+        #   --blankrun    只撤这一道（家族分叉还在）⇒ 没有任何一档可跑 ⇒ 写盘前的[空账闸]红，零训练
+        #   --blindcommit 连 committed() 的家族分叉一起撤（同一个错误的两面）⇒ 真去训练 12 次
+        #                 ⇒ 由[仪器对账]在数值层抓住"借了别族的锚点"
     if args.width == 64 and args.tier in TIERS:
         # 旧写法在这里一刀切拒绝 --width 64，写死的假设是"S64 只跑过满数据档"。第十五发要在这副
         # 宽度上造中数据档的底，所以放行条件换成"这个组合会不会撞名/有没有档案名"：撞名由紧接着的

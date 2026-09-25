@@ -42,8 +42,7 @@ import torch
 
 import step6_fashion_replication as s6
 from step1_quantize import MODELS, build_cnn, predict
-from step4_distill import VAL_N, logits_of, soft_label_audit
-from step4e_marginal_recheck import NEW_SEEDS, OLD_SEEDS, summarize
+from step4_distill import VAL_N, flows, logits_of, soft_label_audit, summarize
 from step5_second_teacher import train_recipe
 from step6_fashion_replication import LOW, N_LOW, TEACHER_ACC_GATE, TEACHER_PT, load_fashion, run_tier
 
@@ -52,7 +51,7 @@ DRY_EPOCHS = 40                                   # A 那副是 20：只把轮�
 DRY_PT = MODELS / "fashion_cnn_ep40.pt"
 OUT = HERE / "compress_report_v6b_fashion_dry.json"
 MARGIN_PP = 10.0                                  # 干湿闸：塌缩率至少差这么多才算换了变量
-SEEDS8 = OLD_SEEDS + NEW_SEEDS
+SEEDS8 = flows(8)             # 名单只有一个出处：登记处缺这一档会直接 SystemExit，不会静默少跑一条流
 
 
 def get_dry_teacher(xt, yt):

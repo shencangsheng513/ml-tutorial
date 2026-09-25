@@ -65,8 +65,8 @@ from pathlib import Path
 import torch
 
 from step1_quantize import MODELS, build_cnn, predict
-from step4_distill import (D4, T95, DATA_TIERS, VAL_N, check_flow_constants, logits_of, sign_test_p,
-                           soft_label_audit, train_student)
+from step4_distill import (D4, T95, DATA_TIERS, VAL_N, check_flow_constants, flow_tiers, flows,
+                           logits_of, sign_test_p, soft_label_audit, train_student)
 from step4c_alpha_T_sweep import TIER as FULL_TIER
 from train_baseline import load_split
 
@@ -75,10 +75,13 @@ LO_TIER, HI_TIER = "低数据2000", "中数据4500"        # 两个端点锚：�
 FLIP_TIERS = {"低2500": 2500, "低3000": 3000, "低3500": 3500}
 ALPHAS = (0.7, 1.0)
 TEMPS = (1.0, 6.0)                                   # 只测两端：主效应就是这两端之差
-SEEDS = (42, 7, 2026)
-SEEDS8 = SEEDS + (11, 202, 3003, 40004, 55555)       # 第4课e 那五条：老 3 条只对账，新 5 条才是这一发买到的
+# 流名单唯一来源 = step4_distill.FLOW_SEEDS：本课只挑要用哪一档，不养第二份副本。
+SEEDS = flows(3)
+SEEDS8 = flows(8)                                    # 第4课e 那五条：老 3 条只对账，新 5 条才是这一发买到的
 NSEEDS = (3, 8)
-SEED_SET = {3: SEEDS, 8: SEEDS8}
+if set(NSEEDS) - set(flow_tiers()):
+    raise SystemExit(f"--nseeds 档位 {NSEEDS} 里有未登记的档位（在册 {flow_tiers()}）")
+SEED_SET = {n: flows(n) for n in NSEEDS}
 WIDTH = 128
 STEP_LINE = 40.0                                     # 台阶说的"贴住端点"线（张）
 SAMPLES = ("prefix", "disjoint")

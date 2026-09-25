@@ -80,9 +80,12 @@ D4 = {3: 1.693, 5: 2.326, 8: 2.847, 12: 3.258, 16: 3.532, 26: 3.964}     # E[极
 T95 = {3: 4.303, 5: 2.776, 8: 2.365, 12: 2.201, 16: 2.131, 26: 2.060}    # 双侧 95% t 分位数
 
 # ---------- 复现流（种子）名单：全板块唯一来源 ----------
-# 为什么只能有一份：这些标签**就是**"同一批随机流"的定义。第4课b/c/f 各自抄一份 3/8，
+# 为什么只能有一份：这些标签**就是**"同一批随机流"的定义。第4课b/c/f 曾经各自抄一份 3/8，
 # 于是"补一档流数"要在三个文件里各改一遍，漏改的那一份会安静地用短名单跑出"8 条流的账"。
-# （step4g / step5 / step6b / step7 仍各自留有一份，那一族本板块还没并进来。）
+# 第4课e/g、第5课、第6课b、第7课那几份手抄副本（含两处写死的系数：step5 的 D4、step7 的 T95）
+# 也已并进这里。"只剩一份"这件事不由注释担保：守卫的**闸⑩**按值核——模块侧逐个现读它自己那份
+# SEEDS/系数与登记处是否相同，档案侧要求凡是记了名单的账都必须等于在册那一档，
+# 配拆红档 `--flowcopy`（注入"抄来的名单漂一条 + 系数忘了跟着换"）当场各红一条。
 SEEDS = (42, 7, 2026)                              # 42 是第4课那一轮，留着当逐位对账的锚
 SEEDS8 = SEEDS + (11, 202, 3003, 40004, 55555)    # 第4课e/f 那五条：老 3 条只对账，新 5 条才是复现
 SEEDS12 = SEEDS8 + (808, 1337, 24601, 90210)      # 第九发新买四条：只加读数密度，不属于板块共用的那 8 条
@@ -147,6 +150,19 @@ def build_mlp(hidden: int) -> nn.Module:
                          nn.Linear(hidden, 10))
 
 
+STUDENT_ARCHS = ("mlp", "cnn")
+
+
+def build_student(hidden: int, arch: str = "mlp") -> nn.Module:
+    """学生这一侧的架构工厂。`mlp` 是板块 30 本账一直在用的那副；`cnn` 直接复用 build_cnn 本体
+    （不重写一份架构——重写就等于养第二把尺子），于是学生与老师同架构，`hidden` 成为无定义量。"""
+    if arch == "mlp":
+        return build_mlp(hidden)
+    if arch == "cnn":
+        return build_cnn()
+    raise SystemExit(f"未知学生架构 {arch!r}，只认 {STUDENT_ARCHS}")
+
+
 def logits_of(model: nn.Module, x: torch.Tensor) -> torch.Tensor:
     model.eval()
     with torch.no_grad():
@@ -169,12 +185,14 @@ def soft_label_audit(logits: torch.Tensor, t: float = KD_T) -> dict:
 
 
 # ---------- Q2 训练臂：CE 与 KD 只差一个目标函数 ----------
+# 换学生架构时**不换训练预算**：STEPS / BS / LR / 种子重播全部一字不动，
+# 否则"换模型族"与"换训练量"两件事会搅成一件，事后再也分不开。
 def train_student(hidden: int, xd: torch.Tensor, yd: torch.Tensor, soft: torch.Tensor,
                   mode: str, xv: torch.Tensor, yv: torch.Tensor,
                   seed: int = SEED, alpha: float = KD_ALPHA,
-                  t: float = KD_T) -> tuple[nn.Module, list]:
+                  t: float = KD_T, arch: str = "mlp") -> tuple[nn.Module, list]:
     torch.manual_seed(seed)                       # 重播 → 两臂初始权重逐位相同
-    m = build_mlp(hidden)
+    m = build_student(hidden, arch)
     gen = torch.Generator().manual_seed(seed)     # 批次序列走独立流，不污染全局（第3课的修法）
     opt = torch.optim.Adam(m.parameters(), lr=LR)
     ce = nn.CrossEntropyLoss()

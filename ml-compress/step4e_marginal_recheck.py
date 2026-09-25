@@ -63,7 +63,7 @@ from pathlib import Path
 import torch
 
 from step1_quantize import MODELS, build_cnn, predict
-from step4_distill import (D4, T95, DATA_TIERS, VAL_N, logits_of, sign_test_p, summarize,
+from step4_distill import (D4, T95, DATA_TIERS, VAL_N, flows, logits_of, sign_test_p, summarize,
                          train_student)
 from step4c_alpha_T_sweep import ALPHA_ANCHOR, TIER, V4C_SUFFIX, WIDTH, key
 from step4c_alpha_T_sweep import out_path as v4c_out_path
@@ -71,8 +71,10 @@ from step6_fashion_replication import TEACHER_PT, load_fashion
 from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
-OLD_SEEDS = (42, 7, 2026)                    # v4c/v6 已跑过的三条：本课只当对账锚，不重算结论
-NEW_SEEDS = (11, 202, 3003, 40004, 55555)    # 补进来的五条随机流
+# 流名单唯一来源是 step4_distill.FLOW_SEEDS（第4课b/c/f 已经并进去过）：本课那 8 条从这里取，
+# 自己不养第二份副本——第二份副本一旦与在册池漂移，"补进来的那几条才是复现"这句就悄悄不成立了。
+OLD_SEEDS = flows(3)                         # v4c/v6 已跑过的三条：本课只当对账锚，不重算结论
+NEW_SEEDS = flows(8)[len(flows(3)):]         # 补进来的五条随机流
 H_MIN_EFFECT = 5.0                            # 训练前立的下限：低于 5 张不值得为它开一课
 FIELDS = ("wrong_kd", "wrong_ce", "broken", "fixed")
 

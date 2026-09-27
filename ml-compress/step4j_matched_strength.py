@@ -4,9 +4,10 @@
 第4课i（零训练）把 α=0.05 那一格的跨列差（T=6 比 T=3 多错 28.1 张）拆成两条候选通道，判的是
 **出口 (b)：大头在内容通道**。但它的判法是**排除法**：拿第 0 批实测的 ‖∇(T²KL)‖ 算出
 α*=0.080（把 T=6@0.05 的力度钉回 T=3 所需的 α），再用 T=3 阶梯夹住 α* 那一段的**局部斜率**折算成
-share = −5.1 张 = 跨列差的 18%。那句债写得很直白："内容通道本课只量得出自己动了多少，量不出换算成几张
-（单位是 nat 不是张），把它变成测量要一次训练（把 α·‖∇(T²KL)‖ 钉死、只换 T；阶梯 5 格 × 8 条流 =
-40 次训练）。" **这一发就是那一次训练。**
+share = −5.1 张 = 跨列差的 18%。那句债逐字抄自那本账（第廿九发 B 之前这里是一段转述，冒充成引号里的原文）：
+"内容通道没有换算仪器：KL(p_T3‖p_T6) 的单位是 nat，不是张。要把它变成测量需要一发训练
+（把 α·‖∇(T²KL)‖ 钉死、只换 T；阶梯 5 格 × 8 条流 = **40 次训练**，本脚本一次都没付）。"
+**这一发就是那一次训练。**
 
 做法：α 与 T 在 loss 里不正交（T² 补偿不精确，第4课c 已实测在册），但**单位 α 下的 KL 梯度范数
 是 α 的线性系数**（‖∇(α·T²KL)‖ = α·‖∇(T²KL)‖，α 是纯标量前置），所以"钉死力度"这件事有闭式解：
@@ -114,21 +115,28 @@ wrong_kd(T6@α') ⇒ **d<0 = 同力度下 T=6 多错**。
      （②那两条，各 0 次），第三趟绿（21 次）；③ 那处货币修正之后**又**完整预演了一趟（再 21 次，
      账验完即删、未入库）。⇒ 整链实付 **88 次 = 预演 42 + 真跑 46**，零 API 费。
      规规矩矩写全的原因还是那条：成本句漏加的数都是事后才发现的。
-  ⑧ 债的状态：`compress_report_v4i_mechanism_v2.json` 的 `limitations[2]` 那句"把它变成测量要一次训练
-     …40 次训练"从此**已付**。入库不改，那句话原样留在老档里，付账凭据是本档与第4课j 这本账。
+  ⑧ 债的状态：`compress_report_v4i_mechanism_v3.json` 的 `limitations` 第 4 条（按内容锚现读，序号每升一版就 +1）
+     那句"要把它变成测量需要一发训练…40 次训练"从此**已付**。入库不改，那句话原样留在老档里，
+     付账凭据是本档与第4课j 这本账。
+     **第廿九发 B 还的就是这一句的两处错**：v1 的 `pays` 把"需要一发训练"记成了"要一次训练"
+     ——序号对、引文逐字命中 0 条，是**转述冒充引用**（守卫 ⑮ 上岗第一天抓到的，见 `_red_v3.py` ⑮ 段）；
+     同时读档指针还写着 v2（v3 已在册）。两处都在本发改指/改逐字，判词一个字没动 ⇒ 产物升版 v2、
+     v1 留盘逐字段对账（对账线：除 `pays`、`archives`、`gates.pairing` 三处外，全部读数与 v1 逐位相同——
+     第三处也被迫改过：那句写死的"同 8 条流"在 16 条流那本里会直接变成假话，顺手把两本阶梯的账名带上）。
 """
 from __future__ import annotations
 
 import argparse
 import json
+import statistics
 from pathlib import Path
 
 import torch
 
 from step1_quantize import MODELS, build_cnn, predict
-from step4_distill import (DATA_TIERS, FLOW_SEEDS, SEEDS, TEACHER_ARCHIVE_ACC, VAL_N,
+from step4_distill import (DATA_TIERS, FLOW_SEEDS, SEEDS, T95, TEACHER_ARCHIVE_ACC, VAL_N,
                            check_flow_constants, logits_of, summarize, train_student)
-from step4c_alpha_T_sweep import term_grad_norms
+from step4c_alpha_T_sweep import power_preflight, term_grad_norms
 from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
@@ -137,11 +145,37 @@ T_LO, T_HI = 3.0, 6.0
 RUNGS = (0.05, 0.1, 0.2, 0.3, 0.7)          # T=3 那一列在册阶梯的五格（0 是恒等闸，不是臂）
 PRIMARY = 0.05                              # 主格：第4课i 的 α* 与倒挂都住在这附近
 GATE_ALPHA = 0.3                            # 闸 V 重训那一格（两本账都有、且是老 3 条流可对账的格）
-L3 = "compress_report_v4f_mid_n8_v5.json"      # T=3 列的阶梯（配对差另一头的来源）
-L6 = "compress_report_v4f_mid_n8_t6_v5.json"   # T=6 列同阶梯（未配平的对照，本发只读）
+# 两列阶梯账名**不写死**（第廿九发 C 前置）：以前是 L3/L6 两个模块常量，写死 `_n8` ⇒ 16 条流那一发
+# 会拿 8 条流的阶梯当配对另一头。现在走 ladder_names(nseeds)，见下面的 def。
 V4C = "compress_report_v4c_mid.json"           # 探针在册基准 + alpha_to_match_anchor
-V4I = "compress_report_v4i_mechanism_v2.json"  # 这笔债的原文所在
+V4I = "compress_report_v4i_mechanism_v3.json"  # 这笔债的原文所在（第廿九发 B：改指**在册最高版**）
 DEBT_ANCHOR = "内容通道没有换算仪器"            # 债句的**内容锚**：序号会漂，这半句不会
+# 档案版本位（第廿九发 B 起）：产物只能升版，同一坐标重跑不许盖旧账，旧账留盘逐字段对账。
+# 按坐标而不是按全局记：8 条流那本在第廿九发被升版（引文改成逐字 + 指针改指 v3），
+# 而 16 条流那本（第廿九发 C）是**那个坐标的第一本**，它没有 v1 可 supersede。
+REPORT_VER = {3: 1, 8: 2, 16: 1}
+# 买流数那一发的"前一档流数"：配对 CI 半宽比要对着它读（第廿七发把这句话判倒之后，
+# 开口必打的那一行需要一个 sibling，否则它连"预期是多少"都印不出来）。
+SIBLING = {16: 8}
+
+
+def ladder_names(nseeds: int) -> tuple[str, str]:
+    """两列阶梯账名**按流数派生**（第廿九发 C 的代码前置）。
+
+    为什么这条必须进代码而不是留在散文里：写死 `_n8` 的那两行让 16 条流那一发去拿
+    8 条流的阶梯当配对另一头 ⇒ 闸 II 比的是两本阶梯之间的一致性（它们当然一致），
+    而本发真正的新数（16 条流的 d）与旧数（8 条流的 cells）之间的流数差**不在任何闸的射程里**。
+    这与第廿三发 `step4c.v4b_path` 读自己模块全局那笔缺陷是同一个形状。
+
+    `nseeds == 3` 是预演档：盘上没有 3 条流的 T=6 列阶梯（那一列是第廿一发之后才补的），
+    所以它照旧借 8 条流那两本走一遍接线，**不入库、不产读数**——这里把它打印出来而不是让它静默。
+    """
+    n = 8 if nseeds == 3 else nseeds
+    if n != nseeds:
+        print(f"[读档] 预演档 nseeds={nseeds} 借 {n} 条流那两本阶梯走接线（不入库、不产读数；"
+              f"入库账都带自己的 _n 位）")
+    suf = "" if n == 3 else f"_n{n}"
+    return f"compress_report_v4f_mid{suf}_v5.json", f"compress_report_v4f_mid{suf}_t6_v5.json"
 
 
 def debt_index(v4i: dict, where: str) -> int:
@@ -162,8 +196,62 @@ def debt_index(v4i: dict, where: str) -> int:
 
 
 def out_name(nseeds: int) -> Path:
-    """流数是本发的判别维度：不带 _n8 会让 3 条流那本预演账撞掉真跑那本。"""
-    return HERE / f"compress_report_v4j_matched{'' if nseeds == 3 else f'_n{nseeds}'}.json"
+    """流数是本发的判别维度：不带 _n8 会让 3 条流那本预演账撞掉真跑那本。
+
+    版本位（第廿九发 B）按坐标查 `REPORT_VER`，不给全局数字：16 条流那本是那个坐标的第一本，
+    它没有 v1 可 supersede，跟着 8 条流那本一起写 v2 会凭空造出一本不存在的旧账。
+    """
+    suf = "" if nseeds == 3 else f"_n{nseeds}"
+    ver = REPORT_VER[nseeds]
+    return HERE / f"compress_report_v4j_matched{suf}{'' if ver == 1 else f'_v{ver}'}.json"
+
+
+def sibling_halfwidth(out: Path, nseeds: int, diffs: dict) -> dict:
+    """本发的 d 的 CI 半宽 ÷ **前一档流数**那本同格的半宽（第廿九发 C 的事后读数）。
+
+    为什么要单独一个函数、而且要跟 ex-ante 那一行分开印：`power_preflight` 读的是同坐标 α×T 网格的
+    历史比值（别人的尺子），这一行才是本发这个量自己买到的东西。拿别人的比值给自己的发交差，
+    等于用结论证结论。
+
+    三种"没测到"分开出声，一种都不许返回空 dict 冒充通过：这一档没登记 sibling（不该走这里）、
+    sibling 那本不在盘上、那本在但剂量格对不上。第三种返回 `n_cells: 0` 而不是不算——
+    0 格可比是一个**读数**，漏掉它就等于把"我比不了"说成"我比过了"。
+    """
+    if nseeds not in SIBLING:
+        return {}
+    prev = SIBLING[nseeds]
+    sib = out_name(prev)
+    if not sib.exists():
+        print(f"\n[事后半宽比·本发的 d] 前一档流数那本 {sib.name} 不在盘上 ⇒ **无从开口**"
+              f"（不许拿别的坐标的比值冒充这一格）")
+        return {"sibling": sib.name, "n_cells": 0, "why": "前一档那本不在盘上"}
+    sb = json.loads(sib.read_text(encoding="utf-8")).get("paired_diff", {})
+    hw = lambda s: (s["ci95_imgs"][1] - s["ci95_imgs"][0]) / 2.0
+    ratios = {f"α={a:g}": round(hw(diffs[a]["paired"]) / hw(sb[f"α={a:g}"]["paired"]), 3)
+              for a in RUNGS
+              if sb.get(f"α={a:g}", {}).get("paired", {}).get("ci95_imgs")}
+    if not ratios:
+        print(f"\n[事后半宽比·本发的 d] {sib.name} 在盘上，可它的 paired_diff 与本发五格"
+              f"（{[f'α={a:g}' for a in RUNGS]}）一格都对不上 ⇒ **无从开口**"
+              "（宁可不印中位数，也不许拿空表算出一个数）")
+        return {"sibling": sib.name, "n_cells": 0,
+                "why": "剂量格不是同一套：两本账没有共通的格可比"}
+    vals = sorted(ratios.values())
+    ge1 = sum(1 for v in vals if v >= 1.0)
+    exp = (round(T95[nseeds] / T95[prev] * (prev / nseeds) ** 0.5, 3)
+           if nseeds in T95 and prev in T95 else None)
+    print(f"\n[事后半宽比·本发的 d] {prev}→{nseeds} 条流（{sib.name} → {out.name}，"
+          f"{len(ratios)}/{len(RUNGS)} 格可比）" + "、".join(f"{k}:{v}" for k, v in ratios.items()) +
+          f" ⇒ 中位 {statistics.median(vals):.3f}" +
+          (f" vs σ̂ 不变时预期 {exp}" if exp is not None else "（在册系数表没有这一档流数 ⇒ 预期算不出）") +
+          f"；半宽 ≥ 1（**这一格反而变宽了**）{ge1}/{len(vals)} 格"
+          "（第廿七发那句话的全部内容：买流数不保证买到分辨率）")
+    return {"sibling": sib.name, "flow_step": f"{prev}→{nseeds}", "ratios": ratios,
+            "median": round(statistics.median(vals), 3), "cells_ge_1": ge1, "n_cells": len(vals),
+            "expected_if_sigma_constant": exp,
+            "meaning": "本发每个等力度格那条配对差 d 的 CI 半宽 ÷ 前一档流数那本同格的半宽（< 1 = 更窄）。"
+                       "与 power_preflight_ex_ante 分开：那一行是同坐标 α×T 网格的历史比值（别人的尺子），"
+                       "这一行才是本发这个量自己买到的东西"}
 
 
 # ---------- 读账（三本在册账；本发只新训 T=6 那一列的五个等力度格） ----------
@@ -282,6 +370,12 @@ def main(nseeds: int = 8, probeblind: bool = False, scramble: bool = False) -> N
     if out.exists() and not mode:
         raise SystemExit(f"{out.name} 已入库——重跑会盖掉这本判决档案（要重跑得先改名或删档）")
 
+    L3, L6 = ladder_names(nseeds)
+    # 开口必打（第廿八发把第廿七发那条否定读数固化成规矩）：再买流数之前先印"补流数买不买得到分辨率"。
+    # 只在**登记了前一档流数**的坐标上打（现读 SIBLING：16→8）；8 条流那本不发这一行，
+    # 否则 v2 会比 v1 多一个顶层键，"除 pays/archives 外逐位相同"那条对账线就作废了。
+    pp = (power_preflight(WIDTH, TIER, where=f"step4j 买流数（{nseeds} 条流）", arch=ARCH)
+          if nseeds in SIBLING else {})
     lo, hi = load_ladder(L3), load_ladder(L6, scramble=scramble)
     gate_recalc(lo)                                              # 闸 I
     gate_recalc(hi)
@@ -397,6 +491,11 @@ def main(nseeds: int = 8, probeblind: bool = False, scramble: bool = False) -> N
         print(f"  对照·未配平（固定 α、只换 T）α={a:<5} 差 {s['mean_gap_imgs']:+6.1f} 张 "
               f"CI [{s['ci95_imgs'][0]:+.1f}, {s['ci95_imgs'][1]:+.1f}] 同号 {s['same_sign_seeds']}")
 
+    # ---------- 事后半宽比（第廿九发 C）：本发这个量自己买到了几分之几的分辨率 ----------
+    # 上面那行 ex-ante 是**别人的尺子**（同坐标 α×T 网格的历史比值），这一行是**本发的 d**：
+    # 两把尺子分开印，才许说"这一发买到的分辨率是预期的几分之几"。合起来印就等于用结论证结论。
+    post_rec = sibling_halfwidth(out, nseeds, diffs)
+
     prim = diffs[PRIMARY]
     nonnull = [a for a, v in diffs.items() if not v["ci_crosses_zero"]]
     neg = [a for a in nonnull if diffs[a]["paired"]["mean_gap_imgs"] < 0]
@@ -427,7 +526,7 @@ def main(nseeds: int = 8, probeblind: bool = False, scramble: bool = False) -> N
 
     report = {"quantity": "同力度（α·‖∇(T²KL)‖ 相等）下 T=6 列与 T=3 列的逐流配对错图数之差，"
                           "五格剂量各一条（负 = 同力度下 T=6 多错）",
-              "pays": f"{V4I} 的 limitations 第 {debt} 条（『把它变成测量要一次训练…40 次训练』；"
+              "pays": f"{V4I} 的 limitations 第 {debt} 条（『把它变成测量需要一发训练…40 次训练』；"
                       f"序号按内容锚『{DEBT_ANCHOR}』现读，不写死）",
               "tier": TIER, "width": WIDTH, "student_arch": ARCH, "seeds": list(seeds),
               "temps": [T_LO, T_HI], "rungs": list(RUNGS), "primary_rung": PRIMARY,
@@ -437,7 +536,8 @@ def main(nseeds: int = 8, probeblind: bool = False, scramble: bool = False) -> N
                                "parity_against_v4c_anchor": top_booked},
               "archives": {"T3_ladder": L3, "T6_ladder": L6, "probe_baseline": V4C, "debt_source": V4I},
               "gates": {**ident, "recalc_cells": f"{len(lo['cells'])}+{len(hi['cells'])}",
-                        "pairing": "同 8 条流同序、判别变量全同、只温度列不同",
+                        "pairing": f"同 {len(seeds)} 条流同序、判别变量全同、只温度列不同"
+                                   f"（T=3 那头 {L3} / T=6 那头 {L6}）",
                         "probe_batch0_bitwise": True,
                         "cross_script": {"n": len(gates), "all_match": True, "detail": gates}},
               "predictions_ex_ante": {"H_strength_d_is_zero": "五格 CI 全含 0",
@@ -446,6 +546,13 @@ def main(nseeds: int = 8, probeblind: bool = False, scramble: bool = False) -> N
               "matched_ladder": {f"α={a:g}": rows[a] for a in RUNGS},
               "paired_diff": {f"α={a:g}": diffs[a] for a in RUNGS},
               "unmatched_cross_column_diff_read_from_books": {f"α={a:g}": unbal[a] for a in RUNGS},
+              **({"power_preflight_ex_ante": pp or
+                  {"status": "无从开口",
+                   "why": f"坐标 {ARCH} × {TIER} × S{WIDTH} 的 α×T 网格账在盘上凑不出相邻流数的两本"
+                          "（现读那批同族账的流数版本不足相邻两档）"
+                          "⇒ 开口预检这一格是**否定读数**，不是没跑"}}
+                 if nseeds in SIBLING else {}),
+              **({"paired_hw_ratio_vs_prev_flow": post_rec} if post_rec else {}),
               "exit": exit_rule, "verdict": exit_rule,
               "cost": {"arm_trainings": len(RUNGS) * len(seeds),
                        "cross_script_gate_trainings": len(gates),
@@ -459,9 +566,14 @@ def main(nseeds: int = 8, probeblind: bool = False, scramble: bool = False) -> N
                   "训练 600 步里两项的相对尺度会随学生逼近老师而变（与第4课c 自我审计④ 同一条）。"
                   "所以『同力度』指的是初始那一步的系数对齐，不是一个被全程守住的量——"
                   "出口 (c) 那一支正是这条边界的兑现方式，本发不假装它不存在",
-                  f"这一发买的是**覆盖**（{len(RUNGS)} 个从未训过的 α 坐标 × 同一批 {len(seeds)} 条流）："
-                  "七维独立性一维都没换、流数没动 ⇒ 出口 (b) 只写成『第一次直接读数』，"
-                  "不许写成『内容通道被复证』",
+                  (f"这一发买的是**覆盖**（{len(RUNGS)} 个从未训过的 α 坐标 × 同一批 {len(seeds)} 条流）："
+                   "七维独立性一维都没换、流数没动 ⇒ 出口 (b) 只写成『第一次直接读数』，"
+                   "不许写成『内容通道被复证』") if nseeds == 8 else
+                  (f"这一发动的**只有流数**这一维（{len(seeds)} 条流 vs 在册 {SIBLING.get(nseeds, 8)} 条）："
+                   f"坐标（{TIER} × S{WIDTH} × {ARCH} 族）、温度对、五格剂量、等力度映射、判据、货币全部照旧"
+                   f"⇒ 读数只能写成『同一坐标上一条更窄（或更宽）的 CI』，"
+                   "不许写成『内容通道被复证』，也不许与 8 条流那本合并报一个数"
+                   "（两本共用同一段老流，第廿七发闸 VI 证过嵌套性，但嵌套≠独立）"),
                   "五格**不许合并成一个数**：α 曲线非单调（第4课i 自我审计那句），"
                   "所以没有一个"
                   "『平均同力度残余』是合法的机制量；承重的是主格那一格，其余四格是它的对照组",
@@ -483,8 +595,10 @@ def main(nseeds: int = 8, probeblind: bool = False, scramble: bool = False) -> N
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="把 α·‖∇(T²KL)‖ 钉成常数、只换温度：等力度阶梯配平实验")
-    ap.add_argument("--nseeds", type=int, choices=(3, 8), default=8,
-                    help="3 = 预演/对账那批老流（账验完即删，不入库）；8 = 板块共用那批（真跑）")
+    ap.add_argument("--nseeds", type=int, choices=(3, 8, 16), default=8,
+                    help="3 = 预演/对账那批老流（借 8 条流那两本阶梯走接线，账验完即删、不入库）；"
+                         "8 = 板块共用那批（真跑，第廿八发已入库）；"
+                         "16 = 买流数那一发（第廿九发 C：开口先打 power_preflight、事后打本发 d 的半宽比）")
     ap.add_argument("--probeblind", action="store_true",
                     help="拆红：不许 backward，改用教科书假设「T² 补偿精确 ⇒ α'=α」⇒ 只有闸 IV 该红")
     ap.add_argument("--scramble", action="store_true",

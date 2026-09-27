@@ -47,6 +47,11 @@
   ⑤ 与第廿五发的关系（写在这里防串账）：本发还的是**同族内**"两行相减没误差棒"那条债；
      第廿五发 `step4l` 还的是 `step4f` 落地⑤ 那条**跨族**（MLP↔CNN 偏移）债，
      两笔债的出口分别是 (b) 与 (a)，**不许互相引用成对方的结论**。
+  ⑥ **第廿九发 B 的随动升版（0 次训练）**：`V4J` 从 `..._matched_n8.json` 改指 `..._matched_n8_v2.json`
+     （v4j 那本因引文与指针两处缺陷升版，v1 留盘对账），本发产物随之升版 `_v2`、v1 留盘。
+     对账凭据：两本逐字段比，**读数一条都不许动**——v2 只换了 `pays`/`archives`/`gates.pairing`
+     三处出处字段（v4j 那本自己点的名），而本发只读 `matched_ladder` 的错图数 ⇒
+     升版前后本发的每一条数（含 +4.8 张那条配对读数）逐字相同；不相同就是读错了账。
 """
 from __future__ import annotations
 
@@ -56,7 +61,7 @@ from pathlib import Path
 from step4_distill import FLOW_SEEDS, summarize
 
 HERE = Path(__file__).resolve().parent
-V4J = "compress_report_v4j_matched_n8.json"
+V4J = "compress_report_v4j_matched_n8_v2.json"      # 在册最高版（第廿九发 B 升版；v1 留盘对账）
 T6_BOOK = "compress_report_v4f_mid_n8_t6_v5.json"      # T=6 列（α=0.05 那一头 + 它自己的 CE 臂）
 T3_BOOK = "compress_report_v4f_mid_n8_v5.json"         # T=3 列：v4j 两行共用的那一臂，这里只用来核恒等式
 
@@ -177,7 +182,10 @@ def main() -> None:
                   "不改任何在册判词：这一发不进形状判据 v5 的参评对象（它量的是同列两次训练之差，"
                   "不是 α 阶梯的形状），也不进守卫的翻转集合"],
               }
-    out = HERE / "compress_report_v4k_paired_balance.json"
+    out = HERE / "compress_report_v4k_paired_balance_v2.json"
+    if out.exists():
+        raise SystemExit(f"{out.name} 已入库——本发是纯读档，重跑不改任何一个数，只会悄悄盖掉在册那本"
+                         f"并让『旧版留盘逐字段对账』这条线消失（要重跑得先改名或删档）")
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\n已存 {out.name}（0 次训练、零 API 费）· {exit_rule[:70]}…")
 

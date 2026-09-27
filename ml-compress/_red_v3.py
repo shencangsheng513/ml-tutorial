@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 """v3/v4/v5 形状判据的离线验红（零训练）：把已入库的 v4f 档案按 v1/v2/v3/v4/v5 各算一遍，看翻转集合落在哪。
 
-十四道闸（沿用第四发的规矩：一道闸只钉一件修复，红要知道是哪件修复没装上；
+十五道闸（沿用第四发的规矩：一道闸只钉一件修复，红要知道是哪件修复没装上；
   ⑪ 是第二十发的"口径等价闸"，⑫ 是第二十一发的"档案文本闸"，⑨ 的家族位也在第二十一发接上——换模型族那一发；
   ⑬ 是第廿二发补上的"入口闸"——它判的是脚本能不能打开，不判读数；
   ⑭ 是第廿六发补上的"派生账复算闸"——①–⑬ 吃的全是训练路径产出的那批账（v4f 名下），
-     零训练派生账（v4i/v4j/v4k/v4l）里那几十条 95% CI 此前一条都不在任何闸里）：
+     零训练派生账（v4i/v4j/v4k/v4l）里那几十条 95% CI 此前一条都不在任何闸里）；
+  ⑮ 是第廿八发补上的"债句指针闸"——档案里按序号引用 `limitations` 的那类指针，必须按内容命中：
+     那个列表每升一版就在头部插一条，写死的序号是一根会自己漂走的指针）：
   ① 复算自证     每本档案**记录在案**的那句判词 = 产出它那一版的复算值（钉"喂的是同一批数字"）
   ② 翻转集合     v3 相对 v2 只许翻掉预登记的那一本（钉"v3 不是装饰，也不是连坐"）
   ③ 只翻该翻的   那一本必须从 测不动 翻到 反号线（钉翻的是对的方向）
@@ -171,10 +173,92 @@
                  本轮盘上 70 → **146**，净增 76 = 两本升版副本各自新写的块（`v4i_v3` 7 + `v4l_v2` 69），
                  旧版一块没删；这一闸参评的是"按族取最新"那一档 = **87 条**，与 70、146 都不是同一个口径。
                  专属拆红 `--ciderived` 两处注入各钉一条腿（改端点→复算不平、抹 gaps→口径外）。
+  ⑮ 债句指针按内容命中  档案里凡是「某本账的 limitations 第 N 条（『引文』…）」这种**按序号引用**，
+                 引文（按 `…` 切成片段，每个片段都要逐字命中）必须真的躺在那一本的第 N 条里。
+                 两种分法：命中在别的条目 = **序号漂走**（红）；哪条都不命中 = **引文是转述冒充引用**
+                 （序号无从复核 ⇒ 出声并点名，见下面那笔真缺陷）。
+                 为什么需要它：`limitations` 每一版都在**头部**插一条变更说明 ⇒ 同一句话的序号每升
+                 一版就 +1（现读 `v4i` 那本：债句在 v1/v2/v3 里分别是第 **2/3/4** 条），所以"写死序号"
+                 是一根会自己漂走的指针。第二十六发记下这笔债时它**没有一档会因它而红**，第廿八发才
+                 把它变成守卫；`step4j` 侧同步改成按内容锚现读（`DEBT_ANCHOR` + `debt_index()`），
+                 于是它下一次产出的档案里那个序号是**算出来的**而不是抄的。
+                 **分母只有一条，这一点要如实报**：全册现读可核指针 **1** 条（`v4j_matched_n8` 的 `pays`）、
+                 裸序号引用（写了"第 N 条"却没点名是哪本账）**0** 条 ⇒ 这是一道建在分母 1 上的闸，
+                 它的价值在"下一本再这么引用就会被抓住"，不在"它此刻查了多少东西"。
+                 **两类只出声、不红，各自点名**（红只给"指针会漂"这件广告过的事，别的缺陷形态各归各的账）：
+                 ⑴ 过期指针：那条指针指 `v4i_..._v2`，而 `_v3` 已在册（按 `_famv` 取最新）⇒ 现读 `1` 条；
+                 ⑵ 引文不逐字（**本闸第一次上岗就抓到的真缺陷**）：`v4j` 的 `pays` 写的是
+                 『把它变成测量**要一次**训练…40 次训练』，而 `v4i_v2` 第 3 条原文是「要把它变成测量**需要一发**
+                 训练…」——**序号是对的（第 3 条），引文是转述冒充引用** ⇒ 这条指针的序号**无法**被内容复核。
+                 实测 `1` 条。它为什么不红：把它变红的唯一合法修法是让 `step4j` 重跑升版档案，那要 **46 次训练**
+                 （本轮未授权，且本轮的授权里没有它），而"为了凑零红去放宽逐字判定"是把真缺陷改成假绿。
+                 ⇒ 两条出声都记成**新欠**，不许记成已覆盖（`step4j` 侧已经不再生产这种引文：它的新 `pays`
+                 用的是 `DEBT_ANCHOR`，那半句在原文里逐字存在）。
+                 专属拆红 `--limitptr` **四腿**一次测完，且顺序有讲究：全册唯一那条指针引文不逐字 ⇒
+                 **漂移腿没有可核底座**，所以腿 E 先上岗——把 `pays` 的引文换成 `step4j` 自己的 `DEBT_ANCHOR`
+                 （从模块现读，不重打一遍字）⇒ 不逐字计数必须由 **1 降到 0** 且红仍为 0（既证明这条计数
+                 承重，也证明修好引文之后序号本来就没错）；在这个底座上再测：腿 A 序号 +1 ⇒ 恰好 1 红；
+                 腿 B 在被指那本**头部插一条**（真升版的形状）⇒ 恰好 1 红；腿 C 把指针改成内容式（去掉"第 N 条"）
+                 ⇒ 必须 **0 指针 0 红**——否则判别器在惩罚正确的修法，会把人推回写死序号。凑不齐即红。
 
 自我拆红（每条各拆一道闸，跑了不红的模式=那条闸没测到，不许拿它当通过。下面全是**本轮实测**，
 不是预期——规矩是实测再写回这张表，写死的计数只对"当前在册的那几本"成立：
 
+**【第二十八发·三件零训练的收口（闸⑮ + `--limitptr` / `power_preflight` / `check_report_shape`）
+＋一件换任务的读数（`step4l --dataset fashion`，原料 250 次训练）入库】
+在册 35 本（v4f 名下，本轮 **+0**：进来的 15 本没有一本是判据重跑本）、全册 **112** 本（**97 → +15**：
+7 本 `v4b_fashion*`（Fashion 三档 × 两族的种子底）＋ 6 本 `v4c_fashion*`（同坐标 α×T 网格）＋
+`v4l_soft_shape_family_fashion_v2`／`_v3`（换任务那本的升版对，v2 留盘），正常模式 rc=0 / 0 条红，
+**二十五档**全部重跑（档数由源码里的 `MODES` 登记处现读并在每轮开头打印，本轮实测 **25**；
+增档 = 闸⑮ 的 `--limitptr` ⇒ 24 → 25；逐档红数全部本轮实测，原件 `_tmp_red28/*.log` + `summary.txt`）：
+misfeed 99、decorative 27、borrowseeds 22、famblind 20、**unformatted 19（+7）**、collateral 15、
+v4blind 13、v5strict 13、v4loose 8、borrowfloor 7、drift 5、v5blind 4、sibdrift 3、ciderived 2、
+laddersib 2、flowcopy 2、ciasym 2、**limitptr 2（新档）**、bareid 1、oldsib 1、g5drop 1、ciunread 1、
+wrongcount 1、helpblind 1、destroy 0。
+**与【第二十六、廿七发】那张表相比：既有二十四档里二十三档一位没动；动的两档各有归属。**
+逐档归因（现读失败名单、按本点名，不猜）：
+- **`unformatted` 12 → 19 的 +7 全部落在本轮新增的 7 本 `v4b_fashion*` 上**：这一档的注入面是"全册里带
+  『种子底由 N 个点』那句的账"，一本注入一处 ⇒ 红数**等于**该那句的本数；正常模式闸⑫ 现读那句就是
+  **19 本** ⇒ 红数与分母同一个数、不是新缺陷被抓住，也不是判别器变宽。**同一档的反对照照旧在**：
+  `--wrongcount` 仍 1 条且腿 A 一条不红。
+- **本轮 15 本新账在红行里的点名次数**（只数 `^    闸` 那些失败行，分母打印不算）：
+  `v4b_fashion*` **7 次**（全部来自上面那档的注入体本身）、`v4c_fashion*` **0 次**、
+  `v4l_*_fashion*` **0 次**。后两本进的是分母不是红数：⑭ 派生账 glob 现读 **9 本**（参评 5 / 豁免 4，
+  `v4l_fashion_v3` 进参评、`_v2` 进豁免）；⑩ 档案侧 **108 条**（口径是**名单条目数**，一本可贡献
+  `seeds`/`seed_order`/`seed_pools` 多条 ⇒ 与"全册 112 本"不同质，别相减当遗漏）；
+  ⑫ 全册扫描面 97 → **112 本 / 展开字符串字段 3859 → 4800 条**。
+- **两条独立链照旧**：26 份日志（normal + 25 档）逐档数红行数与 `summary.txt` 逐一一致，含 `normal` 的 0
+  与 `destroy` 的 0；"没动"不是抄上一轮的表。
+- **`--limitptr` 的 2 条 = 腿 A（序号 +1）1 条 + 腿 B（被指那本头部插一条）1 条**；腿 E（底座：把 `pays`
+  的转述换成 `step4j` 自己的 `DEBT_ANCHOR`）实测"不逐字 1 → 0、红 0 → 0"，腿 C（改成内容式引用）
+  实测"指针 0 / 红 0"。分母只有 **1 条**可核指针（全册），这道闸的价值在"下一本再这么引用就会被抓住"。
+各闸本轮现读：**①** 35/35 复算通过；**④** 板块在册『污染型』**23 本**；**⑤** 候选 27 本 = 逐位核过 6 + 首跑/无前账 21；
+**⑥ 27 → 27 对**（**一对没多**，"对数与买了哪一维没有单调关系"第十次现读，这次 +0 落在**换任务**那一发上——
+⑥ 的候选只在 `compress_report_v4f*` 这一族里，本轮 15 本新账是 `v4b` / `v4c` / `v4l` 三名 ⇒ **结构上进不了这一对账**，
+这是入册键给出的理由，不是"比了没比上"）；**⑦** 14 本候选里参评 11；**⑧** 参评 6 本、v4 名下翻转名单 4 本、
+唯一还站着的倒挂仍是 `v4f_mid_n8_t6_v4`；**⑨** 腿A 参评 27 本全等 & 腿B 27 本（13 同流数底 / 14 被实现拒绝 /
+0 借错底），另盘点 21 本**当时**借过别的流数的底，8 本 fashion 侧**免检**（没测到，不是通过）；
+**⑩** 模块侧 10 项 + 档案侧 108 条；**⑪** 参评 **31 本**、自带双记账 **5 本**；
+**⑫** 全册 **112 本 / 展开 4800 条字符串字段 / 19 本带那句 / 漏渲染 0 条**；
+**⑬** 现读清单 **13 本 / 退出码 0 的 13 本 / 4 并发墙钟 61.5 秒**（同一清单历次 28.0 / 34.4 / 200.3 秒 ⇒
+只报读数区间不报倍数）；**⑭** 派生账现读 **123 条** ci95：可复算 123 / 口径外 0（参评 5 本、旧档豁免 4 本）；
+**⑮** 可核指针 **1 条** / 漂走 **0** / 裸序号引用 **0** / 引文不逐字 **1**（出声不红）/ 过期指针 **1**（出声不红）。
+**本轮两笔必须跟着这张表一起读的账**：
+⑴ **闸⑮ 第一次上岗就抓到一处缺陷，而那一处不是原本记的那笔债**：`v4j` 的 `pays` 序号是对的（第 3 条），
+引文是**转述冒充引用**（在那本账 7 条里逐字命中 0 条）。把它变红的唯一合法修法是让 `step4j` 重跑升版档案
+= **46 次训练**（本轮未授权）⇒ 记成**新欠**而不是"已覆盖"，处置是把它分到另一个桶（"不逐字"与"过期"各出声）。
+⑵ **`power_preflight`（买流数之前开口必打的那一行）不在守卫里**：要常驻得给旧账补 `power_preflight_ex_ante`
+键（= 重跑 264 次，本轮未授权），按"没有一档红会因它而红 ⇒ 它只在脚本与文档里"记账。本轮为它做的
+是**结构闸 `check_report_shape()`**（档案顶层键必须与 `REQUIRED_TOP` 逐字相符）——那是另一道闸，别并读。
+⑶ **落笔后补跑的那一趟**：上面那张二十五档表是在**这段文件头写进 `_red_v3.py` 之前**跑的，而这张表本身
+是 `_red_v3.py` 的 docstring ⇒ 照第十五发那条"改完守卫文件头与文档后重跑正常模式验红"的规矩补跑一次，
+实测 **rc=0 / 0 条红**，且 ⑮ 那行照旧出声两条"只出声"的账（不逐字 1、过期 1）⇒ 新增的散文没有改变任何
+判据的输入面（十五道闸读的是 `compress_report_*.json` 与模块常量，不读 .md，也不读本文件头部）。
+原件 `_tmp_red28/normal_afterheader.log` 是一次性日志（`*.log` 被 `.gitignore` 拦住）⇒ **从写下起就是叙述级**。
+
+（下表【第二十六、廿七发】已被上面那张表替代：它记的在册 35 本、全册 97 本、⑩ 档案侧 95 条、
+ ⑫ 97 本/3859 字段、⑭ 87 条、⑬ 34.4 秒都已被上面覆盖；留着是因为它的**逐档归因**——尤其
+ "零漂移的机理要分'根本不进'与'进的是分母'"与"闸⑫ 第一次在真产物上产假红 ⇒ 修闸不修账"那两段。）
 **【第二十六、廿七发合并记·264 次三本 8 流网格（v4c×3）＋两本升版派生账（`v4i_v3`／`v4l_v2`）入库，
 ＋闸⑭ 补上"派生账 CI 无闸"那笔债，＋闸⑫ 第一次在真产物上产假红并修闸】
 在册 35 本（v4f 名下，本轮 **+0**：进来的五本没有一本是判据重跑本）、全册 **97** 本（**+5**：
@@ -639,7 +723,8 @@ MODE = next((a for a in sys.argv[1:] if a.startswith("--")), "")
 MODES = ("--decorative", "--drift", "--destroy", "--collateral", "--v4blind", "--v4loose",
          "--v5blind", "--v5strict", "--famblind", "--misfeed", "--sibdrift", "--laddersib",
          "--oldsib", "--g5drop", "--borrowfloor", "--borrowseeds", "--flowcopy", "--ciasym",
-         "--ciunread", "--unformatted", "--wrongcount", "--helpblind", "--ciderived", "--bareid")
+         "--ciunread", "--unformatted", "--wrongcount", "--helpblind", "--ciderived", "--bareid",
+         "--limitptr")
 if MODE and MODE not in MODES:
     raise SystemExit(f"未知拆红档位 {MODE!r}：MODES 登记处在册 {len(MODES)} 档，没有这一档 ⇒ 加一档必须先登记"
                      "（否则 dispatch 里写了 elif 也永远不会被跑到，那一档是恒绿的装饰）")
@@ -1745,6 +1830,154 @@ if MODE == "--ciderived":
         fails.append(f"闸⑭（拆红模式 --ciderived）改了 CI 端点却没抓到（{inj_recalc}）⇒ 复算那条腿恒绿")
     if inj_nogap and not any(f.startswith("闸⑭") and inj_nogap in f and "口径外" in f for f in fails):
         fails.append(f"闸⑭（拆红模式 --ciderived）抹掉 gaps 却没抓到（{inj_nogap}）⇒ 『必须有原料』那条腿恒绿")
+
+# ---------- ⑮ 债句指针（第二十八发：把上一发记成"新欠"的那根会漂的指针变成守卫） ----------
+# 形状：档案里「<某本账>.json 的 limitations 第 N 条（『引文』…）」——文件名 + 序号 + 引文三件套齐了才算**可核指针**。
+# 判据：引文按 `…` 切成片段，每个片段都必须躺在那本账 `limitations[N-1]` 里；不在就红，并把"按内容命中的是第几条"打出来。
+# 为什么值得常驻：`limitations` 每一版都在**头部**插一条变更说明 ⇒ 同一句话的序号每升一版 +1
+# （现读 v4i 那本：债句在 v1/v2/v3 = 第 2/3/4 条），所以"写死序号"是一根会自己漂走的指针。
+# 只写了"第 N 条"却没点名的那类（裸序号引用）不猜目标，只数出来报分母——猜目标等于把判别器建在假设上。
+PTR_FORM = re.compile(r"(compress_report_[A-Za-z0-9_]+\.json)\s*的\s*limitations\s*第\s*(\d+)\s*条[^。；]{0,4}『(.+?)』")
+PTR_BARE = re.compile(r"limitations[^。；]{0,14}第\s*\d+\s*条")
+NEWEST = {}
+for _b in sorted(arch_all):
+    _f, _v = _famv(_b)
+    if _f not in NEWEST or _v > NEWEST[_f][0]:
+        NEWEST[_f] = (_v, _b)
+
+
+def _ptr_scan(books):
+    """纯函数：抽全册可核指针 → 逐条按内容核。
+
+    返回 (指针清单, 裸序号引用条数, 红清单, 过期指针清单, 引文不逐字清单)。
+    红只给本闸广告过的那件事：**指针会漂**（序号与内容命中位置分家 / 被指那本不在盘上）。
+    另两类只出声——它们的修法都要重跑付费档案，本轮未授权（见文件头 ⑮ 那一段）。"""
+    named, bare, out, stale, noquote = [], 0, [], [], []
+    for book, d in sorted(books.items()):
+        for path, s in _walk(d):
+            hits = list(PTR_FORM.finditer(s))
+            bare += max(0, len(PTR_BARE.findall(s)) - len(hits))
+            for m in hits:
+                tgt, n, frag = m.group(1), int(m.group(2)), m.group(3)
+                named.append((book, path, tgt, n))
+                tag = f"{_base(book)}{path} → {_base(tgt)} 第 {n} 条"
+                if tgt not in books:
+                    out.append(f"闸⑮ {tag}：被指的那本账不在盘上 ⇒ 这条指针悬空，谁都不能核它")
+                    continue
+                lims = books[tgt].get("limitations") or []
+                if _famv(tgt)[1] < NEWEST[_famv(tgt)[0]][0]:
+                    # 它指的那本已被同族新版取代。放在逐字判定**之前**算：这两件事互相独立，
+                    # 若排在后面，那条引文不逐字的指针会先 continue 掉，这一桶就恒等于 0（报 0 不算测过）
+                    stale.append(tag)
+                pieces = [p.strip() for p in re.split(r"…|\.\.\.", frag) if p.strip()]
+                moved = [i + 1 for i, x in enumerate(lims) if pieces and all(p in str(x) for p in pieces)]
+                if not moved:
+                    noquote.append(f"{tag}（引文『{frag}』在那本账 {len(lims)} 条里逐字命中 0 条）")
+                    continue
+                if n not in moved:
+                    out.append(f"闸⑮ {tag}：那句引文按内容命中的是第 {moved} 条而不是第 {n} 条"
+                               f"（那本账共 {len(lims)} 条）⇒ `limitations` 每升一版就在头部插一条变更说明，"
+                               "写死的序号会静默漂走")
+                    continue
+    return named, bare, out, stale, noquote
+
+
+def _ptr_toks(path):
+    """`.gaps[2].note` → ['gaps', 2, 'note']：`_walk` 的路径不是字典键，读写都得先拆。"""
+    toks = []
+    for part in path.split(".")[1:]:
+        head = part.partition("[")[0]
+        if head:
+            toks.append(head)
+        for i in re.findall(r"\[(\d+)\]", part):
+            toks.append(int(i))
+    return toks
+
+
+def _ptr_get(books, book, path):
+    node = books[book]
+    for t in _ptr_toks(path):
+        node = node[t]
+    return node
+
+
+def _ptr_patch(books, book, path, value):
+    """把 `_walk` 吐出来的路径写回 books[book]——注入腿要靠它改嵌套字段。"""
+    toks = _ptr_toks(path)
+    node = books[book]
+    for t in toks[:-1]:
+        node = node[t]
+    node[toks[-1]] = value
+
+
+if MODE == "--limitptr":
+    import copy as _copy
+    import step4j_matched_strength as s4j           # 内容锚的唯一来源：不在守卫里重打一遍字
+    probe, _, ptr0, stale0, nq0 = _ptr_scan(arch_all)
+    if not probe:
+        fails.append("闸⑮（拆红模式 --limitptr）全册没有一条可核指针可注入 ⇒ 四腿此刻全是空转，不许记成通过")
+    else:
+        bk, pth, tgt_book, _n = probe[0]
+
+        def _quote_with(s, new_frag):
+            return PTR_FORM.sub(lambda m: m.group(0).replace(f"『{m.group(3)}』", f"『{new_frag}』"), s)
+
+        def _bump(s, delta):
+            return PTR_FORM.sub(lambda m: m.group(0).replace(f"第 {m.group(2)} 条",
+                                                             f"第 {int(m.group(2)) + delta} 条"), s)
+        # ---- 腿 E（底座）：盘上唯一那条指针引文不逐字 ⇒ 漂移腿没有可核靶子，先把引文换成内容锚 ----
+        base = _copy.deepcopy(arch_all)
+        orig = _ptr_get(base, bk, pth)
+        _ptr_patch(base, bk, pth, _quote_with(orig, s4j.DEBT_ANCHOR))
+        _, _, rE, _, nqE = _ptr_scan(base)
+        if len(nq0) < 1:
+            fails.append(f"闸⑮（--limitptr 腿 E）底座不成立：现读引文不逐字 {len(nq0)} 条（要 ≥1）"
+                         "⇒ 这条计数此刻没有被任何真产物喂过，它报的 0 不算数")
+        if len(nqE) != 0 or len(rE) != 0:
+            fails.append(f"闸⑮（--limitptr 腿 E）把引文换成逐字内容锚之后不逐字计数 = {len(nqE)}、红 = {len(rE)}"
+                         "（要 0 / 0）⇒ 要么这条计数不承重（改坏了也降不下来），要么序号本来就漂着（那 A/B 白测）")
+        print(f"  腿 E（底座）：不逐字 {len(nq0)} → {len(nqE)} 条、红 {len(ptr0)} → {len(rE)} 条"
+              f"（锚点来自 {s4j.__name__}.DEBT_ANCHOR = 『{s4j.DEBT_ANCHOR}』）")
+        # ---- 在这个可核底座上测三条漂移腿 ----
+        now = _ptr_get(base, bk, pth)
+        mut_a = _copy.deepcopy(base)
+        _ptr_patch(mut_a, bk, pth, _bump(now, 1))                      # 腿 A：序号 +1，内容一个字没动
+        mut_b = _copy.deepcopy(base)
+        mut_b[tgt_book]["limitations"].insert(                          # 腿 B：被指那本头部插一条 = 真升版的形状
+            0, "（拆红注入）这一条插在最前面，模拟 limitations 每升一版在头部加一条变更说明")
+        mut_c = _copy.deepcopy(base)
+        _ptr_patch(mut_c, bk, pth, now.replace(f"第 {_n} 条", "里那句"))      # 腿 C：反对照 = 改成内容式引用
+        pa, _, ra, _, _ = _ptr_scan(mut_a)
+        pb, _, rb, _, _ = _ptr_scan(mut_b)
+        pc, _, rc, _, _ = _ptr_scan(mut_c)
+        print(f"  腿 A 序号 +1：指针 {len(pa)} 条 / 红 {len(ra)} 条；腿 B 头部插一条：{len(pb)} 条 / 红 {len(rb)} 条；"
+              f"腿 C 改成内容式：{len(pc)} 条 / 红 {len(rc)} 条")
+        if len(ra) == 1:
+            fails.extend(ra[:1])          # 咬住了：这条红就是本档的凭据（零红的拆红档与"没跑"无法区分）
+        else:
+            fails.append(f"闸⑮（--limitptr 腿A）序号 +1 之后红 {len(ra)} 条（要恰好 1）⇒ 『序号与内容分家』这条腿不承重")
+        if len(rb) == 1:
+            fails.extend(rb[:1])
+        else:
+            fails.append(f"闸⑮（--limitptr 腿B）被指那本头部插一条之后红 {len(rb)} 条（要恰好 1）⇒ "
+                         "『世界漂了而指针没跟着漂』这条腿不承重")
+        if rc or pc:
+            fails.append(f"闸⑮（--limitptr 腿C 反对照）把指针改成内容式引用之后仍读到 {len(pc)} 条指针 / 红 {len(rc)} 条"
+                         "（要 0 / 0）⇒ 判别器在惩罚正确的修法，会把人推回写死序号")
+
+named_ptr, bare_ptr, ptr_red, stale_ptr, nq_ptr = _ptr_scan(arch_all)
+fails.extend(ptr_red)
+if MODE != "--limitptr":
+    if not named_ptr:
+        fails.append("闸⑮ 全册一条可核指针都没读到 ⇒ 不是通过，是没测到（glob 空转，或指针换了形状而这条闸看不见）")
+    else:
+        print(f"  现读可核指针 {len(named_ptr)} 条：漂走 {len(ptr_red)} 条、裸序号引用 {bare_ptr} 条；"
+              f"只出声的两类 = 引文不逐字 {len(nq_ptr)} 条、过期指针 {len(stale_ptr)} 条（都不红，理由见文件头 ⑮）")
+        for x in nq_ptr:
+            print(f"    · 引文不逐字：{x}")
+        for x in stale_ptr:
+            print(f"    · 过期指针：{x}")
+
 
 print(f"\n模式：{MODE or '（正常验红）'}")
 if fails:

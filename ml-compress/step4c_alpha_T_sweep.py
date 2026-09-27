@@ -66,16 +66,17 @@ H1 的伤害基数、种子底三样全都跟着宽度走，S64 那一份是 0.9
 from __future__ import annotations
 
 import json
+import statistics
 from pathlib import Path
 
 import torch
 import torch.nn as nn
 
 from step1_quantize import MODELS, build_cnn, predict
-from step4_distill import (BS, DATA_TIERS, KD_ALPHA, KD_T, SEED, SEEDS, SEEDS8, STUDENT_ARCHS, TIERS, VAL_N,
-                           build_student, check_flow_constants, flow_tiers, flows, logits_of,
+from step4_distill import (BS, DATA_TIERS, DATASETS, DATASET_SUFFIX, KD_ALPHA, KD_T, SEED, SEEDS, SEEDS8,
+                           STUDENT_ARCHS, T95, TEACHER_PT, TIERS, VAL_N,
+                           build_student, check_flow_constants, dataset_loader, flow_tiers, flows, logits_of,
                            sign_test_p, soft_label_audit, summarize, train_student)
-from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
 TIER = "满数据8500"                                 # 默认档；--tier 低数据2000 兑现自我审计③ 欠的那一发
@@ -89,6 +90,7 @@ ANCHOR_T = KD_T                                     # 3.0：探针的基准温�
 T2_TOL = 0.15                                       # KD 梯度范数随 T 漂移超过 ±15% 就算 T 轴被污染
 ARCH = "mlp"                                        # 学生架构族；--arch cnn 是第八维（换族），键与 step4b 同一份
 FAMILY_SUFFIX = {"mlp": "", "cnn": "_cnn"}          # 档案名里的家族位：借别的族的底=换尺子，所以名字必须带上它
+DATASET = "mnist"                                   # 任务；--dataset 是第九维（第廿八发 D）。默认 mnist ⇒ 在册那些账的名字、读法、判决一字不变
 
 
 # 种子底档案的位置：**MLP 族第4课那两档记在同一本合并账里**（step4b 默认跑法一次写两档，
@@ -101,21 +103,36 @@ V4B_SUFFIX = {"中数据4500": "_mid"}
 # 名字由 step4b 的 OUT_SUFFIX 说了算（那里登记了 _low）。这里不跟上，`--arch cnn --tier 低数据2000`
 # 会去读一本不存在的合并账——照样炸在训练前，但报的原因是"先跑 step4b"，而真正的缺口是名字。
 V4B_SUFFIX_CNN = {"低数据2000": "_low"}
+# 任务位（第廿八发 D）。上面两张表说的都是 MNIST 那 26 本账的历史，对 Fashion 全部不成立：
+# step4b 对新任务在训练前就拒绝默认合并跑法 ⇒ 它**每一档**都有自己的本子，档位后缀由那里的 OUT_SUFFIX 说了算
+# （满数据=空串、中数据=_mid、低数据=_low）。这里漏登一格会怎样：`suffix.get(tier, "")` 回落成空后缀 ⇒
+# Fashion 低数据档去读 `_fashion.json`（那是满数据那本），而那本里真有一个档对的臂，load_anchor 拦不到。
+# 所以这张表必须完整列出，而不是只补"看起来缺的"那一格。
+V4B_SUFFIX_FASHION = {"中数据4500": "_mid", "低数据2000": "_low"}
 V4C_SUFFIX = {"低数据2000": "_low", "中数据4500": "_mid"}
 
 
 def v4b_path(width: int, tier: str, nseeds: int | None = None) -> Path:
-    """这一档、这一副宽度、**这一族**、**这一个流数**的种子底档案。S64 只跑过满数据档，所以那本里没有档位后缀。
+    """这一档、这一副宽度、**这一族**、**这一个任务**、**这一个流数**的种子底档案。S64 只跑过满数据档，所以那本里没有档位后缀。
 
     第廿三发查出的定向缺陷（本轮修）：流数原先读的是**本模块的全局 `NSEEDS`**，而 `--nseeds` 只落在
     `step4f` 自己那份 argparse 上 ⇒ 从 step4f 调进来时这里永远是 3，于是流数大于 3 的账全在借 3 条流的底，
     而守卫闸⑨ 比的正是这个函数算出的名字（实现与闸同源 ⇒ 结构性看不见这件事）。
     现在流数由调用方**显式传**：同流数的那本底不在盘上就**在第一次训练之前拒跑**，不许回落到别的流数
     （借来的底自己随流数涨，跨流数只能各读各的配对 CI——这是第6课b 就记过、当时只写在散文里的口径）。
+    任务位与它同一形状：这一维原先根本不在名字里，于是 Fashion 的账会去读 MNIST 的底而名字看不出来。
     """
     n = NSEEDS if nseeds is None else int(nseeds)
-    stem = "compress_report_v4b" + FAMILY_SUFFIX[ARCH] + ("" if width == 128 else f"_s{width}")
-    suffix = dict(V4B_SUFFIX, **(V4B_SUFFIX_CNN if ARCH == "cnn" else {}))
+    stem = ("compress_report_v4b" + DATASET_SUFFIX[DATASET] + FAMILY_SUFFIX[ARCH]
+            + ("" if width == 128 else f"_s{width}"))
+    # 叠表按"历史 → 族特判 → 任务特判"顺序覆盖（后盖前）。这里不许用 dict(a, **b, **c)：
+    # 两张表登记同一个档（中数据4500 在 V4B_SUFFIX 与 V4B_SUFFIX_FASHION 里都有）时，** 解包会变成
+    # 重复关键字参数直接 TypeError——预检第一次跑就撞在这行上。
+    suffix = dict(V4B_SUFFIX)
+    if ARCH == "cnn":
+        suffix.update(V4B_SUFFIX_CNN)
+    if DATASET == "fashion":
+        suffix.update(V4B_SUFFIX_FASHION)
     if tier not in TIERS and tier not in suffix:
         raise SystemExit(f"档 {tier} 没登记种子底档案名：它要么在第4课那两档的合并账里（那就别新加名字），"
                          f"要么有自己的 v4b 单档账（在这里登记后缀）。"
@@ -124,9 +141,9 @@ def v4b_path(width: int, tier: str, nseeds: int | None = None) -> Path:
     if n > 3:                                      # 补过流的底：名字必须带上流数，缺档就拒，不回落
         p = HERE / (base + f"_n{n}.json")
         if not p.exists():
-            raise SystemExit(f"缺 {p.name}——{n} 条流的账必须读 {n} 条流的底（族={ARCH} × 档={tier} × "
-                             f"S{width}）。先跑 python step4b_seed_variance.py --arch {ARCH} --tier {tier} "
-                             f"--nseeds {n}"
+            raise SystemExit(f"缺 {p.name}——{n} 条流的账必须读 {n} 条流的底（任务={DATASET} × 族={ARCH} × 档={tier} × "
+                             f"S{width}）。先跑 python step4b_seed_variance.py --dataset {DATASET} "
+                             f"--arch {ARCH} --tier {tier} --nseeds {n}"
                              + ("" if width == 128 else f" --width {width}")
                              + f" 把那一本底造出来；借 {base}.json（3 条流）= 借别的流数的底，"
                                f"而借来的底自己随流数涨，两本账的 vs_floor 不可横比")
@@ -137,10 +154,91 @@ def v4b_path(width: int, tier: str, nseeds: int | None = None) -> Path:
     return HERE / (base + ".json")
 
 
+def _v4c_stem(width: int, tier: str, arch: str | None = None) -> str:
+    """这一坐标（任务 × 族 × 档 × 宽）的 v4c 档案名前缀，**不含流数位**。
+
+    `out_path` 与 `flow_books` 共用它：两处各拼一遍，将来加一维就会只改一处，
+    另一处安静地去读别的坐标的账——那是第廿三发 `v4b_path` 那笔缺陷的同一形状。
+    任务位（第廿八发 D）已经按这条规矩只落在这里一处：换任务的账与 MNIST 的账同名 = 无声盖账。
+    `arch` 默认取本模块全局（跑训练时就是它），但预检要能替**别的族**问一次而不改动那个全局。"""
+    fam = ARCH if arch is None else arch
+    return ("compress_report_v4c" + DATASET_SUFFIX[DATASET] + FAMILY_SUFFIX[fam]
+            + ("" if width == 128 else f"_s{width}") + V4C_SUFFIX.get(tier, ""))
+
+
 def out_path(width: int, tier: str = TIER) -> Path:
-    stem = "compress_report_v4c" + FAMILY_SUFFIX[ARCH] + ("" if width == 128 else f"_s{width}")
+    stem = _v4c_stem(width, tier)
     # 流数是这本账的判别维度：不带 _n{n} 就会把板块一路在用的那本 3 条流的判决无声盖掉
-    return HERE / (stem + V4C_SUFFIX.get(tier, "") + ("" if NSEEDS == 3 else f"_n{NSEEDS}") + ".json")
+    return HERE / (stem + ("" if NSEEDS == 3 else f"_n{NSEEDS}") + ".json")
+
+
+def flow_books(width: int, tier: str, arch: str | None = None) -> dict[int, Path]:
+    """同族 × 同档 × 同宽在**盘上**的所有流数版本：{流数: 路径}。
+
+    按登记处的系数表（`T95` 的键）枚举而不是 glob：glob 会把"名字像但不是这个坐标"的本
+    收进来（例如 `_n8_t6_v5` 那一类带判据版本位的），而预检要的恰恰是"同一张网格、只有流数不同"。"""
+    got: dict[int, Path] = {}
+    for n in sorted(T95):
+        p = HERE / (_v4c_stem(width, tier, arch) + ("" if n == 3 else f"_n{n}") + ".json")
+        if p.exists():
+            got[n] = p
+    return got
+
+
+def _ci_half(st: dict) -> float:
+    lo, hi = st["ci95_imgs"]
+    return (hi - lo) / 2.0
+
+
+def power_preflight(width: int, tier: str, where: str, arch: str | None = None) -> dict:
+    """开口预检（第廿八发把第廿七发那条**否定读数**固化成规矩）：买流数之前先问"补流买不买得到分辨率"。
+
+    判据：同一坐标、同一张 α×T 网格，**每格那条配对差 CI 的半宽**在大流数那本里 ÷ 小流数那本里，
+    必须 < 1。σ̂ 不变时它应当是 `T95[b]/T95[a]·√(a/b)`（3→8 即 0.337）。第廿七发实测丙前置**没过**：
+    六格 0.602/0.668/0.692/0.841/1.014/1.441（中位 0.766、两格 ≥ 1），机理是配对差的 σ̂ 自己随流数涨
+    （×1.67~×3.75）⇒ 板块那句"补流数 = 买分辨率"从此有了反例。
+
+    所以这一发之后的每一发**再买流数**，开口都要先把这个比印出来。它**不拦跑也不判红**：
+    拦跑等于替作者决定买不买，而这一条读数的全部内容就是"买之前知道自己在赌什么"。
+    盘上凑不出可比的两本 ⇒ 返回空 dict，并由调用方打印"预检无从开口"——不许打印 1.0 假装通过。
+
+    口径要写清：这里比的是**每格 gap 的 CI 半宽**（族内、逐流配对差），不是第廿七发丙那六格的
+    **跨族 offset** 半宽。两个量同一形状、各自独立，同时摆出来才叫"丙不是某一处的偶然"。
+    """
+    fam = ARCH if arch is None else arch
+    books = flow_books(width, tier, fam)
+    ns = sorted(books)
+    out: dict[str, dict] = {}
+    for a, b in zip(ns, ns[1:]):
+        da = json.loads(books[a].read_text(encoding="utf-8"))
+        db = json.loads(books[b].read_text(encoding="utf-8"))
+        ratios: dict[str, float] = {}
+        for cell, cb in sorted(db.get("grid", {}).items()):
+            ca = da.get("grid", {}).get(cell)
+            if not ca or not ca.get("gaps_imgs") or not cb.get("gaps_imgs"):
+                continue
+            hw_a = _ci_half(summarize([int(x) for x in ca["gaps_imgs"]], f"{books[a].name}:{cell}"))
+            hw_b = _ci_half(summarize([int(x) for x in cb["gaps_imgs"]], f"{books[b].name}:{cell}"))
+            if hw_a > 0:
+                ratios[cell] = round(hw_b / hw_a, 3)
+        if not ratios:
+            continue
+        vals = sorted(ratios.values())
+        out[f"{a}→{b}"] = {"books": [books[a].name, books[b].name], "ratios": ratios,
+                           "median": round(statistics.median(vals), 3),
+                           "cells_ge_1": sum(1 for v in vals if v >= 1.0), "n_cells": len(vals),
+                           "expected_if_sigma_constant": round(T95[b] / T95[a] * (a / b) ** 0.5, 3)}
+    if not out:
+        print(f"[开口预检·买流数] {where}：坐标 {fam} × {tier} × S{width} 盘上只有流数版本 {ns or '（一本都没有）'}"
+              "⇒ 凑不出相邻的两本，**预检无从开口**（这一发的流数是第一次有人买，没有旧尺可对）")
+    for pair, d in out.items():
+        verdict = ("预期成立（全格变窄）" if d["cells_ge_1"] == 0 else
+                   f"预期不成立：{d['cells_ge_1']}/{d['n_cells']} 格半宽 ≥ 1 ⇒ **补流数不保证买到分辨率**"
+                   "（第廿七发的前置·丙就是在这里倒的）")
+        print(f"[开口预检·买流数] {where} {fam} × {tier} × S{width}：{pair}（{d['books'][0]} → {d['books'][1]}，"
+              f"{d['n_cells']} 格逐格比每格 gap 的 CI 半宽）中位 {d['median']} vs σ̂ 不变时预期 "
+              f"{d['expected_if_sigma_constant']} ⇒ {verdict}")
+    return out
 
 
 def scope_note(width: int, tier: str, other: int) -> str:
@@ -149,18 +247,23 @@ def scope_note(width: int, tier: str, other: int) -> str:
     为什么单独成一个函数：换族之后"另一副学生"这件事在 MLP 那族是**换宽度**、在 cnn 那族**无定义**
     （它与老师同架构，没有宽度旋钮）。同一句话在两族里指的不是同一个对照，写在一处才核得清。"""
     sib = out_path(other if ARCH == "mlp" else width, TIER).name      # 对照那一本叫什么，族内现算
+    dflag = "" if DATASET == "mnist" else f" --dataset {DATASET}"
     if ARCH == "cnn":
         cross = ("本族没有宽度旋钮，『跨不跨宽度』这句在本族无定义；跨族那一维由 --arch 自己承担。"
-                 f"另一档的底要另跑 step4b --arch cnn --tier <档>，那一本的账该叫 {sib}"
+                 f"另一档的底要另跑 step4b{dflag} --arch cnn --tier <档>，那一本的账该叫 {sib}"
                  "（名字是算出来的，在不在盘上以 ls 为准）；")
     elif tier == TIER:
-        cross = f"其余档位各自补扫（每档要先有 step4b --tier 造的种子底），另一副宽度是 {sib}；"
+        cross = f"其余档位各自补扫（每档要先有 step4b{dflag} --tier 造的种子底），另一副宽度是 {sib}；"
     else:
         cross = (f"另一副宽度（S{other}）只造过 {TIER} 一档的底，档位与宽度没法同时换；对照是 {sib}；")
     which = (f"S{width}" if ARCH == "mlp" else "学生族 cnn")
     tables = ("3 条流那本，各写各的表" if NSEEDS == 3 else f"{NSEEDS} 条流那本")
-    return (f"只扫 {tier} + {which}；{cross}（{tables}；"
-            "补过流的那几本只做过 S128 满/低两档，跨架构/跨档结论要几份对照着读，而跨流数只能读配对 CI）")
+    # 末尾那句历史只属于 MNIST：册内"补过流的几本"全部是 MNIST 的账，新任务那一维一格都还没买
+    bound = ("补过流的那几本只做过 S128 满/低两档，跨架构/跨档结论要几份对照着读，而跨流数只能读配对 CI"
+             if DATASET == "mnist" else
+             f"任务 {DATASET} 这一维册内此前一格都没买过（所有流数/宽度/族的历史都在 MNIST 那一侧），"
+             f"跨任务结论只能靠同名坐标的两本账对照，而跨流数只能读配对 CI")
+    return (f"只扫 {tier} + {which}（任务 {DATASET}）；{cross}（{tables}；{bound}）")
 
 
 def load_anchor(v4b: Path, width: int, tier: str = TIER, nseeds: int | None = None) -> dict:
@@ -188,6 +291,11 @@ def load_anchor(v4b: Path, width: int, tier: str = TIER, nseeds: int | None = No
         raise SystemExit(f"{v4b.name} 记的学生架构是 {d.get('student_arch', 'mlp')}，本课是 {ARCH}："
                          f"档案名里的家族位与档案内容对不上（名字带 _cnn 却记着 mlp 的臂，或反之）——"
                          f"借来的底必须连族一起对，否则这一档的闸门量的是别的族")
+    if d.get("dataset", "mnist") != DATASET:
+        raise SystemExit(f"{v4b.name} 记的任务是 {d.get('dataset', 'mnist')}，本课是 {DATASET}："
+                         f"名字里的任务位与档案内容对不上（那本底是在别的数据集上造的）。"
+                         f"锚点值/软标签的读数换一个任务就全变，用 MNIST 的底判 Fashion 的闸门"
+                         f"等于把结论外推到一个没量过的任务上")
     arm_key = f"{tier} 种子{SEEDS[0]}"
     if arm_key not in d["arms"]:
         raise SystemExit(f"{v4b.name} 里没有 {arm_key} 这一格（该档案只有 "
@@ -246,25 +354,36 @@ def term_grad_norms(xd, yd, soft, t: float, width: int, seed: int = SEED, arch: 
 
 
 def main(width: int = WIDTH, tier: str = TIER) -> None:
-    if not (MODELS / "mnist_cnn_fp32.pt").exists():
-        raise SystemExit("缺 teacher 权重，先跑 python train_baseline.py")
+    if not (MODELS / TEACHER_PT[DATASET]).exists():
+        raise SystemExit(f"缺 {TEACHER_PT[DATASET]}（{DATASET} 那副老师的权重）——"
+                         f"MNIST 侧先跑 python train_baseline.py，Fashion 侧先跑 python step6_fashion_replication.py")
     v4b = v4b_path(width, tier)
     if not v4b.exists():
-        hint = "python step4b_seed_variance.py" if tier == TIER else \
-            f"python step4b_seed_variance.py --tier {tier}"
-        raise SystemExit(f"缺 {v4b.name}——锚点档案值与**这一档自己的**种子底都从它读，先跑 "
-                         + (hint + ("" if width == 128 else " --width 64")))
+        # 提示必须**照着能跑**：族/任务/档三项都要带上。旧写法只带 --tier，于是
+        # cnn 那一支照抄会造出 MLP 的底（名字都不对），Fashion 那一支照抄更直接被 step4b 自己的
+        # "换任务不许走默认合并跑法"那道闸拒绝——报错里没有可执行下一步，等于把人推回去读代码。
+        cmd = ["python step4b_seed_variance.py", f"--arch {ARCH}"]
+        if DATASET != "mnist":
+            cmd.append(f"--dataset {DATASET}")
+        if tier != TIER or DATASET != "mnist":
+            cmd.append(f"--tier {tier}")
+        if width != 128:
+            cmd.append(f"--width {width}")
+        raise SystemExit(f"缺 {v4b.name}——锚点档案值与**这一档自己的**种子底都从它读，先跑 " + " ".join(cmd))
     out = out_path(width, tier)
+    # 开口预检（第廿八发固化的 (u) 前置）：**这一发在买流数**（比 3 多）就必须先把"补流买不买得到分辨率"
+    # 印在第一次训练之前。放在装载数据之前是刻意的：它只读盘上已有的账，一次训练都不该惊动。
+    pp = power_preflight(width, tier, where="step4c 开口") if NSEEDS > 3 else {}
     anchor = load_anchor(v4b, width, tier)
     floor = anchor["floor"]
     ANCHOR_KD, ANCHOR_CE_ACC = anchor["kd"], anchor["ce_acc"]
     H1_PRED = h1_pred(anchor["gap_imgs"])
 
-    xt_all, yt_all, xte, yte = load_split()
+    xt_all, yt_all, xte, yte = dataset_loader(DATASET)()
     cut = len(xt_all) - VAL_N
     xv, yv = xt_all[cut:], torch.tensor(yt_all[cut:])
     teacher = build_cnn()
-    teacher.load_state_dict(torch.load(MODELS / "mnist_cnn_fp32.pt", weights_only=True))
+    teacher.load_state_dict(torch.load(MODELS / TEACHER_PT[DATASET], weights_only=True))
     teacher.eval()
     n_data = DATA_TIERS[tier]
     xd, yd = xt_all[:n_data], torch.tensor(yt_all[:n_data])
@@ -633,9 +752,13 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
           "这一格按「不可配平」记账而不是悄悄删掉。")
 
     other = 64 if width == 128 else 128
-    report = {"tier": tier, "width": width, "student_arch": ARCH,
+    pp_rec = pp or {"applicable": False,
+                    "reason": (f"本发用 {NSEEDS} 条流，盘上没有同坐标、流数相邻的两本可比 ⇒ 预检不适用"
+                               "（不适用不等于通过）")}
+    report = {"tier": tier, "width": width, "student_arch": ARCH, "dataset": DATASET,
               "alphas": list(ALPHAS), "temps": list(TEMPS),
               "seeds": list(seeds), "n_seeds_arg": NSEEDS, "test_n": int(len(yte)), "train_fit_n": cut,
+              "power_preflight_ex_ante": pp_rec,
               "anchor_hyperparams": {"alpha": ALPHA_ANCHOR, "T": ANCHOR_T},
               "anchor_archive_from": v4b.name,
               "seed_floor_imgs_from_v4b": floor,
@@ -659,8 +782,13 @@ def main(width: int = WIDTH, tier: str = TIER) -> None:
                                 "ce_acc_archive": ANCHOR_CE_ACC},
               "cross_script_gap_parity": gap_parity,
               "ce_ref_by_seed": ce_ref, "grid": grid, "verdicts": verdicts,
-              "limitations": ["种子底借自第4课b 的 α=0.7/T=3 一格；第4课d 已逐格量过自己的配对误差棒"
-                              "（借来的底对单格读数偏大，±2SE 又因跨格共用随机流是下界）",
+              "limitations": [
+                  "种子底借自第4课b 的 α=0.7/T=3 一格；第4课d 已逐格量过自己的配对误差棒"
+                  "（借来的底对单格读数偏大，±2SE 又因跨格共用随机流是下界）"
+                  if DATASET == "mnist" else
+                  f"种子底借自 {v4b.name} 的 α=0.7/T=3 一格（那一本也是这一任务新造的底，不是第4课b 在册那 26 本账）；"
+                  f"本任务没有第4课d 那样的逐格配对误差棒 ⇒ 每一格都只能用锚点格这一条底判显著性，"
+                  f"「借来的底对单格读数偏大」这条偏差在本任务上连量都没量过（是边界，不是已核）",
                               scope_note(width, tier, other),
                               f"每格 {len(seeds)} 条流，均值本身没有二次底",
                               "权重/温度解耦只在初始一步的一个批次上配平，不是全程配平",
@@ -684,8 +812,13 @@ if __name__ == "__main__":
     ap.add_argument("--nseeds", type=int, choices=flow_tiers(), default=3,
                     help="每个格子几条随机流；补流只服务「老账只有 3 条流」那笔分辨率债，"
                          "种子底必须换到对应的 compress_report_v4b_n<流数>.json（先跑 step4b --nseeds 同值）")
+    ap.add_argument("--dataset", choices=DATASETS, default=DATASET,
+                    help="任务（第九维，第廿八发 D）。它管四件事：档案名里的任务位、数据装载器、"
+                         "用哪副老师权重、读哪一本种子底（连带 load_anchor 的任务位对账）。"
+                         "默认 mnist ⇒ 在册那些账的名字与判决一字不变")
     args = ap.parse_args()
     ARCH = args.arch
+    DATASET = args.dataset
     NSEEDS = args.nseeds
     if ARCH == "cnn" and args.width != 128:
         raise SystemExit(f"--arch cnn 配 --width {args.width}：CNN 学生与老师同架构，hidden 这一维在它身上"

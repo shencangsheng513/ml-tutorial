@@ -51,6 +51,7 @@
   --tierblind  把低数据档那本 MLP 阶梯换成中数据档那本（流名单仍逐位相同）⇒ 只有闸 III 该红、闸 I 全绿；
   --unpair     把配对里 CNN 那一侧整体错开一位（种子 42 配种子 7 的读数）⇒ 只有闸 II-b 该红，
                而 II-a、闸 I、闸 III 全绿（这正是"均值不变、配对已坏"那个形状）。
+（注：第廿八发 D 那一趟"换任务"的预登记与落地，在 v1/v2 两段之后、本 docstring 的最末尾。）
 
 落地（跑完之后追加，上面预登记原文一字未改；读数全部来自 `compress_report_v4l_soft_shape_family.json`）：
   ① 实付：`cost` 三项全 **0**（arm_trainings 0 / total 0 / api_fee 0）——纯读 12 本在册账 + 一次老师前向。
@@ -124,6 +125,14 @@ v1 跑完之后盘上多了三本 8 条流的 v4c 网格（`_cnn_low_n8` / `_cnn
   丙 **半宽确实变窄**：6 格各自 `hw8/hw3 < 1`，其中 hw =（CI 上端 − 下端）/2。
      预期（σ̂ 不变时）= T95[8]/T95[3] × √(3/8) = 2.365/4.303 × 0.612 ≈ **0.34**——但"约 0.34"是**预期不是判据**，
      判据只要求 < 1；任一格 ≥ 1 ⇒ (u)。
+     **第廿八发把这条倒掉的判据固化成开口预检**（零训练）：丙实测没过 ⇒ "补流数 = 买分辨率"在本板块
+     第一次有了反例，于是任何**再买流数**的一发，开口都要先把这个比摆出来再决定买不买。实现落在
+     `step4c.power_preflight()`（α×T 网格那一族的档案名归它管，别的脚本调它而不是各抄一份），
+     `step4c --nseeds >3` 在第一次训练之前调用并同步写进档案的 `power_preflight_ex_ante` 键。
+     **两个量不许混**：丙比的是**跨族 offset** 的 CI 半宽（本脚本自己算，六格），预检比的是**每格 gap** 的
+     CI 半宽（族内、逐流配对差，九格）——同形状、各自独立，两个都摆出来才叫"丙不是某一处的偶然"。
+     预检**不拦跑也不判红**：拦跑等于替作者决定买不买，而这条读数的全部内容就是"买之前知道自己在赌什么"；
+     盘上凑不出可比的两本时它明打"预检无从开口"，不许打印 1.0 假装通过。
 
 判定（前置全过才走）：q8 = 那 6 格里配对 CI 不含 0 的格数。
   (u) 前置不过 ⇒ 只报数，本段不产出任何话。
@@ -141,6 +150,103 @@ v1 跑完之后盘上多了三本 8 条流的 v4c 网格（`_cnn_low_n8` / `_cnn
   （v1 那两档 --tierblind / --unpair 的定义一字不改，v2 之后仍需各自复跑一次。）
 
 落地（跑完之后追加）：
+  ① 实付：本脚本仍 **0** 次训练；那三本 8 流网格的 264 次记在第廿七发，不在这里。
+  ② 三条前置按甲→乙→丙的顺序现读，**丙倒下**：甲过（120 行 × 3 字段逐位相同、红 0 条，`counts
+     .nested_rows_compared` 就是那 120）；乙过（闸 IV 从 3 对 9 格扩到 **5 对 15 格**，8 流那两对也钉住了）；
+     丙不过（六格半宽比 **0.602 ~ 1.441**、中位 **0.766**、两格 ≥1，而 σ̂ 不变时的期望是 **0.337**）
+     ⇒ 整段落 **(u)：只报数，本段不产出任何话**。
+  ③ 读数：q8 = **0/6**（分母写死 = 2 档 × 3 个 α；谁引用 q8 必须连这个 6 一起引用），T=6 那一列
+     6/6 不含 0 只作描述（`T6_column_8flows_descriptive`）。**(u) 不等于"8 条流也测不出所以效应为 0"**：
+     丙没过意味着这把新尺子**根本没变快**，它测不出是它自己的事。
+  ④ R1 兑现（不是声明，是刚比过的）：把 v1 与 v2 两本档案逐字段对照，`quantity` / `pays` /
+     `sign_convention` / `exit` / `verdict` / `reading_A_paired_T6_8flows` /
+     `reading_B_offset_vs_T_3flows` **七个字段 JSON 归一化后逐字段相同** ⇒ 段② 的新东西只住在
+     `section2_power_check` 与 `reading_B2_*` 两个独立键里，出口一格一字未动。
+  ⑤ 三档专属拆红实测（两腿分离全部兑现，跑完都逐字节核过没落盘）：`--nest` 红 **1** 条、只在闸 VI；
+     `--tierblind` 复跑仍红 **1** 条、只在闸 III；`--unpair` 复跑仍红 **9** 条、只在 II-b。
+     活计数同步涨到：闸 I **8 对**、闸 III **16 本**（**7 本没记 `student_arch`**，打印不补默认）、
+     II-a **594 行**、II-b **54 次**、闸 IV **5 对 15 格**（老师精度 0.9798 == 档案常数）。
+  ⑥ 丙那条倒下的判据没有停在讨论里：第廿八发把它固化成 `step4c.power_preflight()`，任何再买流数的一发
+     开口都要先摆出这个比（`[开口预检·买流数]` 那几行），凑不出相邻两本时明打"预检无从开口"。
+
+────── 换任务那一趟的预登记（第廿八发 D，`--dataset fashion`；同样跑之前写死，事后只许追加"落地"）──────
+
+**问的那一句**：上面那一整段只在 MNIST × 老师 A × S128 上量过。这一趟买的是同一句问话的**第二个任务取值**
+——Fashion × 两族 × 三档 × 3 条流，只跑读法 B 那条代码路径（同一个 `read_B`，一字未改）。
+
+**结构上少的三样原料**（不是"没测"，是"这一本名下没有那种账"，各自打印"无从开口"并进档案）：
+  · 读法 A 吃 α→0 阶梯账 ⇒ Fashion 的 CNN 侧一格都没造过 ⇒ p 的分母是 **0**，不是 p=0；
+  · 段② 与前置·甲/丙吃 8 流网格账 ⇒ Fashion 三档全部只有 3 条流（第廿七发 (u) 实测"补流数 = 买分辨率"
+    有反例：六格半宽比 0.602~1.441、两格 ≥1 ⇒ 这一发只买 3 条流那一档，不做 88 次/本的补流）；
+  · 闸 VI 同理 ⇒ **不记红也不记通过**。空表在这里有两种毒：`all([])` 恒真会让甲/丙"通过"，
+    `median([])` 会当场崩 ⇒ 整段走 NA、判词记 None，不许塌成 True 或 0。
+  留下真跑的：闸 I / II-a / II-b / 闸 III / 闸 IV（读档 + 现读 Fashion 那副老师）——与 MNIST 同一份代码路径。
+
+**出口四格**（三个计数都在 `task_switch_crosscheck` 里；n_hit = Fashion 那 9 格里配对 CI 不含 0 的格数，
+n_agree = 其中与 MNIST 同名格同号的格数，n_mag = 其中"MNIST 该格点估计落在 Fashion 该格 CI 内"的格数——
+后者是"量级相当"唯一可核的形式，不引入新数）：
+  (u) n_hit == 0 ⇒ **只报数、不产话**：这条偏移在第二个任务上记成"没量过"，不是"量过且没差别"
+      （后一句要效应量上界，3 条流给不出）；第廿五发那句边界仍只站在 MNIST 上。
+  (b) n_hit ≥ 1 且有格与 MNIST **反号** ⇒ 那句归因在第二个任务上被**否证**，边界反过来写死成 MNIST 特产；
+      反号的格逐格点名，不许合并成一句方向词。
+  (a) n_hit ≥ 1、全部同号、且 n_mag == n_hit ⇒ 边界从"这一个任务"扩到**两个任务**。
+  (m) n_hit ≥ 1、全部同号、但 n_mag < n_hit ⇒ 换任务跟的是**方向**、不跟的是**高度**：
+      不许写成"两任务偏移相当"，也不许写成"翻号"。
+  （(a)/(b)/(m)/(u) 由 n_hit 是否为 0、n_dis 是否为 0、n_mag 是否等于 n_hit 三个判据拼成 ⇒ 不重不漏；
+    读法 C 那一腿（闸 IV）红仍然**当场退出**，同 MNIST 的 (d)。）
+
+**两条不许读成**：⑴ 这一趟**不产生复证**——换任务是第七维的一个新取值，不是同名坐标的两本对照；
+⑵ 两个任务的 9 格**不许并成 n=18**，这里没有差之差的 CI，只有两条各自成立的 CI。
+
+落地（跑完之后追加，上面预登记原文一字未改；读数全部来自 `compress_report_v4l_soft_shape_family_fashion_v3.json`）：
+  ① 实付 **250 次训练**（不是价签原先写的 234）：读的 12 本账 = 6 本 v4b 底 × 6 + 6 本 v4c 网格 × 33 = 234，
+     另 **16 次是预检件的副作用** —— `_preflight_fashion.py` 的 [6] 腿本意"零训练地真跑一次 CLI"，
+     但它只枚举了两种盘态，在第三种盘态下真去训练了，产出一本计划外的 `compress_report_v4b_fashion_n8.json`
+     （fashion × MLP × 满数据 × 8 条流，2 臂 × 8 流）。**本趟不读那一本** ⇒ 它不进任何判据，但钱是花了的。
+     本脚本自身仍 `cost` 三项全 0（0 次训练、零 API 费）。
+  ② 三处"结构上少原料"全部做成显式不适用，实测各就其位：读法 A 打"无从开口"、`counts.p_A_cells_total = 0`
+     （**分母 0，不是 p=0**）；段② 与前置·甲/丙走 NA、`counts.q8_B2_T1_cells_out_of_zero = None`
+     （不是 True 也不是 0）；闸 VI 打"**不适用**"而不是"比了 0 行、红 0 条"。两种毒都绕过了：
+     `all([])` 那支由 NA 分支挡住，`median([])` 那支根本没被调用。
+  ③ 真跑那四道闸的现读：闸 III **6 本**全 S128、红 0 条、**0 本**缺 `student_arch`（MNIST 那侧是 7 本缺）；
+     闸 I **3 对**同序且等于登记处那 3 条流；II-a **162 行**逐位、II-b **27 次**配对、红 0 条；
+     闸 IV 两族 **9/9 格**体检逐位相同 + 现算（中数据4500 × 4500 张 × T{1,3,6} × 4 量）逐位相同 +
+     老师现读精度 **0.8771 == 档案里那个 0.8771**（与 MNIST 那本的 0.9798 各自成立，两副老师不混）。
+  ④ **出口按预登记字面落在 (u)**：T=1 那一列 9 格里配对 CI 不含 0 = **0** 格（q(T=1 列)=0，与 MNIST 的
+     q=0 同判）。⇒ 第廿五发那句"跨族偏移住在这份形状 × 这个族"的边界**仍然只站在 MNIST 上**，
+     在 Fashion 上这一格记成**"没量过"**（不是"量过且没差别"——后一句要效应量上界，3 条流给不出）。
+  ⑤ 三处"写下来的东西"被运行纠正（预登记原文不动，纠正记在这里）：
+     (1) **分母口径**：上面那句"n_hit = Fashion 那 9 格"没写清是哪 9 格，而对照表实际吃的是读法 B 整张
+         网格 **27 格**（3 档 × 3 α × 3 T）。两种读法给出**不同出口**：27 格 → n_hit=3、同号 3、量级 3 ⇒ **(a)**；
+         T=1 那一列 9 格 → n_hit=0 ⇒ **(u)**。判据走预登记字面（T=1 列），27 格那一读法**同格并列报出**
+         （`task_switch_crosscheck.whole_grid_descriptive` 与 `exit` 末尾那句），因为两种读法的差全部来自
+         T≠1 的那 18 格，而那一块在 MNIST 侧本来就已知不含 0 ⇒ 拿它当分母等于把已知答案的格子算进新证据。
+         **代码侧的 `"/9"` 是写死的** ⇒ 现在两个格数都由 `xt_counts()` 现读，且**一次算两种**（谁挑分母都会
+         挑到对自己有利的那个，那就都摆出来）。
+     (2) **档案顶层形状**：`report` 字面量里 `section2_power_check` 少一个闭合括号，而它由 `red_modes` 末尾
+         一个**多出来的** `}` 顶岗 ⇒ 语法合法、`py_compile` 绿、判词照印，但 `counts` 之后 9 个顶层键
+         （含 `exit`/`verdict`/`cost`/`limitations`/`task_switch_crosscheck`）全被吞成 `section2_power_check`
+         的子键 —— 只有下游按名字读账的人拿到 KeyError。修法：括号搬回该在的位置 + 新增**结构闸**
+         `check_report_shape()`（顶层键必须与登记处 `REQUIRED_TOP` 逐字相符，缺键则点名每个键被嵌进了
+         哪个子层并**拒写档案**）。两腿实测：红腿吃**盘上那本真坏档案**（改名留盘
+         `_v4l_fashion_v2_swallowedkeys_v1.json`，前缀 `_` 是为了不被 `_red_v3.py` 的
+         `compress_report_v*.json` glob 扫成一本在册账）⇒ 拦下并点名 9 个键；绿腿 = 本发重跑后打印
+         "顶层 20 个键齐"。**一条盲区照实报**：MNIST 那一腿今天没有活体绿腿（那本在册，重跑会被
+         "已入库"那道护栏先拦下），而键集合与任务分支无关（分支只改值不改键）。
+     (3) **出口四格里"量级相当"那条腿在这一发是恒真的**：预登记把 `n_mag` 定义成"MNIST 该格点估计落在
+         Fashion 该格 CI 内"的格数，而实测它**每一格都成立**（primary 那 9 格 = 9/9、整张网格 = 27/27），
+         机理是 Fashion 那把尺子比 MNIST 的钝：配对 CI 半宽中位 **213.2 张 vs 18.9 张（11.3 倍）**（T=1 列）／
+         **196.3 vs 39.6（5.0 倍）**（整张网格）。⇒ 出口 (a) 的第三条判据在这里**没有区分度**，它若真把那句
+         边界"扩到两个任务"，扩出去的那一步只由一条永真的腿点亮。本发落在 (u)，这条腿没被选中，但缺陷属于
+         预登记本身 ⇒ 处置**不是换一条判据**（那等于事后改出口），是把它的恒真**现读出来贴在判词旁边**：
+         `xt_counts()` 每种读法多三个键（`n_mag_all_cells` / `ci_halfwidth_median_imgs` / `mag_leg_degenerate`），
+         聚合成 `task_switch_crosscheck.leg_check` 并在出口句与屏幕上同格报出。**档案为此升版 v3**
+         （护栏要求人处置 ⇒ 不覆盖 v2；v2 留盘）。逐字段对账实测：`cells` 那 27 格与 `denominators`
+         **与 v2 完全相同**，只有上述三键、`leg_check` 一条与 `exit`/`verdict` 那两句话变长 ⇒ 没有一个读数被动过。
+  ⑥ 没买到的（下一发别把这几条当已有）：Fashion 上的**读法 A**（要 CNN 的 α→0 薄阶梯，`step4f` 那侧
+     `--arch cnn --dataset fashion` 在第一次训练之前就拒，理由已登记）；Fashion 上**段② 那种加宽尺子**
+     （三档全 3 条流 ⇒ 本本 q 没有兜底，测不出只能记"没量过"）；T=1 那一列在**第二个任务 × 更宽尺子**下
+     的功效（两个维度一起欠着）；以及 `exit` 里那个 (m) 分支——四格在本任务上只实到 (u)，(m) 仍是空的一格。
 """
 from __future__ import annotations
 
@@ -152,13 +258,19 @@ from pathlib import Path
 import torch
 
 from step1_quantize import MODELS, build_cnn, predict
-from step4_distill import (DATA_TIERS, FLOW_SEEDS, T95, TEACHER_ARCHIVE_ACC, logits_of,
-                           soft_label_audit, summarize)
-from train_baseline import load_split
+import step4c_alpha_T_sweep as sc            # 开口预检的唯一实现（买流数那句 (u) 读数固化在那里，不在这儿重抄）
+from step4_distill import (DATA_TIERS, DATASETS, DATASET_SUFFIX, FLOW_SEEDS, T95, TEACHER_PT, dataset_loader,
+                           logits_of, soft_label_audit, summarize, teacher_archive_acc)
 
 HERE = Path(__file__).resolve().parent
+# 任务位（第廿八发 D）：默认 mnist ⇒ 在册那本 v2 账的名字、读法、判决一字不动。
+DATASET = "mnist"
 # v2：只多段② 那几个键（`exit`/`verdict`/读法 A/B 逐字段与 v1 相同）；v1 档案留盘做逐字段对账
-OUT = HERE / "compress_report_v4l_soft_shape_family_v2.json"
+# 版本位登记处（不自动升：自动挑号等于绕过"已入库"那条要人处置的护栏）。fashion 升 v3 的原因写在
+# 本文件 docstring 的 D 落地段：往 `task_switch_crosscheck` 里加了三个"腿自己有没有区分度"的键。
+REPORT_VER = {"mnist": "v2", "fashion": "v3"}
+OUT = HERE / f"compress_report_v4l_soft_shape_family{DATASET_SUFFIX[DATASET]}_{REPORT_VER[DATASET]}.json"
+MNIST_V2 = HERE / "compress_report_v4l_soft_shape_family_v2.json"   # 换任务那趟的对照基准（按内容核身份）
 
 ALPHAS = (0.05, 0.3, 0.7)                 # 三对阶梯账**共有**的 α 格（0.1/0.2 只有两档有 ⇒ 不顺手扩）
 GRID_ALPHAS = (0.3, 0.7, 1.0)
@@ -184,7 +296,37 @@ GRID8 = {
     "低数据2000": ("compress_report_v4c_cnn_low_n8.json", "compress_report_v4c_low_n8.json"),
     "满数据8500": ("compress_report_v4c_cnn_n8.json", "compress_report_v4c_n8.json"),
 }
+# 第廿八发 D：读法 B 搬到第二个任务。六本网格账是那一发的 198 次训练换来的，档位后缀跟着 step4c 的名字规则。
+GRID_FASHION = {
+    "低数据2000": ("compress_report_v4c_fashion_cnn_low.json", "compress_report_v4c_fashion_low.json"),
+    "中数据4500": ("compress_report_v4c_fashion_cnn_mid.json", "compress_report_v4c_fashion_mid.json"),
+    "满数据8500": ("compress_report_v4c_fashion_cnn.json", "compress_report_v4c_fashion.json"),
+}
+# Fashion 名下这两张**结构上就是空的**，不是忘了填：
+#   · 读法 A 吃的是 α→0 阶梯账，Fashion 侧只有 MLP 那两本（`v4f_fashion_*`），CNN 侧一格都没造过
+#     ⇒ 没有可配对的另一族，硬凑只能去借 MNIST 的 CNN 阶梯，那是换任务冒充同任务；
+#   · 段② 吃的是 8 流网格，Fashion 两族都只有 3 流那一档（这一发只买 3 条流，理由写在第廿七发 (u)）
+#     ⇒ 甲（共流嵌套）与丙（半宽变窄）都没有原料。
+# 所以这两处在 Fashion 模式下打印"无从开口"并把键写进档案，**不回落 MNIST**。
+LADDER_FASHION: dict[str, tuple[str, str]] = {}
+GRID8_FASHION: dict[str, tuple[str, str]] = {}
 AUDIT_KEYS = ("mean_top1", "pct_top1_gt_0.99", "mean_p2", "mean_margin_top1_top2")
+
+
+def books_for(ds: str) -> tuple[dict, dict, dict]:
+    """三张表按任务取，且只在这里取一次（别在每个闸里各写一遍 `if ds == ...`）。"""
+    if ds == "fashion":
+        return LADDER_FASHION, GRID_FASHION, GRID8_FASHION
+    if ds == "mnist":
+        return LADDER, GRID, GRID8
+    raise SystemExit(f"任务 {ds!r} 在 step4l 没有登记账表 ⇒ 要它得先登记那三张表，"
+                     f"而不是让它安静地读 MNIST 的本")
+
+
+def out_path(ds: str) -> Path:
+    """产物名里的任务位 + 版本位（查 `REPORT_VER`）。mnist 是空串（在册那本 v2 的名字就是本板块的身份，
+    改名等于断开所有对照）；版本位**不自动升**——自动挑一个没被占用的号，等于绕过"已入库"那条要人处置的护栏。"""
+    return HERE / f"compress_report_v4l_soft_shape_family{DATASET_SUFFIX[ds]}_{REPORT_VER[ds]}.json"
 
 red3: list[str] = []                       # 闸 III 的失败（打印 + 计数，最后统一裁决）
 red2b: list[str] = []                      # 闸 II-b 的失败（同上）
@@ -209,6 +351,175 @@ def check_family(book: dict, want: str) -> None:
     if booked is not None and booked != want:
         raise SystemExit(f"闸 III {book['_name']}：文件名的家族位说是 {want} 族，`student_arch` 记的是 "
                          f"{booked} ⇒ 名字与臂不是同一族，这一对不能配对")
+
+
+def read_baseline() -> dict:
+    """换任务那一趟的对照基准 = 在册 MNIST 那本 v2 的 `reading_B_offset_vs_T_3flows`。
+
+    身份**按内容**核，不按文件名核：`dataset` 位（老账没记就读成 mnist，并把"没记"数出来）+ 每一格
+    `provenance` 里两族的档案名不许带任务位 `_fashion`（那说明基准本身被换成了 Fashion 的账，
+    于是"换任务对照"变成自己跟自己比）。覆盖不足**当场退出**——少比几格继续判，报出来的分母就是假的。
+    """
+    if not MNIST_V2.exists():
+        raise SystemExit(f"对照基准 {MNIST_V2.name} 不在盘上：换任务那一趟吃的是 MNIST 在册那 9 格，"
+                         f"缺它就没有'换任务'这个读数（不是回落成只报 Fashion 自己的数）")
+    d = json.loads(MNIST_V2.read_text(encoding="utf-8"))
+    if d.get("dataset", "mnist") != "mnist":
+        raise SystemExit(f"{MNIST_V2.name} 记的任务是 {d['dataset']}，不是 mnist ⇒ 拿它当 MNIST 侧基准是接错线")
+    rb = d["reading_B_offset_vs_T_3flows"]
+    print(f"[基准] 对照读 {MNIST_V2.name}（dataset={'mnist（老账没记这一位，按历史口径读成 mnist）' if 'dataset' not in d else d['dataset']}）"
+          f"：{len(rb)} 档 × {len(next(iter(rb.values()))['offset_by_cell'])} 格")
+    return rb
+
+
+def baseline_cell(rb: dict, tier: str, cell: str) -> dict:
+    blk = rb.get(tier)
+    if blk is None or cell not in blk["offset_by_cell"]:
+        raise SystemExit(f"基准那本里没有 {tier} × {cell} ⇒ 换任务的对照表缺格（分母会虚报成少几格），"
+                         f"先查那一本的档位/α/T 取法与本次是否同一张网格")
+    return blk["offset_by_cell"][cell]
+
+
+def cross_task(read_b: dict, rb: dict) -> tuple[dict, int, int]:
+    """把 Fashion 的逐格 offset 与 MNIST **同名格**并排。这不是配对：两任务的流、图、老师都不同，
+    所以这里只有'两条 CI 各摆各的'与'符号是否一致'，没有差之差的 CI。"""
+    cmp: dict[str, dict] = {}
+    n_hit = n_agree = 0
+    for tier, blk in read_b.items():
+        for cell, st in blk["offset_by_cell"].items():
+            base = baseline_cell(rb, tier, cell)
+            lo, hi = st["ci95_imgs"]
+            bm = float(base["mean_gap_imgs"])
+            item = {"fashion_mean_imgs": st["mean_gap_imgs"], "fashion_ci95_imgs": st["ci95_imgs"],
+                    "fashion_out_of_zero": st["ci_excludes_zero"], "fashion_flows": st["provenance"]["flows"],
+                    "mnist_mean_imgs": bm, "mnist_ci95_imgs": list(base["ci95_imgs"]),
+                    "mnist_out_of_zero": base["ci_excludes_zero"],
+                    "same_sign": (st["mean_gap_imgs"] > 0) == (bm > 0) if st["mean_gap_imgs"] and bm else None,
+                    # 预登记里"量级相当"的可核形式：基准那格的点估计落在本格 CI 之内（不引入新数）
+                    "mnist_point_inside_fashion_ci": lo <= bm <= hi,
+                    "provenance": st["provenance"],
+                    "baseline_book": MNIST_V2.name}
+            cmp[f"{tier} × {cell}"] = item
+            if item["fashion_out_of_zero"]:
+                n_hit += 1
+                if item["same_sign"]:
+                    n_agree += 1
+    return cmp, n_hit, n_agree
+
+
+def halfwidths(cmp_table: dict, keys) -> tuple:
+    """这一读法全部格子上，两任务各自那条配对 CI 半宽的中位数（张）。"""
+    def med(ci) -> float:
+        return round(statistics.median([(cmp_table[k][ci][1] - cmp_table[k][ci][0]) / 2 for k in keys]), 1)
+    return med("fashion_ci95_imgs"), med("mnist_ci95_imgs")
+
+
+def mag_leg_note(name: str, d: dict) -> str:
+    """『量级相当』这条腿自己有没有区分度——恒真就当场点名，不留给读者事后发现。"""
+    if not d["mag_leg_degenerate"]:
+        return ""
+    hw = d["ci_halfwidth_median_imgs"]
+    return (f"但 {name} 那一读法的『量级相当』腿是**恒真的**：{d['n_cells']} 格里 "
+            f"{d['n_mag_all_cells']}/{d['n_cells']} 格『MNIST 点估计落在 Fashion 本格 CI 内』"
+            f"（半宽中位 Fashion {hw['fashion']} 张 vs MNIST {hw['mnist']} 张，约 "
+            f"{round(hw['fashion'] / hw['mnist'], 1) if hw['mnist'] else None} 倍钝）⇒ 它是"
+            f"**这个任务上那把尺子更钝**的副产品，不是『两个任务偏移高度相当』的证据；这一读法若被选中，"
+            f"出口 (a) 只由一条恒真的腿点亮")
+
+
+def xt_counts(cmp_table: dict) -> dict:
+    """两种读法各自的计数，**一次全算出来**（谁挑分母都会挑到对自己有利的那一个 ⇒ 那就都摆出来）。
+
+    primary = 预登记字面上那"9 格" = T=1 那一列（与 q 同口径，也是本发唯一的新证据）；
+    whole   = 对照表实际吃的整张读法 B 网格（3 档 × 3 α × 3 T）。
+    除三个判据计数外，每种读法还现读自己的**腿有没有区分度**（`n_mag_all_cells` / 半宽 / `mag_leg_degenerate`）
+    ——它们不进判据，只负责让"换任务后高度相当"这类话在账上无处藏身。
+    """
+    def cnt(keys) -> dict:
+        hit = [k for k in keys if cmp_table[k]["fashion_out_of_zero"]]
+        mag_all = sum(1 for k in keys if cmp_table[k]["mnist_point_inside_fashion_ci"])
+        hw_f, hw_m = (halfwidths(cmp_table, keys) if keys else (None, None))
+        return {"n_cells": len(keys), "n_hit": len(hit),
+                "n_agree": sum(1 for k in hit if cmp_table[k]["same_sign"]),
+                "n_mag": sum(1 for k in hit if cmp_table[k]["mnist_point_inside_fashion_ci"]),
+                "hits": hit,
+                # ↓ 两条"腿自己有没有区分度"的现读诊断（不参与判据，只负责让读者不必自己发现）
+                "n_mag_all_cells": mag_all,
+                "ci_halfwidth_median_imgs": {"fashion": hw_f, "mnist": hw_m},
+                "mag_leg_degenerate": bool(keys) and mag_all == len(keys)}
+    t1 = [k for k in cmp_table if k.endswith(",T=1")]
+    return {"T1_column_pre_registered": cnt(t1), "whole_grid_descriptive": cnt(list(cmp_table))}
+
+
+def exit_fashion(q_hits: int, cmp_table: dict) -> str:
+    """换任务那一趟的出口（四格穷尽；判据只吃 `xt_counts()` 里 primary 那三个计数，都在
+    `task_switch_crosscheck` 里可核）。
+
+    n_hit = **预登记字面**那 9 格（T=1 那一列）里配对 CI 不含 0 的格数；n_agree / n_mag = 这些格中与 MNIST
+    **同名格**同号 / "MNIST 点估计落在本格 CI 内"（预登记里"量级相当"的可核形式）的格数。四格互斥且覆盖全部取值。
+    全表（27 格）那一读法的格数与出口在下面 `whole_grid_descriptive` 里并列报出，不替换判据。
+    """
+    c = xt_counts(cmp_table)
+    p, w = c["T1_column_pre_registered"], c["whole_grid_descriptive"]
+    hit, n_hit = p["hits"], p["n_hit"]
+    n_agree, n_mag = p["n_agree"], p["n_mag"]
+    n_dis = n_hit - n_agree
+    whole_exit = ("(u)" if w["n_hit"] == 0 else
+                  "(b)" if w["n_hit"] - w["n_agree"] >= 1 else
+                  "(a)" if w["n_mag"] == w["n_hit"] else "(m)")
+    alt = (f"（若把整张读法 B 网格 {w['n_cells']} 格当分母：n_hit={w['n_hit']}、同号 {w['n_agree']}、"
+           f"量级对上 {w['n_mag']} ⇒ 出口是 {whole_exit}。两种读法的差全部来自 T≠1 的那 "
+           f"{w['n_cells'] - p['n_cells']} 格，而那一块在 MNIST 侧本来就已知不含 0 ⇒ "
+           f"判据按预登记字面走 primary，另一读法只作描述，事后不许挑对自己有利的那个。"
+           f"{mag_leg_note('whole_grid_descriptive', w)}）")
+    if n_hit == 0:
+        return (f"(u) 按预登记字面（{p['n_cells']} 格 = T=1 那一列）配对 CI 不含 0 = **0** 格"
+                f"（q(T=1 列)={q_hits}），且逐格点估计的符号都没站住 ⇒ 这一发的读数是**只报数、不产话**："
+                f"这条跨族偏移在第二个任务上记成**『没量过』**，不是『量过且没差别』（后一句要的是效应量的"
+                f"上界，3 条流给不出）。第廿五发那句边界仍然只站在 MNIST 上{alt}")
+    if n_dis >= 1:
+        bad = "、".join(f"{k}（Fashion {cmp_table[k]['fashion_mean_imgs']:+.1f} vs MNIST "
+                        f"{cmp_table[k]['mnist_mean_imgs']:+.1f}）" for k in hit
+                        if not cmp_table[k]["same_sign"])
+        return (f"(b) Fashion 在 {p['n_cells']} 格里有 {n_hit} 格测得出，其中 **{n_dis} 格与 MNIST 反号**"
+                f"（{bad}）⇒ 第廿五发那句『跨族偏移』在第二个任务上被**否证**：它的边界反过来写死成 MNIST 特产。"
+                f"逐格点名在此，不许合并成一句方向词{alt}")
+    if n_mag == n_hit:
+        return (f"(a) Fashion 在预登记那 {p['n_cells']} 格里有 {n_hit} 格测得出、全部与 MNIST 同名格同号，"
+                f"且 MNIST 该格点估计都落在 Fashion 该格 CI 内（『量级相当』的可核形式）⇒ 那条『只换学生族就有"
+                f"跨族偏移』的句子边界从『这一个任务』扩到**两个任务**（q(T=1 列)={q_hits}，与 MNIST 的 q=0 同判）。"
+                f"{mag_leg_note('primary（T=1 那一列）', p)}{alt}")
+    weak = "、".join(f"{k}（Fashion {cmp_table[k]['fashion_mean_imgs']:+.1f} "
+                     f"CI{cmp_table[k]['fashion_ci95_imgs']} vs MNIST {cmp_table[k]['mnist_mean_imgs']:+.1f}）"
+                     for k in hit if not cmp_table[k]["mnist_point_inside_fashion_ci"])
+    return (f"(m) Fashion 在预登记那 {p['n_cells']} 格里有 {n_hit} 格测得出、全部与 MNIST 同号，"
+            f"但 **{n_hit - n_mag} 格的量级对不上**（MNIST 点估计落在本格 CI 之外：{weak}）⇒ "
+            f"换任务跟的是**方向**、不跟的是**高度**：不许写成『两个任务上偏移相当』，也不许写成『翻号』"
+            f"（一格都没翻）{alt}")
+
+
+REQUIRED_TOP = ("dataset", "dataset_applicability", "quantity", "pays", "sign_convention", "gates",
+                "reading_A_paired_T6_8flows", "reading_A_applicability", "reading_B_offset_vs_T_3flows",
+                "reading_B2_offset_vs_T_8flows", "section2_power_check", "counts", "shape_identity",
+                "task_switch_crosscheck", "v2_increment", "exit", "verdict", "cost", "limitations", "red_modes")
+
+
+def check_report_shape(report: dict) -> None:
+    """结构闸：顶层键必须与登记处逐字相符。缺键 = 某个未闭合的字面量把它们吞成了子键。
+
+    这类事故的毒在于它**不报语法错**：`exit` 的判词照样打印、档案照样写出，坏的是名字空间——下游按
+    `report["task_switch_crosscheck"]` 读账的人拿到 KeyError，而判词已经进了 README。"""
+    miss = [k for k in REQUIRED_TOP if k not in report]
+    extra = [k for k in report if k not in REQUIRED_TOP]
+    if not miss and not extra:
+        print(f"\n[结构闸] 顶层 {len(REQUIRED_TOP)} 个键齐（现读登记处）⇒ 没有键被嵌进子层")
+        return
+    where = {k: [pk for pk, pv in report.items() if isinstance(pv, dict) and k in pv] for k in miss}
+    raise SystemExit(f"档案顶层形状不对：缺 {miss}"
+                     + ("".join(f"；'{k}' 其实被嵌进了 {v}" for k, v in where.items() if v) or
+                        "；它们不在任何子层里 = 真的没写")
+                     + (f"；多出 {extra}" if extra else "")
+                     + " ⇒ 拒写：判词已经印出来了，但按名字读这本账的下游会拿到 KeyError")
 
 
 def arm_row(book: dict, alpha: float, seed: int) -> dict:
@@ -343,7 +654,16 @@ def print_B(read_b: dict, head: str, denom: int) -> tuple[int, int]:
     return q, t6
 
 
-def main(red: str = "") -> None:
+def main(red: str = "", ds: str = "mnist") -> None:
+    global DATASET, OUT
+    DATASET = ds
+    OUT = out_path(ds)                 # 不在 def 时绑死：换任务要换的是这一本的**名字**，不只是内容
+    sc.DATASET = ds                    # 账名规则与开口预检的唯一实现住在 step4c，这里不重抄一份
+    lad_t, grid_t, grid8_t = books_for(ds)
+    if ds != "mnist" and red:
+        raise SystemExit(f"{red} 的注入点写在 MNIST 那三张账表上（阶梯/8 流网格），任务换成 {ds} 之后那些本"
+                         f"根本不参评 ⇒ 换任务这一趟不许跑拆红档（要么先给这个任务登记注入点，"
+                         f"要么它会安静地红在别处，那不算拆红）")
     # 快照在一切动作之前取：红档那条自查比的是"跑前 vs 跑后"，不是"盘上有没有"
     snap = OUT.read_bytes() if OUT.exists() else None
     # 这条护栏只管正常模式：拆红档从头到尾不写盘（下面还有一条自查钉它），拦它就是拦"判决之后再也验不了红"
@@ -355,9 +675,9 @@ def main(red: str = "") -> None:
     if red == "--unpair":
         print("[验红] --unpair：把配对里 CNN 那一侧整体错开一位 ⇒ 只有闸 II-b 该红（II-a / 闸 I / 闸 III 全绿）")
 
-    books = {t: (read(c), read(m)) for t, (c, m) in LADDER.items()}
-    grids = {t: (read(c), read(m)) for t, (c, m) in GRID.items()}
-    grids8 = {t: (read(c), read(m)) for t, (c, m) in GRID8.items()}
+    books = {t: (read(c), read(m)) for t, (c, m) in lad_t.items()}
+    grids = {t: (read(c), read(m)) for t, (c, m) in grid_t.items()}
+    grids8 = {t: (read(c), read(m)) for t, (c, m) in grid8_t.items()}
     if red == "--nest":
         row = next(r for r in grids8["满数据8500"][0]["grid"]["match_T6"]["per_seed"]
                    if int(r["seed"]) == FLOW_SEEDS[3][0])
@@ -409,16 +729,27 @@ def main(red: str = "") -> None:
           f"（{'、'.join(f'{n} 条流' for n in sorted(flow_sizes))}）⇒ 有配对资格")
 
     # ---- 闸 VI（段② 前置·甲）：8 流那把尺子必须是 3 流那把的**加宽**，不是另起一炉 ----
-    for tier, (cb8, mb8) in grids8.items():
-        cb3, mb3 = grids[tier]
-        nest_check(cb8, cb3, f"{tier} × CNN")
-        nest_check(mb8, mb3, f"{tier} × MLP")
-    if stats["nest_rows"] == 0:
-        red6.append("闸 VI 一行都没比到（共有格 × 共有流 = 0）⇒ 不是通过，是没测到：段② 的甲前置无凭据")
-    print(f"[闸 VI · 共流嵌套性] 8 流两对 vs 同档 3 流两对，共有流 × 共有格共比 {stats['nest_rows']} 行 × "
-          f"3 个字段，红 {len(red6)} 条（这一闸要的是'同一条流同一起点'，含不进读法 B 的 `match_T6`）")
+    vi_na = not grids8
+    if not vi_na:
+        for tier, (cb8, mb8) in grids8.items():
+            cb3, mb3 = grids[tier]
+            nest_check(cb8, cb3, f"{tier} × CNN")
+            nest_check(mb8, mb3, f"{tier} × MLP")
+        if stats["nest_rows"] == 0:
+            red6.append("闸 VI 一行都没比到（共有格 × 共有流 = 0）⇒ 不是通过，是没测到：段② 的甲前置无凭据")
+        print(f"[闸 VI · 共流嵌套性] 8 流两对 vs 同档 3 流两对，共有流 × 共有格共比 {stats['nest_rows']} 行 × "
+              f"3 个字段，红 {len(red6)} 条（这一闸要的是'同一条流同一起点'，含不进读法 B 的 `match_T6`）")
+    else:
+        print(f"[闸 VI · 共流嵌套性] **本任务（{DATASET}）无从开口**：段② 要的 8 流网格账两族都没有"
+              f"（这一发只买 3 条流，理由 = 第廿七发 (u)『补流数不保证买到分辨率』）⇒ 甲前置没有原料，"
+              f"既不记红也不记通过；段② 那一整段随之不产出任何话")
 
     # ---- 读法 A ----
+    if not books:
+        print(f"\n[读法 A · 本任务（{DATASET}）**无从开口**] 它吃的是 α→0 阶梯账（两族各一本 × 三档），"
+              f"Fashion 侧只有 MLP 那几本（`compress_report_v4f_fashion_*`），CNN 侧一格都没造过 ⇒ "
+              f"没有可配对的另一族。要买这一格 = 先造 CNN 的薄阶梯（每本 27 次 × 缺的档数），"
+              f"那是另一发的钱，本课不借 MNIST 的 CNN 阶梯来凑。")
     read_a: dict[str, dict] = {}
     for tier, (cb, mb) in books.items():
         seeds = [int(s) for s in cb["seeds"]]
@@ -443,7 +774,8 @@ def main(red: str = "") -> None:
                   f"同号 {st['same_sign_seeds']} 二项 p={st['p_seeds_binomial']} σ̂(D4) {st['d4_sigma_hat']} "
                   f"（CNN {st['mean_cnn']:+.1f} / MLP {st['mean_mlp']:+.1f}）→ "
                   f"{'不含 0' if st['ci_excludes_zero'] else '含 0'}")
-    print(f"  ⇒ p（{len(p_cells)} 格里 CI 不含 0 的格数）= {p_hits}")
+    print(f"  ⇒ p（{len(p_cells)} 格里 CI 不含 0 的格数）= {p_hits}"
+          + ("" if p_cells else "  ← 分母是 0：见上面那句『无从开口』，这一格不是 p=0"))
 
     # ---- 读法 B（3 条流那把尺子，与段② 共用 read_B 这一条代码路径）----
     read_b = read_B(grids)
@@ -467,13 +799,18 @@ def main(red: str = "") -> None:
           f"`soft_label_audit_by_T`：两族逐位相同（⇒ 跨族差不可能来自形状本身）"
           f"（8 流那两对是段② 的前置·乙，v1 只锁了 3 流那三对）")
 
+    teacher_pt = MODELS / TEACHER_PT[DATASET]
+    if not teacher_pt.exists():
+        raise SystemExit(f"盘上没有 {teacher_pt.name}（任务 {DATASET} 的老师权重）⇒ 闸 IV 的现算那一腿没有原料，"
+                         f"本课不许借别的任务的老师来'证明'两族读的是同一份软标签")
+    acc_archive = teacher_archive_acc(DATASET)
     teacher = build_cnn()
-    teacher.load_state_dict(torch.load(MODELS / "mnist_cnn_fp32.pt", weights_only=True))
+    teacher.load_state_dict(torch.load(teacher_pt, weights_only=True))
     teacher.eval()
-    xt_all, yt_all, xte, yte = load_split()
+    xt_all, yt_all, xte, yte = dataset_loader(DATASET)()
     t_acc = float((predict(teacher, xte, False) == yte).mean())
-    if abs(t_acc - TEACHER_ARCHIVE_ACC) * 100 >= 0.05:
-        raise SystemExit(f"闸 IV 老师现读 {t_acc:.4f} ≠ 档案常数 {TEACHER_ARCHIVE_ACC:.4f} ⇒ 盘上这副老师"
+    if abs(t_acc - acc_archive) * 100 >= 0.05:
+        raise SystemExit(f"闸 IV 老师现读 {t_acc:.4f} ≠ 档案值 {acc_archive:.4f} ⇒ 盘上这副老师"
                          f"不是算出那些体检的那一副，出口 (d)")
     n_data = DATA_TIERS[AUDIT_TIER]
     soft = logits_of(teacher, xt_all[:n_data])
@@ -485,45 +822,90 @@ def main(red: str = "") -> None:
             if live[k] != booked[k] or live[k] != mb["soft_label_audit_by_T"][f"a1_T{t:g}"]["除以T"][k]:
                 raise SystemExit(f"闸 IV 现算 T={t:g} 的 {k}={live[k]} ≠ 两族在册 {booked[k]} "
                                  f"⇒ 现读的不是 {AUDIT_TIER} 那 {n_data} 张图 / 那副老师")
-    print(f"[闸 IV] 老师现读精度 {t_acc:.4f} == 档案 {TEACHER_ARCHIVE_ACC:.4f}；{AUDIT_TIER} 那 {n_data} 张图"
+    print(f"[闸 IV] 老师现读精度 {t_acc:.4f} == 档案 {acc_archive:.4f}（任务 {DATASET}）；{AUDIT_TIER} 那 {n_data} 张图"
           f"现算体检与两族在册逐位相同（T∈{{1,3,6}} × {len(AUDIT_KEYS)} 个量）")
 
     # ---- 段②：把读法 B 的 T=1 那一列搬到 8 条流的尺子上（与 v1 共用 read_B，不是另写一套）----
-    read_b8 = read_B(grids8)
-    q8_hits, t86_hits = print_B(read_b8, "B2（段②）· 同一件事、同一把 α×T 网格，尺子换成 8 条流",
-                                len(grids8) * len(GRID_ALPHAS))
-    denom8 = len(grids8) * len(GRID_ALPHAS)
-    hw_ratio: dict[str, float] = {}
-    for tier in read_b8:
-        for a in GRID_ALPHAS:
-            k = f"α={a:g},T=1"
-            hw_ratio[f"{tier} × α={a:g}"] = round(
-                half_width(read_b8[tier]["offset_by_cell"][k])
-                / half_width(read_b[tier]["offset_by_cell"][k]), 3)
-    丙 = all(v < 1 for v in hw_ratio.values())
-    甲 = (not red6) and stats["nest_rows"] > 0
-    med_hw = round(statistics.median(list(hw_ratio.values())), 3)
-    print(f"  前置·丙（同一格 8 流半宽 ÷ 3 流半宽，判据只要求 < 1；σ̂ 不变时预期 ≈ "
-          f"{T95[8] / T95[3] * (3 / 8) ** 0.5:.3f}）："
-          + "  ".join(f"{k.split(' × ')[0]}·{k.split('α=')[-1]}:{v}" for k, v in hw_ratio.items())
-          + f" ⇒ {'全 < 1，通过' if 丙 else '有格 ≥ 1，段② 不可用'}")
-    print(f"  前置·甲（闸 VI 共流嵌套）{'通过' if 甲 else '不过'}：比了 {stats['nest_rows']} 行、红 {len(red6)} 条；"
-          f"前置·乙（闸 IV 含 8 流两对）已在上面钉住")
-    if not (甲 and 丙):
-        section2 = (f"(u) 前置不过 ⇒ 本段只报数，不产出任何话。甲红 {len(red6)} 条（比了 {stats['nest_rows']} 行）、"
-                    f"丙半宽比 {hw_ratio} ⇒ 两把尺子要么不嵌套、要么加宽没换来更窄的区间，"
-                    f"'8 流仍然测不出'这句话没有凭据（这一段没测到，不叫通过）")
-    elif q8_hits == 0:
-        section2 = (f"(i) q8 = 0/{denom8} 且甲乙丙全过 ⇒ 『3 条流测不动』这一支被**削弱**（不是证伪）：尺子加宽到 "
-                    f"8 条流、同一格半宽实测缩到 3 流的 {med_hw:g} 倍"
-                    f"（中位数，逐格 {hw_ratio}），T=1 那一列仍然处处含 0 ⇒ v1 那句 q=0 更偏'效应确实小'。"
-                    f"分母是 {denom8} 格不是 9 格（中数据档没有 8 流网格），与 q 不许比大小")
+    if not grids8:
+        # 空表在这里有两种毒：`all(v < 1 for v in {})` 恒真 ⇒ 前置·丙会"通过"；
+        # `statistics.median([])` 当场崩。两者都不许发生，所以整段走 NA、判词记 None 而不是记 True。
+        read_b8, q8_hits, t86_hits, denom8, med_hw, hw_ratio = {}, None, None, 0, None, {}
+        丙, 甲 = None, None
+        section2 = (f"(不适用) 任务 {DATASET} 名下没有 8 条流的 v4c 网格账 ⇒ 段② 的甲（共流嵌套）与丙（半宽变窄）"
+                    f"都没有原料，q8 无从定义。**不适用不等于通过**：这一发只买 3 条流那一档，"
+                    f"理由 = 第廿七发 (u)『补流数 = 买分辨率』已有反例（六格半宽比 0.602~1.441、两格 ≥1）")
+        print(f"\n[段②] {section2[:130]}…")
     else:
-        section2 = (f"(ii) q8 = {q8_hits}/{denom8} ≥ 1 ⇒ 『3 条流功效不够』直接坐实：8 条流量得出的东西 "
-                    f"3 条流量不出 ⇒ v1 那句 q=0 降级为功效陈述；出口 (a) 的承重整个挪到 t_slope_paired 那条"
-                    f"差之差上（v1 落地③ 本已这么写，这里不动它的判决）")
-    print(f"  段② 判词：{section2[:150]}…")
+        read_b8 = read_B(grids8)
+        q8_hits, t86_hits = print_B(read_b8, "B2（段②）· 同一件事、同一把 α×T 网格，尺子换成 8 条流",
+                                    len(grids8) * len(GRID_ALPHAS))
+        denom8 = len(grids8) * len(GRID_ALPHAS)
+        hw_ratio: dict[str, float] = {}
+        for tier in read_b8:
+            for a in GRID_ALPHAS:
+                k = f"α={a:g},T=1"
+                hw_ratio[f"{tier} × α={a:g}"] = round(
+                    half_width(read_b8[tier]["offset_by_cell"][k])
+                    / half_width(read_b[tier]["offset_by_cell"][k]), 3)
+        丙 = all(v < 1 for v in hw_ratio.values())
+        甲 = (not red6) and stats["nest_rows"] > 0
+        med_hw = round(statistics.median(list(hw_ratio.values())), 3)
+        print(f"  前置·丙（同一格 8 流半宽 ÷ 3 流半宽，判据只要求 < 1；σ̂ 不变时预期 ≈ "
+              f"{T95[8] / T95[3] * (3 / 8) ** 0.5:.3f}）："
+              + "  ".join(f"{k.split(' × ')[0]}·{k.split('α=')[-1]}:{v}" for k, v in hw_ratio.items())
+              + f" ⇒ {'全 < 1，通过' if 丙 else '有格 ≥ 1，段② 不可用'}")
+        print(f"  前置·甲（闸 VI 共流嵌套）{'通过' if 甲 else '不过'}：比了 {stats['nest_rows']} 行、红 {len(red6)} 条；"
+              f"前置·乙（闸 IV 含 8 流两对）已在上面钉住")
+        if not (甲 and 丙):
+            section2 = (f"(u) 前置不过 ⇒ 本段只报数，不产出任何话。甲红 {len(red6)} 条（比了 {stats['nest_rows']} 行）、"
+                        f"丙半宽比 {hw_ratio} ⇒ 两把尺子要么不嵌套、要么加宽没换来更窄的区间，"
+                        f"'8 流仍然测不出'这句话没有凭据（这一段没测到，不叫通过）")
+        elif q8_hits == 0:
+            section2 = (f"(i) q8 = 0/{denom8} 且甲乙丙全过 ⇒ 『3 条流测不动』这一支被**削弱**（不是证伪）：尺子加宽到 "
+                        f"8 条流、同一格半宽实测缩到 3 流的 {med_hw:g} 倍"
+                        f"（中位数，逐格 {hw_ratio}），T=1 那一列仍然处处含 0 ⇒ v1 那句 q=0 更偏'效应确实小'。"
+                        f"分母是 {denom8} 格不是 9 格（中数据档没有 8 流网格），与 q 不许比大小")
+        else:
+            section2 = (f"(ii) q8 = {q8_hits}/{denom8} ≥ 1 ⇒ 『3 条流功效不够』直接坐实：8 条流量得出的东西 "
+                        f"3 条流量不出 ⇒ v1 那句 q=0 降级为功效陈述；出口 (a) 的承重整个挪到 t_slope_paired 那条"
+                        f"差之差上（v1 落地③ 本已这么写，这里不动它的判决）")
+        print(f"  段② 判词：{section2[:150]}…")
 
+    # 第廿八发：把 (u) 固化成开口预检之后，这里顺手摆出**另一把尺**上的同一形状（每格 gap 的 CI 半宽，
+    # 族内九格）。它跟上面丙那六格（跨族 offset）是两个量，所以两行都印、各标各的口径。
+    # 档的来源也跟着分叉：有 8 流原料时问段② 那两档（与丙同坐标），没有就问本趟真在读的那几档——
+    # 预检在 Fashion 上必然报"无从开口"（同坐标只有一本 3 流账），而那句话本身就是要留下的记录。
+    print("  [开口预检·第廿八发固化 (u)] 与丙不同量：下面比的是**每格 gap** 的 CI 半宽（族内、九格），"
+          "由 step4c.power_preflight 现读盘上同坐标的相邻两本：")
+    for _fam in ("mlp", "cnn"):
+        for _t in sorted(read_b8 if grids8 else read_b):
+            sc.power_preflight(128, _t, where=f"step4l {'段②' if grids8 else '换任务'}·{_fam}", arch=_fam)
+
+    # ---- 换任务那一趟的对照（第七维换取值）：与 MNIST 同名格并排。不配对、不合并分母 ----
+    xtask = None
+    if DATASET != "mnist":
+        cmp_table, _, _ = cross_task(read_b, read_baseline())
+        xc = xt_counts(cmp_table)
+        p, w = xc["T1_column_pre_registered"], xc["whole_grid_descriptive"]
+        xtask = {"buys": "第廿八发 D：把『同数据、同老师、只换学生族』那条跨族 offset 搬到第二个任务上",
+                 "baseline_book": MNIST_V2.name, "cells": cmp_table,
+                 "denominators": (f"两种读法都算：primary = 预登记字面那 {p['n_cells']} 格（T=1 那一列，与 q 同口径）"
+                                  f"⇒ 进判据；whole = 读法 B 整张网格 {w['n_cells']} 格（{len(grids)} 档 × "
+                                  f"{len(GRID_ALPHAS)} 个 α × {len(TEMPS)} 个 T）⇒ 只作描述。预登记那句只写了"
+                                  f"『那 9 格』没写口径，落地时如实登记为它自己的缺陷（见 docstring 落地段），"
+                                  f"两种读法的出口都在 `exit` 那一格里"),
+                 "T1_column_pre_registered": {k: v for k, v in p.items() if k != "hits"} | {"cells_out_of_zero": p["hits"]},
+                 "whole_grid_descriptive": {k: v for k, v in w.items() if k != "hits"} | {"cells_out_of_zero": w["hits"]},
+                 "leg_check": " ".join(x for x in (mag_leg_note("primary（T=1 那一列）", p),
+                                                   mag_leg_note("whole（整张网格）", w)) if x)
+                                or "两种读法的『量级相当』腿都**不是**恒真（各自有区分度）",
+                 "not_paired": "两任务的流、图、老师都不是同一批 ⇒ 这里没有差之差的 CI，只有两条各自成立的 CI；"
+                               f"Fashion 的 {w['n_cells']} 格与 MNIST 的 {w['n_cells']} 格不许并成一个计数"}
+        print(f"\n[换任务对照] 按预登记字面（T=1 那一列 {p['n_cells']} 格）配对 CI 不含 0 = {p['n_hit']} 格"
+              f"（同号 {p['n_agree']}、量级对上 {p['n_mag']}）；整张网格 {w['n_cells']} 格口径则是 "
+              f"{w['n_hit']} 格（同号 {w['n_agree']}、量级 {w['n_mag']}）"
+              f"（基准 {MNIST_V2.name}；两本同格子、非配对）")
+        print(f"[换任务对照·腿自查] {xtask['leg_check']}")
     # ---- 拆红档的裁决（先于正常模式的出口判定；红档不写档案）----
     if red == "--tierblind":
         if not red3:
@@ -569,7 +951,11 @@ def main(red: str = "") -> None:
                          f" ⇒ 先查账，本发不停在判词上")
 
     # ---- 出口判定（预登记那四格：(d) 已在闸 IV 处当场退出）----
-    exit_rule = (
+    if DATASET != "mnist":
+        exit_rule = exit_fashion(q_hits, cmp_table)
+        print(f"\n[出口 · 换任务] {exit_rule[:150]}…")
+    else:
+        exit_rule = (
         f"(a) 交互成立：q={q_hits}（T=1 那一列 9 格处处测不出）、p={p_hits}（T=6 那一列 9 格里 "
         f"{p_hits} 格测得出），而闸 IV 已把两族的软标签形状钉成同一份 ⇒ 那条跨族差既不是『CNN 天生抗蒸馏』、"
         f"也不是『两族读到的形状不同』，是**这份形状 × 这个学生族**的交互"
@@ -582,6 +968,14 @@ def main(red: str = "") -> None:
         f"『近似档无关的跨族偏移』仍然只是点估计，本发不给它加任何方向词")
 
     report = {
+        "dataset": DATASET,
+        "dataset_applicability": (
+            f"任务 = {DATASET}。这一本名下只有 3 流 α×T 网格（两族 × 三档），没有 α→0 阶梯、也没有 8 流网格"
+            "⇒ 读法 A、段②、闸 VI 三处在这一本里都是**不适用**（各有各的 `…_applicability` 键说明），"
+            "不适用不等于通过，更不等于 0 格命中；而 MNIST 那本在册账没有 `dataset` 这一位（记于任务位上线之前），"
+            "对照它时按历史口径读成 mnist"
+            if DATASET != "mnist" else
+            "本发在册三张账表（阶梯 / 3 流网格 / 8 流网格）全部落在这一个任务上，无一格跨任务"),
         "quantity": "跨族偏移（CNN 学生 − MLP 学生，同一份软标签）跟不跟软标签的温度走：先逐流配对，"
                     "再看它在 T=1 / T=3 / T=6 三列上各是多少",
         "pays": "step4f_alpha_curve.py 落地⑤（『逐流配对、CI、同号由第廿五发现算』那句欠账）",
@@ -597,28 +991,46 @@ def main(red: str = "") -> None:
                   "闸IV_形状互锁": f"两族 {nine} 格体检逐位相同（{len(grids)} 对 3 流 + {len(grids8)} 对 8 流 × "
                                    f"T∈{{1,3,6}}；段② 的前置·乙）+ 现算（{AUDIT_TIER} × {n_data} 张 × "
                                    f"T∈{{1,3,6}} × {len(AUDIT_KEYS)} 量）逐位相同 + 老师精度 {t_acc:.4f}",
-                  "闸VI_共流嵌套性": f"8 流两对 vs 同档 3 流两对：共有流 × 共有格共 {stats['nest_rows']} 行 × "
+                  "闸VI_共流嵌套性": (f"8 流两对 vs 同档 3 流两对：共有流 × 共有格共 {stats['nest_rows']} 行 × "
                                      f"3 字段逐位相同（红 {len(red6)} 条）；0 行算『没测到』不算通过"
-                                     f"（段② 的前置·甲）",
+                                     f"（段② 的前置·甲）" if not vi_na else
+                                     f"**不适用**（任务 {DATASET}）：这一本名下两族都没有 8 流网格账，"
+                                     f"甲前置没有原料 ⇒ 不记红也不记通过（写成『比了 0 行、红 0 条』会让读者"
+                                     f"以为闸跑过了）"),
                   "闸V_来源": "每个数带 (档案名, 格名, 流名单)，见各格 `provenance` 与 `offset_by_seed`"},
         "reading_A_paired_T6_8flows": read_a,
+        "reading_A_applicability": ("全档齐备（三对阶梯账都在册）" if read_a else
+                                    f"**不适用**（任务 {DATASET}）：读法 A 吃的是两族各自的 α→0 阶梯账，"
+                                    f"这一本名下 CNN 侧一格都没造过 ⇒ 上面那张空表的意思是『无从开口』，"
+                                    f"不是『测过了且 p=0（即测不出跨族差）』；p 的分母因此是 0，不参与任何计数"),
         "reading_B_offset_vs_T_3flows": read_b,
         "reading_B2_offset_vs_T_8flows": read_b8,
         "section2_power_check": {"buys": "上面 docstring 落地⑧ 第 3 笔：q=0 里『效应为 0』与『3 条流测不动』分不开",
                                  "q8_T1_cells_out_of_zero": q8_hits,
-                                 "denominator": f"{denom8} 格（{len(grids8)} 档 × α∈{{0.3,0.7,1.0}} 的 T=1 列）"
-                                                f"——不是读法 B 的 9 格，中数据档两族都没有 8 流网格",
+                                 "denominator": (f"{denom8} 格（{len(grids8)} 档 × α∈{{0.3,0.7,1.0}} 的 T=1 列）"
+                                                 f"——不是读法 B 的 9 格，中数据档两族都没有 8 流网格" if grids8 else
+                                                 f"**不适用**（任务 {DATASET}）：0 档有 8 流网格 ⇒ q8 无从定义，"
+                                                 f"这里的 0 不是『六格全含 0』那个意思"),
                                  "half_width_ratio_8_over_3": hw_ratio,
                                  "half_width_ratio_median": med_hw,
                                  "ex_ante_expected_ratio": round(T95[8] / T95[3] * (3 / 8) ** 0.5, 3),
-                                 "precondition_甲_嵌套": f"{'过' if 甲 else '不过'}（比了 {stats['nest_rows']} 行、"
-                                                         f"红 {len(red6)} 条）",
-                                 "precondition_乙_形状互锁": f"闸 IV 已含 8 流两对（{nine} 格逐位相同）",
-                                 "precondition_丙_半宽变窄": f"{'过' if 丙 else '不过'}（逐格 {hw_ratio}）",
+                                 "precondition_甲_嵌套": ("不适用（本任务没有 8 流网格账，等于『没有原料』，"
+                                                        "不等于『过了』或『不过』）" if vi_na else
+                                                        f"{'过' if 甲 else '不过'}（比了 {stats['nest_rows']} 行、"
+                                                        f"红 {len(red6)} 条）"),
+                                 "precondition_乙_形状互锁": (f"闸 IV 已含 8 流两对（{nine} 格逐位相同）" if grids8 else
+                                                            f"不适用：闸 IV 只锁到 3 流那 {nine} 对，"
+                                                            f"本任务名下没有 8 流那两对"),
+                                 "precondition_丙_半宽变窄": ("不适用（同上，没有可比的相邻两本）" if not grids8 else
+                                                            f"{'过' if 丙 else '不过'}（逐格 {hw_ratio}）"),
                                  "exit": section2, "verdict": section2,
                                  "T6_column_8flows_descriptive": t86_hits,
-                                 "not_a_re_verdict": "R1：这一段不重开出口——`exit`/`verdict` 两个顶层键与 v1 逐字"
-                                                     "相同，段② 只住在这一个独立键里"},
+                                 "not_a_re_verdict": ("R1：这一段不重开出口——`exit`/`verdict` 两个顶层键与 v1 逐字"
+                                                     "相同，段② 只住在这一个独立键里" if DATASET == "mnist" else
+                                                     "R1（换任务口径）：段② 的判词只住在 `section2_power_check` 里，"
+                                                     "不回头改顶层 `exit`；顶层那一格在本发是 (a)/(b)/(m)/(u) 四格，"
+                                                     "由 `task_switch_crosscheck` 的计数决定"),
+        },
         "counts": {"p_A_cells_out_of_zero": p_hits, "p_A_cells_total": len(p_cells),
                    "q_B_T1_cells_out_of_zero": q_hits, "q_B_T1_cells_total": len(grids) * len(GRID_ALPHAS),
                    "B_T6_cells_out_of_zero_descriptive": t6_hits,
@@ -627,59 +1039,119 @@ def main(red: str = "") -> None:
                    "nested_rows_compared": stats["nest_rows"]},
         "shape_identity": {"两族软标签体检逐位相同": f"{nine}/{(len(grids) + len(grids8)) * len(TEMPS)} 格"
                                                    f"（{len(grids)} 对 3 流 + {len(grids8)} 对 8 流 × T∈{{1,3,6}}）",
-                          "老师在这个拟合集上的精度": TEACHER_ARCHIVE_ACC},
-        "v2_increment": "v2 相对 v1 只多了段② 那几位（reading_B2_offset_vs_T_8flows、section2_power_check、"
-                        "counts 里三枚 q8/嵌套计数、gates 里的闸VI）＋闸 IV 的参评对数（3 对→5 对）与由此带动的"
-                        "活计数（II-a 行数 / II-b 次数 / 本数）。`quantity`、`pays`、`sign_convention`、`exit`、"
-                        "`verdict`、`reading_A_paired_T6_8flows`、`reading_B_offset_vs_T_3flows` 与 v1 逐字段相同"
-                        "⇒ 除这些位之外任何一处不相同，就是这段升版把判决碰着了",
+                          "老师在这个拟合集上的精度": acc_archive},
+        "task_switch_crosscheck": (xtask if xtask else
+                                   "不适用：本趟任务就是对照基准那一侧（`reading_B_offset_vs_T_3flows` 那 9 格"
+                                   "是被比的那一份），换任务那一趟读的是另一本档案"),
+        "v2_increment": ("v2 相对 v1 只多了段② 那几位（reading_B2_offset_vs_T_8flows、section2_power_check、"
+                         "counts 里三枚 q8/嵌套计数、gates 里的闸VI）＋闸 IV 的参评对数（3 对→5 对）与由此带动的"
+                         "活计数（II-a 行数 / II-b 次数 / 本数）。`quantity`、`pays`、`sign_convention`、`exit`、"
+                         "`verdict`、`reading_A_paired_T6_8flows`、`reading_B_offset_vs_T_3flows` 与 v1 逐字段相同"
+                         "⇒ 除这些位之外任何一处不相同，就是这段升版把判决碰着了"
+                         if DATASET == "mnist" else
+                         "本发（换任务）新增的位：`dataset`、`dataset_applicability`、`task_switch_crosscheck`、"
+                         "两处 applicability 文案与 gates 里闸VI 的不适用分支。读法 B 那一格的代码路径与 MNIST "
+                         "那本逐字相同（同一个 `read_B`），**没有 v1 可比**——MNIST 侧的 v1→v2 那条声明指的是 "
+                         "`compress_report_v4l_soft_shape_family_v2.json`，与本本无关"),
         "exit": exit_rule, "verdict": exit_rule,
         "cost": {"arm_trainings": 0, "total": 0, "api_fee": 0,
-                 "note": f"纯读档 + 一次老师前向：{n_books} 本在册账的原始错图数逐流相减，不训练任何学生。"
-                         f"但段② 不是免费的：它吃的三本 8 流 v4c 网格（`compress_report_v4c_cnn_n8.json` / "
-                         f"`compress_report_v4c_cnn_low_n8.json` / `compress_report_v4c_low_n8.json`）"
-                         f"是 step4c 那 88×3 = 264 次训练换来的，训练数记在那一发，不记在本脚本"},
+                 "note": (f"纯读档 + 一次老师前向：{n_books} 本在册账的原始错图数逐流相减，不训练任何学生。"
+                          f"但段② 不是免费的：它吃的三本 8 流 v4c 网格（`compress_report_v4c_cnn_n8.json` / "
+                          f"`compress_report_v4c_cnn_low_n8.json` / `compress_report_v4c_low_n8.json`）"
+                          f"是 step4c 那 88×3 = 264 次训练换来的，训练数记在那一发，不记在本脚本"
+                          if DATASET == "mnist" else
+                          f"本趟同样 0 次训练、零 API 费：{n_books} 本 Fashion 在册账（6 本 v4c 网格 = "
+                          f"第廿八发 D 那 198 次训练换的，训练数记在 step4c 那一发）逐流相减 + 一次 Fashion "
+                          f"老师前向（{teacher_pt.name}）。对照基准 {MNIST_V2.name} 是读档，不重算。"
+                          f"**换任务这一趟买的是 {n_books} 本新账，那一头的 234 次已经花掉了，不记在本脚本**"),
+                 "paid_elsewhere": (None if DATASET == "mnist" else
+                                    "第廿八发 D：6 本 v4b 底 × 6 次 = 36 ＋ 6 本 v4c 网格 × 33 次 = 198 ⇒ 本趟读的"
+                                    "那 12 本账付 234 次；**但这一发实付 250 次** —— 多出的 16 次来自预检件"
+                                    " `_preflight_fashion.py` 的 [6] 腿：它本意是'零训练地真跑一次 CLI'，"
+                                    "却因盘态判窄（只枚举了两种盘态）在第三种盘态下真去训练了，产出一本计划外的 "
+                                    "`compress_report_v4b_fashion_n8.json`（fashion × MLP × 满数据档 × 8 条流，"
+                                    "2 个臂 × 8 条流 = 16 次）。"
+                                    "**本趟不读那一本**，所以它不进任何判据，但它花掉的 16 次是这一发的账")},
         "limitations": [
             "两把尺子不许横比：读法 A 是 8 条流、读法 B 是 3 条流，σ̂ 与 CI 半宽都不同；"
             "B 只回答『偏移跟不跟 T 走』，不回答『偏移是多少张』——后者只由 A 报",
             "『形状同一份』由闸 IV 钉（读档 + 现算）。它排除的是『两族读的不是同一批软标签』这一支，"
             "不排除『同一份形状对不同架构作用不同』——恰恰后者是本发的读数对象",
-            "本发不新增任何独立性维度：七维（档/宽/族/任务/老师/温度列/流数）一维都没换，"
-            "换的是**归因**（把点估计买成配对读数）⇒ 既不叫复证也不叫翻案",
+            ("本发不新增任何独立性维度：七维（档/宽/族/任务/老师/温度列/流数）一维都没换，"
+             "换的是**归因**（把点估计买成配对读数）⇒ 既不叫复证也不叫翻案" if DATASET == "mnist" else
+             "本发换的正是七维里的**任务**那一维（档/宽/族/老师/温度列/流数都没换）。但它**不叫复证**："
+             "复证要的是同名坐标上的两本对照，这里是给同一个读数买第二个任务的取值 ⇒ 一条跨任务边界读数，"
+             "第廿五发那句归因既不因此扩界也不因此作废（扩与不扩由 `exit` 那一格说）"),
             "读法 B 的温度只有三个点且带并列 ⇒ 这里不报相关系数：3 点、带 ties 的 Spearman ρ 在任何"
             "预登记口径下都够不着判定门槛，报了就是给噪声配一个数字",
-            "出口 (a) 只数『CI 不含 0 的格数』；不含 0 的格落在哪一档、三档是否同号，全部写在 "
-            "`reading_A_paired_T6_8flows` 里由读者自己看，本发不据它另立一句判词",
-            f"阶梯三对里有 {len(v4_mlp)} 对的 MLP 本记的是 v4 时代的判据（{'、'.join(v4_mlp)}）：它们的 "
-            f"`student_arch` 字段是缺的 ⇒ 家族位这件事只由文件名定；本发只取它们的原始错图数"
-            "（`wrong_ce`/`wrong_kd`/`gap_imgs` 与判据版本无关），**不取它们的判词** ⇒ 谁引用这一格的形状判词，"
-            "不许把 v4 账与 v5 账混作一版（档案里没有'这本在 v5 之下怎么判'的字段，守卫也没替它复算过）",
-            "段② 只把**流数**这一维从 3 加宽到 8，档/宽/族/任务/老师/温度列一维都没换 ⇒ 它加强的是"
-            "读法 B 那条结论的**功效**，不是它的外部效度；而且 q8 的分母是 6 格（中数据档两族都没有 8 流"
-            "网格）——与 q 的 9 格不许比大小，只许各自报数",
-            "(i) 那一支只**削弱**不证伪『3 条流测不动』：8 条流仍可能功效不足（判据只要求半宽比 < 1，"
-            "没要求窄到能测出某个预先指定的效应量）⇒ 谁要把 q=0 读成『T=1 处跨族差为 0』，"
-            "那是把『更宽的尺子也量不出』读成『量为 0』",
+            ("出口 (a) 只数『CI 不含 0 的格数』；不含 0 的格落在哪一档、三档是否同号，全部写在 "
+             "`reading_A_paired_T6_8flows` 里由读者自己看，本发不据它另立一句判词" if DATASET == "mnist" else
+             "出口那一格只数计数（n_hit / n_agree / n_mag）；不含 0 的格落在哪一档、两任务各是多少张、CI 端点，"
+             "全部写在 `task_switch_crosscheck.cells` 里由读者自己看，本发不据它们另立一句判词"),
+            ([] if DATASET != "mnist" else
+             [f"阶梯三对里有 {len(v4_mlp)} 对的 MLP 本记的是 v4 时代的判据（{'、'.join(v4_mlp)}）：它们的 "
+              f"`student_arch` 字段是缺的 ⇒ 家族位这件事只由文件名定；本发只取它们的原始错图数"
+              "（`wrong_ce`/`wrong_kd`/`gap_imgs` 与判据版本无关），**不取它们的判词** ⇒ 谁引用这一格的形状判词，"
+              "不许把 v4 账与 v5 账混作一版（档案里没有'这本在 v5 之下怎么判'的字段，守卫也没替它复算过）"])
+            + (["本任务名下没有 α→0 阶梯账 ⇒ 上面那句『v4 判据 vs v5 判据』的债在 Fashion 这一本上还不存在"
+                "（不是已还清）：新造的 12 本全部记于 v5 之后，`student_arch` 字段齐备。"
+                "这条债真正的形状是『家族位只由文件名定』，Fashion 那 12 本同样只由文件名定，谁改名谁断链"]
+               if DATASET != "mnist" else []),
+            *([] if DATASET != "mnist" else [
+                "段② 只把**流数**这一维从 3 加宽到 8，档/宽/族/任务/老师/温度列一维都没换 ⇒ 它加强的是"
+                "读法 B 那条结论的**功效**，不是它的外部效度；而且 q8 的分母是 6 格（中数据档两族都没有 8 流"
+                "网格）——与 q 的 9 格不许比大小，只许各自报数",
+                "(i) 那一支只**削弱**不证伪『3 条流测不动』：8 条流仍可能功效不足（判据只要求半宽比 < 1，"
+                "没要求窄到能测出某个预先指定的效应量）⇒ 谁要把 q=0 读成『T=1 处跨族差为 0』，"
+                "那是把『更宽的尺子也量不出』读成『量为 0』",
+            ]),
+            *([] if DATASET == "mnist" else [
+                "两个任务的格数不许相加：Fashion 的 9 格与 MNIST 的 9 格各配各的流、各配各的老师，"
+                "`task_switch_crosscheck` 里只有『两条各自成立的 CI』与『同号与否』，"
+                "没有差之差的 CI ⇒ 谁把 n_hit 写成 18 格里的命中数，那是把两把尺子当一把",
+                "『量级相当』在本发只有这一个可核形式 = MNIST 该格的**点估计**落在 Fashion 该格的配对 CI 内；"
+                "它不等于两任务的 CI 重叠（那是更宽的要求），也不等于斜率相同 ⇒ 出口 (m) 就是为"
+                "『方向跟、高度不跟』那一格留的，不许把它读成 (a) 或 (b)",
+                f"这一本三档全部只有 3 条流（未买 8 条流那一档）：理由 = 第廿七发 (u) 实测『补流数 = 买分辨率』"
+                f"有反例（六格半宽比 0.602~1.441、两格 ≥1），花 88 次/本不保证买到更窄的区间 ⇒ "
+                f"所以本本的 q/命中数**没有段② 那条加宽尺子兜底**，测不出只能记成『没量过』",
+                "MNIST 那 26 本在册账一个数字都没重测：本发只新增 Fashion 名下这 12 本（6 底 + 6 网格）的读数 ⇒ "
+                "『跨任务』这句话的对照侧永远指向盘上那本 v2（按内容核身份，见 `read_baseline`），"
+                "不是指向一个新算出来的 MNIST 数",
+            ]),
         ],
-        "red_modes": {"--tierblind": "把低数据档的 MLP 阶梯换成中数据档那本（流名单仍相同）⇒ 只有闸 III 该红，"
-                                     "且闸 I 必须全绿（两腿分离）",
-                      "--unpair": "把配对里 CNN 那一侧整体错开一位 ⇒ 只有闸 II-b 该红；II-a、闸 I、闸 III 全绿"
-                                  "（实测不变的只有**点估计与两族各自的逐侧均值**——CI 端点会跟着配对移动，"
-                                  "所以看得见它的仍然是逐流序列；预登记那句'CI 宽度不动'是断言过头，见落地⑥）",
-                      "--nest": "（v2 新增，钉闸 VI）把满数据档 8 流 CNN 那本 `match_T6` 里种子 42 的 "
-                                "`wrong_ce` 在内存里 +1 ⇒ 只有闸 VI 该红：那一格既不进读法 A/B 的 9 个 α×T 格"
-                                "（所以 II-a 看不见它），也不动档/宽/族/流名单（所以闸 I、III 看不见它）"},
+        "red_modes": ({"--tierblind": "把低数据档的 MLP 阶梯换成中数据档那本（流名单仍相同）⇒ 只有闸 III 该红，"
+                                      "且闸 I 必须全绿（两腿分离）",
+                        "--unpair": "把配对里 CNN 那一侧整体错开一位 ⇒ 只有闸 II-b 该红；II-a、闸 I、闸 III 全绿"
+                                    "（实测不变的只有**点估计与两族各自的逐侧均值**——CI 端点会跟着配对移动，"
+                                    "所以看得见它的仍然是逐流序列；预登记那句'CI 宽度不动'是断言过头，见落地⑥）",
+                        "--nest": "（v2 新增，钉闸 VI）把满数据档 8 流 CNN 那本 `match_T6` 里种子 42 的 "
+                                  "`wrong_ce` 在内存里 +1 ⇒ 只有闸 VI 该红：那一格既不进读法 A/B 的 9 个 α×T 格"
+                                  "（所以 II-a 看不见它），也不动档/宽/族/流名单（所以闸 I、III 看不见它）"}
+                       if DATASET == "mnist" else
+                       {"本任务名下不可跑": f"三档注入点（阶梯错档 / 配对错位 / 8 流 `match_T6` +1）全部写在 MNIST "
+                                            f"那三张账表上，任务换成 {DATASET} 之后那些本根本不参评 ⇒ 硬跑只会安静地"
+                                            f"红在别处，那不算拆红。`main()` 在这一趟遇到 `--tierblind`/`--unpair`/"
+                                            f"`--nest` 会当场退出（零训练脚本没有'重跑一遍'的代价，所以拒得起来）；"
+                                            f"闸 III / II-a / II-b / 闸 IV 这四道在本本上是**真跑过**的，"
+                                            f"它们吃的注入与 MNIST 那本是同一份代码路径"}),
     }
+    check_report_shape(report)
     OUT.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\n已存 {OUT.name}（0 次训练、零 API 费）· {exit_rule[:90]}…")
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="第4课l（零训练）：跨族偏移拆给形状还是拆给交互"
-                                             "（v2 多段②：把读法 B 的 T=1 那一列搬到 8 条流的尺子上）")
+                                             "（v2 多段②：把读法 B 的 T=1 那一列搬到 8 条流的尺子上；"
+                                             "第廿八发 D 加任务位：同一句问话搬到第二个任务）")
     ap.add_argument("--tierblind", action="store_true", help="把低数据档的 MLP 阶梯换成中数据档那本 ⇒ 只红闸 III")
     ap.add_argument("--unpair", action="store_true", help="把配对里 CNN 那一侧错开一位 ⇒ 只红闸 II-b")
     ap.add_argument("--nest", action="store_true",
                     help="给 8 流 CNN 那本 match_T6 的种子42 的 wrong_ce 内存里 +1 ⇒ 只红闸 VI（共流嵌套性）")
+    ap.add_argument("--dataset", choices=DATASETS, default=DATASET,
+                    help="读哪一组任务的在册账（choices 来自登记处，不在这里另列名单）。"
+                         "非 mnist 时三档拆红一律当场退出——注入点写在 MNIST 的账表上，那些本不参评")
     a = ap.parse_args()
-    main(red="--tierblind" if a.tierblind else "--unpair" if a.unpair else "--nest" if a.nest else "")
+    main(red="--tierblind" if a.tierblind else "--unpair" if a.unpair else "--nest" if a.nest else "",
+         ds=a.dataset)

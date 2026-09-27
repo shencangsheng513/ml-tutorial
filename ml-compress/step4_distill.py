@@ -69,6 +69,44 @@ TICK_MS = 0.001     # paired_timing 只留 3 位小数 = 一格 1µs；在 0.015
                     # 比对照臂量出来的 0.76% 底大一个数量级——底必须按被测臂自己的刻度重算
 
 
+# ---------- 任务登记处：换任务是这本账的判别维度 ----------
+# 第廿八发 D（把"跨族偏移"搬到第二个任务上）前置：名字里的任务位、装载器、老师权重、老师的档案精度
+# 只在这里各一份。两处各拼一遍 = 第二把尺子（同一形状在流数位上摔过，见 step4c.v4b_path 那段）。
+# 为什么住在本模块而不是 step6：step6 在模块级 import step4c，而 step4b/step4c 都要问这张表
+# ⇒ 表若住在 step6，那两个脚本一 import 它就成环（本轮现读到的硬前置）。所以 fashion 那支只能延迟 import。
+DATASETS = ("mnist", "fashion")
+DATASET_SUFFIX = {"mnist": "", "fashion": "_fashion"}    # mnist 不贴：那是 26 本历史账的名字，改名等于换身份
+TEACHER_PT = {"mnist": "mnist_cnn_fp32.pt", "fashion": "fashion_cnn_fp32.pt"}
+FASHION_ARCHIVE = HERE / "compress_report_v6_fashion.json"
+
+
+def dataset_loader(name: str):
+    """该任务的装载函数，签名一律是 `load_split()` 那一套（返回 xtr / ytr / xte / yte）。
+
+    未登记的名字必须硬退出而不是回落 MNIST：回落出来的那本账顶着 `_fashion` 的名字记着 MNIST 的读数。"""
+    if name == "mnist":
+        return load_split
+    if name == "fashion":
+        from step6_fashion_replication import load_fashion      # 延迟 import，理由见上面那张表
+        return load_fashion
+    raise SystemExit(f"任务 {name!r} 没登记装载器：DATASETS 只有 {list(DATASETS)}。"
+                     f"悄悄回落到 MNIST 等于用别的任务的读数判这一本")
+
+
+def teacher_archive_acc(name: str) -> float:
+    """老师的档案精度，从**那一本任务自己的账**现读（MNIST 记在第4课那本的常数里，Fashion 记在 v6 里）。
+
+    为什么不写第二套字面量：抄一份数字进代码，档案一改就对上老账了——档案是唯一来源，这里只负责读。"""
+    if name == "mnist":
+        return TEACHER_ARCHIVE_ACC
+    if name == "fashion":
+        if not FASHION_ARCHIVE.exists():
+            raise SystemExit(f"缺 {FASHION_ARCHIVE.name}——Fashion 那副老师的档案精度只记在那本账里，"
+                             f"抄数进代码等于把「档案一改就对上老账」那条路重新打开")
+        return float(json.loads(FASHION_ARCHIVE.read_text(encoding="utf-8"))["teacher"]["test_acc"])
+    raise SystemExit(f"任务 {name!r} 没登记档案精度来源：DATASETS 只有 {list(DATASETS)}")
+
+
 # ---------- 以「流」为单位的汇总：全板块一把尺子 ----------
 # 表放在这里而不是各脚本自带：补流数时必须连系数表一起改，回落成默认值等于用错刻度（第4课e 的教训）
 # n=16 那两格不是查表抄来的：`_coef_check.py` 现算（D4=2n∫xΦ^(n-1)φ 的 Simpson 积分、

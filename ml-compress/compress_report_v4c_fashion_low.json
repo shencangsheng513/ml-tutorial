@@ -1,0 +1,865 @@
+{
+  "tier": "低数据2000",
+  "width": 128,
+  "student_arch": "mlp",
+  "dataset": "fashion",
+  "alphas": [
+    0.3,
+    0.7,
+    1.0
+  ],
+  "temps": [
+    1.0,
+    3.0,
+    6.0
+  ],
+  "seeds": [
+    42,
+    7,
+    2026
+  ],
+  "n_seeds_arg": 3,
+  "test_n": 10000,
+  "train_fit_n": 8500,
+  "power_preflight_ex_ante": {
+    "applicable": false,
+    "reason": "本发用 3 条流，盘上没有同坐标、流数相邻的两本可比 ⇒ 预检不适用（不适用不等于通过）"
+  },
+  "anchor_hyperparams": {
+    "alpha": 0.7,
+    "T": 3.0
+  },
+  "anchor_archive_from": "compress_report_v4b_fashion_low.json",
+  "seed_floor_imgs_from_v4b": 36,
+  "seed_floor_imgs_detail": {
+    "gate_used_kd_arm": 36,
+    "ce_arm": 80,
+    "note": "被门控量是 KD−CE 之差；CE 底更大时，介于两数之间的读数按保守底就不显著"
+  },
+  "soft_label_audit_by_T": {
+    "a1_T1": {
+      "T": 1.0,
+      "原始": {
+        "T": 1.0,
+        "mean_top1": 0.8976,
+        "pct_top1_gt_0.99": 42.3,
+        "mean_margin_top1_top2": 0.8181,
+        "mean_p2": 0.0795
+      },
+      "除以T": {
+        "T": 1.0,
+        "mean_top1": 0.8976,
+        "pct_top1_gt_0.99": 42.3,
+        "mean_margin_top1_top2": 0.8181,
+        "mean_p2": 0.0795
+      }
+    },
+    "a1_T3": {
+      "T": 3.0,
+      "原始": {
+        "T": 3.0,
+        "mean_top1": 0.8976,
+        "pct_top1_gt_0.99": 42.3,
+        "mean_margin_top1_top2": 0.8181,
+        "mean_p2": 0.0795
+      },
+      "除以T": {
+        "T": 3.0,
+        "mean_top1": 0.642,
+        "pct_top1_gt_0.99": 0.1,
+        "mean_margin_top1_top2": 0.4842,
+        "mean_p2": 0.1578
+      }
+    },
+    "a1_T6": {
+      "T": 6.0,
+      "原始": {
+        "T": 6.0,
+        "mean_top1": 0.8976,
+        "pct_top1_gt_0.99": 42.3,
+        "mean_margin_top1_top2": 0.8181,
+        "mean_p2": 0.0795
+      },
+      "除以T": {
+        "T": 6.0,
+        "mean_top1": 0.3884,
+        "pct_top1_gt_0.99": 0.0,
+        "mean_margin_top1_top2": 0.2206,
+        "mean_p2": 0.1679
+      }
+    }
+  },
+  "gradient_probe": {
+    "t2_tolerance_pct": 15.0,
+    "matched_temps": [
+      6.0
+    ],
+    "unmatchable_temps": [
+      1.0
+    ],
+    "by_T": {
+      "1.0": {
+        "g_ce": 0.97079,
+        "g_kd_unit": 0.89784,
+        "kd_share_at_anchor_alpha": 0.683,
+        "g_kd_drift_vs_anchor_pct": -60.9,
+        "alpha_to_match_anchor": 1.791,
+        "matchable": false
+      },
+      "3.0": {
+        "g_ce": 0.97079,
+        "g_kd_unit": 2.29772,
+        "kd_share_at_anchor_alpha": 0.847,
+        "g_kd_drift_vs_anchor_pct": 0.0,
+        "alpha_to_match_anchor": 0.7,
+        "matchable": true
+      },
+      "6.0": {
+        "g_ce": 0.97079,
+        "g_kd_unit": 3.25363,
+        "kd_share_at_anchor_alpha": 0.887,
+        "g_kd_drift_vs_anchor_pct": 41.6,
+        "alpha_to_match_anchor": 0.494,
+        "matchable": true
+      }
+    }
+  },
+  "predictions_ex_ante": {
+    "H1_alpha_axis": [
+      {
+        "alpha": 0.3,
+        "h1_gap_imgs": 59,
+        "h1_expect_T_flat": "该 α 三个 T 之差 ≤ 种子底 36 张"
+      },
+      {
+        "alpha": 0.7,
+        "h1_gap_imgs": 137,
+        "h1_expect_T_flat": "该 α 三个 T 之差 ≤ 种子底 36 张"
+      },
+      {
+        "alpha": 1.0,
+        "h1_gap_imgs": 196,
+        "h1_expect_T_flat": "该 α 三个 T 之差 ≤ 种子底 36 张"
+      }
+    ],
+    "H1_alpha_max_T_column_flat": true,
+    "H2_alpha_max_T_column_rises": true,
+    "H1_pred_gap_imgs": {
+      "0.3": 59,
+      "0.7": 137,
+      "1.0": 196
+    }
+  },
+  "parity_anchor": {
+    "this_run": {
+      "acc": 0.828,
+      "wrong": 1720,
+      "broken": 357,
+      "fixed": 494
+    },
+    "archive": {
+      "acc": 0.828,
+      "wrong": 1720,
+      "broken": 357,
+      "fixed": 494
+    },
+    "ce_acc_this_run": 0.8143,
+    "ce_acc_archive": 0.8143
+  },
+  "cross_script_gap_parity": {
+    "verdict": "这一发没有可借的逐流账（3 条流那本底只记极差，不记逐流 gap）",
+    "flow_order_matches": null
+  },
+  "ce_ref_by_seed": {
+    "42": {
+      "acc": 0.8143,
+      "wrong": 1857
+    },
+    "7": {
+      "acc": 0.8195,
+      "wrong": 1805
+    },
+    "2026": {
+      "acc": 0.8223,
+      "wrong": 1777
+    }
+  },
+  "grid": {
+    "a0.3_T1": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 0.3,
+          "T": 1.0,
+          "wrong_kd": 1795,
+          "wrong_ce": 1857,
+          "acc_kd": 0.8205,
+          "gap_imgs": 62,
+          "broken": 99,
+          "fixed": 161,
+          "p_sign": 0.000145
+        },
+        {
+          "seed": 7,
+          "alpha": 0.3,
+          "T": 1.0,
+          "wrong_kd": 1728,
+          "wrong_ce": 1805,
+          "acc_kd": 0.8272,
+          "gap_imgs": 77,
+          "broken": 126,
+          "fixed": 203,
+          "p_sign": 2.6e-05
+        },
+        {
+          "seed": 2026,
+          "alpha": 0.3,
+          "T": 1.0,
+          "wrong_kd": 1713,
+          "wrong_ce": 1777,
+          "acc_kd": 0.8287,
+          "gap_imgs": 64,
+          "broken": 91,
+          "fixed": 155,
+          "p_sign": 5.4e-05
+        }
+      ],
+      "gaps_imgs": [
+        62,
+        77,
+        64
+      ],
+      "mean_gap_imgs": 67.7,
+      "range_imgs": 15,
+      "same_dir_as_h1": 0,
+      "pooled": {
+        "broken": 316,
+        "fixed": 519
+      },
+      "p_pooled": 0.0
+    },
+    "a0.3_T3": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 0.3,
+          "T": 3.0,
+          "wrong_kd": 1718,
+          "wrong_ce": 1857,
+          "acc_kd": 0.8282,
+          "gap_imgs": 139,
+          "broken": 205,
+          "fixed": 344,
+          "p_sign": 0.0
+        },
+        {
+          "seed": 7,
+          "alpha": 0.3,
+          "T": 3.0,
+          "wrong_kd": 1721,
+          "wrong_ce": 1805,
+          "acc_kd": 0.8279,
+          "gap_imgs": 84,
+          "broken": 286,
+          "fixed": 370,
+          "p_sign": 0.001176
+        },
+        {
+          "seed": 2026,
+          "alpha": 0.3,
+          "T": 3.0,
+          "wrong_kd": 1678,
+          "wrong_ce": 1777,
+          "acc_kd": 0.8322,
+          "gap_imgs": 99,
+          "broken": 183,
+          "fixed": 282,
+          "p_sign": 5e-06
+        }
+      ],
+      "gaps_imgs": [
+        139,
+        84,
+        99
+      ],
+      "mean_gap_imgs": 107.3,
+      "range_imgs": 55,
+      "same_dir_as_h1": 0,
+      "pooled": {
+        "broken": 674,
+        "fixed": 996
+      },
+      "p_pooled": 0.0
+    },
+    "a0.3_T6": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 0.3,
+          "T": 6.0,
+          "wrong_kd": 1716,
+          "wrong_ce": 1857,
+          "acc_kd": 0.8284,
+          "gap_imgs": 141,
+          "broken": 268,
+          "fixed": 409,
+          "p_sign": 0.0
+        },
+        {
+          "seed": 7,
+          "alpha": 0.3,
+          "T": 6.0,
+          "wrong_kd": 1724,
+          "wrong_ce": 1805,
+          "acc_kd": 0.8276,
+          "gap_imgs": 81,
+          "broken": 295,
+          "fixed": 376,
+          "p_sign": 0.00199
+        },
+        {
+          "seed": 2026,
+          "alpha": 0.3,
+          "T": 6.0,
+          "wrong_kd": 1691,
+          "wrong_ce": 1777,
+          "acc_kd": 0.8309,
+          "gap_imgs": 86,
+          "broken": 226,
+          "fixed": 312,
+          "p_sign": 0.000241
+        }
+      ],
+      "gaps_imgs": [
+        141,
+        81,
+        86
+      ],
+      "mean_gap_imgs": 102.7,
+      "range_imgs": 60,
+      "same_dir_as_h1": 0,
+      "pooled": {
+        "broken": 789,
+        "fixed": 1097
+      },
+      "p_pooled": 0.0
+    },
+    "a0.7_T1": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 0.7,
+          "T": 1.0,
+          "wrong_kd": 1715,
+          "wrong_ce": 1857,
+          "acc_kd": 0.8285,
+          "gap_imgs": 142,
+          "broken": 199,
+          "fixed": 341,
+          "p_sign": 0.0
+        },
+        {
+          "seed": 7,
+          "alpha": 0.7,
+          "T": 1.0,
+          "wrong_kd": 1699,
+          "wrong_ce": 1805,
+          "acc_kd": 0.8301,
+          "gap_imgs": 106,
+          "broken": 263,
+          "fixed": 369,
+          "p_sign": 2.8e-05
+        },
+        {
+          "seed": 2026,
+          "alpha": 0.7,
+          "T": 1.0,
+          "wrong_kd": 1732,
+          "wrong_ce": 1777,
+          "acc_kd": 0.8268,
+          "gap_imgs": 45,
+          "broken": 272,
+          "fixed": 317,
+          "p_sign": 0.069743
+        }
+      ],
+      "gaps_imgs": [
+        142,
+        106,
+        45
+      ],
+      "mean_gap_imgs": 97.7,
+      "range_imgs": 97,
+      "same_dir_as_h1": 0,
+      "pooled": {
+        "broken": 734,
+        "fixed": 1027
+      },
+      "p_pooled": 0.0
+    },
+    "a0.7_T3": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 0.7,
+          "T": 3.0,
+          "wrong_kd": 1720,
+          "wrong_ce": 1857,
+          "acc_kd": 0.828,
+          "gap_imgs": 137,
+          "broken": 357,
+          "fixed": 494,
+          "p_sign": 3e-06
+        },
+        {
+          "seed": 7,
+          "alpha": 0.7,
+          "T": 3.0,
+          "wrong_kd": 1756,
+          "wrong_ce": 1805,
+          "acc_kd": 0.8244,
+          "gap_imgs": 49,
+          "broken": 418,
+          "fixed": 467,
+          "p_sign": 0.106583
+        },
+        {
+          "seed": 2026,
+          "alpha": 0.7,
+          "T": 3.0,
+          "wrong_kd": 1736,
+          "wrong_ce": 1777,
+          "acc_kd": 0.8264,
+          "gap_imgs": 41,
+          "broken": 357,
+          "fixed": 398,
+          "p_sign": 0.145412
+        }
+      ],
+      "gaps_imgs": [
+        137,
+        49,
+        41
+      ],
+      "mean_gap_imgs": 75.7,
+      "range_imgs": 96,
+      "same_dir_as_h1": 0,
+      "pooled": {
+        "broken": 1132,
+        "fixed": 1359
+      },
+      "p_pooled": 5.87e-06
+    },
+    "a0.7_T6": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 0.7,
+          "T": 6.0,
+          "wrong_kd": 1780,
+          "wrong_ce": 1857,
+          "acc_kd": 0.822,
+          "gap_imgs": 77,
+          "broken": 461,
+          "fixed": 538,
+          "p_sign": 0.016151
+        },
+        {
+          "seed": 7,
+          "alpha": 0.7,
+          "T": 6.0,
+          "wrong_kd": 1763,
+          "wrong_ce": 1805,
+          "acc_kd": 0.8237,
+          "gap_imgs": 42,
+          "broken": 428,
+          "fixed": 470,
+          "p_sign": 0.171219
+        },
+        {
+          "seed": 2026,
+          "alpha": 0.7,
+          "T": 6.0,
+          "wrong_kd": 1807,
+          "wrong_ce": 1777,
+          "acc_kd": 0.8193,
+          "gap_imgs": -30,
+          "broken": 459,
+          "fixed": 429,
+          "p_sign": 0.330468
+        }
+      ],
+      "gaps_imgs": [
+        77,
+        42,
+        -30
+      ],
+      "mean_gap_imgs": 29.7,
+      "range_imgs": 107,
+      "same_dir_as_h1": 1,
+      "pooled": {
+        "broken": 1348,
+        "fixed": 1437
+      },
+      "p_pooled": 0.09539415
+    },
+    "a1_T1": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 1.0,
+          "T": 1.0,
+          "wrong_kd": 1683,
+          "wrong_ce": 1857,
+          "acc_kd": 0.8317,
+          "gap_imgs": 174,
+          "broken": 331,
+          "fixed": 505,
+          "p_sign": 0.0
+        },
+        {
+          "seed": 7,
+          "alpha": 1.0,
+          "T": 1.0,
+          "wrong_kd": 1745,
+          "wrong_ce": 1805,
+          "acc_kd": 0.8255,
+          "gap_imgs": 60,
+          "broken": 349,
+          "fixed": 409,
+          "p_sign": 0.032047
+        },
+        {
+          "seed": 2026,
+          "alpha": 1.0,
+          "T": 1.0,
+          "wrong_kd": 1789,
+          "wrong_ce": 1777,
+          "acc_kd": 0.8211,
+          "gap_imgs": -12,
+          "broken": 401,
+          "fixed": 389,
+          "p_sign": 0.695555
+        }
+      ],
+      "gaps_imgs": [
+        174,
+        60,
+        -12
+      ],
+      "mean_gap_imgs": 74.0,
+      "range_imgs": 186,
+      "same_dir_as_h1": 1,
+      "pooled": {
+        "broken": 1081,
+        "fixed": 1303
+      },
+      "p_pooled": 5.92e-06
+    },
+    "a1_T3": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 1.0,
+          "T": 3.0,
+          "wrong_kd": 1730,
+          "wrong_ce": 1857,
+          "acc_kd": 0.827,
+          "gap_imgs": 127,
+          "broken": 445,
+          "fixed": 572,
+          "p_sign": 7.6e-05
+        },
+        {
+          "seed": 7,
+          "alpha": 1.0,
+          "T": 3.0,
+          "wrong_kd": 1794,
+          "wrong_ce": 1805,
+          "acc_kd": 0.8206,
+          "gap_imgs": 11,
+          "broken": 474,
+          "fixed": 485,
+          "p_sign": 0.746777
+        },
+        {
+          "seed": 2026,
+          "alpha": 1.0,
+          "T": 3.0,
+          "wrong_kd": 1808,
+          "wrong_ce": 1777,
+          "acc_kd": 0.8192,
+          "gap_imgs": -31,
+          "broken": 489,
+          "fixed": 458,
+          "p_sign": 0.329627
+        }
+      ],
+      "gaps_imgs": [
+        127,
+        11,
+        -31
+      ],
+      "mean_gap_imgs": 35.7,
+      "range_imgs": 158,
+      "same_dir_as_h1": 1,
+      "pooled": {
+        "broken": 1408,
+        "fixed": 1515
+      },
+      "p_pooled": 0.04990584
+    },
+    "a1_T6": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 1.0,
+          "T": 6.0,
+          "wrong_kd": 1826,
+          "wrong_ce": 1857,
+          "acc_kd": 0.8174,
+          "gap_imgs": 31,
+          "broken": 570,
+          "fixed": 601,
+          "p_sign": 0.380666
+        },
+        {
+          "seed": 7,
+          "alpha": 1.0,
+          "T": 6.0,
+          "wrong_kd": 1871,
+          "wrong_ce": 1805,
+          "acc_kd": 0.8129,
+          "gap_imgs": -66,
+          "broken": 562,
+          "fixed": 496,
+          "p_sign": 0.045628
+        },
+        {
+          "seed": 2026,
+          "alpha": 1.0,
+          "T": 6.0,
+          "wrong_kd": 1884,
+          "wrong_ce": 1777,
+          "acc_kd": 0.8116,
+          "gap_imgs": -107,
+          "broken": 581,
+          "fixed": 474,
+          "p_sign": 0.001091
+        }
+      ],
+      "gaps_imgs": [
+        31,
+        -66,
+        -107
+      ],
+      "mean_gap_imgs": -47.3,
+      "range_imgs": 138,
+      "same_dir_as_h1": 2,
+      "pooled": {
+        "broken": 1713,
+        "fixed": 1571
+      },
+      "p_pooled": 0.01386343
+    },
+    "match_T6": {
+      "per_seed": [
+        {
+          "seed": 42,
+          "alpha": 0.494,
+          "T": 6.0,
+          "wrong_kd": 1758,
+          "wrong_ce": 1857,
+          "acc_kd": 0.8242,
+          "gap_imgs": 99,
+          "broken": 385,
+          "fixed": 484,
+          "p_sign": 0.000876
+        },
+        {
+          "seed": 7,
+          "alpha": 0.494,
+          "T": 6.0,
+          "wrong_kd": 1747,
+          "wrong_ce": 1805,
+          "acc_kd": 0.8253,
+          "gap_imgs": 58,
+          "broken": 390,
+          "fixed": 448,
+          "p_sign": 0.048885
+        },
+        {
+          "seed": 2026,
+          "alpha": 0.494,
+          "T": 6.0,
+          "wrong_kd": 1723,
+          "wrong_ce": 1777,
+          "acc_kd": 0.8277,
+          "gap_imgs": 54,
+          "broken": 324,
+          "fixed": 378,
+          "p_sign": 0.045385
+        }
+      ],
+      "gaps_imgs": [
+        99,
+        58,
+        54
+      ],
+      "mean_gap_imgs": 70.3,
+      "range_imgs": 45,
+      "same_dir_as_h1": 0,
+      "pooled": {
+        "broken": 1099,
+        "fixed": 1310
+      },
+      "p_pooled": 1.859e-05
+    }
+  },
+  "verdicts": {
+    "H1_alpha_axis": {
+      "pred": {
+        "0.3": 59,
+        "0.7": 137,
+        "1.0": 196
+      },
+      "measured_anchor_T": {
+        "0.3": 107.3,
+        "0.7": 75.7,
+        "1.0": 35.7
+      },
+      "alpha_slope_imgs": -71.6,
+      "abs_error_vs_pred": [
+        48.3,
+        61.3,
+        160.3
+      ],
+      "monotone_worse_with_alpha": true,
+      "slope_beats_seed_floor": true
+    },
+    "H1_or_H2_alpha_max_T_column": {
+      "measured": {
+        "1.0": 74.0,
+        "3.0": 35.7,
+        "6.0": -47.3
+      },
+      "T_span_imgs": 121.3,
+      "T_max_minus_T_min_imgs": -121.3,
+      "flat_as_H1_says": false,
+      "rises_as_H2_says": false
+    },
+    "T_main_effect": {
+      "T_max_minus_T_min_pooled_over_alpha": -51.4,
+      "beats_seed_floor": true,
+      "seed_floor_gate_is_n_dependent": "底 36 张是 3 条流的 max−min，换流数不可比（compress_report_v4b_fashion_low.json）；跨流数只能读 paired_per_flow",
+      "paired_per_flow": {
+        "label": "T6−T1（每流先配对再按 α 平均）",
+        "n_seeds": 3,
+        "mean_gap_imgs": -51.4,
+        "sd_imgs": 9.7,
+        "se_imgs": 5.6,
+        "ci95_imgs": [
+          -75.5,
+          -27.4
+        ],
+        "gaps": [
+          -43.0,
+          -62.0,
+          -49.3
+        ],
+        "same_sign_seeds": "3/3（−）",
+        "p_seeds_binomial": 0.25,
+        "range_imgs": 19.0,
+        "d4_sigma_hat": 11.2
+      },
+      "adjacent_steps": {
+        "1→3": {
+          "imgs": -6.9,
+          "in_seed_floor_units": 0.19
+        },
+        "3→6": {
+          "imgs": -44.5,
+          "in_seed_floor_units": 1.24
+        }
+      },
+      "axis_noun": "收益",
+      "where_the_effect_lives": "3→6"
+    },
+    "pure_KD_low_T_vs_CE": {
+      "mean_gap_imgs": 74.0,
+      "vs_floor": 2.06,
+      "sign": "KD 更好",
+      "counts_as_effect": true
+    },
+    "alpha_03_at_anchor_T": {
+      "mean_gap_imgs": 107.3,
+      "vs_floor": 2.98,
+      "survives_seed": true,
+      "paired_per_flow": {
+        "label": "α=0.3/T=3 按流配对",
+        "n_seeds": 3,
+        "mean_gap_imgs": 107.3,
+        "sd_imgs": 28.4,
+        "se_imgs": 16.4,
+        "ci95_imgs": [
+          36.7,
+          178.0
+        ],
+        "gaps": [
+          139,
+          84,
+          99
+        ],
+        "same_sign_seeds": "3/3（+）",
+        "p_seeds_binomial": 0.25,
+        "range_imgs": 55,
+        "d4_sigma_hat": 32.5
+      },
+      "paired_ci_excludes_zero": true,
+      "yardsticks_agree": true,
+      "reading": "这句反事实在本档用不上：锚点格自身 +75.7 张也在底（36 张）以内，α=0.3 与 α=0.7 都还没和纯 CE 分出胜负，所以「往 α→0 走会怎样」在本档是两个不显著读数之间的比较"
+    },
+    "grid_extremes": {
+      "best": {
+        "cell": "a0.3_T3",
+        "mean_gap_imgs": 107.3
+      },
+      "worst": {
+        "cell": "a1_T6",
+        "mean_gap_imgs": -47.3
+      },
+      "cells_beating_ce": [
+        "a0.3_T1",
+        "a0.3_T3",
+        "a0.3_T6",
+        "a0.7_T1",
+        "a0.7_T3",
+        "a0.7_T6",
+        "a1_T1",
+        "a1_T3"
+      ],
+      "n_cells": 9
+    },
+    "weight_or_temperature": {
+      "per_T": {
+        "6.0": {
+          "alpha_matched": 0.494,
+          "gap_at_anchor_alpha": 29.7,
+          "gap_gradient_matched": 70.3,
+          "damage_recovered_imgs": 40.6
+        }
+      },
+      "mean_damage_recovered_imgs": 40.6,
+      "axis_noun": "收益",
+      "weight_explains_the_T_dose": true,
+      "reading": "本档 T 轴是收益：把 KD 梯度钉回锚点（降 α）后收益变化 +40.6 张，幅度 40.6 张 > 底 36 张 → 这档收益里确实有一部分是「T² 顺带抬了权重」买来的，温度与权重在本档没完全分开"
+    }
+  },
+  "limitations": [
+    "种子底借自 compress_report_v4b_fashion_low.json 的 α=0.7/T=3 一格（那一本也是这一任务新造的底，不是第4课b 在册那 26 本账）；本任务没有第4课d 那样的逐格配对误差棒 ⇒ 每一格都只能用锚点格这一条底判显著性，「借来的底对单格读数偏大」这条偏差在本任务上连量都没量过（是边界，不是已核）",
+    "只扫 低数据2000 + S128（任务 fashion）；另一副宽度（S64）只造过 满数据8500 一档的底，档位与宽度没法同时换；对照是 compress_report_v4c_fashion_s64.json；（3 条流那本，各写各的表；任务 fashion 这一维册内此前一格都没买过（所有流数/宽度/族的历史都在 MNIST 那一侧），跨任务结论只能靠同名坐标的两本账对照，而跨流数只能读配对 CI）",
+    "每格 3 条流，均值本身没有二次底",
+    "权重/温度解耦只在初始一步的一个批次上配平，不是全程配平",
+    "p_pooled 偏乐观（多条流共用同一批测试图（极差型种子底还随流数变宽））"
+  ]
+}

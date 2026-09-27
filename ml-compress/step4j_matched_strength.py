@@ -141,6 +141,24 @@ L3 = "compress_report_v4f_mid_n8_v5.json"      # T=3 列的阶梯（配对差另
 L6 = "compress_report_v4f_mid_n8_t6_v5.json"   # T=6 列同阶梯（未配平的对照，本发只读）
 V4C = "compress_report_v4c_mid.json"           # 探针在册基准 + alpha_to_match_anchor
 V4I = "compress_report_v4i_mechanism_v2.json"  # 这笔债的原文所在
+DEBT_ANCHOR = "内容通道没有换算仪器"            # 债句的**内容锚**：序号会漂，这半句不会
+
+
+def debt_index(v4i: dict, where: str) -> int:
+    """那句债在 `where` 这本账的 limitations 里排第几（返回 1 起的序号）。
+
+    为什么按内容而不是按序号：`limitations` 每一版都在**头部**插一条变更说明（v1 6 条 → v2 7 条
+    → v3 8 条），所以同一句话的序号每升一版就 +1。第廿三发把 v3 入库之后，本脚本原先写死的
+    "第 3 条"就只对 v2 成立了，而守卫当时没有任何一档会因这件事红（第二十六发把它记成了新欠之一）。
+    命中 0 条 = 那句话被改写或指错了账本，命中 >1 条 = 锚点不唯一——两种情况都没有资格报序号，
+    一律在**第一次训练之前**退出（贵的失败要提前到花钱之前，第4课f 第十发那条老规矩）。
+    """
+    hits = [i for i, s in enumerate(v4i.get("limitations", [])) if DEBT_ANCHOR in str(s)]
+    if len(hits) != 1:
+        raise SystemExit(f"{where} 的 limitations 里按『{DEBT_ANCHOR}』命中 {len(hits)} 条（要恰好 1 条）："
+                         f"0 条 = 那句话被改写或这本不是债源，>1 条 = 锚点不唯一；"
+                         f"两种情况都不许再引用序号，先修锚点再来付账")
+    return hits[0] + 1
 
 
 def out_name(nseeds: int) -> Path:
@@ -270,6 +288,7 @@ def main(nseeds: int = 8, probeblind: bool = False, scramble: bool = False) -> N
     gate_pairing(lo, hi)                                         # 闸 II
     v4c = json.loads((HERE / V4C).read_text(encoding="utf-8"))
     v4i = json.loads((HERE / V4I).read_text(encoding="utf-8"))
+    debt = debt_index(v4i, V4I)         # 闸 VI：债句按内容命中，序号现读（在第一次训练之前）
 
     xt_all, yt_all, xte, yte = load_split()
     cut = len(xt_all) - VAL_N
@@ -304,6 +323,8 @@ def main(nseeds: int = 8, probeblind: bool = False, scramble: bool = False) -> N
           f"CE 减数逐位核过 {ident['ce_minus_number_checked']} 条")
     print(f"[闸 IV] 第 0 批探针逐位命中 {V4C} 与 {V4I}：‖∇(T²KL)‖ T=3 {g3:.5f} / T=6 {g6:.5f}"
           f"（‖∇CE‖ {g[T_LO]['g_ce']:.5f}，与 T 无关）⇒ 等力度比 g3/g6 = {g3 / g6:.4f}")
+    print(f"[闸 VI] 债句指针按内容命中：『{DEBT_ANCHOR}』在 {V4I} 的 limitations 里现读是第 {debt} 条"
+          f"（序号是算出来的、没写死：那一列每升一版就在头部多一条变更说明 ⇒ 写死的序号会静默漂走）")
     print(f"[等力度映射] α'（T=6 上与本发各格同力度）= " +
           "、".join(f"α={a:g}→{AM[a]:.4f}" for a in RUNGS) +
           f"；阶梯顶那一格复现在册配平数 {top_booked}（第4课c 的 match_T6 臂用的就是它）")
@@ -406,7 +427,8 @@ def main(nseeds: int = 8, probeblind: bool = False, scramble: bool = False) -> N
 
     report = {"quantity": "同力度（α·‖∇(T²KL)‖ 相等）下 T=6 列与 T=3 列的逐流配对错图数之差，"
                           "五格剂量各一条（负 = 同力度下 T=6 多错）",
-              "pays": f"{V4I} 的 limitations 第 3 条（『把它变成测量要一次训练…40 次训练』）",
+              "pays": f"{V4I} 的 limitations 第 {debt} 条（『把它变成测量要一次训练…40 次训练』；"
+                      f"序号按内容锚『{DEBT_ANCHOR}』现读，不写死）",
               "tier": TIER, "width": WIDTH, "student_arch": ARCH, "seeds": list(seeds),
               "temps": [T_LO, T_HI], "rungs": list(RUNGS), "primary_rung": PRIMARY,
               "strength_map": {"g_kd_unit_T3": g3, "g_kd_unit_T6": g6,

@@ -74,11 +74,10 @@ from pathlib import Path
 import torch
 
 from step1_quantize import MODELS, build_cnn, predict
-from step4_distill import (DATA_TIERS, SEEDS, SEEDS8, STUDENT_ARCHS, TIERS, VAL_N,
-                           check_flow_constants, flow_tiers, flows, logits_of, sign_test_p,
+from step4_distill import (DATA_TIERS, DATASETS, DATASET_SUFFIX, SEEDS, SEEDS8, STUDENT_ARCHS, TEACHER_PT, TIERS,
+                           VAL_N, check_flow_constants, dataset_loader, flow_tiers, flows, logits_of, sign_test_p,
                            train_student)
 from step4e_marginal_recheck import summarize          # CI 用全板块同一套 t 系数表，不在这里另刻一把
-from train_baseline import load_split
 
 HERE = Path(__file__).resolve().parent
 V4 = HERE / "compress_report_v4.json"
@@ -86,6 +85,8 @@ V4 = HERE / "compress_report_v4.json"
 NSEEDS = 3                                         # 可被 --nseeds 覆盖
 WIDTH = 128                                        # 可被 --width 覆盖（S64 复现用）
 ARCH = "mlp"                                       # 可被 --arch 覆盖；cnn = 换模型族那一发（学生与老师同架构）
+DATASET = "mnist"                                  # 可被 --dataset 覆盖；第廿八发 D = 换任务那一发
+                                                   # 默认 mnist ⇒ 那 26 本历史账的名字与读数一字不变
 # 三个拆红开关：各自撤掉家族化改造里的一道检查，只用来证明"那道检查真在生效"，不参与任何读数
 BLANK_RUN = BLIND_COMMIT = BLIND_FAMILY = False
 TIER = ""                                          # 可被 --tier 覆盖；空 = 第4课那两档全跑
@@ -111,7 +112,12 @@ FAMILY_SUFFIX = {"mlp": "", "cnn": "_cnn"}
 
 
 def book_name(nseeds: int) -> Path:
-    """这一族、这一档、这副宽度、这条流数的那本账叫什么名字——唯一来源。"""
+    """这一**任务**、这一族、这一档、这副宽度、这条流数的那本账叫什么名字——唯一来源。
+
+    任务位贴在基名之后、家族位之前（`v4b_fashion_cnn_low_n8`）：它比家族更外层，读起来是
+    "哪一本 → 哪一族 → 哪一档 → 几条流"。mnist 那一格是空串而不是 `_mnist`——在册 26 本历史账
+    的名字就是这个板块的身份，改一次名等于把所有判决的对照全断开（家族位当年同此理由）。
+    """
     if TIER == "":
         suffix = ""
     elif TIER in OUT_SUFFIX:
@@ -119,7 +125,7 @@ def book_name(nseeds: int) -> Path:
     else:
         raise SystemExit(f"--tier {TIER!r} 没有登记档案名：它要么该并进合并档案（那别用 --tier），"
                          f"要么该有自己的档案名（在这里登记）。回落成通用文件名等于把两档记进同一本")
-    stem = "compress_report_v4b" if WIDTH == 128 else f"compress_report_v4b_s{WIDTH}"
+    stem = "compress_report_v4b" + DATASET_SUFFIX[DATASET] + ("" if WIDTH == 128 else f"_s{WIDTH}")
     # 流数是这本账的判别维度：补过流那几本若写回同名文件，就无声盖掉了板块一路在用的那把 3 点底
     return HERE / (stem + FAMILY_SUFFIX[ARCH] + suffix
                    + ("" if nseeds == 3 else f"_n{nseeds}") + ".json")
@@ -171,10 +177,10 @@ def spread(xs: list[int]) -> dict:
 def committed(tier: str) -> dict | None:
     """第4课那一轮的 committed 精度值（种子 42 逐位对账用）。
 
-    它**只对 mlp 学生存在**：ARCHIVE 里那些数是 S128/S64 那两副 MLP 跑出来的，换一副架构
-    就没有任何数可比。按家族分叉写在这一个函数里，是为了让"这一本没有独立于本课的锚点"
-    成为算出来的事实，而不是靠人在 main 里记得每处都加 if。"""
-    if ARCH == "mlp" or BLIND_COMMIT:      # 后者是拆红专用：假装忘了按家族分叉
+    它**只对 MNIST × mlp 学生存在**：ARCHIVE 里那些数是 S128/S64 那两副 MLP 跑出来的 MNIST 读数，
+    换一副架构或换一个任务都没有任何数可比。按家族 × 任务分叉写在这一个函数里，是为了让"这一本没有
+    独立于本课的锚点"成为算出来的事实，而不是靠人在 main 里记得每处都加 if。"""
+    if (ARCH == "mlp" and DATASET == "mnist") or BLIND_COMMIT:      # 后者是拆红专用：假装忘了分叉
         return ARCHIVE[WIDTH].get(tier)
     return None
 
@@ -185,8 +191,9 @@ def stu_tag() -> str:
 
 
 def main() -> None:
-    if not (MODELS / "mnist_cnn_fp32.pt").exists():
-        raise SystemExit("缺 teacher 权重，先跑 python train_baseline.py")
+    if not (MODELS / TEACHER_PT[DATASET]).exists():
+        raise SystemExit(f"缺 {TEACHER_PT[DATASET]}（{DATASET} 那副老师的权重）——"
+                         f"MNIST 侧先跑 python train_baseline.py，Fashion 侧先跑 python step6_fashion_replication.py")
     seeds = flows(NSEEDS)
     check_flow_constants(len(seeds))    # 缺系数在这一步就停：KeyError 会炸在 64 次训练之后
     # 补过流那几本的全部价值在于它们能与老账**并起来读**（同一批流、同一顺序）。所以训练之前先立一道
@@ -195,24 +202,27 @@ def main() -> None:
     v4b_ref = ref_path()
     if NSEEDS > 3:
         if not v4b_ref.exists():
-            raise SystemExit(f"--nseeds {NSEEDS} 要拿 {v4b_ref.name} 当跨脚本基准，它不在盘上：先确认那一族那一档的 3 条流底在不在")
+            raise SystemExit(f"--nseeds {NSEEDS} 要拿 {v4b_ref.name} 当跨脚本基准，它不在盘上："
+                             f"先确认那个任务那一族那一档的 3 条流底在不在")
         ref_doc = json.loads(v4b_ref.read_text(encoding="utf-8"))
-        # 家族对账放在数值对账之前：基准那本自己记着它是哪一族（老账没这个字段=mlp 那族）。
+        # 身份对账放在数值对账之前：基准那本自己记着它是哪一族、哪一个任务（老账没这两个字段 = mlp/mnist）。
         # 这一道是零训练的，先拦掉才轮得到下面那烧十几分钟的数值闸——两道闸各管一段。
         ref_arch = ref_doc.get("student_arch", "mlp")
-        if ref_arch != ARCH and not BLIND_FAMILY:
-            raise SystemExit(f"[家族对账] {v4b_ref.name} 记的学生架构是 {ref_arch}，本课是 {ARCH}："
-                             f"跨脚本基准必须同族，否则老 3 条流本来就对不上，红的是接错线不是代码漂")
+        ref_ds = ref_doc.get("dataset", "mnist")
+        if (ref_arch != ARCH or ref_ds != DATASET) and not BLIND_FAMILY:
+            raise SystemExit(f"[身份对账] {v4b_ref.name} 记的是 任务={ref_ds} × 学生架构={ref_arch}，"
+                             f"本课是 {DATASET} × {ARCH}：跨脚本基准必须同任务同族，"
+                             f"否则老 3 条流本来就对不上，红的是接错线不是代码漂")
         ref = ref_doc["arms"]
         for tier in (TIERS if TIER == "" else {TIER: None}):
             for s in SEEDS:
                 if f"{tier} 种子{s}" not in ref:
                     raise SystemExit(f"跨脚本闸没有记录可比（{tier} 种子{s}）：空表在 all() 下恒真，那不算测过")
-    xt_all, yt_all, xte, yte = load_split()
+    xt_all, yt_all, xte, yte = dataset_loader(DATASET)()
     cut = len(xt_all) - VAL_N
     xv, yv = xt_all[cut:], torch.tensor(yt_all[cut:])
     teacher = build_cnn()
-    teacher.load_state_dict(torch.load(MODELS / "mnist_cnn_fp32.pt", weights_only=True))
+    teacher.load_state_dict(torch.load(MODELS / TEACHER_PT[DATASET], weights_only=True))
     teacher.eval()
 
     selected = TIERS if TIER == "" else {TIER: DATA_TIERS[TIER]}
@@ -222,8 +232,9 @@ def main() -> None:
           + "。"
           + ("种子 42 必须逐位复现第4课那一轮，否则是本课把 train_student 改坏了："
              f"对照 {V4.name}（committed）" if archivable else
-             f"本次只跑 {TIER}（第4课没有这一档的档案）→ 对账栏无值可比，"
-             "代码是否漂移由默认跑法代测；本轮只交付一件仪器：这一档的种子底"))
+             f"本次只跑 {TIER or '默认两档'}（任务 {DATASET} × 族 {ARCH} 在第4课没有档案）→ 对账栏无值可比，"
+             + ("代码是否漂移由默认跑法代测；" if TIER == "" else "代码是否漂移由有档案那几档代测；")
+             + "本轮只交付一件仪器：这一档的种子底"))
     parity: dict[str, tuple] = {}
     parity_na: list[str] = []
     tiers: dict[str, list[dict]] = {}
@@ -233,8 +244,10 @@ def main() -> None:
         if arch is None and TIER == "":
             continue        # 默认跑法只跑第4课配过对的那几档，不往合并档案里塞新档
         if arch is None:
-            print(f"  [{tier}] 学生架构 {ARCH} 在第4课没有 committed 读数"
-                  f"（{'S64 低数据档第4课本就没跑' if ARCH == 'mlp' else '那本账全是 MLP 学生的'}）"
+            why = (f"任务换成 {DATASET}：第4课那本 committed 账全是 MNIST × MLP 学生的读数"
+                   if DATASET != "mnist" else
+                   f"{'S64 低数据档第4课本就没跑' if ARCH == 'mlp' else '那本账全是 MLP 学生的'}")
+            print(f"  [{tier}] 学生架构 {ARCH}、任务 {DATASET} 在第4课没有 committed 读数（{why}）"
                   f"→ 没有可逐位对账的档案值，parity 记 n/a；本课在这里只产**种子底**，不产复现")
         xd, yd = xt_all[:n_data], torch.tensor(yt_all[:n_data])
         soft = logits_of(teacher, xd)             # 软标签与随机流无关：各种子共用同一份
@@ -245,10 +258,12 @@ def main() -> None:
                 o = ref[f"{tier} 种子{r['seed']}"]
                 four = (r["wrong_ce"], r["wrong_kd"], r["flips"]["broken"], r["flips"]["fixed"])
                 if four != (o["wrong_ce"], o["wrong_kd"], o["flips"]["broken"], o["flips"]["fixed"]):
-                    raise SystemExit(f"[跨脚本对账] FAIL {tier} 种子{r['seed']}：本发（学生架构 {ARCH}）{four} vs "
+                    raise SystemExit(f"[跨脚本对账] FAIL {tier} 种子{r['seed']}：本发（任务 {DATASET} × 学生架构 "
+                                     f"{ARCH}）{four} vs "
                                      f"{v4b_ref.name} {tuple(o[k] for k in ('wrong_ce', 'wrong_kd')) + (o['flips']['broken'], o['flips']['fixed'])}"
                                      f"\n老 3 条流没复现老账 → 这 {NSEEDS} 条与那 3 条不可并读，"
-                                     f"先查 train_student/load_split 有没有被改坏（基准那本已由上面那道家族闸核过）")
+                                     f"先查 train_student/dataset_loader(DATASET) 有没有被改坏"
+                                     f"（基准那本已由上面那道身份闸核过任务与家族）")
             xcheck[f"{tier} 老3条流×4项读数"] = "逐位相同"
         for r in rows:
             if r["seed"] == 42:
@@ -270,12 +285,12 @@ def main() -> None:
     na = f"（另有 {len(parity_na)} 项无档案可对：{ '、'.join(parity_na) }）" if parity_na else ""
     if bad:
         raise SystemExit(f"[仪器对账] FAIL：{bad}\n种子 42 没复现第4课 → 这一轮的数不能当复现用，"
-                         f"先查是不是 train_student/load_split 被改坏了")
+                         f"先查是不是 train_student/dataset_loader(DATASET) 被改坏了")
     if parity:
         print(f"\n[仪器对账] 逐位复现 {len(parity)}/{len(parity)} 通过 → 换种子测到的确实是随机流，不是代码漂了{na}")
     else:
-        print(f"\n[仪器对账] **本轮没有对账可做**（{len(parity_na)} 项全 n/a：这一档第4课没跑过，"
-              f"没有档案值可逐位比）→ 这一栏没测到任何事，别当闸门过了；"
+        print(f"\n[仪器对账] **本轮没有对账可做**（{len(parity_na)} 项全 n/a：任务 {DATASET} × 族 {ARCH}"
+              f"在第4课没有档案值可逐位比）→ 这一栏没测到任何事，别当闸门过了；"
               f"本课在这里只产**种子底**，「代码有没有漂」由默认跑法（有档案那两档）代测")
     if xcheck:
         print(f"[跨脚本对账] { '；'.join(xcheck) } —— 这 {len(xcheck)} 本老账逐位相同，"
@@ -343,7 +358,7 @@ def main() -> None:
           f"不能当第二个独立复现。真正干净的复现统计只有上面那行「{len(seeds)} 个种子同向」。")
 
     report = {"seeds": list(seeds), "cross_script_parity": xcheck, "width": WIDTH, "test_n": int(len(yte)),
-              "student_arch": ARCH, "student_tag": stu_tag(),
+              "dataset": DATASET, "student_arch": ARCH, "student_tag": stu_tag(),
               "tier_arg": TIER or "默认（第4课两档）", "n_seeds_arg": NSEEDS,
               "parity_no_archive": parity_na,
               "train_fit_n": cut, "parity_seed42_vs_archive":
@@ -359,7 +374,8 @@ def main() -> None:
                               "种子底用的是 max−min 型极差：它随流数机械变宽，所以 gap_over_floor 只能在同一本账内部读，拿 3 条流那本与 8 条流这本的比值互相翻案就是拿 n 当效应"]}
     if parity_na:
         report["limitations"].append(
-            f"{'、'.join(parity_na)} 没有第4课档案可对：这一档只产种子底，"
+            f"{'、'.join(parity_na)} 没有第4课档案可对（任务 {DATASET} × 族 {ARCH} 这一坐标第4课没跑过）："
+            f"这一档只产种子底，"
             f"「换随机流还同向吗」这件事对它没有历史判决可复核")
     n_train = len(seeds) * 2 * len(tiers)
     if not tiers:
@@ -383,6 +399,10 @@ if __name__ == "__main__":
     ap.add_argument("--arch", choices=STUDENT_ARCHS, default="mlp",
                     help="学生架构。cnn = 换模型族那一发：学生换成与老师**同架构**的那副 CNN；"
                          "此时 --width 无定义，且必须带 --tier（默认合并账是 MLP 的读数）")
+    ap.add_argument("--dataset", choices=DATASETS, default="mnist",
+                    help="任务（第廿八发 D = 换任务那一发）。它管四件事：档案名里的任务位、"
+                         "装载器、老师权重、有没有第4课的 committed 锚点（换新任务以后没有，parity 全 n/a）。"
+                         "默认 mnist ⇒ 在册那 26 本账的名字、读法、判决一字不变")
     ap.add_argument("--blankrun", action="store_true",
                     help="**拆红专用**：撤掉「cnn 不许走默认合并跑法」那道提前闸 ⇒ 该由写盘前的空账闸接住"
                          "（两道闸互为备份，红在第二道上）")
@@ -393,7 +413,14 @@ if __name__ == "__main__":
                          "对不上账，证明基准名真的按家族走而不是恰好都能对上")
     args = ap.parse_args()
     ARCH = args.arch
+    DATASET = args.dataset
     BLANK_RUN, BLIND_COMMIT, BLIND_FAMILY = args.blankrun, args.blindcommit, args.blindfamily
+    # 换任务必须逐档单跑：新任务**没有**"第4课两档共本"那段历史，而满数据档的后缀是空串 ⇒
+    # 默认跑法会把低数据档的读数记进 `v4b_fashion.json`（那本的名字属于满数据档）。那是撞名，不是合并。
+    if DATASET != "mnist" and args.tier == "":
+        raise SystemExit(f"--dataset {DATASET} 不能走默认合并跑法（要带 --tier 逐档单跑）："
+                         f"合并档案是 MNIST × MLP 那两档的历史，新任务没有这本账，"
+                         f"而空后缀在名字规则里已经归给满数据档了")
     # 闸门必须在这里、训练之前：out_path() 是流程最后一行，那时才炸就白烧十几分钟 CPU
     if ARCH == "cnn" and args.width != 128:
         raise SystemExit("--arch cnn 没有宽度可言：build_cnn() 是固定架构，"
@@ -407,13 +434,15 @@ if __name__ == "__main__":
         #   --blankrun    只撤这一道（家族分叉还在）⇒ 没有任何一档可跑 ⇒ 写盘前的[空账闸]红，零训练
         #   --blindcommit 连 committed() 的家族分叉一起撤（同一个错误的两面）⇒ 真去训练 12 次
         #                 ⇒ 由[仪器对账]在数值层抓住"借了别族的锚点"
-    if args.width == 64 and args.tier in TIERS:
+    if DATASET == "mnist" and args.width == 64 and args.tier in TIERS:
         # 旧写法在这里一刀切拒绝 --width 64，写死的假设是"S64 只跑过满数据档"。第十五发要在这副
         # 宽度上造中数据档的底，所以放行条件换成"这个组合会不会撞名/有没有档案名"：撞名由紧接着的
         # exists() 拦，没登记后缀的档由 out_path() 拦，都不必在这里连坐整副宽度。
+        # 任务位：这两句话的主语是"合并档案"，而合并档案只存在于 MNIST × MLP 那一族账里
+        # （换新任务时上面那道 --dataset 闸已经禁止默认跑法）⇒ 这一道对其他任务无从成立。
         raise SystemExit(f"--tier {args.tier} 属于 S128 那两档的合并档案，S64 这一副没有它的位置："
                          f"要老档案就别带 --tier，要新档请先在 OUT_SUFFIX 里登记档案名")
-    if args.tier in TIERS and ARCH == "mlp":
+    if DATASET == "mnist" and args.tier in TIERS and ARCH == "mlp":
         raise SystemExit(f"--tier {args.tier} 是第4课那两档之一：它属于合并档案 "
                          f"compress_report_v4b.json（两档一起写）。单跑一档会把另一档的账抹掉——"
                          f"要老档案就别带 --tier")

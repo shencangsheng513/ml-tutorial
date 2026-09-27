@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 """v3/v4/v5 形状判据的离线验红（零训练）：把已入库的 v4f 档案按 v1/v2/v3/v4/v5 各算一遍，看翻转集合落在哪。
 
-十五道闸（沿用第四发的规矩：一道闸只钉一件修复，红要知道是哪件修复没装上；
+十六道闸（沿用第四发的规矩：一道闸只钉一件修复，红要知道是哪件修复没装上；
   ⑪ 是第二十发的"口径等价闸"，⑫ 是第二十一发的"档案文本闸"，⑨ 的家族位也在第二十一发接上——换模型族那一发；
   ⑬ 是第廿二发补上的"入口闸"——它判的是脚本能不能打开，不判读数；
   ⑭ 是第廿六发补上的"派生账复算闸"——①–⑬ 吃的全是训练路径产出的那批账（v4f 名下），
-     零训练派生账（v4i/v4j/v4k/v4l）里那几十条 95% CI 此前一条都不在任何闸里）；
+     零训练派生账（v4i/v4j/v4k/v4l）里那几十条 95% CI 此前一条都不在任何闸里；
   ⑮ 是第廿八发补上的"债句指针闸"——档案里按序号引用 `limitations` 的那类指针，必须按内容命中：
-     那个列表每升一版就在头部插一条，写死的序号是一根会自己漂走的指针）：
+     那个列表每升一版就在头部插一条，写死的序号是一根会自己漂走的指针；
+  ⑯ 是第卅发补上的"引用面闸"——同一件坏法（正文用反引号引用了 clone 之后不存在的一次性件）在三发里
+     坏了三次，前两次靠人肉搬运结，所以这一发把它变成判据：判的是"这句话在**别人机器上**还成不成立"）：
   ① 复算自证     每本档案**记录在案**的那句判词 = 产出它那一版的复算值（钉"喂的是同一批数字"）
   ② 翻转集合     v3 相对 v2 只许翻掉预登记的那一本（钉"v3 不是装饰，也不是连坐"）
   ③ 只翻该翻的   那一本必须从 测不动 翻到 反号线（钉翻的是对的方向）
@@ -221,10 +223,95 @@
                  这一腿本轮**红过一次而数字全对**（0/0 对 0/0）：判别式把 `pc`（清单）与 `want_c`（整数）直接比了，
                  恒真 ⇒ 反照常在"改对了"的时候也报警。它今天才暴露是因为第廿八发那次它是**真**该红（漏改一条）。
                  记法：这类 bug 只在"数字看着对却仍进名单"时现形，靠的就是打印行同时写**测得值与期望值**。
+  ⑯ 引用面（第卅发新增·零训练） 正文里用反引号写成的**整名**、形状像一次性件（`_` 开头或以 `.log` 结尾）、
+                 而 `git ls-files` 名单里没有它 ⇒ 每一次提到都必须在 ±2 行内留一句"它不在库里"的标记
+                 （标记词集合：本机 / 不在库里 / 库外 / gitignore / 断链 / 作废 / 叙述级 / 清理清单 / 永久保留）。
+                 参评引用面 = 本模块**在册**的 `.py`/`.md` + 根目录那两本会引用它的文档；名字集合取
+                 **盘上现读 ∪ 登记处**两个来源——只扫盘，一次性件被清理之后那句裸引用永远查不红
+                 （会衰减的门禁不算门禁）；只登记，下一发新造的名字没人管。
+                 **这条闸最容易坏的地方是它自己的分母**：`git ls-files <路径…>` 里那个路径是**过滤**不是加宽，
+                 第一版只点名根目录那两本 ⇒ 名单塌成 2 本、引用面也只剩 2 本，于是本模块所有 `_` 开头的
+                 **在册件**都被打成"库外断链"（正常模式当次报 5 条红，其中 4 条指着守卫自己、1 条指着
+                 `_coef_check.py`）。那 5 条没有一条是正文的债，而它的形状和"债变多了"完全一样：照红单去补
+                 声明，等于给已入库的文件写"它不在库里"——修一个断链修出第二个谎。现在三步钉住：
+                 ① 名单带 `.` 这个 pathspec；② 一条**常驻分母自证**（在册名单必须收得下 `_red_v3.py` 自己——
+                 它既是 `_` 开头又已入库，是最省事的探针；红句直接指向那个 pathspec，不指向"正文"）；
+                 ③ `--citedlink` **腿D** 用 `use_dot=False` **注入**复现这个坏法，两向都量。
+                 射程边界（登记成新欠，不算已覆盖）：**没有**反引号的名字、不带 `_` 前缀也不以 log 后缀结尾的
+                 名字、以及别的模块目录里的引用，这一条都看不见——它管的是"本册引用了本册之外的东西"。
 
 自我拆红（每条各拆一道闸，跑了不红的模式=那条闸没测到，不许拿它当通过。下面全是**本轮实测**，
 不是预期——规矩是实测再写回这张表，写死的计数只对"当前在册的那几本"成立：
 
+**【第三十发·把"正文引用了库里没有的一次性件"从人肉搬运变成一条常驻闸（闸⑯ + `--citedlink`）
+＋结第廿九发新欠⑶（本文件那三处 `_tmp_redNN/*.log` 式引用改成命令形态）＋两件菜单判为"不付钱"
+（D 那 132 次不买 / E 那张价签作废重开）＋一件只登记不删（F）】
+**0 次训练、0 元 API、进册 0 本】**
+在册 35 本（v4f 名下，本轮 **+0**：这一发没有一本新账入库，动的全是守卫自己与文档）、全册 **115** 本（同样 +0），
+正常模式 rc=0 / 0 条红，**二十六档**全部重跑（档数由源码里的 `MODES` 登记处现读并在每轮开头打印，本轮实测 **26**，
+增档 = 闸⑯ 的 `--citedlink` ⇒ 25 → 26；逐档红数全部本轮实测。凭据**不指文件、指命令形态**：
+`python _red_v3.py <档名>`，档名现读自本文件的 `MODES` 登记处 ⇒ 共 **27** 份 = `normal` + 26 档；每份只数
+`^    闸` 前缀的行当红数，并**同时**数"任意缩进的 `闸` 行"做第二口径，本轮 27 份里两种口径**逐份相等**
+（`normal` 与 `--destroy` 都是 0/0）。这一批由一份**未入库的一次性驱动**（`_tmp_r30_red_all.py`，2 并发、
+整批墙钟 **626 秒**、末行现报"新鲜落盘 = 27/27"）产出，它本人在收工清理清单里 ⇒ 正文只留上面那串命令形态；
+"末行那条新鲜落盘计数"不是装饰：本轮之前有一批死在半路，就是靠这一行现形的，而不是靠"看起来跑完了"）：
+misfeed 99、decorative 27、borrowseeds 22、famblind 20、unformatted 19、collateral 15、v4blind 13、
+v5strict 13、v4loose 8、borrowfloor 7、drift 5、v5blind 4、sibdrift 3、**citedlink 3（新档）**、ciderived 2、
+laddersib 2、flowcopy 2、ciasym 2、limitptr 2、bareid 1、oldsib 1、g5drop 1、ciunread 1、wrongcount 1、
+helpblind 1、destroy 0。
+**与【第二十九发】那张表逐档一比：既有二十五档一位没动**（含 `normal` 与 `--destroy` 的两个 0），
+多出来的那一档是本发的新档。**零漂移的机理这一轮与上一轮不是同一种，别混着引用**：上一轮是"3 本新账全在
+`compress_report_v4f*` 这道 glob 之外 ⇒ 结构上进不去红面"，这一轮是"**本轮根本不产任何新读数**"——
+改的东西只有三类（守卫自己的 docstring、三处文档里的引用写法、4 件工具的入库状态），
+没有一类落在 ①–⑮ 的输入面上。唯一动了的分母是 ⑯ 自己，其次是"在册 `.py` 名单 +4 本"；
+⑫ 的全册扫描面**没动**（115 本 / 展开字符串字段 4921 条 / 带『种子底由 N 个点』那句的 19 本）：
+新入库那 4 件是脚本，不产档案。
+各闸本轮现读：**①** 35/35 复算通过；**②** 只在旧账 8 本上算，翻转名单 1 本；**③** 该翻的那一本仍是
+`v4f_low_n8_thin_v2`（测不动 → 反号线）；**④** 板块在册『污染型』**23 本**未被连坐（逐字保持）；
+**⑤** 候选 27 本 = 逐位核过 6 + 首跑/无前账 21；**⑥ 27 → 27 对**（**一对没多**，"对数与这一发买了哪一维
+没有单调关系"**第十二次**现读；本轮连"结构上进不去"都谈不上，是**根本没有新账**）；
+**⑦** 14 本候选里参评 11；**⑧** 参评 6 本、v4 名下翻转名单 4 本、按配置归并后唯一还站着的倒挂仍是
+`v4f_mid_n8_t6_v4`；**⑨** 腿A 参评 27 本全等 & 腿B 27 本（13 同流数底 / 14 被实现拒绝 / 0 借错底），
+另盘点 21 本**当时**借过别的流数的底，8 本 fashion 侧**免检**（没测到，不是通过）；**⑩** 模块侧 10 项 +
+档案侧 **111 条**；**⑪** 参评 **31 本**、自带双记账 5 本且与复算逐字段相同；**⑫** 全册 **115 本 / 4921 条 /
+19 本带那句 / 漏渲染 0 条**；**⑬** 现读清单 **13 本 / 退出码 0 的 13 本 / 4 并发墙钟 36.0 秒**（同一清单历次
+28.0 / 34.4 / 200.3 / 61.5 / 55.4 / **36.0** 秒 ⇒ 只报读数区间不报倍数。**本轮另有三发单跑对照**：写回头部之后单独跑 `normal`，同一条清单 **27.1 / 25.7 / 24.4** 秒（最后一发是本文件改完散文后的收口复跑）⇒ **24.4 是目前最低读数**，而 36.0 那个数是**在 2 并发的批里**量的（并发会抬高它）——两头的读数都要报，只留一个就是把"倍数"重新焊进判据）；
+**⑭** 派生账现读 **12 本 / 133 条** ci95：可复算 133 / 口径外 0（参评 6 本、旧档豁免 6 本）；
+**⑮** 可核指针 **2** 条 / 漂走 **0** / 裸序号 **0** / 引文不逐字 **0** / 过期 **0**（出处扫描面 参评 **93** 本 /
+旧版留盘豁免 **22** 本；后两类仍"只出声不红"）；
+**⑯** 引用面 **31** 个在册文件（在册名单 **147** 本）/ 射程内库外名字 **98** 个（盘上现读 ∪ 登记处 14）/
+命中引用 **52** 处 = 带声明 52 + **裸引用 0**、本闸墙钟 **0.03 秒**。
+**同一条读数的第二次（写回头部、并修掉头部那 2 条裸引用之后单跑一次 `normal`）：名字 100 / 命中 55 = 带声明 55 +
+裸 0**。两个数不一样是**口径本身决定的**：名字集合的一半来自"盘上现读"，而本发自己造的那些一次性日志正在盘上 ⇒
+**这个名字会随一次性件的增减而漂**（清理清单走完它会掉回去），引用数会随正文增删而漂；它**不是**一个应当恒定的常数，
+所以历次引用数不可跨轮相减当趋势。
+**第三读（收口那一次，两份文档里的旧数改完之后）**：单跑 normal **rc=0 / 0 条红**，名字 **100** / 命中 **55** = 带声明 55 + 裸 0 ⇒ 与上面那一读**逐字复现**（那两处改动没引进新的射程内名字）；同一次收口跑了拆红档 **rc=1 / 3 条红**（腿B 打印 0 红），而**那一档里本闸报的名字数是 102**——比裸跑多 2，因为它自己注入的那两个名字当时正躺在盘上。这是"名字集合的一半来自盘上现读"最直接的例证，也定下一条口径：**拆红档内的 ⑯ 读数与裸跑读数分属两个状态，不许互相引用、更不许相减。**
+**上面那句刚落盘，下一次裸跑就把漂移演示了一遍**：紧接着再单跑一次 normal ⇒ 名字 **103** / 命中 **55**、仍 **rc=0 / 0 条红**——涨的那 3 个逐一点名：一份原先落在上级目录（不在射程里）、后来被搬进本目录的收口日志，加上这两次裸跑各自新建的那两份重定向日志（`git ls-files .` 现读三份都不在册）。**所以"会漂"不是历轮之间的事，是同一轮内两次裸跑之间的事**；能被写进文档的只有**命中数与"裸 0"这一判定**，名字数只许带上当时的状态。
+**`--citedlink` 那 3 条红全部是"注入的凭据"（rc=1，打印行同时写测得值与期望值）**：**腿A** 注入一条新造的裸引用
+⇒ 红句**点名注入的那一个名字**（这条闸认得**新造**的断链，不是在复述旧账）；**腿C** 把盘上一条"靠声明才绿"的
+引用（`../项目复盘与简历写法.md:201` 引用 `*.log`）±2 行里的声明抹掉 ⇒ 该处翻红（那一句『不在库里』是唯一承重的
+东西）；**腿D** 把在册名单换成少了 `.` 的旧写法 ⇒ 名单塌成 2 本、引用面 2 本，闸⑯ 当场把**在册的 `_red_v3.py`**
+当库外断链点名 4 条，且同一状态下**分母自证**那条腿也红 ⇒ "名单塌了"不会被读成"正文欠声明"。
+**腿B 反对照打印 0 红**（同一条引用只多"本机"二字）⇒ 判据吃的确实是**声明本身**而不是"名字像不像临时件"，
+所以修法不会被推歪成"把引用删掉"。
+**这一轮跟着这张表一起读的三件事**：
+⑴ **一条新闸交来的第一批红，先问"红的是被检对象还是分母"**：本轮第一版报的 5 条红**全是**分母塌了造成的假红
+（4 条指着守卫自己、1 条指着 `_coef_check.py`），而它的形状与"正文欠声明变多了"完全一样。判据的分母与被判对象
+共用同一份名单时，名单塌了会**伪装成债务变多**；照红单去补声明 = 给已入库的文件写"它不在库里"。
+⑵ **标记词按文本匹配 ⇒ "闸在自己的头部解释标记词"这件事有自我消音的风险**：腿C 只证明了"没有声明 ⇒ 红"，
+没有证明"声明在场、但说的不是这回事 ⇒ 也红"。这一条登记成射程边界（连同"无反引号的名字 / 不带 `_` 前缀也不以
+log 后缀结尾的名字 / 别的模块目录"三格），不当已覆盖。
+⑶ **落笔后补跑照第十五发的规矩做，而它这一次真的抓到了东西——抓的是这条闸自己的头部**：上面那张表是在它写进
+`_red_v3.py` **之前**跑的 ⇒ 规矩要求写完补跑一次 `normal`。**第一次补跑 rc=1 / 2 条红，两条都指着本文件里刚写进去
+的散文**：我在解释这条闸的口径时把那个日志后缀写成了反引号整名 ⇒ 它自己落进自己的射程（"整名 + log 后缀 +
+同段无声明"三条全中，红句报出的名字就是那个后缀）。**修法是把后缀的反引号去掉，不是给规则加豁免**——
+加豁免等于开一个"只要在规则里提到它就能躲过它"的口子。修完复跑 rc=0 / 0 条红（末次读数就是上面 ⑯ 那一行）。
+⇒ ①–⑮ 读 `compress_report_*.json` 与模块常量、不读散文，所以头部追加对它们零影响；**⑯ 是唯一的例外**：
+它的参评面里就有本文件自己——这一条例外不是理论风险，本轮实测兑现了一次。
+
+（下表【第二十九发】已被上面那张表替代：它记的**档数 25**、"十五道闸"、⑯ 那一行不存在，都已被覆盖；
+ 留着是因为它的**逐档归因**——尤其"3 本新账全在 `compress_report_v4f*` glob 之外 ⇒ 全不进红面"与
+ "⑩⑫⑭ 进的是分母不是红数"那两桶的分法，以及 `--limitptr` 那 2 条"**数字没动而含义换了**"的机理。）
 **【第二十九发·一发结清第廿八发那两笔"要重跑档案才还得清"的债（`step4j` 升版 46 次 + 指针改指 `_v3`）
 ＋同一坐标往上买一档流数（`--nseeds 16`，实付 86 次）＋把开口预检摊成全坐标现读表（零训练）
 ＋闸⑮ 的断言口径从"绝对红数"换成"相对底座的增量 + 身份核对"】
@@ -302,7 +389,9 @@ destroy 0。
 7 本 `v4b_fashion*`（Fashion 三档 × 两族的种子底）＋ 6 本 `v4c_fashion*`（同坐标 α×T 网格）＋
 `v4l_soft_shape_family_fashion_v2`／`_v3`（换任务那本的升版对，v2 留盘），正常模式 rc=0 / 0 条红，
 **二十五档**全部重跑（档数由源码里的 `MODES` 登记处现读并在每轮开头打印，本轮实测 **25**；
-增档 = 闸⑮ 的 `--limitptr` ⇒ 24 → 25；逐档红数全部本轮实测，原件 `_tmp_red28/*.log` + `summary.txt`）：
+增档 = 闸⑮ 的 `--limitptr` ⇒ 24 → 25；逐档红数全部本轮实测，**凭据按第廿九发统一的口径＝命令形态**
+`python _red_v3.py <档名>`（档名现读自 `MODES`）；原来那句"原件 `_tmp_red28/*.log` + `summary.txt`"
+是断链指针——`*.log` 被 `ml-compress/.gitignore:2` 挡在库外，clone 之后正文指着不存在的目录）：
 misfeed 99、decorative 27、borrowseeds 22、famblind 20、**unformatted 19（+7）**、collateral 15、
 v4blind 13、v5strict 13、v4loose 8、borrowfloor 7、drift 5、v5blind 4、sibdrift 3、ciderived 2、
 laddersib 2、flowcopy 2、ciasym 2、**limitptr 2（新档）**、bareid 1、oldsib 1、g5drop 1、ciunread 1、
@@ -358,7 +447,8 @@ wrongcount 1、helpblind 1、destroy 0。
 `v4i_mechanism_v3`、`v4l_soft_shape_family_v2`（两本升版派生账，旧版留盘）），
 正常模式 rc=0 / 0 条红，**二十四档**全部重跑（档数由源码里的 `MODES` 登记处现读并在每轮开头打印，
 本轮实测 **24**；两次增档 = 补 ⑭ 的 `--ciderived` ⇒ 23，补 ⑫ 假红修复的 `--bareid` ⇒ 24；
-逐档红数全部本轮实测，原件 `_tmp_red26/*.log` + `summary.txt`）：
+逐档红数全部本轮实测，凭据＝命令形态、见上面【第二十九发】那段口径，旧那句"原件 `_tmp_red26/*.log`
++ `summary.txt`"是断链指针（`*.log` 落在 `ml-compress/.gitignore` 里）、第卅发起作废）：
 misfeed **99**、decorative 27、collateral 15、v4blind 13、v5strict 13、famblind 20、borrowseeds 22、
 unformatted 12、v4loose 8、borrowfloor 7、drift 5、v5blind 4、sibdrift 3、ciderived **2**（新档）、
 laddersib 2、flowcopy 2、ciasym 2、bareid **1**（新档）、oldsib 1、g5drop 1、ciunread 1、wrongcount 1、
@@ -400,7 +490,8 @@ helpblind 1、destroy 0。
  与"入册键"那一组推理，是本轮第 ①② 笔诚实账要对着读的东西。）
 **【第二十五发·跨族形状互锁（step4l，零训练派生账）入库】在册 35 本（v4f 名下，本轮 **+0**）、
 全册 92 本（+1：`v4l_soft_shape_family`），正常模式 rc=0 / 0 条红，**二十二档**全部重跑（档数仍由现读源码里的
-`MODE ==` 比较数出：本轮实测 **22**；逐档红数全部本轮实测，原件 `_tmp_red25/*.log` + `summary.txt`）：
+`MODE ==` 比较数出：本轮实测 **22**；逐档红数全部本轮实测，凭据＝命令形态、见上面【第二十九发】那段口径，
+旧那句"原件 `_tmp_red25/*.log` + `summary.txt`"是断链指针、第卅发起作废）：
 misfeed **99**、decorative 27、collateral 15、v4blind 13、v5strict 13、famblind 20、borrowseeds 22、
 unformatted 12、v4loose 8、drift 5、borrowfloor 7、v5blind 4、sibdrift 3、laddersib 2、flowcopy 2、
 ciasym 2、oldsib 1、g5drop 1、ciunread 1、wrongcount 1、helpblind 1、destroy 0。
@@ -546,7 +637,7 @@ flowcopy 2、ciasym 2、oldsib 1、g5drop 1、ciunread 1、wrongcount 1、helpbl
 退出码 0 的 12 本。**墙钟要如实报**：同一档（⑬）本轮三次实测 **56.8 秒 / 30.9 秒 / 19.6 秒**（同机、同清单、4 并发；
 最后一次整轮 25 秒、rc=0），比下表记的 24.7 / 18.2 秒又宽了一倍 ⇒ 这一档的成本**不是常数**，写死的秒数和写死的计数一样会腐；
 本轮只报"三个读数"、不报倍数〔这句里的"三个"在落笔当时就已经不准：其中一个是叙述级，见下；随后又添了第四个〕。**但这三个读数的证据强度不齐，按第 3 节那条"来源标注"的规矩分开记**：
-30.9 与 19.6 各有一份盘上原件（`_run_red_normal.log` / `_tmp_rednormal_timing.log`，同一档、同一行打印），
+30.9 与 19.6 各有一份**本机**原件（`_run_red_normal.log` / `_tmp_rednormal_timing.log`，同一档、同一行打印，落在 `.gitignore` 的 `*.log` 里 ⇒ 库外件，clone 后要核得重跑），
 **56.8 那一份已被同名重跑覆盖**（重跑沿用同一个日志名，ctime 停在后跑那一趟）⇒ 它只剩本段的叙述，不再可从盘上核。
 **这与上一发删掉"慢 14 倍"是同一个失守，只是这一回丢的不是倍数、是一个读数**——所以下一次动这一档请现读，别引用 56.8。
 **第四次实测（改完本文件与两份文档之后重跑正常模式验红）：闸⑬ 200.3 秒、清单仍 12 本、退出码 0 的 12 本、整轮 rc=0**
@@ -816,7 +907,7 @@ MODES = ("--decorative", "--drift", "--destroy", "--collateral", "--v4blind", "-
          "--v5blind", "--v5strict", "--famblind", "--misfeed", "--sibdrift", "--laddersib",
          "--oldsib", "--g5drop", "--borrowfloor", "--borrowseeds", "--flowcopy", "--ciasym",
          "--ciunread", "--unformatted", "--wrongcount", "--helpblind", "--ciderived", "--bareid",
-         "--limitptr")
+         "--limitptr", "--citedlink")
 if MODE and MODE not in MODES:
     raise SystemExit(f"未知拆红档位 {MODE!r}：MODES 登记处在册 {len(MODES)} 档，没有这一档 ⇒ 加一档必须先登记"
                      "（否则 dispatch 里写了 elif 也永远不会被跑到，那一档是恒绿的装饰）")
@@ -2188,6 +2279,159 @@ if MODE != "--limitptr":
             print(f"    · 引文不逐字：{x}")
         for x in stale_ptr:
             print(f"    · 过期指针：{x}")
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# 闸⑯ 正文引用的"库外一次性件"必须自带声明（第卅发新增·零训练）
+# ════════════════════════════════════════════════════════════════════════════
+# 口径（三句话，写在这条闸旁边是因为它得能被现读复算）：
+#   ① 参评引用面 = 本模块**在册**的 .py/.md + 根目录那两本会引用它的文档（别的项目模块不在射程里）；
+#   ② 面里凡是用反引号写成**整名**、形状像一次性件（下划线开头，或以 .log 结尾——日志永远进不了库，
+#      本目录 .gitignore 挡着），而 `git ls-files` 里没有这个名字的 ⇒ 每一次提到它，都必须在 ±2 行内
+#      留下"这东西不在库里"的标记；
+#   ③ 缺标记 ⇒ 红。判的是"clone 之后这句话还成不成立"，不是"此刻这台机器上有没有那个文件"。
+# 为什么要一条闸而不是又一轮人肉搬：同一件事三发里坏了三次——第廿八发记下、第廿九发结掉一半的
+# 新欠⑶（本文件里那三处 _tmp_redNN 日志）、本轮菜单 B 搬掉的三处、**装这条闸时现读又抓到的一处**
+# （第廿二发那条"第一次跑 8 条流被杀"的墙钟原件）。每一次写的人都是诚实的：他当时看得见那个文件。
+# 会说谎的是"盘上"这两个字，不是人——所以这条闸管的是措辞欠下的义务，不是文件的存在。
+# 登记处 SCRATCH_CITED 与盘上扫描两个来源缺一不可：只扫盘 ⇒ 一次性件被清理之后那句裸引用永远查不红
+# （会衰减的门禁不算门禁）；只登记 ⇒ 下一发新造的名字没人管。
+SCRATCH_CITED = ("_tmp_red25", "_tmp_red26", "_tmp_red28", "_tmp_r29_red", "_tmp_r29_red_all.py",
+                 "_run_d_seg3.log", "_run_red_normal.log", "_tmp_rednormal_timing.log",
+                 "_tmp_l_tierblind.log", "_tmp_l_unpair.log", "_run_cnn_v4f_killed1.log",
+                 "_v4l_fashion_v2_swallowedkeys_v1.json", "_v4l_handcount_bad_v1.json", "_qq.py")
+_LOCAL_MARK = re.compile(r"本机|不在库里|库外|gitignore|断链|作废|叙述级|清理清单|一次性件|永久保留")
+_BT_TOKEN = re.compile(r"`([^`\s]{3,})`")
+_ROOT_DOCS = ("../README.md", "../项目复盘与简历写法.md")
+
+
+def _git_tracked(extra=(), use_dot=True):
+    """在册名单。cwd 恒为本模块目录，所以模块内是相对名、根目录那两本带 ../。
+    `.` 是承重的：少了它，git 把 pathspec 当**过滤**用 ⇒ 名单塌成那两本，本模块所有在册件
+    （含 `_red_v3.py` 自己、`_coef_check.py`）都会被误判成"库外断链"。第卅发就是这么坏的。"""
+    return [x for x in subprocess.run(
+        ["git", "-c", "core.quotepath=false", "ls-files"] + (["."] if use_dot else []) + list(extra),
+        capture_output=True, text=True, encoding="utf-8").stdout.splitlines() if x]
+
+
+CIT_TRACKED = _git_tracked(_ROOT_DOCS)
+CIT_NAMES = {p.rsplit("/", 1)[-1] for p in CIT_TRACKED}
+
+
+def cited_surfaces(tracked=None):
+    """引用面只收**在册**文件：草稿引草稿不是断链（第廿九发 F 清点踩过的第二个坑）。"""
+    tracked = CIT_TRACKED if tracked is None else tracked
+    cands = sorted(glob.glob("*.py") + glob.glob("*.md")) + list(_ROOT_DOCS)
+    return {p: open(p, encoding="utf-8").read().splitlines()
+            for p in cands if p in tracked and os.path.isfile(p)}
+
+
+def cited_denominator_ok(tracked):
+    """分母自证：在册名单必须收得下本模块自己（`_red_v3.py` 在册且以 `_` 开头，是最省事的探针）。
+    名单一旦塌成引用面那两本，这条闸会把满目录的在册件当断链点名——那种红看着像正文的债，其实是分母坏了。"""
+    return "_red_v3.py" in {p.rsplit("/", 1)[-1] for p in tracked} and len(tracked) > 20
+
+
+def cited_universe(surfaces, tracked_names=None):
+    """(每个库外一次性件名 → 它被提到的地方, 射程内的名字数)。目录式写法 `名/…` 按第一段认。"""
+    names = CIT_NAMES if tracked_names is None else tracked_names
+    scope = ({f for f in os.listdir(".") if f.startswith("_") and not f.startswith("__")}
+             | set(SCRATCH_CITED)) - names
+    hits = {}
+    for path, ls in surfaces.items():
+        for i, line in enumerate(ls, 1):
+            for m in _BT_TOKEN.finditer(line):
+                nm = m.group(1).rstrip("/").split("/")[0]
+                if nm in scope or (nm.endswith(".log") and nm not in CIT_NAMES):
+                    hits.setdefault(nm, []).append((path, i))
+    return hits, len(scope)
+
+
+def cited_scan(surfaces, hits, strip_win=None):
+    """返回 (裸引用, 被声明救回)。strip_win=(文件, 行号) 只改内存里那一处引用的窗口——腿C 的抹标记。"""
+    bare, saved = [], []
+    for nm, where in hits.items():
+        for path, ln in where:
+            if path not in surfaces:
+                continue
+            lines = list(surfaces[path])
+            if strip_win == (path, ln):
+                for j in range(max(0, ln - 3), min(len(lines), ln + 2)):
+                    lines[j] = _LOCAL_MARK.sub("", lines[j])
+            win = " ".join(lines[max(0, ln - 3):ln + 2])
+            (saved if _LOCAL_MARK.search(win) else bare).append((nm, path, ln))
+    return sorted(bare), sorted(saved)
+
+
+_T16 = time.perf_counter()
+CIT_SURF = cited_surfaces()
+CIT_HITS, CIT_SCOPE = cited_universe(CIT_SURF)
+CIT_BARE, CIT_SAVED = cited_scan(CIT_SURF, CIT_HITS)
+_T16C = time.perf_counter() - _T16
+print("\n[闸⑯ 正文用反引号引用的库外一次性件，每一次提到都要在同段写明它不在库里]")
+print(f"  引用面 {len(CIT_SURF)} 个在册文件（在册名单 {len(CIT_TRACKED)} 本）；射程内库外名字 {CIT_SCOPE} 个"
+      f"（盘上现读 ∪ 登记处 {len(SCRATCH_CITED)}）；命中引用 "
+      f"{sum(len(v) for v in CIT_HITS.values())} 处 = 带声明 {len(CIT_SAVED)} + 裸引用 {len(CIT_BARE)}"
+      f"（只有裸的算红）；本闸墙钟 {_T16C:.2f} 秒")
+if not cited_denominator_ok(CIT_TRACKED):
+    fails.append(f"闸⑯（分母自证）`git ls-files` 现读只回 {len(CIT_TRACKED)} 本、名单里没有本模块的"
+                 " `_red_v3.py` ⇒ 少了 `.` 那个 pathspec 时 git 是把引用面参数当**过滤**用的，"
+                 "于是全目录在册件都会被点名成『库外断链』——那种红是闸自己的债，不是正文的债")
+
+if MODE == "--citedlink":
+    inj = "_tmp_r30_injected_" + "legA.log"
+    src_a = {"__注入A__": ["首行", f"三份读数各有原件 `{inj}` 与另一份", "末行"]}
+    src_b = {"__注入B__": ["首行", f"三份读数各有本机原件 `{inj}` 与另一份", "末行"]}
+    red_a = cited_scan(src_a, cited_universe(src_a)[0])[0]
+    if sorted(x[0] for x in red_a) == [inj]:
+        fails.append(f"闸⑯（--citedlink 腿A 注入的凭据）{red_a[0][1]}:{red_a[0][2]} 用反引号引用了库外"
+                     f"一次性件 {inj} 而同段无声明 ⇒ 这条闸认得**新造**的断链（点名由注入决定，不是复述旧账）")
+    else:
+        fails.append(f"闸⑯（--citedlink 腿A）注入一条裸引用，测得点名 {sorted(x[0] for x in red_a)}"
+                     f"（要恰好点名 {inj} 一处）⇒ 这条闸看不见新造的断链，它只是在复述旧账")
+    red_b = cited_scan(src_b, cited_universe(src_b)[0])[0]
+    if red_b:
+        fails.append(f"闸⑯（--citedlink 腿B 反对照）同一条引用只多了『本机』二字，测得仍红 "
+                     f"{len(red_b)} 条（要 0）⇒ 判据吃的不是那句声明，修法会被推歪成删引用")
+    else:
+        print(f"  腿B 同一条引用 + 『本机』⇒ 测得红 {len(red_b)} 条（期望 0）——声明本身在承重")
+    if not CIT_SAVED:
+        fails.append("闸⑯（--citedlink 腿C）盘上一条『靠声明才绿』的引用都读不到 ⇒ 腿C 此刻空转，"
+                     "不许记成通过（声明全被删了，或正文换了写法而这条闸看不见）")
+    else:
+        nm0, p0, l0 = CIT_SAVED[0]
+        red_c = [x for x in cited_scan(CIT_SURF, CIT_HITS, strip_win=(p0, l0))[0] if x == (nm0, p0, l0)]
+        if red_c:
+            fails.append(f"闸⑯（--citedlink 腿C 注入的凭据）抹掉 {p0}:{l0}（引用 {nm0}）±2 行里的声明之后"
+                         f"这一处翻红（命中 {len(red_c)} 条）⇒ 那一句『不在库里』是唯一承重的东西")
+        else:
+            fails.append(f"闸⑯（--citedlink 腿C）把 {p0}:{l0}（引用 {nm0}）±2 行窗口里的声明全部抹掉之后"
+                         f"测得这一处翻红 {len(red_c)} 条（要 ≥1）⇒ 它的绿不是声明给的，是被别的腿顶掉了")
+    bad = _git_tracked(_ROOT_DOCS, use_dot=False)
+    if cited_denominator_ok(bad):
+        fails.append(f"闸⑯（--citedlink 腿D 反对照）少了 `.` 那个 pathspec 仍读到 {len(bad)} 本在册、"
+                     "名单里含 `_red_v3.py` ⇒ 那条分母自证腿恒绿，抓不住本发实测过的坏法")
+    else:
+        sb = cited_surfaces(bad)
+        hb = cited_universe(sb, {p.rsplit("/", 1)[-1] for p in bad})[0]
+        bb = [x for x in cited_scan(sb, hb)[0] if x[0] == "_red_v3.py"]
+        if not bb:
+            fails.append(f"闸⑯（--citedlink 腿D）名单塌成 {len(bad)} 本、引用面 {len(sb)} 本时，"
+                         "测得『把在册件当断链』0 条（要 ≥1）⇒ 这个坏法不会把在册件点名，"
+                         "分母自证那条腿也就没有东西可自证")
+        else:
+            fails.append(f"闸⑯（--citedlink 腿D 注入的凭据）换成少了 `.` 的旧写法读在册 ⇒ 名单只剩 "
+                         f"{len(bad)} 本（引用面 {len(sb)} 本），闸⑯ 当场把在册的 `_red_v3.py` 当库外断链"
+                         f"点名 {len(bb)} 条，而同一个状态下分母自证那条腿也红 ⇒ 名单塌了不会被读成"
+                         "『正文欠声明』")
+else:
+    for nm, path, ln in CIT_BARE:
+        fails.append(f"闸⑯（断链引用）{path}:{ln} 用反引号引用了库外一次性件 {nm}，±2 行内没有"
+                     "『本机/不在库里/一次性件/清理清单/叙述级/断链/作废/永久保留』任一句"
+                     " ⇒ clone 之后这句话指着不存在的原件（补声明，或改成命令形态的凭据）")
+    if not CIT_HITS:
+        fails.append("闸⑯ 一条库外一次性件引用都没读到 ⇒ 不是通过，是没测到"
+                     "（glob 空转，或正文换了写法而这条闸看不见）")
 
 
 print(f"\n模式：{MODE or '（正常验红）'}")

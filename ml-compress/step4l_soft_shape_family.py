@@ -248,7 +248,12 @@ n_agree = 其中与 MNIST 同名格同号的格数，n_mag = 其中"MNIST 该格
          （护栏要求人处置 ⇒ 不覆盖 v2；v2 留盘）。逐字段对账实测：`cells` 那 27 格与 `denominators`
          **与 v2 完全相同**，只有上述三键、`leg_check` 一条与 `exit`/`verdict` 那两句话变长 ⇒ 没有一个读数被动过。
   ⑥ 没买到的（下一发别把这几条当已有）：Fashion 上的**读法 A**（要 CNN 的 α→0 薄阶梯，`step4f` 那侧
-     `--arch cnn --dataset fashion` 在第一次训练之前就拒，理由已登记）；Fashion 上**段② 那种加宽尺子**
+     `--arch cnn --dataset fashion` 在第一次训练之前就拒，理由已登记）〔**第卅二发 D 买掉这一条的一半**：
+     低数据档那一对薄阶梯已造齐（CNN 35 次 + 它自己的 8 条流底 16 次），读法 A 在 Fashion 上从此
+     **能开口**，但登记处只有 1 档、两本的共有 α 只有 {0.05, 0.7} ⇒ p 的分母是 **2 格而不是 9 格**；
+     中数据/满数据两档的 CNN 薄阶梯仍然没有，那一半继续按"没买到"读；另贴一条更正——上面那句
+     "在第一次训练之前就拒"是**当时**的前置状态，那条按任务一刀切的拒绝已在第卅一发撤掉（撤的是
+     "整个组合一律拒"，不是"这一档没造过"），原文按老规矩不动，更正只贴在它脚边〕；Fashion 上**段② 那种加宽尺子**
      （三档全 3 条流 ⇒ 本本 q 没有兜底，测不出只能记"没量过"）；T=1 那一列在**第二个任务 × 更宽尺子**下
      的功效（两个维度一起欠着）；以及 `exit` 里那个 (m) 分支——四格在本任务上只实到 (u)，(m) 仍是空的一格。
 """
@@ -272,7 +277,9 @@ DATASET = "mnist"
 # v2：只多段② 那几个键（`exit`/`verdict`/读法 A/B 逐字段与 v1 相同）；v1 档案留盘做逐字段对账
 # 版本位登记处（不自动升：自动挑号等于绕过"已入库"那条要人处置的护栏）。fashion 升 v3 的原因写在
 # 本文件 docstring 的 D 落地段：往 `task_switch_crosscheck` 里加了三个"腿自己有没有区分度"的键。
-REPORT_VER = {"mnist": "v2", "fashion": "v3"}
+# fashion 再升 v4（第卅二发 D）：`reading_A_paired_T6_8flows` 从空表变成"低数据档一对 × 共有 α 两格"，
+# `reading_A_applicability` 那句随之不能再说"没造过"⇒ 内容变了就换号，v3 留盘不覆盖。mnist 那本一个字不动。
+REPORT_VER = {"mnist": "v2", "fashion": "v4"}
 OUT = HERE / f"compress_report_v4l_soft_shape_family{DATASET_SUFFIX[DATASET]}_{REPORT_VER[DATASET]}.json"
 MNIST_V2 = HERE / "compress_report_v4l_soft_shape_family_v2.json"   # 换任务那趟的对照基准（按内容核身份）
 
@@ -306,13 +313,19 @@ GRID_FASHION = {
     "中数据4500": ("compress_report_v4c_fashion_cnn_mid.json", "compress_report_v4c_fashion_mid.json"),
     "满数据8500": ("compress_report_v4c_fashion_cnn.json", "compress_report_v4c_fashion.json"),
 }
-# Fashion 名下这两张**结构上就是空的**，不是忘了填：
-#   · 读法 A 吃的是 α→0 阶梯账，Fashion 侧只有 MLP 那两本（`v4f_fashion_*`），CNN 侧一格都没造过
-#     ⇒ 没有可配对的另一族，硬凑只能去借 MNIST 的 CNN 阶梯，那是换任务冒充同任务；
+# Fashion 名下这两张表**历史上就是空的**，不是忘了填（第卅二发之前，读法 A 的 CNN 侧一格都没造过）：
+#   · 读法 A 吃的是 α→0 阶梯账，硬凑只能去借 MNIST 的 CNN 阶梯，那是换任务冒充同任务；
 #   · 段② 吃的是 8 流网格，Fashion 两族都只有 3 流那一档（这一发只买 3 条流，理由写在第廿七发 (u)）
 #     ⇒ 甲（共流嵌套）与丙（半宽变窄）都没有原料。
 # 所以这两处在 Fashion 模式下打印"无从开口"并把键写进档案，**不回落 MNIST**。
-LADDER_FASHION: dict[str, tuple[str, str]] = {}
+# 〔第卅二发：读法 A 那一半的空格按菜单 D 买掉了低数据档——两族各一本 8 条流的薄阶梯都在册了，
+#  于是下面登记成一对；中数据/满数据两档的 CNN 薄阶梯仍然没有，所以这张表**不是**三档齐，
+#  p 的分母按现读算（见 reading_A_applicability 那句），不许按 MNIST 的 9 格读。
+#  GRID8_FASHION 那一半仍空，理由未变。〕
+LADDER_FASHION: dict[str, tuple[str, str]] = {
+    "低数据2000": ("compress_report_v4f_fashion_cnn_low_n8_thin_t6_v5.json",
+                   "compress_report_v4f_fashion_low_n8_thin_t6_v5.json"),
+}
 GRID8_FASHION: dict[str, tuple[str, str]] = {}
 AUDIT_KEYS = ("mean_top1", "pct_top1_gt_0.99", "mean_p2", "mean_margin_top1_top2")
 
@@ -534,6 +547,16 @@ def arm_row(book: dict, alpha: float, seed: int) -> dict:
     return book["arms"][key]
 
 
+def ladder_alphas(cb: dict, mb: dict) -> tuple[float, ...]:
+    """这一对阶梯账**真的**共有哪几格 α：两本 `arms` 键名的交集，再与登记的那三格相交。
+    MNIST 那三对算出来就是 `ALPHAS` 本身 ⇒ 读数一字不动；Fashion 低数据档的 MLP 那本只有
+    {0.05, 0.7}（薄阶梯没跑 α=0.3）⇒ 交集是两格，p 的分母跟着变成 2，而不是"少比一格、照 9 报"。"""
+    def cell_alphas(b: dict) -> set:
+        return {float(k.split(" 种子")[0][1:]) for k in b["arms"]}
+    both = cell_alphas(cb) & cell_alphas(mb)
+    return tuple(a for a in ALPHAS if a in both)
+
+
 def grid_row(book: dict, alpha: float, temp: float, seed: int) -> dict:
     key = f"a{alpha:g}_T{temp:g}"
     cell = book["grid"].get(key)
@@ -750,15 +773,19 @@ def main(red: str = "", ds: str = "mnist") -> None:
 
     # ---- 读法 A ----
     if not books:
-        print(f"\n[读法 A · 本任务（{DATASET}）**无从开口**] 它吃的是 α→0 阶梯账（两族各一本 × 三档），"
-              f"Fashion 侧只有 MLP 那几本（`compress_report_v4f_fashion_*`），CNN 侧一格都没造过 ⇒ "
-              f"没有可配对的另一族。要买这一格 = 先造 CNN 的薄阶梯（每本 27 次 × 缺的档数），"
-              f"那是另一发的钱，本课不借 MNIST 的 CNN 阶梯来凑。")
+        print(f"\n[读法 A · 本任务（{DATASET}）**无从开口**] 它吃的是 α→0 阶梯账（同一坐标两族各一本），"
+              f"而登记处在这一名下是**空的** ⇒ 没有可配对的坐标，p 的分母是 0；本课不借别的任务的 CNN 阶梯来凑。"
+              f"（历史上 Fashion 名下三档全空；第卅二发 D 买掉了低数据档那一对，剩下的两档要造就是"
+              f"每对一薄的笔钱，见 README【第三十二发】）")
     read_a: dict[str, dict] = {}
     for tier, (cb, mb) in books.items():
         seeds = [int(s) for s in cb["seeds"]]
+        alphas = ladder_alphas(cb, mb)
+        if not alphas:
+            print(f"  {tier}：登记了这一对，但两本账**没有共有的 α 格** ⇒ 这一档不进 p 的分母"
+                  f"（是『无从开口』，不是『比过且 p=0』）")
         cells = {}
-        for a in ALPHAS:
+        for a in alphas:
             off, gc, gm, by_seed = pair_block(
                 cb, mb, seeds, lambda b, s: arm_row(b, a, s), lambda s: f"α{a:g}",
                 f"{tier} × α={a:g} × T=6", unpair=(red == "--unpair"))
@@ -1003,10 +1030,15 @@ def main(red: str = "", ds: str = "mnist") -> None:
                                      f"以为闸跑过了）"),
                   "闸V_来源": "每个数带 (档案名, 格名, 流名单)，见各格 `provenance` 与 `offset_by_seed`"},
         "reading_A_paired_T6_8flows": read_a,
-        "reading_A_applicability": ("全档齐备（三对阶梯账都在册）" if read_a else
-                                    f"**不适用**（任务 {DATASET}）：读法 A 吃的是两族各自的 α→0 阶梯账，"
-                                    f"这一本名下 CNN 侧一格都没造过 ⇒ 上面那张空表的意思是『无从开口』，"
-                                    f"不是『测过了且 p=0（即测不出跨族差）』；p 的分母因此是 0，不参与任何计数"),
+        "reading_A_applicability": (
+            f"参评 {len(read_a)} 档（登记处 {len(books)} 档）× 每档取两本账的**共有** α ⇒ 共 {len(p_cells)} 格，"
+            f"α 集合 {sorted({float(k.split('=')[1]) for t in read_a.values() for k in t})}；"
+            f"MNIST 那三对算出来是 9 格（登记处三档 × α∈{{0.05,0.3,0.7}}），"
+            f"分母不同 ⇒ p 的读数**不许跨任务横比**，只能各自对着自己的分母读"
+            if read_a and len(read_a) == len(books) else
+            f"**不适用**（任务 {DATASET}）：读法 A 吃的是同一坐标两族各自的 α→0 阶梯账，"
+            f"登记处在这一名下是空的（{len(books)} 档）⇒ 上面那张表的意思是『无从开口』，"
+            f"不是『测过了且 p=0（即测不出跨族差）』；p 的分母因此是 0，不参与任何计数"),
         "reading_B_offset_vs_T_3flows": read_b,
         "reading_B2_offset_vs_T_8flows": read_b8,
         "section2_power_check": {"buys": "上面 docstring 落地⑧ 第 3 笔：q=0 里『效应为 0』与『3 条流测不动』分不开",

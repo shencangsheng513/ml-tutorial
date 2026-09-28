@@ -1,0 +1,210 @@
+{
+  "seeds": [
+    42,
+    7,
+    2026,
+    11,
+    202,
+    3003,
+    40004,
+    55555
+  ],
+  "cross_script_parity": {
+    "低数据2000 老3条流×4项读数": "逐位相同"
+  },
+  "width": 128,
+  "test_n": 10000,
+  "dataset": "fashion",
+  "student_arch": "cnn",
+  "student_tag": "CNN学生（无宽度旋钮）",
+  "tier_arg": "低数据2000",
+  "n_seeds_arg": 8,
+  "parity_no_archive": [
+    "低数据2000 CE",
+    "低数据2000 KD"
+  ],
+  "train_fit_n": 8500,
+  "parity_seed42_vs_archive": {},
+  "arms": {
+    "低数据2000 种子42": {
+      "seed": 42,
+      "acc_ce": 0.8368,
+      "acc_kd": 0.8505,
+      "gap_pp": 1.37,
+      "gap_imgs": 137,
+      "flips": {
+        "broken": 381,
+        "fixed": 518
+      },
+      "p_sign": 6e-06,
+      "wrong_ce": 1632,
+      "wrong_kd": 1495
+    },
+    "低数据2000 种子7": {
+      "seed": 7,
+      "acc_ce": 0.8263,
+      "acc_kd": 0.8436,
+      "gap_pp": 1.73,
+      "gap_imgs": 173,
+      "flips": {
+        "broken": 389,
+        "fixed": 562
+      },
+      "p_sign": 0.0,
+      "wrong_ce": 1737,
+      "wrong_kd": 1564
+    },
+    "低数据2000 种子2026": {
+      "seed": 2026,
+      "acc_ce": 0.8369,
+      "acc_kd": 0.8421,
+      "gap_pp": 0.52,
+      "gap_imgs": 52,
+      "flips": {
+        "broken": 329,
+        "fixed": 381
+      },
+      "p_sign": 0.055544,
+      "wrong_ce": 1631,
+      "wrong_kd": 1579
+    },
+    "低数据2000 种子11": {
+      "seed": 11,
+      "acc_ce": 0.8342,
+      "acc_kd": 0.8402,
+      "gap_pp": 0.6,
+      "gap_imgs": 60,
+      "flips": {
+        "broken": 389,
+        "fixed": 449
+      },
+      "p_sign": 0.041474,
+      "wrong_ce": 1658,
+      "wrong_kd": 1598
+    },
+    "低数据2000 种子202": {
+      "seed": 202,
+      "acc_ce": 0.8259,
+      "acc_kd": 0.8534,
+      "gap_pp": 2.75,
+      "gap_imgs": 275,
+      "flips": {
+        "broken": 268,
+        "fixed": 543
+      },
+      "p_sign": 0.0,
+      "wrong_ce": 1741,
+      "wrong_kd": 1466
+    },
+    "低数据2000 种子3003": {
+      "seed": 3003,
+      "acc_ce": 0.8428,
+      "acc_kd": 0.8526,
+      "gap_pp": 0.98,
+      "gap_imgs": 98,
+      "flips": {
+        "broken": 325,
+        "fixed": 423
+      },
+      "p_sign": 0.000383,
+      "wrong_ce": 1572,
+      "wrong_kd": 1474
+    },
+    "低数据2000 种子40004": {
+      "seed": 40004,
+      "acc_ce": 0.8378,
+      "acc_kd": 0.8589,
+      "gap_pp": 2.11,
+      "gap_imgs": 211,
+      "flips": {
+        "broken": 228,
+        "fixed": 439
+      },
+      "p_sign": 0.0,
+      "wrong_ce": 1622,
+      "wrong_kd": 1411
+    },
+    "低数据2000 种子55555": {
+      "seed": 55555,
+      "acc_ce": 0.8376,
+      "acc_kd": 0.8413,
+      "gap_pp": 0.37,
+      "gap_imgs": 37,
+      "flips": {
+        "broken": 343,
+        "fixed": 380
+      },
+      "p_sign": 0.180578,
+      "wrong_ce": 1624,
+      "wrong_kd": 1587
+    }
+  },
+  "verdicts": {
+    "低数据2000": {
+      "gaps_imgs": [
+        137,
+        173,
+        52,
+        60,
+        275,
+        98,
+        211,
+        37
+      ],
+      "gap_spread": {
+        "min": 37,
+        "max": 275,
+        "range": 238,
+        "mean": 130.38
+      },
+      "same_dir_seeds": "8/8",
+      "p_seeds": 0.0078,
+      "pooled_flips": {
+        "broken": 2652,
+        "fixed": 3695
+      },
+      "p_pooled": 0.0,
+      "seed_floor_imgs": {
+        "CE": 169,
+        "KD": 187
+      },
+      "gap_over_floor": 0.7,
+      "survives_seed": false,
+      "floor_is_n_dependent": "底是 max−min 型统计量，随流数机械变宽：n=8 时它必然 ≥ n=3 时的值，所以 gap_over_floor 这个比值**跨本不可比**，换流数的那一发不能用它翻案或定案",
+      "paired_gap": {
+        "label": "低数据2000 · CNN学生（无宽度旋钮） 按流配对",
+        "n_seeds": 8,
+        "mean_gap_imgs": 130.4,
+        "sd_imgs": 84.6,
+        "se_imgs": 29.9,
+        "ci95_imgs": [
+          59.6,
+          201.1
+        ],
+        "gaps": [
+          137,
+          173,
+          52,
+          60,
+          275,
+          98,
+          211,
+          37
+        ],
+        "same_sign_seeds": "8/8（+）",
+        "p_seeds_binomial": 0.0078,
+        "range_imgs": 238,
+        "d4_sigma_hat": 83.6
+      }
+    }
+  },
+  "limitations": [
+    "每种子只训一次：种子底由 8 个点的极差估，仍是欠估",
+    "只复现了 CNN学生（无宽度旋钮） + 档位 ['低数据2000']；其余臂（S64 满数据）未换种子",
+    "α/T 未扫参（本课只测随机流；扫参见 step4c_alpha_T_sweep.py）",
+    "p_pooled 偏乐观：多个种子共用同一批 10000 张测试图，翻牌事件跨种子不独立",
+    "本轮不测墙钟：精度是确定性读数，墙钟要另开交错配对流程",
+    "种子底用的是 max−min 型极差：它随流数机械变宽，所以 gap_over_floor 只能在同一本账内部读，拿 3 条流那本与 8 条流这本的比值互相翻案就是拿 n 当效应",
+    "低数据2000 CE、低数据2000 KD 没有第4课档案可对（任务 fashion × 族 cnn 这一坐标第4课没跑过）：这一档只产种子底，「换随机流还同向吗」这件事对它没有历史判决可复核"
+  ]
+}

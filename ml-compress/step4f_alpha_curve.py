@@ -1233,7 +1233,8 @@ def check_t(t: float, grid: dict, where: str) -> float:
 
 
 def setup(dataset: str, width: int, tier: str, extra: str = "",
-          t_col: float | None = None, nseeds: int = 3) -> dict:
+          t_col: float | None = None, nseeds: int = 3,
+          v4bc: bool = False) -> dict:
     """六样读数（温度列 / 锚点剂量 / 闸格 / 该档的底 / 锚点伤害 / 产物名）全从**那一本账**现读。
 
     为什么必须现读而不是各写一套：Fashion 的 **MLP** 那本账（step6 的 v6）没有 T=3、也没有 α=0.3——
@@ -1241,8 +1242,14 @@ def setup(dataset: str, width: int, tier: str, extra: str = "",
     账本字段布局的差异只允许出现在这一个函数里。
     选哪本账由**任务 × 族**决定（第卅一发菜单 C）：v4b/v4c 那两本的名字里任务位与族位都齐，
     所以除了 Fashion 的 MLP 腿（它只有 v6 那本按档合并的旧账，布局是 per_tier/raw_rows）之外，
-    其余三型（MNIST×MLP、MNIST×CNN、Fashion×CNN）全走上面那一支。"""
-    if dataset != "fashion" or v4c_mod.ARCH == "cnn":
+    其余三型（MNIST×MLP、MNIST×CNN、Fashion×CNN）全走上面那一支。
+    `--from-v4bc`（第卅四发）是给 Fashion×MLP 那一腿开的**显式**出口：v6 那本只登记了满数据/低数据
+    两档，中数据档走 else 分支必死于训练之前，而同一坐标的按族分册账（`v4b_*_mid_n8` + `v4c_*_mid`）
+    此刻都在盘上。默认**不**走这一支——已入库的那两本 MLP×Fashion 薄账用的是 v6 的尺子
+    （底来自 v6 的 `own_floor_imgs`＝3 条流、闸格恰好落在锚点上），把默认一起翻过去等于用一次
+    改名把两本在册判决的对照断开。走哪一把由付钱的人在命令行上点名，两把的差别也都写进档案
+    （`floor_from`、`anchor_from`、`gate_is_anchor`）。"""
+    if dataset != "fashion" or v4c_mod.ARCH == "cnn" or v4bc:
         v4b, v4c = v4b_path(width, tier, nseeds), v4c_name(width, tier)
         missing = [p.name for p in (v4b, v4c) if not p.exists()]
         if missing:
@@ -1310,7 +1317,7 @@ def setup(dataset: str, width: int, tier: str, extra: str = "",
 
 def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
          nseeds: int = 3, thin: bool = False, t_col: float | None = None,
-         high: bool = False, arch: str | None = None) -> None:
+         high: bool = False, arch: str | None = None, v4bc: bool = False) -> None:
     ds = DATASETS[dataset]
     arch = v4c_mod.ARCH if arch is None else arch      # 唯一真值住在 step4c（守卫也从这里注入）
     # 任务位和族位同源：档案名由 step4c 的 DATASET_SUFFIX × FAMILY_SUFFIX 生成，所以这里只往那一个
@@ -1329,6 +1336,10 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
     v4c_mod.ARCH = arch
     if high and thin:
         raise SystemExit("--ladder-high 与 --thin 互斥：薄阶梯只留判据吃的那几格，而这一发买的正是顶以上那两格")
+    if v4bc and not (dataset == "fashion" and arch == "mlp"):
+        raise SystemExit(f"--from-v4bc 用在了 任务={dataset} × 族={arch} 上：这一格的读账路由本来就是"
+                         f"按族分册（v4b+v4c），没有第二条岔路可点。这个开关只服务 Fashion×MLP 那一腿"
+                         f"（它历史上被无条件接到 step6 那本按档合并的旧账上），配错坐标 = 开关自己也在漂")
     if nseeds not in FLOW_SEEDS:
         raise SystemExit(f"复现流只有 {sorted(FLOW_SEEDS)} 这几档（3=对账那批 / 8=板块共用那批 / "
                          f"12=第九发新买四条 / 16=第十四发再买四条 / 26=第十八发为 Fashion 那一发新买十条）")
@@ -1338,7 +1349,7 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
             ("" if t_col is None else f"_t{t_col:g}") + ("_hi" if high else "") + f"_{SHAPE_RULE}"
     if not ds["teacher_pt"].exists():
         raise SystemExit(f"缺 {ds['teacher_pt'].name}——这一课的老师权重只能复用，别现造")
-    L = setup(dataset, width, tier, extra, t_col, nseeds)
+    L = setup(dataset, width, tier, extra, t_col, nseeds, v4bc=v4bc)
     T, LAD, PROBE, ANC = L["t"], L["ladder"], L["gate_alpha"], L["anchor_alpha"]
     if thin:
         # 薄阶梯：只留判决真正吃的那几格（最小剂量 + 锚点，外加**跨脚本闸格**），恒等闸只在老 3 条流上跑。
@@ -1765,6 +1776,11 @@ if __name__ == "__main__":
                          "显式给值时档案名加 _t<值>（换列=换一本账，不能与默认那本撞名）")
     ap.add_argument("--tier", choices=tuple(DATA_TIERS), default=TIER,
                     help="数据档位；底与跨脚本闸基准都从那一档（那一本任务）自己的账里读，缺格就退出")
+    ap.add_argument("--from-v4bc", action="store_true", dest="v4bc",
+                    help="仅 Fashion×MLP：改从按族分册的两本账现读（底=step4b 的 v4b_*_nN，网格与闸格="
+                         "step4c 的 v4c_*）。默认不走这一支：那两本已入库的 Fashion MLP 薄账用的是 step6"
+                         " 按档合并的旧账（底 3 条流、闸格落在锚点上），翻默认=用一次改路由断开两本在册判决的"
+                         "对照。旧账只登记满数据/低数据两档，中数据档只能靠这个开关点名走另一把尺子")
     args = ap.parse_args()
     main(args.dataset, args.width, args.tier, nseeds=args.nseeds, thin=args.thin, t_col=args.t,
-         high=args.ladder_high, arch=args.arch)
+         high=args.ladder_high, arch=args.arch, v4bc=args.v4bc)

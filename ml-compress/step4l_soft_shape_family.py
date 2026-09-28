@@ -328,7 +328,11 @@ DATASET = "mnist"
 # fashion 又升 v5（第卅三发 D+E）：两件事同时变了——读法 A 从一档成两档（满数据档那一对买齐了），
 # 段② 与闸 VI 在 Fashion 名下**第一次有原料**（低数据档 8 流网格两族各一本）⇒ 那三处"不适用"的文案
 # 全部随之不能再说"没有"。理由细节在 docstring 的 D 落地段。mnist 那本照旧一个字不动。
-REPORT_VER = {"mnist": "v2", "fashion": "v5"}
+# fashion 又升 v6（第卅四发 B）：读法 A 从**两档**成**三档**（中数据档那对的 MLP 腿买齐了），而且这一对
+# 两族**共有三格** α（{0.05, 0.3, 0.7}——MLP 那本走的是按族分册的账，闸格 α=0.3 独立于锚点），前两档那
+# 两对仍只有两格 ⇒ p 的分母从 4 格变成 4+3=7 格。边界照第卅二发那句：分母变大 ≠ 换任务的判决变硬，
+# 它只说明能点名的格子多了三格。
+REPORT_VER = {"mnist": "v2", "fashion": "v6"}
 OUT = HERE / f"compress_report_v4l_soft_shape_family{DATASET_SUFFIX[DATASET]}_{REPORT_VER[DATASET]}.json"
 MNIST_V2 = HERE / "compress_report_v4l_soft_shape_family_v2.json"   # 换任务那趟的对照基准（按内容核身份）
 
@@ -379,6 +383,12 @@ GRID_FASHION = {
 LADDER_FASHION: dict[str, tuple[str, str]] = {
     "低数据2000": ("compress_report_v4f_fashion_cnn_low_n8_thin_t6_v5.json",
                    "compress_report_v4f_fashion_low_n8_thin_t6_v5.json"),
+    # 中数据档是第卅四发新补的一对，也是换任务侧**第一对两族走同一条读账路由**的账：两本都用按族分册
+    # 的 v4b+v4c（底来自各自那本 8 流 v4b、闸格 α=0.3 独立于锚点 ⇒ `gate_is_anchor=False`）。
+    # 下面低数据/满数据那两对的 MLP 腿走的是 step6 那本按档合并的旧账（底 3 条流的 `own_floor_imgs`、
+    # 闸格恰好落在锚点上 ⇒ `gate_is_anchor=True`）⇒ 那两对的跨族配对本来就是两把尺子，只有名字对齐。
+    "中数据4500": ("compress_report_v4f_fashion_cnn_mid_n8_thin_t6_v5.json",
+                   "compress_report_v4f_fashion_mid_n8_thin_t6_v5.json"),
     # MLP 那一本的名字是旧命名规则下的（没有 `_t6` 也没有 `_v5`，温度只能由档案字段核）：
     # 这里登记的是"同一坐标两族各一本"这件事，温度/档/宽/流数全部由闸 III 与闸 I 现读，不由名字读。
     "满数据8500": ("compress_report_v4f_fashion_cnn_n8_thin_t6_v5.json",

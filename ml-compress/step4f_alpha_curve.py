@@ -750,7 +750,7 @@ v4 的倒挂腿吃的界是"份额 > 100%"，而份额 = |第一格| ÷ |阶梯�
         `UnicodeEncodeError`，而 stderr 走块缓冲重定向 ⇒ 事后打开日志**一个字都没有**，看起来像"进程没起来"。
         根因不是代码是没带 `PYTHONIOENCODING=utf-8 PYTHONUTF8=1`（板块记忆里那条第 N 次兑现）。
         (b) **`nohup ... &` 随工具调用进程树一起死**——8 条流那趟跑到**第 7 条流**被杀
-        （`_run_cnn_v4f_killed1.log` 停在 7/8，留档当反例），改回"长跑只用后台任务"才跑完。
+        （`_run_cnn_v4f_killed1.log` 停在 7/8，本机一次性日志、已删除，逐字留档在 README 第廿二发），改回"长跑只用后台任务"才跑完。
         (c) **第二次跑的时间无法归因**——账直到 23:20:24 才落下，而同期本机 `Get-CimInstance` 现读有
         **21 个并存 python 进程**、空闲内存 1.36G/16.47G ⇒ 只报定性（被别人的负载压着，**没动任何别人的进程**）；
         上一版文档在这里写过"慢 14 倍"，那个倍数**算不出来**（重跑复用了同一个日志名，起点时间戳被覆盖）⇒ 已删。
@@ -968,7 +968,7 @@ import torch
 from step1_quantize import MODELS, build_cnn, predict
 from step4_distill import (DATA_TIERS, FLOW_SEEDS, SEEDS, SEEDS8, SEEDS12, SEEDS16, SEEDS26,
                            TEACHER_ARCHIVE_ACC, VAL_N, check_flow_constants, flow_tiers,
-                           logits_of, sign_test_p, train_student)
+                           logits_of, sign_test_p, teacher_archive_acc, train_student)
 from step4e_marginal_recheck import OLD_SEEDS, summarize          # 复现单位是流：CI 用同一套系数表
 from step4c_alpha_T_sweep import ALPHA_ANCHOR, ANCHOR_T, TIER, V4C_SUFFIX, key, load_anchor, out_path, v4b_path
 import step4c_alpha_T_sweep as v4c_mod      # 家族开关在 step4c 那边：档案名/底/锚点格都从那几个路径函数读
@@ -1236,10 +1236,13 @@ def setup(dataset: str, width: int, tier: str, extra: str = "",
           t_col: float | None = None, nseeds: int = 3) -> dict:
     """六样读数（温度列 / 锚点剂量 / 闸格 / 该档的底 / 锚点伤害 / 产物名）全从**那一本账**现读。
 
-    为什么必须现读而不是各写一套：Fashion 那本账没有 T=3、也没有 α=0.3——把 MNIST 的两个常量
-    抄过来，会得到一个不存在的锚点格和一格对不上的闸（而"对不上的闸"是最坏的一种绿）。
-    账本字段布局的差异只允许出现在这一个函数里。"""
-    if dataset == "mnist":
+    为什么必须现读而不是各写一套：Fashion 的 **MLP** 那本账（step6 的 v6）没有 T=3、也没有 α=0.3——
+    把 MNIST 的两个常量抄过来，会得到一个不存在的锚点格和一格对不上的闸（而"对不上的闸"是最坏的一种绿）。
+    账本字段布局的差异只允许出现在这一个函数里。
+    选哪本账由**任务 × 族**决定（第卅一发菜单 C）：v4b/v4c 那两本的名字里任务位与族位都齐，
+    所以除了 Fashion 的 MLP 腿（它只有 v6 那本按档合并的旧账，布局是 per_tier/raw_rows）之外，
+    其余三型（MNIST×MLP、MNIST×CNN、Fashion×CNN）全走上面那一支。"""
+    if dataset != "fashion" or v4c_mod.ARCH == "cnn":
         v4b, v4c = v4b_path(width, tier, nseeds), v4c_name(width, tier)
         missing = [p.name for p in (v4b, v4c) if not p.exists()]
         if missing:
@@ -1248,6 +1251,11 @@ def setup(dataset: str, width: int, tier: str, extra: str = "",
         arch = json.loads(v4c.read_text(encoding="utf-8"))
         if int(arch["width"]) != width or arch["tier"] != tier:
             raise SystemExit(f"{v4c.name} 是 {arch['tier']}/S{arch['width']} 的表，不是 {tier}/S{width}")
+        if arch.get("dataset", "mnist") != dataset or arch.get("student_arch", "mlp") != v4c_mod.ARCH:
+            raise SystemExit(f"{v4c.name} 记的是任务={arch.get('dataset', 'mnist')} × "
+                             f"族={arch.get('student_arch', 'mlp')}，本课是 任务={dataset} × "
+                             f"族={v4c_mod.ARCH}：名字里有任务位和族位而**内容**对不上，"
+                             f"等于拿别的任务/别的族的网格判这一本")
         anc_a, gate_a = ALPHA_ANCHOR, PROBE_ALPHA
         # 阶梯必须**真的训到锚点剂量**：v3 的判据能吃阶梯顶，而上一轮刚把"份额/反号"那两句话
         # 改成读本格现读的阶梯顶（不借 3 条流的档案读数）。少这一格，那两句话与 v3 的第三格都没有原料。
@@ -1291,7 +1299,7 @@ def setup(dataset: str, width: int, tier: str, extra: str = "",
              if key(anc_a, tt) in grid}
     gate = rows_of(key(gate_a, t))
     return {"t": t, "anchor_alpha": anc_a, "gate_alpha": gate_a, "ladder": lad,
-            "teacher_acc": (float(d["teacher"]["test_acc"]) if dataset == "fashion" else TEACHER_ARCHIVE_ACC),
+            "teacher_acc": teacher_archive_acc(dataset),
             "anchor_mean": float(grid[key(anc_a, t)]["mean_gap_imgs"]),
             "gate_rows": gate, "anchor_rows": rows_of(key(anc_a, t)), "gate_mean": round(sum(r["gap_imgs"] for r in gate) / len(gate), 1),
             "floor": floor, "floor_kind": floor_kind, "floor_from": floor_from,
@@ -1305,10 +1313,16 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
          high: bool = False, arch: str | None = None) -> None:
     ds = DATASETS[dataset]
     arch = v4c_mod.ARCH if arch is None else arch      # 唯一真值住在 step4c（守卫也从这里注入）
-    if arch == "cnn" and dataset != "mnist":
-        raise SystemExit(f"--arch cnn 配 --dataset {dataset}：族×任务这一格不是顺手加个 if 就能来的——"
-                         f"换任务那条路径读的是 step6 那本账，而那本账**全是 MLP 学生的臂**（"
-                         f"给它换族等于借 MLP 的底判 CNN 的阶梯）。要买这一格，先按族把那一档的底造出来")
+    # 任务位和族位同源：档案名由 step4c 的 DATASET_SUFFIX × FAMILY_SUFFIX 生成，所以这里只往那一个
+    # 全局里写，setup() 里不许拼第二套名字。
+    v4c_mod.DATASET = dataset
+    # 【第卅一发菜单 C：撤掉这条 blanket 拒绝】原先那句"族×任务这一格不是顺手加个 if 就能来的"
+    # 的理由**只对 setup() 的 else 分支成立**——那一支的底与网格全从 step6 那本账读，而那本账
+    # 全是 MLP 学生的臂。但 Fashion 的 CNN 腿另有它自己的按族账（第卅一发菜单 C 现读：满数据档
+    # compress_report_v4b_fashion_cnn.json + compress_report_v4c_fashion_cnn.json，低数据档同名加
+    # _low，中数据档加 _mid，六本全在册），名字里任务位与族位都齐 ⇒ 按族读档这条路本来就该通，
+    # 是那条 if 把它一起关掉了。关掉之后仍然剩下的前置只有流数：8 条流那本底不在盘上，
+    # 由 v4b_path 在第一次训练之前点名拒（腿②）。
     if arch == "cnn" and width != 128:
         raise SystemExit(f"--arch cnn 配 --width {width}：CNN 学生与老师同架构，宽度这一维在它身上无定义"
                          f"（跨不跨宽度那一发是 MLP 族的 S128 vs S64）——两个判别变量被这一个开关混成了一次")

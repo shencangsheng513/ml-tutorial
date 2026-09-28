@@ -256,6 +256,52 @@ n_agree = 其中与 MNIST 同名格同号的格数，n_mag = 其中"MNIST 该格
      "整个组合一律拒"，不是"这一档没造过"），原文按老规矩不动，更正只贴在它脚边〕；Fashion 上**段② 那种加宽尺子**
      （三档全 3 条流 ⇒ 本本 q 没有兜底，测不出只能记"没量过"）；T=1 那一列在**第二个任务 × 更宽尺子**下
      的功效（两个维度一起欠着）；以及 `exit` 里那个 (m) 分支——四格在本任务上只实到 (u)，(m) 仍是空的一格。
+
+────── 第卅三发 D+E 落地（菜单 D = 上面⑥ 的"段② 那种加宽尺子"，E = 上面⑥ 的"中数据/满数据两档 CNN 薄阶梯" +
+      "T=1 那一列在第二个任务 × 更宽尺子下的功效"；预登记与上面各条原文一字未改，读数来自
+      `compress_report_v4l_soft_shape_family_fashion_v5.json`）──────
+  ⑦ 实付 **294 次训练**（本脚本自己仍 0 次、零 API 费），分三波开账、价签与实际逐本对上：
+     3 本 v4b 底 = 48 次（`compress_report_v4b_fashion_cnn_mid_n8.json`、`compress_report_v4b_fashion_cnn_n8.json`、
+     `compress_report_v4b_fashion_low_n8.json`）＋ 2 本 v4f 薄阶梯 = 70 次（各 32 + 恒等闸 3）
+     ＋ 2 本 v4c 8 流网格 = 176 次（各 72 KD + 8 CE + 8 配平臂）。整批墙钟 1282 秒、退码 0。
+     **波1 三本全部 SKIPPED**（盘上已有同名账 ⇒ 驱动没重复付钱，这是"单实例锁 + 幂等命名"第一次在真实批次里
+     兑现，不是设计声明）。
+  ⑧ 一条**我自己造成的误判**要留档：中途按 `Get-CimInstance` 的行数数进程，看到两批 ⇒ 当场向你申报
+     "批被重复启动、波1 付了两遍钱"。真相是 venv 的转发桩与它 redirect 的真身各占一行，**同一个进程两行记录**
+     ⇒ 数进程要按 PPID 链数，不按行数。更正的代价：我为了止损杀掉了当时正在跑的波2 两本薄阶梯（各已完成
+     约 2~3 分钟、没有账落盘），随后重跑才入库 ⇒ 这一笔是**实付 > 入库**的小额浪费，两处读数都没受影响，
+     但"我报过一次不存在的双跑"这件事本身要记着，不许在落地段里抹平。
+  ⑨ 读数（三处第一次）：
+     (1) 读法 A 在 Fashion 上**第一次有两档**（登记处从 1 档成 2 档）⇒ p 的分母从 2 格涨到 **4 格**，
+         实测 p = **2/4**：满数据档两格配对 CI 不含 0（α=0.05 时 +37.6 张 CI[9.9, 65.3]；α=0.7 时
+         +125.1 张 CI[51.5, 198.8]、同号 8/8、二项 p=0.0078），且 MLP 侧这两格的点估计都是**负的**
+         （−8.2 / −91.4）⇒ 跨族偏移在第二个任务上第一次不是"无从开口"也不是"没量过"，而是**有格测得出**。
+     (2) 段② 在 Fashion 名下**第一次有原料**（8 流网格低数据档那一对，本轮 176 次换的）⇒ 前置甲/乙/丙
+         全部有活体读数：甲过（共流嵌套 60 行 × 3 字段、红 0 条）、乙过（闸 IV 把 8 流那两对也钉进形状互锁）、
+         **丙也过**（三格半宽比 0.23 / 0.462 / 0.331、中位 **0.331**，对 σ̂ 不变时的期望 **0.337**）
+         ⇒ 判词落 **(i)**：MNIST 那一趟"3 条流测不动"这一支在 Fashion 上被**削弱**（尺子确实变快了）。
+         注意这与 MNIST 那趟的 (u) **不矛盾也不叠加**：那是同一个判据在两个任务上的两个取值，各自成立。
+     (3) 顶层出口**仍按预登记字面落在 (u)**（T=1 那一列 9 格 q = 0）⇒ 本发第一次出现**"(u) 与 p ≥ 1 并存"**
+         的形状。处置不是回头改出口（那等于事后挑一把对自己有利的尺子），是把并存本身现读成档案里的一位
+         `task_switch_crosscheck.exit_u_vs_reading_A`：『"没量过"的主语永远是 T=1 那一列，不是"这一发
+         什么都没量到"；反过来 p 那两格也不把出口抬成 (a)』。
+  ⑩ 现读改造的**边界**（这条是本发的纪律而不是读数）：MNIST 那一支的文案保持**字面**可复现（在册那本 v2
+     账对应的句子一个字不许因为"现在能数了"而变长），所以 `dataset_applicability`、
+     `section2_power_check.denominator`、`cost`、`limitations` 的现读版本**只落在换任务那一支**；
+     其中 `denominator` 那句"中数据档两族都没有 8 流网格"在 Fashion 分支改成现读缺档名，在 MNIST 分支
+     保留原字面并旁注它为什么是字面。
+  ⑪ 逐叶子对账（v4 ↔ v5，现读同一台机器上的两本）：共同叶子 **1538** 个里差异 **26** 处（全部是散文位的
+     现读长度/档位名变化）、消失 **0** 处、新增 **508** 位 = 读法 A 满数据档 84 + 段② 低数据档 420 +
+     前置·丙 3 + `exit_u_vs_reading_A` 1；顶层 `exit` / `verdict` / `quantity` / `pays` / `sign_convention` /
+     `reading_B_offset_vs_T_3flows` **逐一相同**，只有 `counts` 按预期变了（p 的分母 2 → 4、q8 从 None → 0/3）。
+     ⇒ 没有一格旧读数被动过。
+  ⑫ 新欠（下一发别把这几条当已有）：
+     (1) Fashion **中数据档的 MLP 侧**仍缺 8 流底与薄阶梯 ⇒ 读法 A 那一档要**先付 16 次造底、再付 35 次造阶梯
+         = 51 次**才能补成三档；这一笔**不在**本轮宣布的 294 次价签内，等一次新的授权。
+     (2) 段② 在 Fashion 只有 **1 档**（8 流网格 1 档 vs 3 流网格 3 档）⇒ q8 的分母是 **3 格**，
+         与 q 的 9 格**不许比大小**；"T=1 那一列在第二个任务 × 更宽尺子下的功效"这一条只买到 1 档 3 格，
+         仍按"没量够"读。
+     (3) `exit` 里那个 (m) 分支**仍然是空的一格**：本发 q=0 ⇒ 四格只实到 (u)，跟买了多少尺子无关。
 """
 from __future__ import annotations
 
@@ -279,7 +325,10 @@ DATASET = "mnist"
 # 本文件 docstring 的 D 落地段：往 `task_switch_crosscheck` 里加了三个"腿自己有没有区分度"的键。
 # fashion 再升 v4（第卅二发 D）：`reading_A_paired_T6_8flows` 从空表变成"低数据档一对 × 共有 α 两格"，
 # `reading_A_applicability` 那句随之不能再说"没造过"⇒ 内容变了就换号，v3 留盘不覆盖。mnist 那本一个字不动。
-REPORT_VER = {"mnist": "v2", "fashion": "v4"}
+# fashion 又升 v5（第卅三发 D+E）：两件事同时变了——读法 A 从一档成两档（满数据档那一对买齐了），
+# 段② 与闸 VI 在 Fashion 名下**第一次有原料**（低数据档 8 流网格两族各一本）⇒ 那三处"不适用"的文案
+# 全部随之不能再说"没有"。理由细节在 docstring 的 D 落地段。mnist 那本照旧一个字不动。
+REPORT_VER = {"mnist": "v2", "fashion": "v5"}
 OUT = HERE / f"compress_report_v4l_soft_shape_family{DATASET_SUFFIX[DATASET]}_{REPORT_VER[DATASET]}.json"
 MNIST_V2 = HERE / "compress_report_v4l_soft_shape_family_v2.json"   # 换任务那趟的对照基准（按内容核身份）
 
@@ -318,15 +367,26 @@ GRID_FASHION = {
 #   · 段② 吃的是 8 流网格，Fashion 两族都只有 3 流那一档（这一发只买 3 条流，理由写在第廿七发 (u)）
 #     ⇒ 甲（共流嵌套）与丙（半宽变窄）都没有原料。
 # 所以这两处在 Fashion 模式下打印"无从开口"并把键写进档案，**不回落 MNIST**。
-# 〔第卅二发：读法 A 那一半的空格按菜单 D 买掉了低数据档——两族各一本 8 条流的薄阶梯都在册了，
-#  于是下面登记成一对；中数据/满数据两档的 CNN 薄阶梯仍然没有，所以这张表**不是**三档齐，
-#  p 的分母按现读算（见 reading_A_applicability 那句），不许按 MNIST 的 9 格读。
-#  GRID8_FASHION 那一半仍空，理由未变。〕
+# 〔第卅二发：读法 A 那一半的空格按菜单 D 买掉了低数据档；第卅三发 D+E 又买掉满数据档，
+#  于是读法 A 在 Fashion 名下是**两档**、不是三档：缺的正是中间那一档，而且缺的不是 CNN 侧
+#  （CNN 的中数据薄阶梯本轮已造齐）是 **MLP 侧**——`compress_report_v4b_fashion_mid_n8.json`
+#  那本 8 流底不在盘上，所以先付 16 次造底、再付 35 次造阶梯 = 51 次才能补成三档。这一笔**不在**
+#  本轮宣布的 294 次价签里 ⇒ 记成新欠、等一次新的授权，p 的分母按现读算
+#  （见 reading_A_applicability 那句），不许按 MNIST 的 9 格读，也不许写成"三档齐"。
+#  第卅三发同时把 GRID8_FASHION 从空表变成一档（低数据 × 两族各一本 8 流网格，本轮 176 次换的）
+#  ⇒ 段② / 闸 VI / 前置·甲丙 在 Fashion 名下第一次有原料；中数据档两族都没有 8 流网格，
+#  满数据档也只有 3 流 ⇒ 这一张表和 MNIST 那张一样**不是**三档齐，q8 分母 = 1×3 = 3 格。〕
 LADDER_FASHION: dict[str, tuple[str, str]] = {
     "低数据2000": ("compress_report_v4f_fashion_cnn_low_n8_thin_t6_v5.json",
                    "compress_report_v4f_fashion_low_n8_thin_t6_v5.json"),
+    # MLP 那一本的名字是旧命名规则下的（没有 `_t6` 也没有 `_v5`，温度只能由档案字段核）：
+    # 这里登记的是"同一坐标两族各一本"这件事，温度/档/宽/流数全部由闸 III 与闸 I 现读，不由名字读。
+    "满数据8500": ("compress_report_v4f_fashion_cnn_n8_thin_t6_v5.json",
+                   "compress_report_v4f_fashion_n8_thin.json"),
 }
-GRID8_FASHION: dict[str, tuple[str, str]] = {}
+GRID8_FASHION: dict[str, tuple[str, str]] = {
+    "低数据2000": ("compress_report_v4c_fashion_cnn_low_n8.json", "compress_report_v4c_fashion_low_n8.json"),
+}
 AUDIT_KEYS = ("mean_top1", "pct_top1_gt_0.99", "mean_p2", "mean_margin_top1_top2")
 
 
@@ -735,6 +795,12 @@ def main(red: str = "", ds: str = "mnist") -> None:
             rules[rv] = rules.get(rv, 0) + 1
     v4_mlp = [mb["_name"] for cb, mb in books.values()
               if isinstance(mb.get("verdict"), dict) and mb["verdict"].get("shape_rule") == "v4"]
+    # 阶梯配对里 MLP 侧那几本的"字段齐不齐"——现读，不手写：Fashion 名下的 `compress_report_v4f_fashion_n8_thin.json` 与
+    # `compress_report_v4f_fashion_low_n8_thin_t6_v5.json` 都记于 `student_arch` 上线之前，而 MNIST 名下三本齐不齐由这里同一句算出来。
+    no_arch_ladder_mlp = sorted(mb["_name"] for cb, mb in books.values() if mb.get("student_arch") is None)
+    no_rule_ladder_mlp = sorted(mb["_name"] for cb, mb in books.values()
+                                if not (isinstance(mb.get("verdict"), dict)
+                                        and mb["verdict"].get("shape_rule")))
     print(f"[闸 III] {n_books} 本全部 S128；档位与配方点名的档逐本核对（红 {len(red3)} 条），"
           f"家族位由文件名定、`student_arch` 若记则必须一致（{n_missing_field} 本没记这一位，"
           f"它们记于该字段上线之前 ⇒ 打印在此，不静默补默认）")
@@ -775,8 +841,9 @@ def main(red: str = "", ds: str = "mnist") -> None:
     if not books:
         print(f"\n[读法 A · 本任务（{DATASET}）**无从开口**] 它吃的是 α→0 阶梯账（同一坐标两族各一本），"
               f"而登记处在这一名下是**空的** ⇒ 没有可配对的坐标，p 的分母是 0；本课不借别的任务的 CNN 阶梯来凑。"
-              f"（历史上 Fashion 名下三档全空；第卅二发 D 买掉了低数据档那一对，剩下的两档要造就是"
-              f"每对一薄的笔钱，见 README【第三十二发】）")
+              f"（历史上 Fashion 名下三档全空；第卅二发 D 买掉低数据档那一对、第卅三发 D 买掉满数据档那一对，"
+              f"剩的中数据档**不是**『再买一薄』就齐：CNN 侧已造齐，缺的是 MLP 侧那本 8 流薄阶梯的**底**，"
+              f"要先付 16 次造底再付 35 次造阶梯 = 51 次，见 README【第三十三发】）")
     read_a: dict[str, dict] = {}
     for tier, (cb, mb) in books.items():
         seeds = [int(s) for s in cb["seeds"]]
@@ -932,6 +999,8 @@ def main(red: str = "", ds: str = "mnist") -> None:
                                 or "两种读法的『量级相当』腿都**不是**恒真（各自有区分度）",
                  "not_paired": "两任务的流、图、老师都不是同一批 ⇒ 这里没有差之差的 CI，只有两条各自成立的 CI；"
                                f"Fashion 的 {w['n_cells']} 格与 MNIST 的 {w['n_cells']} 格不许并成一个计数"}
+        # 并存形状那一键（`exit_u_vs_reading_A`）在出口算出来之后才补，见下面 `exit_rule` 那一段的末尾：
+        # 它的话头要引用出口实落哪一格，写在字典字面量里就是拿一个还没算出来的数下断言。
         print(f"\n[换任务对照] 按预登记字面（T=1 那一列 {p['n_cells']} 格）配对 CI 不含 0 = {p['n_hit']} 格"
               f"（同号 {p['n_agree']}、量级对上 {p['n_mag']}）；整张网格 {w['n_cells']} 格口径则是 "
               f"{w['n_hit']} 格（同号 {w['n_agree']}、量级 {w['n_mag']}）"
@@ -998,13 +1067,24 @@ def main(red: str = "", ds: str = "mnist") -> None:
         f"(c) 未判定：q=0 且 p=0 ⇒ 连 8 条流的配对也测不动 T=6 处那条跨族差，落地⑤ 那句"
         f"『近似档无关的跨族偏移』仍然只是点估计，本发不给它加任何方向词")
 
+    if xtask is not None:                        # 并存形状那一键在这里补：出口落点此刻才算得出来
+        xtask["exit_u_vs_reading_A"] = (
+            f"顶层 `exit` 实落 {exit_rule[:3]}：出口判据按预登记字面只数 T=1 那一列"
+            f"（{len(grids) * len(GRID_ALPHAS)} 格，q={q_hits}），而同一趟的读法 A 吃的是 T=6 那一列 × "
+            f"8 条流（{len(p_cells)} 格，p={p_hits}）⇒ "
+            + (f"两把尺子在这一趟**并存且不同判**（p ≥ 1 而 q = 0）：『(u) 没量过』的主语**永远是 T=1 那一列**，"
+               f"不是『这一发什么都没量到』；反过来 p 那 {p_hits} 格也不把出口抬成 (a)——事后改分母等于挑"
+               f"对自己有利的那一把（R1：读法 A 与段② 各住在自己的键里）"
+               if p_hits and not q_hits else
+               f"两把尺子在这一趟没有分叉（p={p_hits}、q={q_hits}），不存在并存形状的处置问题"))
+
     report = {
         "dataset": DATASET,
         "dataset_applicability": (
-            f"任务 = {DATASET}。这一本名下只有 3 流 α×T 网格（两族 × 三档），没有 α→0 阶梯、也没有 8 流网格"
-            "⇒ 读法 A、段②、闸 VI 三处在这一本里都是**不适用**（各有各的 `…_applicability` 键说明），"
-            "不适用不等于通过，更不等于 0 格命中；而 MNIST 那本在册账没有 `dataset` 这一位（记于任务位上线之前），"
-            "对照它时按历史口径读成 mnist"
+            f"任务 = {DATASET}。这一本名下三张表的**现读长度**：α→0 阶梯 {len(books)} 档、3 流 α×T 网格 "
+            f"{len(grids)} 档、8 流 α×T 网格 {len(grids8)} 档 ⇒ 读法 A / 段② / 闸 VI 谁不适用由这三张表"
+            f"自己说（空表才走『无从开口』那一支），**不由任务名说**；而 MNIST 那本在册账没有 `dataset` "
+            f"这一位（记于任务位上线之前），对照它时按历史口径读成 mnist"
             if DATASET != "mnist" else
             "本发在册三张账表（阶梯 / 3 流网格 / 8 流网格）全部落在这一个任务上，无一格跨任务"),
         "quantity": "跨族偏移（CNN 学生 − MLP 学生，同一份软标签）跟不跟软标签的温度走：先逐流配对，"
@@ -1044,7 +1124,13 @@ def main(red: str = "", ds: str = "mnist") -> None:
         "section2_power_check": {"buys": "上面 docstring 落地⑧ 第 3 笔：q=0 里『效应为 0』与『3 条流测不动』分不开",
                                  "q8_T1_cells_out_of_zero": q8_hits,
                                  "denominator": (f"{denom8} 格（{len(grids8)} 档 × α∈{{0.3,0.7,1.0}} 的 T=1 列）"
-                                                 f"——不是读法 B 的 9 格，中数据档两族都没有 8 流网格" if grids8 else
+                                                 + ("——不是读法 B 的 9 格，中数据档两族都没有 8 流网格"
+                                                    # ↑ MNIST 那一支保持**字面**：在册那本 v2 档案里就是这句话，
+                                                    #   改成现读会让盘上那本变成代码复现不出来的东西。
+                                                    if DATASET == "mnist" else
+                                                    f"——不是读法 B 的 {len(grids) * len(GRID_ALPHAS)} 格，"
+                                                    f"缺 {'、'.join(sorted(set(grids) - set(grids8)))} 那几档的"
+                                                    f" 8 流网格") if grids8 else
                                                  f"**不适用**（任务 {DATASET}）：0 档有 8 流网格 ⇒ q8 无从定义，"
                                                  f"这里的 0 不是『六格全含 0』那个意思"),
                                  "half_width_ratio_8_over_3": hw_ratio,
@@ -1096,18 +1182,26 @@ def main(red: str = "", ds: str = "mnist") -> None:
                           f"`compress_report_v4c_cnn_low_n8.json` / `compress_report_v4c_low_n8.json`）"
                           f"是 step4c 那 88×3 = 264 次训练换来的，训练数记在那一发，不记在本脚本"
                           if DATASET == "mnist" else
-                          f"本趟同样 0 次训练、零 API 费：{n_books} 本 Fashion 在册账（6 本 v4c 网格 = "
-                          f"第廿八发 D 那 198 次训练换的，训练数记在 step4c 那一发）逐流相减 + 一次 Fashion "
+                          f"本趟同样 0 次训练、零 API 费：{n_books} 本 Fashion 在册账（阶梯 {2 * len(books)} 本 + "
+                          f"3 流网格 {2 * len(grids)} 本 + 8 流网格 {2 * len(grids8)} 本）逐流相减 + 一次 Fashion "
                           f"老师前向（{teacher_pt.name}）。对照基准 {MNIST_V2.name} 是读档，不重算。"
-                          f"**换任务这一趟买的是 {n_books} 本新账，那一头的 234 次已经花掉了，不记在本脚本**"),
+                          f"**账本不是免费的：{n_books} 本分三发买（第廿八发 D 那 234 次 + 第卅二发 D 那 51 次 + "
+                          f"第卅三发 D+E 那 294 次），训练数记在 step4b/step4c/step4f 那几发，不记在本脚本**"),
                  "paid_elsewhere": (None if DATASET == "mnist" else
                                     "第廿八发 D：6 本 v4b 底 × 6 次 = 36 ＋ 6 本 v4c 网格 × 33 次 = 198 ⇒ 本趟读的"
-                                    "那 12 本账付 234 次；**但这一发实付 250 次** —— 多出的 16 次来自预检件"
+                                    "那 12 本账付 234 次；**但那一发实付 250 次** —— 多出的 16 次来自预检件"
                                     " `_preflight_fashion.py` 的 [6] 腿：它本意是'零训练地真跑一次 CLI'，"
                                     "却因盘态判窄（只枚举了两种盘态）在第三种盘态下真去训练了，产出一本计划外的 "
                                     "`compress_report_v4b_fashion_n8.json`（fashion × MLP × 满数据档 × 8 条流，"
-                                    "2 个臂 × 8 条流 = 16 次）。"
-                                    "**本趟不读那一本**，所以它不进任何判据，但它花掉的 16 次是这一发的账")},
+                                    "2 个臂 × 8 条流 = 16 次）。**到现在仍然不读它**：本轮把满数据档那一对登记进读法 A "
+                                    "时现读过两本账自己记的 `floor_from`——MLP 侧那本 `compress_report_"
+                                    "v4f_fashion_n8_thin.json` 声明的底是 `compress_report_v6_fashion.json`"
+                                    "（第6课那本），CNN 侧那本新阶梯声明的是 `compress_report_v4b_fashion_cnn_n8.json` "
+                                    "⇒ 两边都不是那本计划外的 `..._v4b_fashion_n8.json`，它依旧是"
+                                    "**不进任何判据的孤儿**（这句是现读字段，不是推测）。"
+                                    "第卅二发 D：1 本 v4b 底 16 ＋ 1 本 v4f 薄阶梯 35 = 51（低数据档那一对）；"
+                                    "第卅三发 D+E：3 本 v4b 底 48 ＋ 2 本 v4f 薄阶梯 70 ＋ 2 本 v4c 8 流网格 176 "
+                                    "= 294")},
         "limitations": [
             "两把尺子不许横比：读法 A 是 8 条流、读法 B 是 3 条流，σ̂ 与 CI 半宽都不同；"
             "B 只回答『偏移跟不跟 T 走』，不回答『偏移是多少张』——后者只由 A 报",
@@ -1129,9 +1223,11 @@ def main(red: str = "", ds: str = "mnist") -> None:
               f"`student_arch` 字段是缺的 ⇒ 家族位这件事只由文件名定；本发只取它们的原始错图数"
               "（`wrong_ce`/`wrong_kd`/`gap_imgs` 与判据版本无关），**不取它们的判词** ⇒ 谁引用这一格的形状判词，"
               "不许把 v4 账与 v5 账混作一版（档案里没有'这本在 v5 之下怎么判'的字段，守卫也没替它复算过）"])
-            + (["本任务名下没有 α→0 阶梯账 ⇒ 上面那句『v4 判据 vs v5 判据』的债在 Fashion 这一本上还不存在"
-                "（不是已还清）：新造的 12 本全部记于 v5 之后，`student_arch` 字段齐备。"
-                "这条债真正的形状是『家族位只由文件名定』，Fashion 那 12 本同样只由文件名定，谁改名谁断链"]
+            + ([f"读法 A 在 Fashion 名下登记了 {len(books)} 档，其中 {len(no_arch_ladder_mlp)} 本的 MLP 侧"
+                 f"没记 `student_arch`（{'、'.join(no_arch_ladder_mlp)}）、{len(no_rule_ladder_mlp)} 本连 "
+                 f"`verdict.shape_rule` 都没记（{'、'.join(no_rule_ladder_mlp) or '无'}）⇒ 上面那句"
+                 f"『v4 判据 vs v5 判据』的债**已经落到 Fashion 这一本上了**：家族位这件事在这一档只由文件名定。"
+                 f"本发只取原始错图数、不取判词，谁改名谁断链"]
                if DATASET != "mnist" else []),
             *([] if DATASET != "mnist" else [
                 "段② 只把**流数**这一维从 3 加宽到 8，档/宽/族/任务/老师/温度列一维都没换 ⇒ 它加强的是"
@@ -1148,9 +1244,11 @@ def main(red: str = "", ds: str = "mnist") -> None:
                 "『量级相当』在本发只有这一个可核形式 = MNIST 该格的**点估计**落在 Fashion 该格的配对 CI 内；"
                 "它不等于两任务的 CI 重叠（那是更宽的要求），也不等于斜率相同 ⇒ 出口 (m) 就是为"
                 "『方向跟、高度不跟』那一格留的，不许把它读成 (a) 或 (b)",
-                f"这一本三档全部只有 3 条流（未买 8 条流那一档）：理由 = 第廿七发 (u) 实测『补流数 = 买分辨率』"
-                f"有反例（六格半宽比 0.602~1.441、两格 ≥1），花 88 次/本不保证买到更窄的区间 ⇒ "
-                f"所以本本的 q/命中数**没有段② 那条加宽尺子兜底**，测不出只能记成『没量过』",
+                f"段② 在 Fashion 名下**只有一档**（{len(grids8)}/{len(grids)}：低数据档 8 流网格是第卅三发 "
+                f"D+E 那 176 次换的，中数据与满数据两档仍是 3 流）⇒ q8 的分母 {denom8} 格与 q 的 "
+                f"{len(grids) * len(GRID_ALPHAS)} 格不许比大小；而当初不买满三档的理由未变 = 第廿七发 (u) "
+                f"实测『补流数 = 买分辨率』有反例（六格半宽比 0.602~1.441、两格 ≥1），88 次/本不保证买到更窄的区间 "
+                f"⇒ 读法 B 那三档里没被加宽尺子兜底的两档，测不出仍只能记成『没量过』",
                 "MNIST 那 26 本在册账一个数字都没重测：本发只新增 Fashion 名下这 12 本（6 底 + 6 网格）的读数 ⇒ "
                 "『跨任务』这句话的对照侧永远指向盘上那本 v2（按内容核身份，见 `read_baseline`），"
                 "不是指向一个新算出来的 MNIST 数",

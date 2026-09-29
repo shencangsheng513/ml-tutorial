@@ -243,6 +243,98 @@
 自我拆红（每条各拆一道闸，跑了不红的模式=那条闸没测到，不许拿它当通过。下面全是**本轮实测**，
 不是预期——规矩是实测再写回这张表，写死的计数只对"当前在册的那几本"成立：
 
+**【第三十五发·把闸⑨ 腿C 那三处"跳过 / 代价"从计数改成常驻点名单，再给这条新腿配一道专属拆红档
+（`--fakeexempt`，增档 = 1）；顺手把出口 (m) 那一格的可达性按盘现读结题】**
+**0 次训练、0 元 API、进册 0 本】**
+在册 39 本（`v4f` 名下，本轮 **+0**）、全册 **130** 本（**+0**：这一发没造任何新账，改的是判别器与文案），
+正常模式 rc=0 / 0 条红，**二十八档**全部重跑（档数由源码里的 `MODES` 登记处现读并在每轮开头打印，本轮实测
+**28**，**增档 = 1** ⇒ **29 份** = `normal` + 28 档；逐档红数全部本轮实测，两口径（`^    闸` 前缀 /
+任意缩进非空行）**逐份相等**；凭据仍只指命令形态 `python _red_v3.py <档名>`。
+**机时这一栏仍只报读数、不报倍数**：2 并发、末档落盘于开跑后 **893** 秒（上一发那 911 秒与它**不同档数
+不同扫描面** ⇒ 不许相减当趋势）。逐档红数：misfeed 104、decorative 30、**famblind 21**、borrowseeds 22、
+unformatted 24、borrowfloor 17、**borrowtask 20**、collateral 15、v5strict 15、v4blind 13、v4loose 9、drift 5、
+**citedlink 5**、v5blind 4、destroy 4、sibdrift 3、**fakeexempt 6**、ciderived 2、laddersib 2、flowcopy 2、
+ciasym 2、limitptr 2、g5drop 1、oldsib 1、bareid 1、ciunread 1、wrongcount 1、helpblind 1、normal **0**。
+
+**与【第三十四发】那张表一比：两批共有的 28 档里 25 档的红行集合逐条相同**（含 `normal` 那个 0），
+**总数涨的是两档**，另有**一档总数没动而红行内容漂了**，**没有任何一档真的落下**——最后这半句要连着
+一处自纠一起读：本轮那把 diff 尺子按"今批条数 > 旧批条数"分桶，于是"总数相同而集合不同"的那一档
+被投进了『落』这一桶，汇总行印出来是"涨 2 / 落 1"，而那个"落 1"其实就是 `--citedlink` 的漂行。
+**口径：计数分桶要按集合判、不能按大小判；这是上一发那句"总数不变不等于红行不变"的同一族错，
+只不过这次错在量红数的脚本里，不在守卫里。**（归因仍然不靠猜：两批红行做集合 diff，再按行前缀定位。）
+① `--borrowtask` 18 → **20**：涨的两条正是本轮改造的落点。`compress_report_v4b_fashion_low_n8.json` 与
+   `compress_report_v4b_fashion_mid_n8.json` 以前在这条注入下**根本不进反算**——实现 `v4b_path` 替它们抛
+   "缺 {某个名字}"，而老写法把这一类整条记成"按自己的流数问不到底 = 代价"（就是下面要撤的那句）；
+   本轮起规则报出来的那个名字被拿来**再比一次** ⇒ 它们落进反算段、当场红，红行自己写着"那个名字此刻
+   不在盘上"（= 抽掉任务位后规则要给它们新造的那本）。**所以这 2 条不是新缺陷，是"原本被记成代价的那两本"
+   从此改由反算腿盯着**；反面凭据：同一批在 `normal` 下 rc=0 / 0 条红。
+② `--famblind` 20 → **21**：涨的那一条住在**本轮新装的"常驻·代价名单"腿**里，它抓的仍是这一档本来就注入的
+   那件事——族位被从命名规则里抽掉 ⇒ 规则认不出 `compress_report_v4b_cnn_mid_n8.json` 这本**已经在盘上**的底，
+   于是腿B 按规则给出的答案是"这一坐标要先补底才能重跑"；新腿不看规则、改按**内容坐标**（任务×族×档×宽×流数）
+   在 v4b 名下复核，查到那本底 ⇒ 报"这一坐标并不是跑不了，是命名规则不认识那本已经在册的底"。
+   **这是覆盖变密（同一个注入被第二条腿也抓到了），不是盘态变坏**；它与第廿三发"借了别的流数的底"是反向孪生：
+   那次是有底而读错本，这次是有底而说没有。
+
+**本轮撤掉的一处旧申报（写在本文件自己头上，第卅二～卅四发连抄三发的那句）**：那三发的腿C 行都写着
+"另 2 本按档合并的老底账、**2 本按自己的流数问不到底（= 代价）**"。现读更正：**C-甲 名下"代价"这一格的真数
+是 0 本，而且这一格按构造造不出来**——v4c 那半问 `out_path`，它只把坐标拼成名字、从不看盘上有没有；v4b 那半
+问 `v4b_path`，它确实查盘，可它报出来的"缺 X"里的 X **必然不等于**眼前这本账自己的名字（相等就意味着那个文件
+就是这本账、`exists` 为真、压根不会 raise）⇒ 按构造只能落进反算段的红，落不进"代价"。上一发被记成"代价"的那
+两本其实是 `compress_report_v4b_n8.json` 与 `compress_report_v4b_n16.json`：它们内容里记的档是
+「默认（第4课两档）」、对不上"单档" ⇒ 本轮归回 `unreg`（跳过），与另两本 `merged` 一起按名字点名。
+**会替别的账当场拒绝的那 14 本全部只住在腿B**，本轮起逐件带坐标点名（`·[代价] 名字 坐标=任务×族×档×宽×流数`），
+不再只报一个数——报数会把"一本账从名单上安静地掉出去"和"一本账本来就平"折叠成同一个数字。
+**常驻点名单腿本轮现读**：`normal` 下 glob 到 **45** 本底/网格账 = 反算参评 **41** + `merged` **2** + `unreg` **2**
+⇒ 守恒 0 红（名单闭合）；`代价名单` 红 **0**（14 本逐件按内容复核，没有一本其实有同坐标的底）；
+`跳过理由现读` 红 **0**、`跳过理由核不到` 红 **0**；`免检面虚报` 红 **0**、`免检面漏记` 红 **0**
+（C-乙 那 8 本"底没有族字段"的名单逐件核过，既没多报也没漏报）。
+**专属拆红档 `--fakeexempt`（本轮新档）实测**：rc=1 / **6 条红**，五条注入各点一条（守恒 / `merged` 理由现读 /
+代价名单 / 跳过理由现读 / 免检面虚报），第六条是"免检面漏记"由注入的摘名单那步连带点亮；
+**分离验到**：反算段与腿A、腿B 在这一档各 **0 条**红 ⇒ 这 6 条确实住在名单腿上，不是把别的腿碰响了的回声。
+**这一档跑了不红就等于那条注入没人守**——按老规矩，没红过不许读成通过。
+
+**各闸本轮现读**：**①** 39/39 复算通过（与上一发同数，本轮没造账）；**②** 只在旧账 8 本上算，翻转名单
+仍是 1 本；**③** 该翻的那一本仍是 `compress_report_v4f_low_n8_thin_v2.json`（测不动 → 反号线）；**④** 板块
+在册『污染型』3 本未被连坐；**⑤** 候选 **31** 本 = 逐位核过 6 ＋ 首跑/无更低版本前账 25；**⑥ 27 → 27 对**
+（**一对没多**，"对数与这一改动没动的东西有没有单调关系"**第十七次**现读）；**⑦** 14 本候选里参评 11；
+**⑧** 参评 6 本、v5 复算判『倒挂』4 本归并成 **1** 个坐标，唯一还站着的仍是
+`compress_report_v4f_mid_n8_t6_v4.json`；**⑨** 腿A 参评 27 本全等 & 腿B 27 本（**13** 本同流数底 / **14** 本被
+实现当场拒绝 / **0** 本返回错流数的底），另按口径出声的"落在登记范围外"那批仍 **12** 本；**腿C** C-甲
+名字由内容反算参评 **41** 本、**41 本全平、0 本不平**，其中 **21** 本内容里没记任务位、按实现同款默认命中
+（照实报，不算核过）⇒ 真正被这一腿盯着的是另外 **20** 本，另有上段那 4 本按名字点名（2 `merged` + 2 `unreg`）
+**跳过不是通过**；C-乙 换任务名下引用自证参评 **12** 本、红 **0** 条，其中 **8** 本的底没记 `student_arch`
+⇒ 族这一维在换任务的 MLP 侧**仍不可核**（没测到，不是通过）；**⑩** 模块侧 10 项 + 档案侧 **122** 条名单全等；
+**⑪** 参评 **35** 本、自带双记账 **9** 本且与复算逐字段相同；**⑫** 全册 **130 本 / 6694 条 / 24 本带那句 /
+漏渲染 0 条**；**⑬** 现读清单 **13 本 / 退出码 0 的 13 本 / 4 并发墙钟 46.5 秒**（同一清单历次 28.0 / 34.4 /
+200.3 / 61.5 / 55.4 / 36.0 / 54.3 / 70.2 / 26.7 / 52.4 / **46.5** 秒 ⇒ 只报读数区间不报倍数）；**⑭** 派生账现读
+**16 本 / 152 条** ci95：可复算 152 / 口径外 0（参评 6 本、旧档豁免 **10** 本）；**⑮** 可核指针 **2** 条 / 漂走 **0** /
+裸序号 **0** / 引文不逐字 **0** / 过期 **0**（出处参评 **104** 本 / 旧版豁免 **26** 本）；**⑯** 引用面 **31** 个
+在册文件（在册名单 **162** 本）/ 名字由正文现读 **45** 个 / 命中引用 **100** 处 = 点名式带声明 100 ＋ **裸 0**、
+本闸墙钟 0.05 秒。**词表哨兵照常驻**：真声明词『用完即删』仍在表**外**（现读 **12** 个词），本轮没动那张表。
+
+**零训练结题的那一格（出口 (m)，读数住在 `step4l` 的档案与文档里，这里只登记它对守卫的意义）**：
+T=1 那一列 9 格现读**没有一格出得了方向**，最便宜的出方向格（满数据档 × 锚点剂量、约 29 条流）与 MNIST
+**反号** ⇒ 沿"整档一起补流"这根轴先撞到的出口是 (b) 不是 (m)；唯一能走到 (m) 的形状是只把低数据档补到
+约 **859 条流 ≈ 18,898 次训练** ⇒ 这一格按**死账**登记（"不再买"），从此不许再被写成"下一发补上"。
+它对守卫的要求只有一条：判据的**量级那条腿只吃 MNIST 的点估计、不吃 MNIST 自己的 CI**（MNIST T=1 那 9 格
+半宽 10.8～39.6 张，比要分辨的 8.7 张还宽）⇒ 尺子加到能出方向时那一格大概率仍写着"量级对上"，这是
+**判据的形状**而不是本轮的缺陷，本轮只把它现读出来、没给它加豁免。
+
+**我自己造成的一次盘态错误（顺序约束本轮第二次坏在同一条上，但形状不同）**：上一发的错是**批中**改文件
+（一边量一边改秤）；这一发我**没有**在批中改任何东西——快照 58 项、批后逐项对回来 **0 漂移**——可我截快照
+的时机错了：第一批（29 份）跑完、冻结也核过之后，我才改腿C 那句 [口径] 文案 ⇒ **那一批读的是改前的文件**，
+红数描述的不是我要写回的那一版 ⇒ 整批作废、重跑第二批。代价 ~25 分钟机时、零训练。
+**可迁移的一句要补一半：跑一批跨文件的读数之前先冻结全部在册 `.py`／`.md`——而"冻结"要截在最后一次源码
+改动之后。批后核对无违反只证明"我没在批中改"，证明不了"批读的就是我要写回的那一版"。**
+
+**落笔后补跑（第十五发的规矩，本轮兑了三次）**：上面这张表写进本文件之后，按命令形态单跑 `normal` **三次**——
+第一次在 step4l 的 ⑬ 段、板块 README 那一节与判决表那条新列落笔之后，第二次在根 README 那串"发"的链与本
+复盘的条目 57 落笔之后，**第三次就在本段落笔之后**（本段是这一轮对扫描面的最后一次改动，不再制造第四次）；
+三次都是 **rc=0 / 0 条红 / stderr 0 字节**。闸⑯ 的计数顺着这条链自己漂：
+名字 **45 → 48**、命中 **100 → 104 → 105 → 105**，涨的每一处都是本发文档自己新写的那几句（含那条给 (m) 结题的
+凭据件，它的"本机、不入库"与名字**同一行**）⇒ 与上一发同一条口径：**能写进文档的仍只有"裸 0"这个判定**，
+上面那对 45 / 100 只描述"整批那一次"的状态，拿它跟补跑后的数相减当趋势是错的。
+
 **【第三十四发·把上一发欠的那笔"换任务侧中数据档的 MLP 一侧"买齐（51 次训练）＋撤掉我自己写进四件文档的
 两处假归因（把注入面读成真缺陷）】**
 **51 次训练、0 元 API、进册 4 本】**
@@ -1312,7 +1404,7 @@ MODES = ("--decorative", "--drift", "--destroy", "--collateral", "--v4blind", "-
          "--v5blind", "--v5strict", "--famblind", "--misfeed", "--sibdrift", "--laddersib",
          "--oldsib", "--g5drop", "--borrowfloor", "--borrowseeds", "--borrowtask", "--flowcopy", "--ciasym",
          "--ciunread", "--unformatted", "--wrongcount", "--helpblind", "--ciderived", "--bareid",
-         "--limitptr", "--citedlink")
+         "--limitptr", "--citedlink", "--fakeexempt")
 if MODE and MODE not in MODES:
     raise SystemExit(f"未知拆红档位 {MODE!r}：MODES 登记处在册 {len(MODES)} 档，没有这一档 ⇒ 加一档必须先登记"
                      "（否则 dispatch 里写了 elif 也永远不会被跑到，那一档是恒绿的装饰）")
@@ -1909,7 +2001,7 @@ else:
 # 档案不可改，当时的事实由本档末尾那几行盘点现读（它一条也不问实现）。
 print("\n[闸⑨ 腿B 底不许跨**流数**借：在册每本用**自己的流数**问一次今天的 v4b_path]")
 n9b = n9b_red = 0
-borrow_hist, refused_today = [], []
+borrow_hist, refused_today, _n9b_refused, _n9b_coord = [], [], [], {}
 _arch_saved = sc.ARCH
 for name, d in sorted(docs.items()):
     if str(name).endswith(".json") and _in_floor_scope(d) and d.get("tier") and d.get("width"):
@@ -1927,6 +2019,8 @@ for name, d in sorted(docs.items()):
             want_p = sc.v4b_path(width, tier, n_book)
         except SystemExit as e:                    # 实现拒绝：这一坐标今天跑不动，先补底
             refused_today.append(f"{_bn}（{n_book} 流）")
+            _n9b_refused.append(_bn)
+            _n9b_coord[_bn] = (str(d.get("dataset", "mnist")), fam, tier, width, n_book)
             print(f"  {_bn}: {fam}×{tier}×S{width} ×{n_book} 流 → 今天的实现**拒绝**："
                   f"{str(e).split('——')[-1][:56]}… ⇒ 这一坐标要先补同流数的底才能重跑（代价，不是红）")
             continue
@@ -1982,7 +2076,13 @@ if MODE == "--borrowtask":
     print("  （拆红注入）把任务位从命名规则里抽掉（`DATASET_SUFFIX` 一律回落空后缀）——"
           "复刻的是第廿八发 D 之前的世界：换任务的账与 MNIST 的账同名 ⇒ 无声盖账")
 n9c = n9c_red = n9c_overwrite = 0
-n9c_merged, n9c_default_ds, n9c_refused = [], [], []
+n9c_merged, n9c_default_ds = [], []
+n9c_unreg = []                       # 记的档位对不上"单档"的那批（多档/占位串）：跳过，不是代价
+# 第卅五发 C：下面这两份是给"常驻点名单"那条腿准备的（见 C-乙 之后那段）。
+# 计数（`len(n9c_merged)` 那一类）留着的唯一用途是打印；**判据读的是名字**，因为计数会把
+# "一本账从名单上安静掉出去"和"一本账本来就平"折叠成同一个数。
+_n9c_face = set()          # 真正进了反算的那批名字
+_n9c_skip = []             # [(名字, "merged"|"unreg", 这一件自己的内容坐标或 None)]
 _ds_saved, _fam_saved, _n_saved = sc.DATASET, sc.ARCH, sc.NSEEDS
 for _pref in ("compress_report_v4b", "compress_report_v4c"):
     for _p in sorted(glob.glob(f"{_pref}*.json")):
@@ -1993,15 +2093,28 @@ for _pref in ("compress_report_v4b", "compress_report_v4c"):
         _nodef = "dataset" not in _d
         if not _tier:
             n9c_merged.append(str(_p).split(chr(92))[-1])
+            _n9c_skip.append((str(_p).split(chr(92))[-1], "merged", None))
             continue
         sc.DATASET, sc.ARCH, sc.NSEEDS = _ds, _fam, _nf
         try:
             _want = (sc.v4b_path(_wd, _tier, _nf) if _pref == "compress_report_v4b"
                      else sc.out_path(_wd, _tier)).name
-        except SystemExit:
-            n9c_refused.append(f"{str(_p).split(chr(92))[-1]}（同坐标 ×{_nf} 流的那本底不在盘上）")
-            continue
+        except SystemExit as _e:
+            # `v4b_path` 那两处 raise 不是一回事，第卅五发 C 之前被记成同一类（"缺同流数底 = 代价"）：
+            # ①"这一档没登记档案名"——这本账压根不按单档记账（多档/占位串）⇒ 反算不成立，是**跳过**；
+            # ②"缺 {名字}"——规则把这个名字报出来了，而盘上记着同一坐标的底**往往就是这本账自己**
+            #   ⇒ 它是"名字对不上规则"，正是反算段的正题，不是能付训练买掉的代价（真缺底的脸在腿B：
+            #   那里问的是**别的账**要用哪本底）。这里把规则报出的那个名字当 _want 继续比一次。
+            _nm = str(_p).split(chr(92))[-1]
+            _msg = str(_e)
+            if "没登记种子底档案名" in _msg:
+                n9c_unreg.append(_nm)
+                _n9c_skip.append((_nm, "unreg", (_ds, _fam, _tier, _wd, _nf)))
+                continue
+            _want = _msg.split("——", 1)[0].removeprefix("缺 ").strip()
+            # 句式哪天改了这里会剥出个怪名字 ⇒ 下面那句比较当场红，不需要再加一条"读不出来"的分支
         n9c += 1
+        _n9c_face.add(str(_p).split(chr(92))[-1])
         if _nodef:
             n9c_default_ds.append(str(_p).split(chr(92))[-1])
         if _want != str(_p).split(chr(92))[-1]:
@@ -2023,12 +2136,14 @@ if MODE == "--borrowtask":
 # 第卅一发只能记成"8 本免检（没测到，不是通过）"。这一腿把它变成真评，问的是那本账**装不装得下**这一本的坐标：
 # 任务（走别名表）、宽度、以及 `per_tier` 里有没有这一档。族与流数两维照实记成不可核——
 # 那本账没记 student_arch，而要求同流数等于先给 step6 加 --nseeds（另一发的钱），两条都不许读成通过。
-n9e = n9e_red = n9e_nofam = 0
+n9e = n9e_red = 0
+n9e_nofam_names, _n9e_all = [], []      # 第卅五发 C：免检面必须**逐件留名**，计数由名单长度现读
 for _name, _d in sorted(docs.items()):
     if not (str(_name).endswith(".json") and str(_d.get("dataset")) == "fashion" and _d.get("floor_from")):
         continue
     _fl = sc.HERE / str(_d["floor_from"])
     n9e += 1
+    _n9e_all.append((str(_name), str(_d["floor_from"])))
     if not _fl.exists():
         n9e_red += 1
         fails.append(f"闸⑨腿C（C-乙）{_name}：记的底 {_fl.name} 不在盘上——换任务那几本的底只有这一本按档合并的账，"
@@ -2044,7 +2159,7 @@ for _name, _d in sorted(docs.items()):
     if isinstance(_pt, dict) and _d["tier"] not in _pt:
         _why.append(f"底里没有 {_d['tier']} 这一档（有 {list(_pt)}）")
     if "student_arch" not in _f:
-        n9e_nofam += 1
+        n9e_nofam_names.append(str(_name))
     if _why:
         n9e_red += 1
         fails.append(f"闸⑨腿C（C-乙）{_name}：这一本记的是 任务=fashion × {_d['tier']} × S{_d['width']}，"
@@ -2067,15 +2182,187 @@ elif MODE == "--borrowtask":
         print(f"  三腿分离验到：腿A 与腿B 在这一档下各 **0 条红**（它们问的是实现挑的底，任务位掉了它们无感），"
               f"红全部住在腿C 的反算段（{n9c_red} 条）；其中 {n9c_overwrite} 条的落点**已在盘上**"
               f"（= 会盖另一任务的账）、{n9c_red - n9c_overwrite} 条的落点不在盘上（= 会新造一本名字里没有任务位的账）")
-else:
-    print(f"  C-甲（名字由内容反算）参评 {n9c} 本：{n9c - n9c_red} 本平、{n9c_red} 本不平；"
-          f"另有 {len(n9c_merged)} 本是**按档合并**的老底账（内容里没有单一档 ⇒ 反算不成立，跳过不是通过）、"
-          f"{len(n9c_refused)} 本按自己的流数问不到底（缺同流数底 = 代价）")
-    print(f"  [口径，不红] 参评这 {n9c} 本里有 {len(n9c_default_ds)} 本内容里**没记任务位**，反算时按实现同款默认"
-          f"（mnist）命中 ⇒ 任务这一维对它们是默认命中、不是核过；真正被这一腿盯着的是另外 "
-          f"{n9c - len(n9c_default_ds)} 本（它们自己记了 dataset）")
-    print(f"  C-乙（Fashion 名下 v4f 引用自证）参评 {n9e} 本、红 {n9e_red} 条；其中 {n9e_nofam} 本的底**没记 student_arch**"
-          f" ⇒ 族这一维在 Fashion 的 MLP 侧不可核（第卅一发那句『8 本免检』从今天起只在这一维还成立）")
+
+# ———— 第卅五发 C：三条「跳过 / 代价」读数从"只印计数"改成"逐件点名 + 理由现读复核"，常驻（normal 与每一档都跑）。
+# 改之前那三行散文只在 normal 那一支印，而且印的是 `len(...)`；计数与同一段循环里那句 `continue` 同源 ⇒
+# 三种消失都不会红：① 一本账从跳过名单上安静掉出去（既没被反算、也没被记成免检）；② 一本其实**可评**的账
+# 被塞进跳过名单（字段换了写法，或为了让反算显得平而把它豁免）；③ 免检的理由已经过期（底账后来补上了那一位）
+# 却照旧印老那个数。从这一发起判据读**名单**：glob 到的每一本必须落在 参评 / 按档合并 / 档位没登记 /
+# 缺同流数底 四份名单之一，名单上每一件的理由再按**内容**读一次。
+# 诚实边界（不许把这一腿读成"它证明了分类规则对"）：merged 那条谓词与反算段共用同一句 `tier_arg or tier`，
+# 所以它盯的是"每一次跳过都留下可点名的名字，且那个名字此刻还成立"；分类规则本身归反算段与腿A/腿B 管。
+# 唯一真正换了信息来源的是缺底那条：反算段问"命名规则算出的那个名字在不在盘上"，这里按**内容坐标**在 v4b
+# 名下枚举同一任务×同族×同档×同宽×同流数的底，两边不一致才红 ⇒ "跑不了"与"在册但命名规则不认识"分得开。
+_FAMS = ("mlp", "cnn")
+
+
+def _floor_family(f):
+    """底账里『记了学生族』的那个值：认任何**值为 mlp/cnn 且名字含 arch** 的字段，不认某一个拼写。
+    免检的理由是"底里找不到族"，这个理由不该由 `student_arch` 一个字段名说了算：旧账哪天换成 `arch`、
+    `net_arch`，免检名单必须当场缩，而不是继续按老字段名装看不见。"""
+    for k, v in f.items():
+        if isinstance(v, str) and v.strip().lower() in _FAMS and "arch" in k.lower():
+            return v.strip().lower()
+    return None
+
+
+def _coord_same(a, b):
+    return bool(a) and bool(b) and _ds_same(a[0], b[0]) and a[1] == b[1] and a[2] == b[2] \
+        and int(a[3]) == int(b[3]) and int(a[4]) == int(b[4])
+
+
+_tier_now, _coord_now, _floors, _arms_tiers = {}, {}, {}, {}
+for _pref in ("compress_report_v4b", "compress_report_v4c"):
+    for _p in sorted(glob.glob(f"{_pref}*.json")):
+        _nm = str(_p).split(chr(92))[-1]
+        _dd = json.loads(open(_p, encoding="utf-8").read())
+        _t = _dd.get("tier_arg") or _dd.get("tier")
+        _tier_now[_nm] = _t
+        _arms_tiers[_nm] = sorted({str(k).split(" ")[0] for k in (_dd.get("arms") or {}) if " " in str(k)})
+        _coord_now[_nm] = (str(_dd.get("dataset", "mnist")), str(_dd.get("student_arch", "mlp")),
+                           _t, int(_dd["width"]), len(_dd.get("seeds") or []))
+        if _pref == "compress_report_v4b":
+            _floors[_nm] = _coord_now[_nm]
+
+if MODE == "--fakeexempt":
+    _pa = [n for n in sorted(_n9c_face) if _tier_now.get(n)]
+    _pb = [n for n in sorted(_coord_now)
+           if n.startswith("compress_report_v4c") and n not in _n9b_refused
+           and any(_coord_same(_coord_now[n], fc) for fc in _floors.values())]
+    _pe = [n for n in sorted(_n9c_face)
+           if _arms_tiers.get(n) and _arms_tiers.get(n) == [_tier_now.get(n)]]
+    _pc = [n for n, fl in _n9e_all
+           if (sc.HERE / fl).exists()
+           and _floor_family(json.loads((sc.HERE / fl).read_text(encoding="utf-8"))) is not None]
+    _pc2 = sorted(n9e_nofam_names)
+    if not (_pa and _pb and _pe and _pc and _pc2 and len(_n9c_face) >= 4):
+        fails.append(f"闸⑨腿C（--fakeexempt）注入对象不齐：可评账 {len(_pa)} 本、盘上有同坐标底的网格账 "
+                     f"{len(_pb)} 本、arms 里只有单一档的账 {len(_pe)} 本、底记着族的 Fashion 账 {len(_pc)} 本、"
+                     f"真免检账 {len(_pc2)} 本、参评账 {len(_n9c_face)} 本 ⇒ 这一档造不出注入 = 没测到，不许记成通过")
+    else:
+        # 五条**虚报的免检/代价**，形状各对应上面 ①②③ 与 C-乙 那条计数：
+        # (a) 一本自己记了档、因而可评的账 → 记成「按档合并 ⇒ 反算不成立」（②）
+        # (b) 一本盘上真有同坐标底的网格账 → 记进腿B 那份「要先补底才能重跑」的代价名单（②，代价虚报）
+        # (c) 一本底确实记着族的账 → 记成「族不可核」，同时把一本真免检的从名单上摘掉（③ + 漏记）
+        # (d) 一本参评账从名单上一起摘掉，连名字都不留（①）
+        # (e) 一本 arms 里只有单一档、记的档位也正是它的账 → 记成「档位没登记 ⇒ 不按单档记账」
+        _x = _pa[0]
+        _y = _pb[0]
+        _z = sorted(n for n in _n9c_face if n not in (_x, _y))[0]
+        _w = next(n for n in _pe if n not in (_x, _z))
+        n9c -= 3
+        for _n in (_x, _z, _w):
+            _n9c_face.discard(_n)
+        n9c_merged.append(_x)
+        _n9c_skip.append((_x, "merged", None))
+        _n9b_refused.append(_y)
+        n9c_unreg.append(_w)
+        _n9c_skip.append((_w, "unreg", _coord_now[_w]))
+        n9e_nofam_names.append(_pc[0])
+        n9e_nofam_names.remove(_pc2[0])
+        print(f"  （拆红注入）五条虚报：{str(_x).split(chr(92))[-1]} 记成按档合并、"
+              f"{str(_y).split(chr(92))[-1]} 记成『要先补底』的代价（它的底其实在盘上）、"
+              f"{str(_w).split(chr(92))[-1]} 记成档位没登记、"
+              f"{str(_pc[0]).split(chr(92))[-1]} 记成族不可核（它那份底记着族）、"
+              f"{str(_z).split(chr(92))[-1]} 从名单上一起摘掉")
+
+_f_loud = len(fails)
+_orphan = sorted(set(_coord_now) - _n9c_face - {n for n, _, _ in _n9c_skip})
+if _orphan:
+    fails.append(f"闸⑨腿C（常驻·守恒）glob 到 {len(_coord_now)} 本底/网格账，其中 {len(_orphan)} 本"
+                 f"**既没进反算参评、也没在任何一份跳过名单上**：{', '.join(_orphan[:8])}"
+                 f" ⇒ 它们被安静地免检了——改之前这里只印一个计数，正是这种消失看不见的形状")
+_stale = [f"{n}（它自己记的档是 {_tier_now.get(n)}）"
+          for n, k, _ in _n9c_skip if k == "merged" and _tier_now.get(n)]
+if _stale:
+    fails.append(f"闸⑨腿C（常驻·理由现读）{len(_stale)} 本被记成『按档合并、内容里没有单一档 ⇒ 反算不成立』，"
+                 f"可现读它们自己记着档：{'; '.join(_stale[:6])} ⇒ 这一本是**可评的**，记在免检名单上"
+                 f"等于让反算腿对它关掉，而关掉的理由是假的")
+_fakecost = []
+for _n in _n9b_refused:
+    _dd2 = json.loads((sc.HERE / _n).read_text(encoding="utf-8"))
+    _c2 = (str(_dd2.get("dataset", "mnist")), str(_dd2.get("student_arch", "mlp")),
+           _dd2.get("tier_arg") or _dd2.get("tier"), int(_dd2["width"]), len(_dd2.get("seeds") or []))
+    _hit = sorted(fn for fn, fc in _floors.items() if _coord_same(_c2, fc))
+    if _hit:
+        _fakecost.append(f"{_n}（盘上有 {', '.join(_hit[:3])}）")
+if _fakecost:
+    fails.append(f"闸⑨腿C（常驻·代价名单）{len(_fakecost)} 本被记成『按自己的流数问不到底 = 这一坐标要先补底"
+                 f"才能重跑』（腿B 那行代价读数吃的就是这份名单），可**按内容坐标**在 v4b 名下查得到"
+                 f"同任务×同族×同档×同宽×同流数的底：{'; '.join(_fakecost[:4])}"
+                 f" ⇒ 这一坐标并不是跑不了，是命名规则不认识那本已经在册的底"
+                 f"（第廿三发借底那一类的反向：那次是借了错的底，这次是明明有底却说没有）")
+_unreg_bad, _unreg_unclear = [], []
+for _n, _k, _c in _n9c_skip:
+    if _k != "unreg":
+        continue
+    _ts = _arms_tiers.get(_n) or []
+    if not _ts:
+        _unreg_unclear.append(f"{_n}（它的 arms 读不出任何档位标签 ⇒ 『不按单档记账』这个理由**核不到**）")
+    elif len(_ts) == 1 and _ts[0] == _c[2]:
+        _unreg_bad.append(f"{_n}（它自己 arms 里只有 档={_ts[0]}，而记的档位也正是它 ⇒ 这本账是按单档记的、可评）")
+if _unreg_bad:
+    fails.append(f"闸⑨腿C（常驻·跳过理由现读）{len(_unreg_bad)} 本被记成『档位没登记 ⇒ 这本账不按单档记账、"
+                 f"反算不成立』，可现读它们的 arms 里**只有一个档、且正是自己记的那个**：{'; '.join(_unreg_bad[:4])}"
+                 f" ⇒ 这一本是可评的，被记成跳过（跳过与代价的分别就在这儿：可评的账不该出现在任何免检名单上）")
+if _unreg_unclear:
+    fails.append(f"闸⑨腿C（常驻·跳过理由核不到）{len(_unreg_unclear)} 本记在『档位没登记』的跳过名单上，"
+                 f"但它的 arms 里读不出档位标签，所以这条跳过理由**没法按内容复核**："
+                 f"{', '.join(_unreg_unclear[:4])} ⇒ 核不到不等于成立，这一件要按『没测到』处置")
+_nofam_set = {str(n) for n in n9e_nofam_names}
+_over, _unlisted = [], []
+for _n, _fl_name in _n9e_all:
+    if not (sc.HERE / _fl_name).exists():
+        continue                        # 底不在盘上：C-乙 已经为这一件红过，这里不重复记账
+    _famval = _floor_family(json.loads((sc.HERE / _fl_name).read_text(encoding="utf-8")))
+    if _famval is not None and str(_n) in _nofam_set:
+        _over.append(f"{str(_n).split(chr(92))[-1]}（它的底 {_fl_name} 记着 族={_famval}）")
+    if _famval is None and str(_n) not in _nofam_set:
+        _unlisted.append(str(_n).split(chr(92))[-1])
+if _over:
+    fails.append(f"闸⑨腿C（常驻·免检面虚报）{len(_over)} 本被记成『族这一维不可核（底没记 student_arch）』，"
+                 f"可现读它们的底**记着族**：{'; '.join(_over[:4])} ⇒ 免检名单比实际需要的大，"
+                 f"这一维现在可核却按老理由免检")
+if _unlisted:
+    fails.append(f"闸⑨腿C（常驻·免检面漏记）{len(_unlisted)} 本的底按内容**确实没有任何族字段**，"
+                 f"却没出现在免检名单上：{', '.join(_unlisted[:6])} ⇒ 它既没被核、也没被登记成免检，"
+                 f"下一次读那句散文的人看不见这一本")
+n9c_loud_red = len(fails) - _f_loud
+
+# 常驻出声（每一档都印，包括 normal 与上面两个分支）：计数之后必须能逐件指认。
+print(f"  C-甲（名字由内容反算）参评 {n9c} 本：{n9c - n9c_red} 本平、{n9c_red} 本不平；"
+      f"另有 {len(n9c_merged)} 本是**按档合并**的老底账（内容里没有单一档 ⇒ 反算不成立，跳过不是通过）、"
+      f"{len(n9c_unreg)} 本记的档位对不上它自己 arms 里那一个档（这本账压根不按单档记账 ⇒ 同样是跳过，"
+      f"**不是**能付训练买掉的代价）")
+print(f"  [口径] C-甲 名下**没有**『按自己的流数问不到底』这一格（不是没查，是按构造查不出）："
+      f"v4c 那半问 `out_path`——它只把坐标拼成名字、从不看盘上有没有；v4b 那半问 `v4b_path`，它确实查盘，"
+      f"可它报出来的『缺 X』里 X 必然**不等于**眼前这本账自己的名字（相等就意味着那个文件就是这本账、"
+      f"`exists` 为真、压根不会 raise）⇒ 按构造只能落进反算段的红，落不进『代价』。"
+      f"会替**别的账**当场拒绝的只有腿B（它问 v4b_path），代价名单现读 {len(_n9b_refused)} 本，逐件点名在下面")
+for _n in sorted(_n9b_refused):
+    _c3 = _n9b_coord.get(_n) or _coord_now[_n]      # 前者=腿B 当场记的，后者=拆红档注入的那本（它只在内容表里）
+    print(f"    · [代价] {_n} 坐标=任务{_c3[0]}×族{_c3[1]}×{_c3[2]}×S{_c3[3]}×{_c3[4]}流")
+for _n, _k, _c in sorted(_n9c_skip, key=lambda t: (t[1], t[0])):
+    print(f"    · [{_k}] {str(_n).split(chr(92))[-1]}"
+          + (f" 坐标=任务{_c[0]}×族{_c[1]}×{_c[2]}×S{_c[3]}×{_c[4]}流" if _c else ""))
+print(f"  [口径，不红] 参评这 {n9c} 本里有 {len(n9c_default_ds)} 本内容里**没记任务位**，反算时按实现同款默认"
+      f"（mnist）命中 ⇒ 任务这一维对它们是默认命中、不是核过；真正被这一腿盯着的是另外 "
+      f"{n9c - len(n9c_default_ds)} 本（它们自己记了 dataset）")
+print(f"  C-乙（Fashion 名下 v4f 引用自证）参评 {n9e} 本、红 {n9e_red} 条；其中 {len(n9e_nofam_names)} 本的底"
+      f"**没有任何形如 arch 的族字段** ⇒ 族这一维对它们不可核（第卅一发那句『8 本免检』从今天起只在这一维还成立，"
+      f"而且它的名单由这条常驻腿逐件核过）")
+if MODE == "--fakeexempt":
+    if n9c_loud_red < 6:
+        fails.append(f"闸⑨腿C（--fakeexempt）五条注入该让常驻腿红 6 条（守恒 / merged 理由现读 / 代价名单 / "
+                     f"跳过理由现读 / 免检面虚报 / 免检面漏记），这一档只抓到 {n9c_loud_red} 条 ⇒ 有一种虚报的免检"
+                     f"照旧看不见，这一腿只是把计数换成了名单的装饰")
+    if n9c_red or n9a_red or n9b_red:
+        fails.append(f"闸⑨腿C 的常驻腿与既有三腿没分离：这一档注入的只有**免检名单**（谁被记成跑不了/不可核），"
+                     f"而反算段 {n9c_red} 条、腿A {n9a_red} 条、腿B {n9b_red} 条都跟着红了"
+                     f" ⇒ 它们读的是同一份状态，注入分不清钉的是哪条腿")
+    else:
+        print(f"  分离验到：这一档的红全部住在常驻名单腿（{n9c_loud_red} 条），反算段与腿A/腿B 各 **0 条**"
+              f"（它们问的是『该读哪本账』，这一档没改那件事，只改了『谁被记成不用问』）")
 
 # 闸⑩：流名单与系数只有一个出处——**按值**查，不看 import 行、不看注释里写了什么。
 # 第十八发 E 把 step4e/4g/5/6b/7 那五份手抄名单并进登记处，这一档钉的是"并完不许再漂回去"：

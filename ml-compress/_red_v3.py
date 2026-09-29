@@ -243,6 +243,124 @@
 自我拆红（每条各拆一道闸，跑了不红的模式=那条闸没测到，不许拿它当通过。下面全是**本轮实测**，
 不是预期——规矩是实测再写回这张表，写死的计数只对"当前在册的那几本"成立：
 
+**【第三十六发·把上一发交接出去的那 352 次训练接进判决链（段② 的分母 3 格 → 9 格）＋给闸⑨ 腿C 的
+常驻点名单补两条它结构上看不见的判据（挂错桶 / 名字对坐标错）并配一道专属拆红档 `--catwrong`
+＋把闸⑥／⑦／⑧那三处"参评 N 本"由计数改成逐件点名】**
+**352 次训练（**本发 A 项实付**：上一发只宣布价签并把开跑交接出去，这一发真跑完了——用上一发保留的那份
+训练驱动（`_tmp_r35_train.py`，本机、不入库，因"删了就跑不了"而**永久保留**），四本各 88 次、
+13:09:52 起、整批墙钟 **1182** 秒、四档 rc 全 **0**、纯 CPU、零造底、零 SKIPPED）、0 元 API、进册 5 本】**
+在册 39 本（`v4f` 名下，本轮 **+0**）、全册 **135** 本（**+5**：换任务侧中数据档与满数据档各两本 8 条流的
+α×T 网格账，加一本 `step4l` 的 v8 派生账——**前四本就是上面那 352 次换回来的，第五本是接链之后重跑
+`step4l --dataset fashion` 出的读数账**；判据一个字没动，新读数只住在派生账里），
+正常模式 rc=0 / 0 条红，**二十九档**全部重跑（档数由源码里的 `MODES` 登记处现读并在每轮开头打印，本轮实测
+**29**，**增档 = 1** ⇒ **30 份** = `normal` + 29 档；逐档红数全部本轮实测，两口径（`^    闸` 前缀 /
+任意缩进非空行）**逐份相等**，30 份 stderr **各 0 字节**；凭据仍只指命令形态 `python _red_v3.py <档名>`。
+**机时这一栏仍只报读数、不报倍数**：2 并发、末档落盘于开跑后 **829** 秒（上一发那 893 秒与它**不同档数
+不同扫描面** ⇒ 不许相减当趋势）。逐档红数：misfeed 104、decorative 30、**unformatted 24**、**borrowtask 24**、
+borrowseeds 22、**famblind 21**、**fakeexempt 7**、**catwrong 2**、borrowfloor 17、v5strict 15、collateral 15、
+v4blind 13、v4loose 9、drift 5、**citedlink 5**、destroy 4、v5blind 4、sibdrift 3、ciasym 2、ciderived 2、
+flowcopy 2、laddersib 2、limitptr 2、bareid 1、ciunread 1、g5drop 1、helpblind 1、oldsib 1、wrongcount 1、
+normal **0**。
+
+**与【第三十五发】那张表一比：两批共有的 29 档里 26 档的红行集合逐条相同**（含 `normal` 那个 0），
+**涨 2、落 0、总数同而内容漂 1**，新档 `--catwrong` 只在新一批出现。先记一处**我自己那把尺子的错**：
+上一发那条"计数分桶要按集合判、不能按大小判"只落地了一半——脚本确实改成按集合判"有没有变"，
+可涨／落两个桶仍按条数大小分 ⇒ 本轮第一次跑它，把 `--citedlink`（5 → 5 而集合换了）又投进了『落』，
+印出"涨 2 / 落 1"；改成"条数差为 0 而集合不同 ⇒ 归漂"再重跑同一批日志，才是上面的"涨 2 / 落 0 / 漂 1"。
+**同一个错第二次犯在同一把尺子上，而且这次犯的地点就是那次自纠要修的地方**（凭据：一次性件
+`_tmp_r36_red_diff.py`（本机、不入库）的修改前后两次输出，同一批 30 份日志、零重跑）。
+① `--borrowtask` 20 → **24**：涨的四条全住在**反算段**，红行自己写着"接的是上一发 A 那 352 次换回来的
+四本账"——任务位被从命名规则里抽掉之后，`compress_report_v4c_fashion_cnn_mid_n8.json`、
+`compress_report_v4c_fashion_mid_n8.json`、`compress_report_v4c_fashion_cnn_n8.json` 与
+`compress_report_v4c_fashion_n8.json` 这四本**新入 glob** 的账各自被规则算出一个不带 `fashion` 的名字，
+其中两本"那个名字此刻不在盘上"、两本"那一本此刻**已在盘上**"。**这是覆盖面随册子变密，不是盘态变坏**：
+反面凭据同一批 `normal` rc=0 / 0 条红。上一发那 +2 与本轮这 +4 是同一型（每入册一本换任务侧的账，
+这条注入就多盯着它一本）。
+② `--fakeexempt` 6 → **7**：这一档一次里换了**两件事**，必须分开读。㈠ 守恒那条红**本身没变**，变的是它
+自己句里的分母——`glob 到 45 本` → `glob 到 49 本`（A 那四本进册）⇒ 按集合 diff 它算"一行今无＋一行今新增"，
+所以这一档被标成**同时含漂**；㈡ 真正的新红只有一条，而且它**不是上一发那条腿的重复**：本轮新装的
+**常驻·名单坐标核不到**腿在**别人的注入面**上第一次出声——`--fakeexempt` 把 `compress_report_v4c_cnn.json`
+记成"要先补底"的代价时**没带坐标**，新腿按设计报"核不到 ≠ 成立，按『没测到』处置"。**这一条不是盘上缺陷**
+（`normal` 下 0 红：真在册的 14 本代价件每本都自带坐标），是新腿的覆盖面比上一发宽 ⇒ 按老规矩记"涨"、
+**不给它加豁免**（把"注入没带坐标"改成"这条腿闭嘴"就是替别人的注入面作保）。分离验到照旧成立：7 条红
+**全部**住在常驻名单腿，反算段与腿A、腿B 各 **0 条**。
+③ `--citedlink` **5 → 5 而内容漂了**：漂的那一条是注入的凭据行号 `README.md:1698` → `README.md:1765`——
+A 往板块 README 里插的那一节把行号顶下去了，红行本身一个字没变。⇒ **"总数不变不等于红行不变"第五次现读**。
+
+**新档 `--catwrong`（本轮 C 项，专属拆红）实测**：rc=1 / **2 条红**，钉的是上一发那条改造**结构上看不见**的
+那一格——名字挂着、**桶**或**坐标**写错。三条注入各撞一条腿（`_catwrong` 1 条 + `_coordwrong` 2 条 ⇒
+`n9c_cat_red = 3`，两句红行按类型各汇一条）：**①** 把 `compress_report_v4b.json` 从"按档合并"挪进
+"档位没登记"（坐标照抄它自己的）⇒ 新判据按**内容**反算它该挂 `merged`，红；**②** 把
+`compress_report_v4b_n16.json` 名单自带的坐标换成 `compress_report_v4b_cnn.json` 那一份 ⇒ 名字对、
+坐标写成隔壁那本，红；**③** 把 `_mid_n12_t6_v5` 的**代价**坐标换成 `_mid_n16_t6_v5` 那一份 ⇒ 同一型换一条腿，
+红。**分离验到**：上一发那三条老判据与守恒腿合计 **0 条**、反算段与腿A、腿B 各 **0 条** ⇒ 这一型（"该挂
+哪儿"与"这份坐标是不是它自己的"）从这一发起才有人盯；**这一档跑了不红就等于那三条注入没人守**。
+**为什么这一型不是假想的**：`merged`（内容里没有单一档 ⇒ 永远反算不了）与 `unreg`（记的档位对不上它自己
+arms 里那一个 ⇒ 差一次登记就能评）在价签上读法**相反**，挪桶不花钱就能把"不可评"说成"买得起"——而上一发
+自己刚撤过一笔同族假账（连三发把 2 本 `unreg` 记成"代价 = 要先补底"）。
+
+**各闸本轮现读**：**①** 39/39 复算通过（与上一发同数，本发没造 v4f 账）；**②** 只在旧账 8 本上算，翻转名单
+仍是 1 本；**③** 该翻的那一本仍是 `compress_report_v4f_low_n8_thin_v2.json`（测不动 → 反号线）；**④** 板块
+在册『污染型』按本批现读 **24** 本未被连坐；**⑤** 候选 **31** 本 = 逐位核过 6 ＋ 首跑/无更低版本前账 25；
+**⑥ 27 → 27 对**（**一对没多**，"对数与这一改动没动的东西有没有单调关系"**第十八次**现读）；**⑦** v3 及更早
+14 本里参评 **11** 本、被"顶不在账"放掉 **3** 本（**本轮起逐件点名，并各带它自己记的锚点值与阶梯**）；
+**⑧** 记在 v4 名下、顶在账因而参评 **6** 本、放掉 **0** 本（同样逐件点名）；**⑨** 腿A 参评 27 本全等 &
+腿B 27 本（**13** 本同流数底 / **14** 本被实现当场拒绝 / **0** 本返回错流数的底），另按口径出声的"落在登记
+范围外"那批仍 **12** 本；**腿C** C-甲 名字由内容反算参评 **45** 本、**45 本全平、0 本不平**（上一发 41 本，
+涨的 4 本就是 A 那四本），其中 **21** 本内容里没记任务位、按实现同款默认命中 ⇒ 真正被这一腿盯着的是
+另外 **24** 本（上一发 20），另有 **4** 本按名字点名（2 `merged` + 2 `unreg`）⇒ 守恒 **49 = 45 + 2 + 2**；
+C-乙 换任务名下引用自证参评 **12** 本、红 **0** 条，其中 **8** 本的底没记 `student_arch` ⇒ 族这一维在换任务的
+MLP 侧**仍不可核**（没测到，不是通过）；**⑩** 模块侧 10 项 + 档案侧 **126** 条名单全等；**⑪** 参评 **35** 本、
+自带双记账 **9** 本且与复算逐字段相同；**⑫** 全册 **135 本 / 7328 条 / 24 本带那句 / 漏渲染 0 条**；
+**⑬** 现读清单 **13 本 / 退出码 0 的 13 本 / 4 并发墙钟 54.7 秒**（同一清单历次 28.0 / 34.4 / 200.3 / 61.5 /
+55.4 / 36.0 / 54.3 / 70.2 / 26.7 / 52.4 / 46.5 / **54.7** 秒 ⇒ 只报读数区间不报倍数）；**⑭** 派生账现读
+**17 本 / 176 条** ci95：可复算 176 / 口径外 0（参评 6 本、旧档豁免 **11** 本）；**⑮** 可核指针 **2** 条 /
+漂走 **0** / 裸序号 **0** / 引文不逐字 **0** / 过期 **0**（出处参评 **108** 本 / 旧版豁免 **27** 本）；
+**⑯** 引用面 **31** 个在册文件（在册名单 **167** 本）/ 名字由正文现读 **50** 个 / 命中引用 **107** 处 =
+点名式带声明 **107** ＋ **裸 0**、本闸墙钟 0.04 秒。**词表哨兵照常驻**：真声明词『用完即删』仍在表**外**
+（现读 **12** 个词），本轮没动那张表。
+
+**本轮对"参评 N 本"这类裸计数动的三处（D 项，只改判据的出声方式、不改判据本身）**：闸⑥ 从此除了"共对 27 对"还把**被它放掉的同配置对**逐件点名，并按内容分成两类——交闸⑤ 的重跑对 **9** 对、流集合与
+阶梯互不包含的不可比对 **4** 对（后者之间**没有**逐位对账线，跨这一对写"两本对齐过"就是写在没有线的话上）；
+闸⑦ 的三份名单（v3 及更早 / 参评 / 放掉）与闸⑧ 的两份名单同样改成件数由名单长度现读、逐件带坐标，
+另把正文那句"近邻对照"的**边界归判据管**：`compress_report_v4f_mid.json` 哪天把锚点剂量训进阶梯、进了参评
+集合，那句"这条腿对它恒等于 v3"就变成假话 ⇒ 届时当场红、要重写那句。**动机与上一发同源**：一份只报
+计数的名单会把"一本账安静地换了一类"和"什么都没变"折叠成同一个数字。
+
+**顺序约束本轮的兑现与一处自纠**：整批 30 份截在**最后一次源码改动之后**——批前冻结 133 项在册
+`.py`／`.md`（一次性件 `_tmp_r36_freeze_before.txt`，本机、不入库），批后逐项对回来 **133/133 未变、
+新增 0 项**，所以这张表描述的就是我要写回的那一版（上一发那条"快照要截在最后一次源码改动之后"本轮
+照做，没再犯）。**但量红的脚本坏了一次**（见上面那段㈠／㈡之前：按大小分桶 ⇒ "落 1"是假的），
+修完重跑的是**同一批日志**、零重跑、零训练。
+
+**落笔后补跑（本轮最后一次扫描面改动，这一段描述的就是提交时那一版盘态）**：上面那张 30 份的表截的是
+整批那一次的盘态，而**文档是最后写的**——E／F 那两节加上去的散文把新名字带进了 ⑯ 的射程，所以按老规矩
+必须再单跑一次。**首跑就红了：rc=1 / 6 条红，全部在闸⑯**（`>>> 验红` 后数 `^    \S`，与"抓『结论：』以前
+全部行"两口径同为 6；stderr 0 字节）：4 条在 `ml-compress/README.md` 的 F 段（那四本并行会话的探针账
+`_v4l_*_v1.json`——名字在行上、"都不在库里"那句声明在**下一行**）、1 条在 E 段、1 条在
+`面试版判决表.md:107`（同一个名字 `compress_report_v4b_low.json`，**这本不在库里**、按盘现读也没有）。
+**整改只改措辞**：把声明搬进点名那一行（判决侧写"这本不在库里、盘上也没有"，F 段改成两行各带两本、
+各写"这两本不在库里"）⇒ **不给规则加豁免、没动 `_LOCAL_MARK` 那张词表**（哨兵照旧：『用完即删』仍在表外，
+现读 **12** 个词）。**复跑：`normal` rc=0 / 0 条红 / stderr 0 字节**；⑯ 现读引用面 **31** 个在册文件（名单
+**167** 本）/ 名字由正文现读 **58** 个 / 命中 **125** 处 = 点名式带声明 **125** ＋ **裸 0**——与上面那串
+**50 / 107** 的差就是本发自己新写的那几句（延续"命中 98 → 100 → 104 → 105"那条逐发递增的记录方式，
+**50 → 58 → 63、107 → 123 → 125 → 132**（最后那一跳是同发把这段补跑记录传播进四件文档之后又单跑一次的现读），涨的每一处都指得到具体句子，不是盘上多坏了 25 处）。
+**而且这段补跑记录本身又被闸抓到一次**：第一次复跑得到 **123** 之后我接着往下写软肋那段，那个动作把新的
+引用送进了射程、其中一条所在行没带声明 ⇒ **第二次单跑 rc=1 / 1 条红，红在守卫自己的文件头**（还是那个
+"缺的底"的名字）。整改照旧只是把声明搬进点名那一行 ⇒ **第三次单跑才是上面报的 rc=0 / 125 / 裸 0**；把这段记录搬进四件文档之后**第四次单跑 rc=0 / 132 / 裸 0**（名字 58 → 63）。
+**可迁移：写"补跑记录"不是元操作，它改的就是扫描面本身；预报的数与实际复跑的数不一样时，链式把每一跳
+都留下（107 → 123 → 125 → 132），不许只写最后那一版冒充一次到位。** `--citedlink` 复跑
+**rc=1 / 5 条红 ⇒ 与整批那张表 5 → 5、而腿C 报的行号由 README.md:1765 漂到 :1876、文档传播后又漂到 :1899（同发内两回）** ⇒
+**"总数不变不等于红行不变"第六次现读**。
+**同发登记 ⑯ 的一条软肋（只登记，不给规则加豁免）**：根 `README.md` 里那句"只缺
+`compress_report_v4b_low.json` 一本"**没有红**（**这本不在库里**），但原因不是那句点了名——根 README 那一行装着两万八千多个字符（本轮量过 **27,150 / 27,194 / 27,972 / 28,033**，每一次都是登记这句话本身把它加长 ⇒ **这个数只用来证形状，不许当精确读数引用**；整条续账链
+写在一行里），行内别处正好躺着『不入库』『断链』『一次性件』『作废』⇒ **"同一行里同时含名字和标记词"
+这条判定在"一行一文档"的形状上等于没有判**。本轮只给那一句补了同行声明（口径上诚实），词表与判定实现
+一个字没动；软肋留在**形状**上：任何把长文压成单行的文档，⑯ 对它是盲的，这一条**不在**任何一档拆红里。
+**这句话本身就是顺序约束的另一半**：整批表没错，错的是把"写回后单跑 0 红"从上一发的习惯抄到这一版文档上
+——所以这一段之后本发不再改任何在册 `.py`／`.md`。
+
+
 **【第三十五发·把闸⑨ 腿C 那三处"跳过 / 代价"从计数改成常驻点名单，再给这条新腿配一道专属拆红档
 （`--fakeexempt`，增档 = 1）；顺手把出口 (m) 那一格的可达性按盘现读结题】**
 **0 次训练、0 元 API、进册 0 本】**
@@ -1404,7 +1522,7 @@ MODES = ("--decorative", "--drift", "--destroy", "--collateral", "--v4blind", "-
          "--v5blind", "--v5strict", "--famblind", "--misfeed", "--sibdrift", "--laddersib",
          "--oldsib", "--g5drop", "--borrowfloor", "--borrowseeds", "--borrowtask", "--flowcopy", "--ciasym",
          "--ciunread", "--unformatted", "--wrongcount", "--helpblind", "--ciderived", "--bareid",
-         "--limitptr", "--citedlink", "--fakeexempt")
+         "--limitptr", "--citedlink", "--fakeexempt", "--catwrong")
 if MODE and MODE not in MODES:
     raise SystemExit(f"未知拆红档位 {MODE!r}：MODES 登记处在册 {len(MODES)} 档，没有这一档 ⇒ 加一档必须先登记"
                      "（否则 dispatch 里写了 elif 也永远不会被跑到，那一档是恒绿的装饰）")
@@ -1626,8 +1744,13 @@ if hard:
 expected_v4 = ["compress_report_v4f_mid_n8_v3.json"]
 flips_v3_v4 = [r[0] for r in rows if r[1] not in ("v4", "v5") and SHORT(r[5]) != SHORT(r[12])]
 can_flip = [r for r in rows if r[1] not in ("v4", "v5") and r[6]]   # 阶梯顶不在账里的本**参评不了**这条腿
-print(f"[闸⑦ v4 相对 v3 的翻转集合（v3 及更早的 {sum(1 for r in rows if r[1] not in ('v4', 'v5'))} 本里，"
-      f"阶梯顶在账因而**参评**的 {len(can_flip)} 本；三本 v1-era 非薄账没训到锚点，"
+# 第卅六发 D：这一闸原来的三处读数全是裸计数（"v3 及更早 N 本""参评 N 本""三本 v1-era 没训到锚点"），
+# 集合换掉而数不变时一个字都看不出来；从这一发起三份名单逐件点名，件数一律由名单长度现读。
+era_v3m = [r for r in rows if r[1] not in ("v4", "v5")]
+excl_v3m = [r for r in era_v3m if not r[6]]                       # 被"顶不在账"放掉的
+under_v45 = [r for r in rows if r[1] in ("v4", "v5")]             # 判词记在 v4/v5 名下 ⇒ 结构上不归这条腿
+print(f"[闸⑦ v4 相对 v3 的翻转集合（v3 及更早的 {len(era_v3m)} 本里，"
+      f"阶梯顶在账因而**参评**的 {len(can_flip)} 本；{len(excl_v3m)} 本没训到锚点剂量，"
       f"这条腿对它们恒等于 v3，不算通过也不算红）] {flips_v3_v4 or '（空）'}")
 if sorted(flips_v3_v4) != expected_v4:
     fails.append(f"闸⑦ v4 的翻转集合应为 {expected_v4}，实为 {flips_v3_v4}——"
@@ -1644,6 +1767,18 @@ else:
           + (f"（保持的那些里离界最近的是 {near[1]}%，即 `{near[0]}`）" if by_share else ""))
     print("  近邻对照要分清两类：`compress_report_v4f_mid.json`(97%) 份额更贴界，但它是 3 条流的账、"
           "阶梯顶不在账里 ⇒ 这条腿对它恒等于 v3，**不能**当这条判据的近邻")
+    print(f"  [点名·参评 {len(can_flip)} 本] " + "、".join(f"{r[0]}（{r[1]} 名下，顶 α={r[11]:g} 在账）"
+                                                            for r in can_flip))
+    print(f"  [点名·被『顶不在账』放掉 {len(excl_v3m)} 本] 每本带它自己记的锚点值与阶梯，读得出为什么参评不了：")
+    for _r in excl_v3m:
+        _lad = sorted(float(x) for x in docs[_r[0]]["ladder"] if float(x) != 0.0)
+        print(f"    · {_r[0]}（{_r[1]} 名下，锚点 α={_r[11]:g} 不在这本的阶梯 {_lad} 里 ⇒ 这条腿恒等于 v3）")
+    # 那句"近邻对照"的散文点名了一本**不在参评集合**里的账；它哪天升版把锚点剂量训进阶梯，
+    # 这句话就变成谎话——所以这条边界归判据管，不归人记（红 = 正文那句对照要重写）。
+    if "compress_report_v4f_mid.json" in [r[0] for r in can_flip]:
+        fails.append("闸⑦ 正文那句近邻对照点名的 `compress_report_v4f_mid.json` **已经进了参评集合**"
+                     "（它的阶梯如今含锚点剂量）⇒ 『这条腿对它恒等于 v3、不能当近邻』那句照抄就是假话，"
+                     "要重写那句、并按 v4 判据重新核对它的份额读数")
 
 # 闸⑧：v5 相对 v4 只许翻掉预登记那四本（出界幅度压不过"把两端钉在一起的这一步"自己的 CI 半宽）。
 # 参评＝**判词记录在 v4 名下**且阶梯顶在账里的那些本：v5 落地的那本是"预言兑现"，归闸⑤ 管，
@@ -1652,9 +1787,17 @@ EXPECTED_V5 = ["compress_report_v4f_mid_n12_v4.json", "compress_report_v4f_mid_n
                "compress_report_v4f_mid_n8_v4.json", "compress_report_v4f_n8_t6_v4.json"]
 MUST_STAY = "compress_report_v4f_mid_n8_t6_v4.json"      # 出界 29.8 张 > 半宽 ±22.4 张 ⇒ v5 之下唯一还站着的倒挂
 can_flip_v5 = [r for r in rows if r[1] == "v4" and r[6]]
+excl_v5 = [r for r in rows if r[1] == "v4" and not r[6]]
 flips_v4_v5 = [r[0] for r in can_flip_v5 if SHORT(r[12]) != SHORT(r[13])]
 print(f"\n[闸⑧ v5 相对 v4 的翻转集合（记录在 v4 名下、阶梯顶在账因而**参评**的 {len(can_flip_v5)} 本；"
-      f"v5 落地那本归闸⑤）] {flips_v4_v5 or '（空）'}")
+      f"另有 {len(excl_v5)} 本记在 v4 名下但顶不在账 ⇒ 结构上参评不了这条腿；v5 落地那本归闸⑤）] "
+      f"{flips_v4_v5 or '（空）'}")
+print(f"  [点名·参评 {len(can_flip_v5)} 本] " + "、".join(f"{r[0]}（顶 α={r[11]:g} 在账）" for r in can_flip_v5))
+if excl_v5:
+    print(f"  [点名·被『顶不在账』放掉 {len(excl_v5)} 本]")
+    for _r in excl_v5:
+        _lad = sorted(float(x) for x in docs[_r[0]]["ladder"] if float(x) != 0.0)
+        print(f"    · {_r[0]}（锚点 α={_r[11]:g} 不在这本的阶梯 {_lad} 里 ⇒ v5 对它恒等于 v4）")
 if not can_flip_v5:
     fails.append("闸⑧ 一本参评的账都没有——不是通过，是没测到")
 if sorted(flips_v4_v5) != sorted(EXPECTED_V5):
@@ -1809,6 +1952,17 @@ def pair_dirs(da, db):
     return None
 
 
+def _set_rel(x, y):
+    """两个集合的关系，只用于把『这一对为什么不可比』说成一句可点名的话。"""
+    if x == y:
+        return "="
+    if x < y:
+        return "⊂"
+    if x > y:
+        return "⊃"
+    return "交叉" if (x & y) else "不相交"
+
+
 print("[闸⑥ 扩流/扩格不改老读数（同配置账两两对账）]")
 if MODE == "--drift":
     cand = []
@@ -1848,6 +2002,7 @@ if MODE == "--drift":
               + (f"。这一对的老那本文件名排在后面（{old} > {new}），按文件名定向的旧规则看不见它"
                  if old > new else ""))
 pairs = 0
+_rerun_pairs, _incomp_pairs = [], []      # 第卅六发 D：被这一闸放掉的同配置对也要逐件点名（原来只有一句 continue）
 for pa, da in sorted(docs.items()):
     for pb, db in sorted(docs.items()):
         if pa >= pb or not same_cfg(da, db):
@@ -1856,7 +2011,15 @@ for pa, da in sorted(docs.items()):
         # 就是本轮那个漏网的对（`_n8 ⊆ _n12`）的来历。
         got = pair_dirs(da, db)
         if got is None:
-            continue                                    # 同流同格＝重跑，那是闸⑤ 的对象不是这条
+            _sa, _sb = set(da["seeds"]), set(db["seeds"])
+            _la = {round(float(x), 4) for x in da["ladder"] if float(x) != 0.0}
+            _lb = {round(float(x), 4) for x in db["ladder"] if float(x) != 0.0}
+            if _sa == _sb and _la == _lb:
+                _rerun_pairs.append((pa, pb))          # 同流同格＝重跑，那是闸⑤ 的对象不是这条
+            else:
+                _incomp_pairs.append((pa, pb, _set_rel(_sa, _sb), _set_rel(_la, _lb),
+                                      len(_sa), len(_sb), len(_la), len(_lb)))
+            continue
         dx, dy, sa, sb, la, lb = got
         px, py = (pa, pb) if dx is da else (pb, pa)     # 老那本 / 新那本
         ia, ib = arm_index(dx), arm_index(dy)
@@ -1879,6 +2042,16 @@ for pa, da in sorted(docs.items()):
 if pairs == 0:
     fails.append("闸⑥ 一对可比的账都没有——不是通过，是没测到")
 print(f"  共对 {pairs} 对")
+# 第卅六发 D：这一闸原先只出声它**比了**的那些对，被它放掉的同配置对一句 `continue` 就没了痕迹。
+# "一本账从已对账漂进放掉那一类"与"计数没变"完全可以同时发生，所以这里把放掉的也逐件点名，
+# 并按内容分成两类（重跑 / 互不包含）；两份名单上的数由名单长度现读，不另写。
+print(f"  [点名·交闸⑤] 同流同格的重跑对 {len(_rerun_pairs)} 对（这一闸按设计不比它们，比它们的是闸⑤ 的"
+      f"『训练路径 14 字段逐位不变』）：" + ("、".join(f"{x}↔{y}" for x, y in _rerun_pairs) or "（这一格没有件）"))
+print(f"  [点名·不可比] 同配置但流集合/阶梯互不包含的对 {len(_incomp_pairs)} 对 ⇒ 它们之间**没有**逐位对账线，"
+      f"跨这一对写『两本对齐过』就是写在没有线的话上：")
+for _x, _y, _rs, _rl, _na, _nb, _ca, _cb in _incomp_pairs:
+    print(f"    · {_x}（{_na} 流×{_ca} 格） vs {_y}（{_nb} 流×{_cb} 格）"
+          f" ⇒ 流 {_rs}、阶梯 {_rl}")
 
 # 闸⑨：底不许跨档/跨宽度借。钉的是第十五发查出的那处定向缺陷——`v4b_path` 旧写法只在
 # width == 128 时贴档位后缀（写死的假设"S64 只跑过满数据档"），于是 64×中数据 会去读满数据那本，
@@ -2224,6 +2397,18 @@ for _pref in ("compress_report_v4b", "compress_report_v4c"):
         if _pref == "compress_report_v4b":
             _floors[_nm] = _coord_now[_nm]
 
+# 第卅六发 C：名单上**自带坐标**的那两件腿（腿B 的代价名单、腿C 的跳过名单）要有一句独立参照，
+# 否则"名字点对、坐标写成隔壁那本"这种错登没有任何东西能核。这张表只从 v4f 账的内容读，
+# 字段口径与腿B 记 `_n9b_coord` 那五行逐字相同（同一本账、同一套缺省），差别只在它由这一处独立算一遍。
+_v4f_coord = {}
+for _name, _d in sorted(docs.items()):
+    if not str(_name).endswith(".json"):
+        continue
+    _v4f_coord[str(_name).split(chr(92))[-1]] = (
+        str(_d.get("dataset", "mnist")), str(_d.get("student_arch", "mlp")), _d.get("tier"),
+        int(_d["width"]) if _d.get("width") is not None else None,
+        len(_d["seeds"]) if isinstance(_d.get("seeds"), list) else None)
+
 if MODE == "--fakeexempt":
     _pa = [n for n in sorted(_n9c_face) if _tier_now.get(n)]
     _pb = [n for n in sorted(_coord_now)
@@ -2265,6 +2450,41 @@ if MODE == "--fakeexempt":
               f"{str(_w).split(chr(92))[-1]} 记成档位没登记、"
               f"{str(_pc[0]).split(chr(92))[-1]} 记成族不可核（它那份底记着族）、"
               f"{str(_z).split(chr(92))[-1]} 从名单上一起摘掉")
+
+if MODE == "--catwrong":
+    # 第卅六发 C：三条**错登**。上一发那条改造钉的是"每一次跳过都留下名字、且这个名字此刻还成立"，
+    # 它看不见名字**挂错桶**：merged（内容里没有单一档 ⇒ 结构上永远反算不了）与 unreg（记的档位对不上
+    # 它自己 arms 里那一个 ⇒ 是一次登记缺口）在既有判据眼里都只是"跳过"——挪桶既不破守恒（它还在一份
+    # 跳过名单上）、也不撞那三条理由复核（merged 那条只看内容有没有档、unreg 那两条只看 arms 里档位
+    # 的数目与相不相等，两边都按"它挂在 unreg/merged"之外的另一件事在问）。而这两桶在价签上读法相反：
+    # 前者永远不用买，后者补一次登记就能评 ⇒ 上一发自己刚撤过一笔同族假账（那 2 本"代价"其实是 unreg）。
+    _q = [n for n in n9c_merged if not _tier_now.get(n)]                       # 真 merged
+    _r = [n for n in n9c_unreg if _tier_now.get(n) and len(_arms_tiers.get(n) or []) != 1]   # 真 unreg（多档）
+    _s = [n for n in _n9b_refused if _n9b_coord.get(n)]                         # 腿B 真记过坐标的代价件
+    if not (_q and _r and len(_s) >= 2):
+        fails.append(f"闸⑨腿C（--catwrong）注入对象不齐：真 merged {len(_q)} 本、真 unreg {len(_r)} 本、"
+                     f"带坐标的代价件 {len(_s)} 本 ⇒ 这一档造不出错登 = 没测到，不许记成通过")
+    else:
+        _a, _b, _cc = sorted(_q)[0], sorted(_r)[0], sorted(_s)[0]
+        _alt = next((n for n in sorted(_coord_now)
+                     if n != _b and all(v is not None for v in _coord_now[n])
+                     and not _coord_same(_coord_now[n], _coord_now[_b])), None)
+        _alt2 = next((n for n in sorted(_s) if n != _cc and not _coord_same(_n9b_coord[n], _n9b_coord[_cc])), None)
+        if _alt is None or _alt2 is None:
+            fails.append("闸⑨腿C（--catwrong）挑不出**坐标确实不同**的另一件来换（名单上所有件的坐标都一样）"
+                         "⇒ 换坐标这一步造不出来 = 没测到，不许记成通过")
+        else:
+            n9c_merged.remove(_a)
+            n9c_unreg.append(_a)
+            for _i, (_n, _k, _c) in enumerate(_n9c_skip):
+                if _n == _a and _k == "merged":
+                    _n9c_skip[_i] = (_a, "unreg", _coord_now[_a])              # ① 挂错桶（坐标照抄自己的）
+                if _n == _b and _k == "unreg":
+                    _n9c_skip[_i] = (_b, "unreg", _coord_now[_alt])            # ② 桶对、坐标写成隔壁那本
+            _n9b_coord[_cc] = _n9b_coord[_alt2]                                # ③ 代价件自带坐标换成别本的
+            print(f"  （拆红注入）三条错登：{str(_a).split(chr(92))[-1]} 从按档合并挪进档位没登记（坐标仍是它自己的）、"
+                  f"{str(_b).split(chr(92))[-1]} 的自带坐标换成 {str(_alt).split(chr(92))[-1]} 的那一份、"
+                  f"{str(_cc).split(chr(92))[-1]} 的代价坐标换成 {str(_alt2).split(chr(92))[-1]} 的那一份")
 
 _f_loud = len(fails)
 _orphan = sorted(set(_coord_now) - _n9c_face - {n for n, _, _ in _n9c_skip})
@@ -2327,6 +2547,85 @@ if _unlisted:
     fails.append(f"闸⑨腿C（常驻·免检面漏记）{len(_unlisted)} 本的底按内容**确实没有任何族字段**，"
                  f"却没出现在免检名单上：{', '.join(_unlisted[:6])} ⇒ 它既没被核、也没被登记成免检，"
                  f"下一次读那句散文的人看不见这一本")
+# ———— 第卅六发 C：两条常驻判据，钉的是上一发那条改造**看不见**的那一格。
+# 上一发把"谁被免检"变成逐件点名，钉的是"每一次跳过都留下名字、且这个名字此刻还成立"；
+# 名字**挂错桶**它照旧看不见：merged 与 unreg 在既有三条理由复核里都只被问"自己那一桶的理由还成不成立"，
+# 从没有一处把这件**该挂哪一桶**按内容反算一遍再与注册桶比。而这两桶在价签上读法相反
+# （merged = 内容里没有单一档，永远反算不了；unreg = 记的档位对不上它自己 arms 里那一个，
+# 是一次登记缺口）⇒ 挪桶不花钱就能把"不可评"说成"差一次登记"。这一发自己刚撤过一笔同族假账
+# （第卅二～卅四连三发把 2 本 unreg 记成"代价 = 要先补底"），所以这一型不是假想的。
+# 重复记账的规矩沿用本文件上面那句先例（"底不在盘上：C-乙 已经为这一件红过，这里不重复记账"）：
+# 已被 `_stale` / `_unreg_bad` / `_unreg_unclear` 点过名的件，这里跳过，一条形状只算一条红。
+_f_old = len(fails)
+
+
+def _bucket_by_content(n):
+    """由**账的内容**反算这一件该挂哪一桶（不看它现在挂在哪儿）。"""
+    _t = _tier_now.get(n)
+    if not _t:
+        return "merged"                      # 内容里没有单一档 ⇒ 反算按构造不成立
+    _ts = _arms_tiers.get(n) or []
+    if not _ts:
+        return "核不到"                       # arms 读不出档位 ⇒ 归 _unreg_unclear 那条
+    if len(_ts) == 1 and _ts[0] == _t:
+        return "可评"                         # 它自己就按单档记账，不该在任何免检名单上
+    return "unreg"
+
+
+_flagged_old = set()
+for _n, _k, _c in _n9c_skip:
+    _ts = _arms_tiers.get(_n) or []
+    if _k == "merged" and _tier_now.get(_n):
+        _flagged_old.add(_n)
+    elif _k == "unreg" and (not _ts or (len(_ts) == 1 and _ts[0] == _c[2])):
+        _flagged_old.add(_n)
+_catwrong = [f"{_n}：名单上挂在 [{_k}]，按内容反算它属于 [{_bucket_by_content(_n)}]"
+             for _n, _k, _c in _n9c_skip if _n not in _flagged_old and _bucket_by_content(_n) != _k]
+if _catwrong:
+    fails.append(f"闸⑨腿C（常驻·类别错登）{len(_catwrong)} 件跳过挂在了**错的桶**里：{'; '.join(_catwrong[:4])}"
+                 f" ⇒ 桶与桶的读法相反（『永远反算不了』与『差一次登记就能评』），挂错桶等于改价签；"
+                 f"上一发那三条理由复核问的是『这个名字此刻还成立吗』，从来没问『该挂哪儿』")
+
+# 名单上**自带坐标**的每一件，那份坐标必须由账的内容独立复现：名字点对、坐标写成隔壁那本，
+# 读的人就会把"这一坐标要先补底 / 这一坐标不按单档记账"报到别的坐标上去。
+_coordwrong, _coordunclear = [], []
+
+
+def _coord_shape(c):
+    return ("任务%s×族%s×%s×S%s×%s流" % c) if c else "（无）"
+
+
+for _n, _k, _c in _n9c_skip:
+    if _c is None:
+        continue                              # merged 那类按设计不带坐标（内容里压根没有档）
+    if _bucket_by_content(_n) == "merged":
+        continue                              # 它错在挂错桶，那条红归上面『类别错登』记，这里不重复记账
+    _own = _coord_now.get(_n)
+    if _own is None or any(v is None for v in _c) or any(v is None for v in _own):
+        _coordunclear.append(f"{_n} [{_k}]（反算侧或内容侧有字段缺位）")
+        continue
+    if not _coord_same(_c, _own):
+        _coordwrong.append(f"{_n} [{_k}] 名单写 {_coord_shape(_c)}，内容读出来是 {_coord_shape(_own)}")
+for _n in _n9b_refused:
+    _rec, _own = _n9b_coord.get(_n), (_v4f_coord.get(_n) or _coord_now.get(_n))
+    if _rec is None or _own is None:
+        _coordunclear.append(f"{_n} [代价]（腿B 没记坐标，或这本不在内容表里）")
+        continue
+    if any(v is None for v in _rec) or any(v is None for v in _own):
+        _coordunclear.append(f"{_n} [代价]（反算侧或内容侧有字段缺位）")
+        continue
+    if not _coord_same(_rec, _own):
+        _coordwrong.append(f"{_n} [代价] 名单写 {_coord_shape(_rec)}，内容读出来是 {_coord_shape(_own)}")
+if _coordwrong:
+    fails.append(f"闸⑨腿C（常驻·名单坐标自证）{len(_coordwrong)} 件名单自带的那份坐标与**账的内容**对不上："
+                 f"{'; '.join(_coordwrong[:4])} ⇒ 跳过/代价是按坐标记账的，名字对而坐标错等于把这句话"
+                 f"记到别的实验上（两条参照由两处独立算：名单那份来自命名规则与腿B 当场记的，"
+                 f"内容那份直接读档案字段）")
+if _coordunclear:
+    fails.append(f"闸⑨腿C（常驻·名单坐标核不到）{len(_coordunclear)} 件自带坐标**没法按内容复核**："
+                 f"{', '.join(_coordunclear[:4])} ⇒ 核不到不等于成立，按『没测到』处置")
+n9c_cat_red = len(_catwrong) + len(_coordwrong) + len(_coordunclear)
+n9c_old_red = _f_old - _f_loud
 n9c_loud_red = len(fails) - _f_loud
 
 # 常驻出声（每一档都印，包括 normal 与上面两个分支）：计数之后必须能逐件指认。
@@ -2363,6 +2662,23 @@ if MODE == "--fakeexempt":
     else:
         print(f"  分离验到：这一档的红全部住在常驻名单腿（{n9c_loud_red} 条），反算段与腿A/腿B 各 **0 条**"
               f"（它们问的是『该读哪本账』，这一档没改那件事，只改了『谁被记成不用问』）")
+if MODE == "--catwrong":
+    if n9c_cat_red < 3:
+        fails.append(f"闸⑨腿C（--catwrong）三条错登该让新判据红 ≥3 条（类别错登 1 条 + 名单坐标自证 2 条），"
+                     f"这一档只抓到 {n9c_cat_red} 条 ⇒ 有一种错登照旧看不见，新加的这两条腿只是把名单挂出来而不判")
+    if n9c_old_red:
+        fails.append(f"闸⑨腿C（--catwrong）三条错登里有 {n9c_old_red} 条是**上一发那三条老判据或守恒腿**抓到的"
+                     f"⇒ 这一型本来就有档守着，本轮记的是重复覆盖而不是新覆盖；要把注入换成老判据"
+                     f"结构上碰不到的那一型（挂错桶 / 名字对坐标错），否则这一档测的是已经测过的东西")
+    if n9c_red or n9a_red or n9b_red:
+        fails.append(f"闸⑨腿C 的常驻腿与既有三腿没分离：这一档注入的只有**桶归属与名单自带的坐标**，"
+                     f"而反算段 {n9c_red} 条、腿A {n9a_red} 条、腿B {n9b_red} 条都跟着红了"
+                     f" ⇒ 它们读的是同一份状态，注入分不清钉的是哪条腿")
+    else:
+        print(f"  分离验到：三条错登的红全部住在新加的两条腿上（类别错登 {len(_catwrong)} 条 + "
+              f"名单坐标自证 {len(_coordwrong)} 条 + 坐标核不到 {len(_coordunclear)} 条），"
+              f"上一发那三条老判据与守恒腿合计 **0 条**、反算段与腿A/腿B 各 **0 条**"
+              f"⇒ 这一型（名字挂着、桶或坐标写错）从上一发起才有人盯")
 
 # 闸⑩：流名单与系数只有一个出处——**按值**查，不看 import 行、不看注释里写了什么。
 # 第十八发 E 把 step4e/4g/5/6b/7 那五份手抄名单并进登记处，这一档钉的是"并完不许再漂回去"：

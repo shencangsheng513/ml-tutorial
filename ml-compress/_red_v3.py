@@ -243,6 +243,147 @@
 自我拆红（每条各拆一道闸，跑了不红的模式=那条闸没测到，不许拿它当通过。下面全是**本轮实测**，
 不是预期——规矩是实测再写回这张表，写死的计数只对"当前在册的那几本"成立：
 
+**【第三十九发·还上一发两笔新欠（⑶ 给句边界表配专属拆红档、⑺ 让在册匹配对认得上跳两级的路径名前缀），把跨发锚从一档
+扩到两档（⑷），并且**第一次真去买那张价签**：覆盖侧实付 72 次训练、进册 1 本账，而那本新账"顶以上还涨不涨"
+那一格**判不了**】**
+本发实付 **72 次训练**（纯 CPU、0 元 API）、**进册 1 本**（在册 v4f **40** 本、全册 **136** 本，两个数由本轮
+`normal` 那一份的闸① 与闸⑫ 现读，上一发是 39 / 135 ⇒ 涨的就是这一本）。新账是
+`compress_report_v4f_n8_hi_v5.json`（它只落本机 `data/` 之下、被 gitignore 挡着、**不在库里**）。
+正常模式 rc=0 / 0 条红，**三十四档**全部重跑（档数由源码里的 `MODES` 登记处现读，本轮实测 **34**，
+**增档 = 2** ⇒ **35 份** = `normal` + 34 档；逐档红数全部本轮实测，两口径（`^    闸` 前缀 / 任意缩进非空行）
+**逐份相等**，35 份 stderr **各 0 字节**，每份都跑到『模式：』收尾）。**一票冻结照旧**：批前与批后各扫一次
+跟踪面（`git -C ROOT ls-files -- *.py *.md`，取 `size@mtime@sha1`），**133 项逐项相同、两侧条目数相等**
+⇒ 这 35 份读的是同一个盘态。凭据仍只指命令形态 `python _red_v3.py <档名>`。
+**机时这一栏仍只报读数、不报倍数**：2 并发、末档落盘于开跑后 **1189** 秒（上一发 1315 秒是**另一个档数**
+⇒ 不许相减当趋势）。逐档红数：misfeed **109**、decorative 30、borrowtask 24、unformatted 24、
+borrowseeds **23**、famblind 21、borrowfloor 17、collateral **16**、v5strict **16**、v4blind 13、
+v4loose **10**、fakeexempt 7、drift 5、citedlink 5、namecut 5、nameextra 5、**sentbreak 5**、destroy 4、
+v5blind 4、laddersib **4**、sibdrift 3、flowcopy 2、ciasym 2、ciderived 2、limitptr 2、catwrong 2、
+**dotdot 2**、oldsib 1、g5drop 1、ciunread 1、wrongcount 1、helpblind 1、bareid 1、longline 1、normal **0**。
+**与【第三十八发】那张表一比：涨 6 / 落 0 / 同数 27**（两批共有 32 档 + `normal` = 33 项；新档
+`--sentbreak` 5、`--dotdot` 2 只在新一批出现，不参与涨落）：misfeed 104→109、borrowseeds 22→23、
+collateral 15→16、v5strict 15→16、v4loose 9→10、laddersib 2→4。
+**这六档全部是注入档，而六条涨每一档都点名点到同一本新账**（落点由本轮日志现读，不是猜）：
+laddersib +2 = 闸⑤ 点出该本的 `['ladder','ladder_summary','seed_floor_imgs']` 与 `['ladder.长度']` 两处阶梯差；
+misfeed +5 = 闸① 该本的 v1–v4 并排判词与 v5 主判词"复算不符"；collateral +1 = 闸① 该本的 v3；
+v4loose +1 = 闸① 该本的 v4（记 污染型、复算 污染型·倒挂）；v5strict +1 = 闸⑪ 该本（实现判"不承重" vs
+CI 不含 0 判"承重"）；borrowseeds +1 = 闸⑨ 腿B 该本用 8 条流问底却返回 3 条流的底 ⇒ 判决作废。
+**⇒ 涨的是注入面（册里多了一本可被拆的账），不是盘上多了六处坏**——第卅四发立的那条口径在这一发**第一次
+自我兑现**：以前每发的涨落只能口头归因，这次六条涨有六条现读落点，撤掉归因的话就没有落点可撤。
+
+**跨发锚从一档扩到两档（还第卅八发新欠⑷）——第一次有两档的逐行集合对账**：上一发只留 `--citedlink`
+一档的逐行原件当锚（本机一次性件、不在库里，`_tmp_r38_red_citedlink.txt` 与 `_tmp_r38_red_namecut.txt`
+两份都留在盘上，本发点名**永久保留**到下一发）。对账结果：`--citedlink` 旧 5 行 vs 本轮批内 5 行
+⇒ **今无 1 行／今新增 1 行**，漂的仍是注入凭据那一行的坐标——腿C 的注入点被上一发的写回从
+`README.md:2040`（引用 ../data/FashionMNIST/ 那一处）顶到了上级那本复盘文档的第 214 行；
+`--namecut` 旧 5 行 vs 本轮批内 5 行 ⇒ **今无 0／今新增 0**。两档再各自与**本发批前单跑**的那一份比，
+都**逐行相同** ⇒ 批跑期间盘态没动，那条漂只能归到"两发之间"。
+**扩锚买到的第一份答案（这是"值不值"的读数，不是修辞）**：刚被改过判据的那一档（`--namecut` 守的点名口径）
+本轮**零漂移**，漂集中在"注入点写在正文里"的那一档 ⇒ **锚会不会漂，取决于它的凭据住在哪里**，不住在正文上
+的锚是免费的；下一发起两档一起留，把这一格从"一发一个样本"变成有对照的常驻读数。其余 32 档的上一发逐行
+原件已清 ⇒「总数同而内容漂」那一型对它们**仍测不到（不是没有）**（老欠原样带过）。
+
+**㈠ C 项·句边界表的专属拆红档 `--sentbreak`（rc=1 / 5 条红，还第卅八发新欠⑶）**：上一发把判定单位收到
+"含名字那一句"，于是**表里那五个字符**（现读 `;。！；？`）成了判据的一部分，而改表这个动作原本不会出声。
+这一档按字符各拆一票：**把其中一个字符临时移出表** ⇒ 注入夹具里"名字那句"与"声明那句"并成一句、同一处
+从红 1 条变成红 0 条，五档各测一次 ⇒ 五条红 ⇒ **五个字符各自承重**（不是"表非空"这一件事承重）。
+另配一条**常驻**登记处对账（`normal` 与每一档都跑）：把 `_SENT_BREAK` 正则里那个字符类**现读**出来，与
+`_SENT_BREAK_EXPECTED` 逐字符比 ⇒ 只动表不动登记处 ⇒ 当场红。**灵敏度上限如实写**：变异台测过两态——
+只改表 ⇒ 常驻那条红 + 逐字符两票都出声；**表与登记处一起改** ⇒ rc=0 / 0 条红（这一型只能靠 diff 留痕，
+与第卅二发那条词表哨兵同级，不吹成更多）。逗号、冒号、顿号仍在表**外**，这条也是常驻读数而不是记忆。
+
+**㈡ E 项·在册匹配对 ../ 前缀归一（`--dotdot`，rc=1 / 2 条红，还第卅八发新欠⑺）**：在册名单的键是
+**仓根相对**，所以带 ../ 或 ./ 前缀的写法**永远点不到键**——上一发㈫ 记的就是这一笔：那一族引用每一处
+都得靠一句声明才绿。现在加第⑤条：**只在**前四条落空、**且**这个名字确实带前缀时，按引用者所在目录
+（由 `git rev-parse --show-prefix` 现读，不写死）反解一次；反解不到在册原件、逃出仓根、或归一后剩 `.`
+的照旧算断链 ⇒ **改的是判定单位，不是放宽**（旧判据一字未动，新支只在旧判据落空处参与）。
+**两向对账常驻**（**批内**实测，落笔之前那一跑）：关归一 命中 169 处／名字 75 个 → 开归一 **167 处／74 个**｜被归一**摘出**
+射程 2 处｜归一**新增**点名 **0** 处。摘出的那两处是上级那本**在册**复盘文档的前缀写法（键 ../项目复盘与简历写法.md，
+一处在板块 README、一处在 `--dotdot` 那段代码的注释里），从此它们的绿来自**名单命中**而不是声明句；
+新增 0 处 ⇒ 归一没有反过来把别的写法推进射程。**收口补跑第一跳用同一把尺子重读：179 处／77 个 → 176 处／76 个｜摘出
+3 处｜新增 0 处** ⇒ **"摘出几处"不是一个能跨跳引用的数**：多出来的第三处正是**本段自己**（我把那个前缀写法当凭据抄进了
+这一段，"落笔"这个动作当场给归一添了一处活），而闸⑯ 把这三处连文件带行号逐条点名（打印三行"反解键 ⇒ …"）⇒
+这一格从此**不许引裸计数**，要引就连"哪一跳 + 那三行点名"一起引。**两跳共同的不变量只有三条**：收紧 0 处、
+归一新增点名 0 处、裸引用 0 处。**变异**（V3，把新支关死）实测：腿A + 腿B + 空转三处红，
+加一处**真正文**红落回 `--dotdot` 自己的凭据行 ⇒ 归一这一支确实承重。
+**限度**：`--dotdot` 那 2 条红是**注入夹具**的红（夹具里造五个名字，关归一裸引用 5 处 → 开归一 3 处，
+差 2 处 ⇒ 与正文那两处的"差 2"是**同一把尺子的两个来源**，不是同一批样本）。
+
+**㈢ B 项·第一次真买价签，而买之前先被抓了一次算术**：上一发㈧ 写"覆盖侧 = **64 次** = 阶梯 8 格 × 8 条流"，
+本轮 `step4f` 新装的只读早退支（`--dry-run`，在训练之前、只打印报价就 return）自报
+**总训练 72 次** = 8 条流 ×（1 副 CE + 7 副 KD）= 64 **＋ 恒等闸 8**。⇒ **菜单上那个 64 少算了 8 次
+恒等闸的训练**（α=0 那一格不是臂，可它照样是一次真训练）。开跑前用 `--dry-run` 报价、落账时由同一段代码
+打印 `[价签对账] 开跑前价签 72 次 → 实际 72 次｜相等`，从此"报价"这件事由**产生它的那段代码**自己兑现，
+不许再由外部探针重算一遍（第卅八发㈧ 那次少算一格、与第卅七发那两处"数量对、集合坏"是同族）。
+**更要紧的一句如实交代**：72 这个拆法**不是本轮发现的事实**——板块 README 里第十发那一节的命令注释早就写着
+「64 臂 + 恒等闸 8 次」⇒ 我上一发报"64"的时候**没读自己写过的账**；`--dry-run` 的价值不是算出 72，
+是让报价再也绕不过那段真正干活的代码（同一条规矩第卅八发刚为它写过㈧）。
+**分辨率侧那张 ≈192 继续不买**，并补一句：192 是按**同一把被证明每本少算 8 次**的拆法算出来的 ⇒ 真要买
+必须先用 `--dry-run` 重报，旧数只当上限看。
+
+**㈣ 新账那一格买到了什么（72 次训练的全部读数，MNIST × 满数据 8500 × S128 × MLP × T=3 × 8 条流，
+阶梯 (0.0,0.05,0.1,0.2,0.3,0.7,0.85,1.0)）**：恒等闸 α=0 **8/8 逐位**等于 CE；跨脚本闸与 v4c 档案
+α=0.3 **3/3**、α=0.7 **3/3** 逐位一致；底 77 张（`compress_report_v4b_n8.json`）、锚点格均值 −75.0。
+阶梯均值（张，负=比 CE 坏）：α=0.05 **−56.0**（底的 0.73x）｜0.1 −64.4｜0.2 −68.1｜0.3 −66.1｜
+0.7 **−68.2**｜0.85 −72.2｜1.0 **−72.0**；每格 8/8 条流同号、流级 p=0.00781、逐图合并 p=0。
+配对步长 α=0.05→0.7 = **−12.2 张、CI [−23.4, −1.1]**、σ 13.4、6/8 同号（二项 p=0.2891）⇒ CI 不含 0
+⇒ "污染说预测这一段 ≈ 0"在这一列被否（这是**第二个**否它的坐标：上一处在 Fashion 的 T=6 列，
+配对步长 −83.1 张 CI [−131.4,−34.8]、8/8 同号）。
+**顶以上那一段是这一发在这一列第一次买到的格子，也是它没买到的东西**：α=0.7→1 步长 **−3.8 张、
+CI [−7.9, +0.4]**、6/8 ⇒ **CI 跨 0** ⇒ **"顶以上还涨不涨"这一发没判**，点估计不许写成形状。
+（中数据那一列第十发就买过一次，读数 +3.0 张 CI [−1.4, +7.4]、7/8 同样跨 0 ⇒ **两个坐标都判不动而点估计
+反向** ⇒ 这一格现在欠的不是"再跑一发同样的"，是把那一列的流数抬上去。）买到锚点伤害的 **82%**
+（−56.0 / −68.2）⇒ 阶梯第一格（锚点剂量的 7%）就把方向摆满了。口径自证：这条腿吃的界是半宽 ±11.15 张、
+出界幅度 12.2 张 ⇒ 承重；CI 中点离点估计 0.05 张（容差 0.1 张）⇒ 对称区间在场；全宽 22.30 张不承重，
+但板块没有任何一句话用「|均值| > 全宽」⇒ 不是候选口径。五版判据同判『污染型』。
+
+**㈤ 各闸本轮现读**：**①** 40/40 复算通过（新账那本的 v1–v4 并排判词与 v5 主判词不符 ⇒ 这正是 misfeed
+那一档涨 5 的来源）；**②** 只在旧账 8 本上算，翻转名单仍 1 本；**③** 该翻的那本仍是
+`compress_report_v4f_low_n8_thin_v2.json`（测不动 → 反号线）；**④** 板块在册『污染型』**25** 本（上一发 24，
+多的就是新账）未被连坐；**⑤** 候选 **32** 本 = 逐位核过 6 ＋ 首跑/无更低版本前账 26；**⑥ 27 → 29 对**
+（新账带来两对：与 3 流那本、与同流 5 格那本的扩格对账，"对数与本轮动过的东西没有单调关系"**第二十次**
+现读）、交闸⑤ 的重跑对 **9**、不可比对 **4**（两串逐件点名）；**点名对账** 登记 5 处、『名单件数 ≠ 实际印出
+件数』**0** 处（印漏 0 + 多印 0）；**⑦** v3 及更早 14 本里参评 **11**、放掉 **3**；**⑧** 记在 v4 名下、顶在账
+因而参评 **6**、放掉 **0**；**⑨** 腿A 参评 **28** 本全等（上一发 27）、腿B 28 本（**14** 本同流数底 /
+**14** 本被实现当场拒绝 / **0** 本返回错流数的底）、按口径出声的"落在登记范围外"仍 **12** 本、历史借底
+盘点 **21** 本；腿C C-甲 反算参评 **45** 本、**45 全平 / 0 不平**，其中 **21** 本内容没记任务位（默认命中、
+不是核过）⇒ 真被盯着的是另外 **24** 本，另 **4** 本按名字点名（2 `merged` + 2 `unreg`）⇒ 守恒
+**49 = 45 + 2 + 2**；C-乙 参评 **12** 本、红 **0** 条，其中 **8** 本的底没有任何形如 arch 的族字段
+⇒ 族那一维在换任务的 MLP 侧**仍不可核**（没测到，不是通过）；**⑩** 模块侧 10 项 + 档案侧 **127** 条
+（上一发 126）名单全等；**⑪** 参评 **36** 本（上一发 35）、自带双记账 **10** 本且与复算逐字段相同；
+**⑫** 全册 **136** 本 / **7363** 条 / 24 本带那句 / 漏渲染 0 条；**⑬** 现读清单 13 本、退出码 0 的 13 本，
+墙钟 **68.1** 秒、4 并发；**⑭** 派生账现读 17 本：参评（各族最新版）6、旧档豁免 11；现读 **176** 条 ci95
+全部可复算、口径外 0；**⑮** 可核指针 2 条（出处参评 **109** 本 = 每族最高版、旧版豁免 27 本）：漂走 0、
+裸序号 0；**⑯**（**批内**读数）引用面 **31** 个在册文件（在册名单 **167** 本）、名字由正文现读 **74** 个、命中 **167** 处 =
+点名式带声明 **167** ＋ **裸 0**、本闸墙钟 0.06 秒。**命中处从上一发的 133 涨到 167 不是盘上多了断链**：
+口径是"带声明不算红"，涨的这两发里绝大多数是本发自己新写进四件文档的点名；裸引用仍 **0** 处才算结清。
+**收口补跑第一跳用同一把尺子重读：名字 74 → 76、命中 167 → 176 = 带声明 176 ＋ 裸 0、名单仍 167 本** ⇒ "落笔"这个
+动作自己就把命中数又推了一格（与㈡ 那处"摘出 2 → 3"同因同源）⇒ 这一列今后**逐跳标注**、不许当定数引用。
+长行暴露面（常驻、不吃进判决）：**批内** 命中处物理行长度 中位 **111**｜p90 **5081**｜最长 **33634** 字符｜
+整行单位救回 162 处 vs 段内同句救回 167 处；两向对账 收紧 **0** 处／放宽 **5** 处。**收口那一跳：中位 98｜p90 4881｜
+最长 35172｜整行救回 170 vs 段内 176、收紧 0／放宽 6** ⇒ 那三个字符长度级的读数每跳都漂，**只有"收紧 0"与"裸 0"承重**。
+词表哨兵照常驻：真声明词『用完即删』仍在表**外**（现读 **12** 个词）。
+
+**㈥ 新欠六笔**（项数与本发板块 README【第三十九发】那一列同源同数）：⑴ 上一发那笔"push 待授权"本发已结
+（A 项当回合回 `4f37bd2..a99430f main -> main`），但**本发落笔之后又攒了新提交** ⇒ ahead 那个数是瞬态，
+要用就现读，下一发的 push 仍需**新一轮**授权；⑵ 分辨率侧那张 ≈192 仍未买，且它用的是本发刚被证明**每本少算
+8 次**的同一拆法 ⇒ 要买先用 `--dry-run` 重报；⑶ "顶以上还涨不涨"本发买到了格子但判不动（点估计 −3.8 张、
+CI [−7.9,+0.4] ⇒ 半宽约 ±4.2），而中数据那一列第十发买过一次是 +3.0 张 CI [−1.4,+7.4] ⇒ **两个坐标都判不动
+且点估计反向** ⇒ 要判它得把流数往上抬，这又是一张价签，且**必须先报价再决定**；⑷ 锚扩到两档只买到
+**一发**对照 ⇒ "凭据住正文的会漂、不住的不会"这一格现在是 1 个样本，下一发两档一起留原件才谈得上趋势；
+⑸ 四桶清点每发过期，本发又造了十几件 r39 前缀的本机一次性件（其中两件按上一发的约定**点名保留**当锚）
+⇒ 下一发要删任何东西必须先重跑清点；⑹ 老欠"全仓还有多少夹具**碰巧**带着能出声的断言"仍未还（本发的
+`--sentbreak` 夹具是给这一型装了断言，不是数了有多少这种夹具）。
+
+**㈦ 落笔之后的补跑链（收口，本机一次性日志不入库）**：第一跳单跑 normal **不是 0 红，而是 rc=1 / 1 条红**，
+而那条红指着**㈡ 那一段我自己新写的正文**——我把一个上跳两级的前缀写法用反引号点了名，而含名字那一句没写声明词
+⇒ 这条闸**第三次在写它的那一发抓住写它的人**（第卅一发、第卅四发、本发）。整改照旧**只改措辞**：那处点名改成
+不用反引号写法，判据、12 词声明词表、句边界表**一字未动**。第二跳 normal **rc=0 / 0 条红、stderr 0 字节**；
+四档单跑逐档红数与批内那一份**完全相同**：`--citedlink` **5**、`--namecut` **5**、`--dotdot` **2**、`--sentbreak` **5**
+⇒ 落笔只动 ⑯ 的两列计数（㈡／㈤ 已逐跳标注），没动任何一档的牙。**同跳另一处自纠**：面试版判决表把归一
+**之前**的命中数写成了 **133**——那是**上一发**的 ⑯ 命中总数，与板块 README 的 169 打不上，属"两把尺子的读数
+串了行"，两处已就地更正。
+
 **【第三十八发·把闸⑯ 的判据单位从『整行』收到『段内含名字的那一句』（口径戊），给上一发那条点名对账
 补上**反向**的一条腿（`--nameextra`）＋一道专属拆红档 `--longline`；两张各 64 次训练的价签又零训练重读
 一遍，**仍一次都没买**】**
@@ -1723,6 +1864,7 @@ v1/v2/v3/v4 并排列各一次＋本发判词一次），所以 `--misfeed` 58�
 import json
 import glob
 import os
+import posixpath
 import re
 import subprocess
 import sys
@@ -1742,7 +1884,7 @@ MODES = ("--decorative", "--drift", "--destroy", "--collateral", "--v4blind", "-
          "--oldsib", "--g5drop", "--borrowfloor", "--borrowseeds", "--borrowtask", "--flowcopy", "--ciasym",
          "--ciunread", "--unformatted", "--wrongcount", "--helpblind", "--ciderived", "--bareid",
          "--limitptr", "--citedlink", "--fakeexempt", "--catwrong", "--namecut",
-         "--nameextra", "--longline")
+         "--nameextra", "--longline", "--dotdot", "--sentbreak")
 if MODE and MODE not in MODES:
     raise SystemExit(f"未知拆红档位 {MODE!r}：MODES 登记处在册 {len(MODES)} 档，没有这一档 ⇒ 加一档必须先登记"
                      "（否则 dispatch 里写了 elif 也永远不会被跑到，那一档是恒绿的装饰）")
@@ -3739,6 +3881,13 @@ _nmark16 = len(_LOCAL_MARK.pattern.split("|"))   # 词数现读：加词/删词�
 # 句界（第卅八发 E）：只认句终符 。！？ 与半／全角分号。**逗号、冒号、顿号故意不算**——算了就把
 # "同段写明"变成"紧邻声明"，同一句里的补语也会被切开（第卅八发量过：软句口径把 9 处抬到 51 处）。
 _SENT_BREAK = re.compile("[。！？;；]")
+# 登记处（第卅九发 C·还第卅八发新欠⑶）：上面那张表**应当**含哪些字符，单独写一行。
+# 它不新增判据，只把"改表"变成一件必须同时改两行的事——只动表不动这里 ⇒ 下面那条常驻红点名。
+# 限度也说清：两行一起改、且正文那批"名字与声明分居两句"的引用恰好不受影响时，这一型只能靠
+# diff 留痕（同第卅二发词表哨兵的强度，不吹成更多）。逐字符各自承重由 `--sentbreak` 现读。
+_SENT_BREAK_EXPECTED = "。！？;；"
+_SENT_CLASS = re.fullmatch(r"\[(.*)\]", _SENT_BREAK.pattern)
+_SENT_CHARS = sorted(set(_SENT_CLASS.group(1))) if _SENT_CLASS else None
 _BT_TOKEN = re.compile(r"`([^`\s]{3,})`")
 _ROOT_DOCS = ("../README.md", "../项目复盘与简历写法.md")
 
@@ -3768,9 +3917,58 @@ CIT_NAMES = {p.rsplit("/", 1)[-1] for p in CIT_TRACKED}
 CIT_REPO = _git_repo_paths()
 
 _CIT_EXT = re.compile(r"\.(?:log|py|json|md|txt|pt|pth|onnx|csv|tsv|html|bat|sh|yml|yaml|ini|lock|xml)$")
+_DOTDOT = re.compile(r"(?:^|/)\.\.(?:/|$)|^\./")
 
 
-def _scratch_pointer(tok, repo_paths):
+def _repo_prefix():
+    """本模块在**仓根**下的目录名，由 git 现读（`rev-parse --show-prefix` 回 `ml-compress/`）。
+    写死它等于赌这个目录永远叫这个名字，而反解相对引用全靠前缀。"""
+    return subprocess.run(["git", "rev-parse", "--show-prefix"],
+                          capture_output=True, text=True, encoding="utf-8").stdout.strip().rstrip("/")
+
+
+_MOD_PREFIX = _repo_prefix()
+
+
+def _ref_dir(path):
+    """引用者所在目录（仓根相对）。cwd 在本模块，所以模块内的 `README.md` 在仓根看是
+    `ml-compress/README.md`；根目录那两本本来就带上一级前缀，去掉便是仓根。
+    合成夹具的键（`__注入A__`）走模块那一支 ⇒ 它的反解口径与真模块文件一致。"""
+    rel = path[3:] if path.startswith("../") else posixpath.join(_MOD_PREFIX, path)
+    return posixpath.dirname(rel)
+
+
+def _resolve_ref(tok, ref_dir):
+    """把带目录前缀的写法反解成仓根相对的键。回 None 的三种情形就是"不放宽"的三条：
+      ① 写法里没有 `..`/`.` 段 ⇒ 归一不插手（那种写法本来由旧判据的尾段规则处理）；
+      ② 反解后爬出仓根 ⇒ `../` 的层数超过引用者所在深度，语义上就是库外，夹紧它等于把库外读成在册；
+      ③ 反解后落在 `.` 或空串 ⇒ 那是"整个仓根"而不是某个原件，拿它比在册名单会把裸 `../`
+         洗白成命中 `.gitignore` 那一类（第卅九发现读到这一型真在正文里，见 `--dotdot` 腿C）。"""
+    if ref_dir is None or not _DOTDOT.search(tok):
+        return None
+    joined = posixpath.normpath(posixpath.join(ref_dir + "/", tok))
+    if joined.startswith("..") or joined in (".", ""):
+        return None
+    return joined
+
+
+def _registry_hit(tok, repo_paths, ref_dir=None, resolve_prefix=True):
+    """在册命中只有两条路，**先后有序**：尾段命中（第卅一发起的旧判据，一字未动）优先；
+    它落空之后才允许按引用者目录反解（第卅九发 E 补的归一，只对带前缀的写法开）。
+    顺序反了就会让归一去覆盖旧判据——那是放宽，不是补洞。"""
+    if any(p.endswith(tok) for p in repo_paths):
+        return True
+    if not resolve_prefix:
+        return False
+    r = _resolve_ref(tok, ref_dir)
+    if r is None:
+        return False
+    if tok.endswith("/"):
+        return any(p.startswith(r + "/") for p in repo_paths)
+    return any(p == r for p in repo_paths)
+
+
+def _scratch_pointer(tok, repo_paths, ref_dir=None, resolve_prefix=True):
     """这个反引号整名是不是一次性件的指针。四条都过才算：
       ① 不是 glob／省略写法（`compress_report_v4f*.json`、`..._n8_v4.json` 指向的是账族，不是某个原件）；
       ② 形状是**完整**件名：以已知扩展名结尾，或以 `/` 结尾；这条挡掉 447 处 `_n8`/`_v4`/`_ptr_tag`
@@ -3779,15 +3977,20 @@ def _scratch_pointer(tok, repo_paths):
          （`scripts/cloud_probe.py`）和在册账名的尾段（`_fashion.json` 是
          `compress_report_v6_fashion.json` 的尾巴）；
       ④ 目录写法（`ml-compress/`）若命中任何在册路径的**目录前缀** ⇒ clone 之后那个目录在，不算断链；
-         落空的留在射程里——比如 `data/fashion/`（本机一次性件、运行时下载的数据集目录）。"""
+         落空的留在射程里——比如 `data/fashion/`（本机一次性件、运行时下载的数据集目录）。
+    第卅九发 E 补的第⑤条**只在上面四条落空时才参与**：带 `../`/`./` 前缀的写法按引用者所在目录反解
+    （`_registry_hit`），所以"在册件的前缀写法"从这一发起不再靠一句声明才绿——反解不出在册原件的
+    照旧算断链，归一不替真断链洗白。"""
     if "*" in tok or "?" in tok or tok.startswith("..."):
         return False
     if _CIT_EXT.search(tok):
-        return not any(p.endswith(tok) for p in repo_paths)
+        return not _registry_hit(tok, repo_paths, ref_dir, resolve_prefix)
     if tok.endswith("/"):
         seg = tok.rstrip("/")
-        return not any(p.startswith(seg + "/") or ("/" + seg + "/") in p or p.endswith("/" + seg + "/")
-                       for p in repo_paths)
+        if any(p.startswith(seg + "/") or ("/" + seg + "/") in p or p.endswith("/" + seg + "/")
+               for p in repo_paths):
+            return False
+        return not _registry_hit(tok, repo_paths, ref_dir, resolve_prefix)
     return False
 
 
@@ -3805,16 +4008,19 @@ def cited_denominator_ok(tracked):
     return "_red_v3.py" in {p.rsplit("/", 1)[-1] for p in tracked} and len(tracked) > 20
 
 
-def cited_universe(surfaces, repo_paths=None):
+def cited_universe(surfaces, repo_paths=None, resolve_prefix=True):
     """(每个库外一次性件指针 → 它被提到的地方, 指针种类数)。
-    名字只有这一个来源：正文里的反引号整名。不扫盘、不靠手写登记处——第卅一发起这是口径的一部分。"""
+    名字只有这一个来源：正文里的反引号整名。不扫盘、不靠手写登记处——第卅一发起这是口径的一部分。
+    `resolve_prefix=False` 把第卅九发 E 的归一关掉（旧判据单独扫一遍），常驻那行两向对账和
+    `--dotdot` 腿就是拿它做"同一把尺子的两个来源"，不是拿上一发的日志当基线。"""
     repo_paths = CIT_REPO if repo_paths is None else repo_paths
     hits = {}
     for path, ls in surfaces.items():
+        d = _ref_dir(path)
         for i, line in enumerate(ls, 1):
             for m in _BT_TOKEN.finditer(line):
                 tok = m.group(1)
-                if _scratch_pointer(tok, repo_paths):
+                if _scratch_pointer(tok, repo_paths, d, resolve_prefix):
                     hits.setdefault(tok, []).append((path, i))
     return hits, len(hits)
 
@@ -3911,6 +4117,47 @@ if len(_row_only) > 6:
     print(f"      ·（收紧·其余 {len(_row_only) - 6} 处同上，整改时按这份名单逐条点名）")
 if len(_sent_only) > 6:
     print(f"      ·（放宽·其余 {len(_sent_only) - 6} 处同上）")
+# 常驻·归一前后两向对账（第卅九发 E·还第卅八发新欠⑺）：在册名单的键是**仓根相对**，而正文里
+# 有一族写法是按引用者目录写的（`../项目复盘与简历写法.md`）——旧判据对这一族**永远点不到键**，
+# 于是每一处在册件的相对写法都得靠一句声明才绿。补洞之后必须现读这一步在正文上改变了多少处，
+# 而且两个来源都要在盘上、同一把尺子（关掉归一再扫一遍），不许拿上一发的日志当基线。
+_HITS_NORM, _SCOPE_NORM = cited_universe(CIT_SURF, resolve_prefix=False)
+_saved_n, _bare_n = cited_scan(CIT_SURF, _HITS_NORM)
+_norm_set = {(n, p, l) for n, p, l in (_saved_n + _bare_n)}
+_now_set = {(n, p, l) for n, p, l in (CIT_SAVED + CIT_BARE)}
+_washed = sorted(_norm_set - _now_set)       # 归一从射程里摘出去的（前缀写法的在册件）
+_gained = sorted(_now_set - _norm_set)       # 反方向：归一之后**新**点名的处（按构造应为空，仍要量）
+print(f"  归一前后对账（第卅九发 E，同一把尺子的两个来源都在盘上）：关归一 命中 "
+      f"{sum(len(v) for v in _HITS_NORM.values())} 处／名字 {len(_HITS_NORM)} 个 → 开归一 命中 "
+      f"{sum(len(v) for v in CIT_HITS.values())} 处／名字 {CIT_SCOPE} 个"
+      f"｜被归一摘出射程 {len(_washed)} 处｜归一**新增**点名 {len(_gained)} 处")
+for _nm, _pth, _ln in _washed[:8]:
+    print(f"      ·（摘出）{_nm} @{_pth}:{_ln}（反解键 {posixpath.normpath(posixpath.join(_ref_dir(_pth) + '/', _nm))}"
+          " ⇒ 这一处本来就指着一个**在册**原件，从此不再靠声明才绿）")
+if len(_washed) > 8:
+    print(f"      ·（摘出·其余 {len(_washed) - 8} 处同上）")
+for _nm, _pth, _ln in _gained[:6]:
+    print(f"      ·（新增）{_nm} @{_pth}:{_ln} ⇒ 归一不该产生新的点名，冒出来说明反解把**别的**原件错认成了它")
+if _gained:
+    fails.append(f"闸⑯（归一 反方向）开归一之后凭空多出 {len(_gained)} 处点名（{[f'{n}@{p}:{l}' for n, p, l in _gained[:3]]}）"
+                 " ⇒ 归一只在旧判据落空时参与，它**只会少判不会多判**；多判等于反解路径撞上了别的在册件，"
+                 "射程被这条改动悄悄换掉了")
+# 常驻·句边界表的登记处对账（第卅九发 C·还第卅八发新欠⑶）：表本身没有腿 ⇒ 移走一个边界字符
+# 判据会静默变松。这一条不新增判据，只让"改表"必须同时改两行；逐字符承重由 `--sentbreak` 现读。
+if _SENT_CHARS is None:
+    fails.append(f"闸⑯（句边界表·形状自证）`_SENT_BREAK.pattern` 现读是 {_SENT_BREAK.pattern!r}，"
+                 "不是 `[...]` 那种纯字符类 ⇒ 归一后的字符集读不出来，`--sentbreak` 的逐字符腿会空转，"
+                 "判据变松也不会红（先把它改回字符类，或者在这里显式接住新形状）")
+elif _SENT_CHARS != sorted(set(_SENT_BREAK_EXPECTED)):
+    fails.append(f"闸⑯（句边界表·登记处对账）表里现读 {''.join(_SENT_CHARS)}（{len(_SENT_CHARS)} 个字符），"
+                 f"登记处 `_SENT_BREAK_EXPECTED` 写的是 {''.join(sorted(set(_SENT_BREAK_EXPECTED)))} ⇒ 有人**只改了一处**。"
+                 "移走一个边界字符 = 把『名字那句』与『声明那句』并成一句 = 判据静默变松（第卅八发新欠⑶），"
+                 "加进一个字符（比如逗号）= 把『同段』滑成『紧邻』= 9 处会变 51 处（第卅八发㈠量过）。"
+                 "两条路都要同时改这两行，并按 `--sentbreak` 现读改了多少处正文")
+else:
+    print(f"  句边界表（常驻，normal 与每一档都跑）：现读 {len(_SENT_CHARS)} 个字符 "
+          f"{''.join(_SENT_CHARS)}，与登记处 `_SENT_BREAK_EXPECTED` 逐字符相等 ⇒ 逗号、冒号、顿号仍在表外"
+          f"（它们一旦进表，`--sentbreak` 那条『非边界字符不被当断点』的反证会当场翻红）")
 if not cited_denominator_ok(CIT_TRACKED):
     fails.append(f"闸⑯（分母自证）`git ls-files` 现读只回 {len(CIT_TRACKED)} 本、名单里没有本模块的"
                  " `_red_v3.py` ⇒ 少了 `.` 那个 pathspec 时 git 是把引用面参数当**过滤**用的，"
@@ -4079,6 +4326,126 @@ if MODE == "--longline":
     if _other:
         fails.append(f"闸⑯（长行失明）{len(_other)} 条红既不在本条腿上、也不是正文的断链引用红"
                      f"（{sorted({f.split('：')[0] for f in _other})[:3]}）⇒ 注入走漏到别的判据")
+
+
+# --dotdot 的专属拆红（第卅九发 E·还第卅八发新欠⑺）：归一这条改动**同时欠两笔证明**——
+# 它得把"在册件的带前缀写法"从射程里摘出去（那是第卅八发㈫那条冤枉），又不得把真断链洗白
+# （那是"改判定不放宽"）。所以注入造**两类**形状，判据由同一个 cited_universe 开／关归一各扫一遍，
+# 两个来源都在盘上、同一把尺子；不拿上一发的日志当基线。
+if MODE == "--dotdot":
+    ref_d = "__注入前缀__"                       # 键走 _ref_dir 的模块那一支 ⇒ 引用者在 ml-compress/
+    _w_in = "../ml-compress/README.md"           # 在册件的本名按上一级目录反写（第卅八发㈫那一族冤枉）
+    _w_dir = "../ml-compress/"                   # 在册目录的同一族写法
+    _b_deep = "../ml-compress/_tmp_r39_" + "injected_legC.md"   # 带前缀的真断链：反解落空，不许被洗白
+    _b_root = "../"                              # 裸前缀：反解落到仓根，第③条不许
+    _b_out = "../../ml-compress/README.md"       # 爬出仓根：第②条不许，夹紧它就等于把库外读成在册
+    src_d = {ref_d: [f"读数写在 `{_w_in}` 里，另有 `{_w_dir}` 那一层。",
+                     f"第三份是 `{_b_deep}`，第四份记作 `{_b_root}`，第五份写作 `{_b_out}`。"]}
+    hits_on, n_on = cited_universe(src_d)
+    hits_off, n_off = cited_universe(src_d, resolve_prefix=False)
+    bare_on = {x[0] for x in cited_scan(src_d, hits_on)[0]}
+    bare_off = {x[0] for x in cited_scan(src_d, hits_off)[0]}
+    washed = sorted(bare_off - bare_on)          # 归一摘出去的
+    kept = sorted(bare_on)                       # 归一之后仍在射程的
+    _want_wash = sorted({_w_in, _w_dir})
+    _want_keep = sorted({_b_deep, _b_root, _b_out})
+    if washed != _want_wash:
+        fails.append(f"闸⑯（前缀归一 腿A）注入两处在册件的带前缀写法，归一后应从射程摘出，测得摘出的名字是 "
+                     f"{washed}（要 {_want_wash}）⇒ 反解没生效或错位命中，第卅八发㈫那笔冤还没结")
+    if kept != _want_keep:
+        fails.append(f"闸⑯（前缀归一 腿B 不放宽）注入三处真断链（前缀写法／裸前缀／爬出仓根），归一后应当仍在射程，"
+                     f"测得留在射程的名字是 {kept}（要 {_want_keep}）⇒ 归一把不该洗白的洗白了，"
+                     f"这条改动就是放宽判据，不是补洞")
+    if n_off <= n_on:
+        fails.append(f"闸⑯（前缀归一）关归一读到 {n_off} 个名字、开归一读到 {n_on} 个 ⇒ 归一没有任何东西可摘，"
+                     f"这一档此刻是空转的，不许记成通过")
+    for nm in washed:
+        fails.append(f"闸⑯（前缀归一·注入的凭据）{nm} @{ref_d}:1 指的是**在册**原件（按引用者目录反解即得），"
+                     f"关归一时它被当成库外断链点名、开归一后从射程里摘出（注入里五个名字，关归一裸引用 "
+                     f"{len(bare_off)} 处 → 开归一 {len(bare_on)} 处，差 {len(washed)} 处）"
+                     f"⇒ 第卅八发㈫那句『前缀写法永远点不到键、每处都得靠一句声明才绿』结清，"
+                     f"结它的是**在册命中**而不是声明句")
+    _onleg = [f for f in fails if "闸⑯（前缀归一" in f]
+    _body = [f for f in fails if f.startswith("闸⑯（断链引用）")]
+    _other = [f for f in fails if "闸⑯（前缀归一" not in f and f not in _body]
+    _ev = [f for f in _onleg if "·注入的凭据）" in f]
+    print(f"\n[--dotdot 专属校验] 注入 1 篇 × 5 个带前缀的名字；关归一在册命中 {n_off} 个 → 开归一 {n_on} 个；"
+          f"洗白 {len(washed)} 处（{washed}）｜留在射程 {len(kept)} 处（{kept}）"
+          f"｜另有 {len(_body)} 条**正文自己的**断链引用红（常驻判据点名的，不算注入走漏）")
+    if len(_ev) != len(washed):
+        fails.append(f"闸⑯（前缀归一）凭据红 {len(_ev)} 条而洗白处数 {len(washed)} ⇒ 处数对红的锁步断了，"
+                     f"这一档的读数不能当档位强度用")
+    if _other:
+        fails.append(f"闸⑯（前缀归一）{len(_other)} 条红既不在本条腿上、也不是正文的断链引用红"
+                     f"（{sorted({f.split('：')[0] for f in _other})[:3]}）⇒ 注入走漏到别的判据")
+
+
+# --sentbreak 的专属拆红（第卅九发 C·还第卅八发新欠⑶）：句边界表今天**自己没有腿**——移走一个边界
+# 字符，"名字那句"与"声明那句"会并成一句，判据静默变松。这一档把表里每个字符各造一个注入形状，
+# 要它**两票**：当前表下红（声明被这个字符隔在另一句里）＋把该字符临时移出表后绿（并句了）。
+# 只前一票说明字符存在，只后一票说明它承重，两票都在同一遍扫描里现读。
+if MODE == "--sentbreak":
+    inj_s = "_tmp_r39_injected_" + "sentbreak.log"
+    _tail = "同期的本机还跑着别的进程，与这条引用无关"   # 声明词『本机』住在**下一句**
+    _head = f"原件 `{inj_s}` 停在第 7 条流、没有第八条"
+
+    def _scan_with(chars, src):
+        """临时把句边界表换成 chars 再扫一遍（活体变异，异常也复原）。"""
+        global _SENT_BREAK
+        _old = _SENT_BREAK
+        try:
+            _SENT_BREAK = re.compile("[" + "".join(chars) + "]") if chars else re.compile("(?!)")
+            return cited_scan(src, cited_universe(src)[0])[0]
+        finally:
+            _SENT_BREAK = _old
+
+    _chars = _SENT_CHARS or []
+    _ev_s = []
+    for ch in _chars:
+        src_s = {"__注入句界__": [f"{_head}{ch}{_tail}"]}
+        now = cited_scan(src_s, cited_universe(src_s)[0])[0]
+        wo = _scan_with([c for c in _chars if c != ch], src_s)
+        if len(now) != 1:
+            fails.append(f"闸⑯（句边界·逐字符）用『{ch}』当断点造好注入（声明词被它隔在另一句），当前表下测得红 "
+                         f"{len(now)} 条（要 1）⇒ 这个字符现在**不隔句**：要么它已不在表里（第卅八发新欠⑶的"
+                         f"那一型正在发生），要么注入的形状没走到判据上")
+        elif len(wo) != 0:
+            fails.append(f"闸⑯（句边界·逐字符）把『{ch}』临时移出表之后同一处仍红 {len(wo)} 条（要 0）"
+                         f"⇒ 这个字符在表里是**装饰**：它不隔任何句，删掉它判据不会变松，"
+                         f"那么它凭什么在登记处里占一格")
+        else:
+            _ev_s.append(f"闸⑯（句边界·注入的凭据）『{ch}』各自承重：当前表下注入点名 {inj_s} 红 1 条，"
+                         f"把这一个字符临时移出表⇒ 名字那句与声明那句并成一句、同一处测得红 0 条"
+                         f"（表内现读 {len(_chars)} 个字符：{''.join(_chars)}）")
+    if not _chars:
+        fails.append("闸⑯（句边界·逐字符）现读不到表内字符 ⇒ 逐字符腿空转，这一档不许记成通过")
+    for nm_ev in _ev_s:
+        fails.append(nm_ev)
+    # 加宽方向的那条腿：这三个标点**故意不算断点**（第卅八发㈠量过：软句口径把 9 处抬成 51 处）。
+    # 谁把它们收进表，下面这一型会当场翻红——判据从『同段』滑成『紧邻』。
+    _soft = [c for c in "，：、" if c not in _chars]
+    soft_reds = []
+    for ch in _soft:
+        src_t = {"__注入软句__": [f"{_head}{ch}{_tail}"]}
+        got = cited_scan(src_t, cited_universe(src_t)[0])[0]
+        soft_reds.append(len(got))
+        if got:
+            fails.append(f"闸⑯（句边界·加宽方向）『{ch}』本不在边界表里（现读 {''.join(_chars)}），"
+                         f"这一型注入测得红 {len(got)} 条（要 0）⇒ 有人把逗号／冒号／顿号一类收进了表，"
+                         f"『含名字那一句』被劈成几小句、每一小句都要自证，这就是新欠⑶说的另一头")
+    _onleg_s = [f for f in fails if "闸⑯（句边界" in f]
+    _body_s = [f for f in fails if f.startswith("闸⑯（断链引用）")]
+    _other_s = [f for f in fails if "闸⑯（句边界" not in f and f not in _body_s]
+    print(f"\n[--sentbreak 专属校验] 边界表现读 {len(_chars)} 个字符（{''.join(_chars)}），"
+          f"逐字符两票（当前表红 1／移出该字符绿 0）⇒ 承重凭据 {len(_ev_s)} 条；"
+          f"非边界候选 {len(_soft)} 个（{''.join(_soft)}）各配一条加宽方向的腿，本轮这些腿测得红 "
+          f"{sum(soft_reds)} 条（期望 0）；"
+          f"另有 {len(_body_s)} 条**正文自己的**断链引用红")
+    if len(_ev_s) != len(_chars):
+        fails.append(f"闸⑯（句边界·逐字符）承重凭据 {len(_ev_s)} 条而表内字符 {len(_chars)} 个 ⇒ 处数对红的锁步断了")
+    if _other_s:
+        fails.append(f"闸⑯（句边界）{len(_other_s)} 条红既不在本条腿上、也不是正文的断链引用红"
+                     f"（{sorted({f.split('：')[0] for f in _other_s})[:3]}）⇒ 注入走漏到别的判据")
 
 
 # 常驻哨兵（第卅二发·normal 与每一档都跑）：加词必须点亮一条红。

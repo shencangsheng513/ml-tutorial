@@ -1317,7 +1317,8 @@ def setup(dataset: str, width: int, tier: str, extra: str = "",
 
 def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
          nseeds: int = 3, thin: bool = False, t_col: float | None = None,
-         high: bool = False, arch: str | None = None, v4bc: bool = False) -> None:
+         high: bool = False, arch: str | None = None, v4bc: bool = False,
+         dry: bool = False) -> None:
     ds = DATASETS[dataset]
     arch = v4c_mod.ARCH if arch is None else arch      # 唯一真值住在 step4c（守卫也从这里注入）
     # 任务位和族位同源：档案名由 step4c 的 DATASET_SUFFIX × FAMILY_SUFFIX 生成，所以这里只往那一个
@@ -1377,6 +1378,25 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
     out = L["out"]
     if out.exists():
         raise SystemExit(f"{out.name} 已入库——重跑会盖掉那本账。要重跑先删或改名")
+
+    # 第卅九发 B：价签必须由生产代码自己报，且必须报在 LAD 被 --thin/--ladder-high 改过**之后**。
+    # 第卅八发的前置现读就是在改之前读的 `L["ladder"]`，把两格少算成一格（6 格 48 次 vs 8 格 64 次），
+    # 那张错价签直接进了交给用户的菜单。这一支不做任何训练、不落任何文件，只把下面那行
+    # 「已存 …（N 次训练）」的同一把尺子在开跑前说一遍；同一份 n_plan 还会在**跑完之后**与实际
+    # 训练次数对账（总训练数不变不等于红字不变那一型的镜像：落账的条数对不上价签=这一发不是那一发）。
+    n_arm = len([a for a in LAD if a > 0])
+    n_zero = 1 if 0.0 in LAD else 0
+    n_id_plan = n_zero * len([s for s in seeds if not (thin and s not in SEEDS)])
+    n_plan = len(seeds) + len(seeds) * n_arm + n_id_plan
+    if dry:
+        print(f"[只读价签] 目标档案 {out.name}"
+              f"｜阶梯（{'已上接' if high else '未上接'}{'·薄' if thin else ''}）{LAD} @ T={T:g}"
+              f"＝ {len(LAD)} 格（其中 α=0 是恒等闸不是臂）"
+              f"｜{len(seeds)} 条流 × (1 副 CE + {n_arm} 副 KD) = {len(seeds) + len(seeds) * n_arm}"
+              f" + 恒等闸 {n_id_plan} = **总训练 {n_plan} 次**"
+              f"｜底 {floor} 张（{L['floor_from']}）· 锚点格均值 {anchor_mean:+.1f}"
+              f"｜数据 {DATA_TIERS[tier]} 张")
+        return
 
     xt_all, yt_all, xte, yte = ds["loader"]()
     cut = len(xt_all) - VAL_N
@@ -1748,8 +1768,14 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
                   f"闸格就是锚点格（{src} 账里没有 α=0.3）：只剩恒等闸一条独立于锚点的对账线",
                   f"底是 {src} 该档自己的 own floor（{floor} 张），比 MNIST 两本账借来的 41/37 张宽"])}
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"\n已存 {out.name}（{len(seeds) + len(seeds) * len([a for a in LAD if a > 0])}"
-          f" + 恒等闸 {len(id_gate)} 次训练，10000 张全量测试，纯 CPU，零 API 费）")
+    n_actual = len(seeds) + len(seeds) * n_arm + len(id_gate)
+    print(f"\n已存 {out.name}（{len(seeds) + len(seeds) * n_arm}"
+          f" + 恒等闸 {len(id_gate)} = 实际训练 {n_actual} 次，10000 张全量测试，纯 CPU，零 API 费）")
+    print(f"[价签对账] 开跑前价签 {n_plan} 次 → 实际 {n_actual} 次"
+          + ("｜相等 ⇒ 落账的就是菜单上那一发" if n_actual == n_plan else
+             f"**｜差 {n_actual - n_plan:+d} 条：恒等闸计划 {n_id_plan}／实跑 {len(id_gate)}"
+             f"⇒ 这一发跑的不是那张价签对应的实验，档案名相同也不许当同一本账读**")
+          )
 
 
 if __name__ == "__main__":
@@ -1781,6 +1807,10 @@ if __name__ == "__main__":
                          "step4c 的 v4c_*）。默认不走这一支：那两本已入库的 Fashion MLP 薄账用的是 step6"
                          " 按档合并的旧账（底 3 条流、闸格落在锚点上），翻默认=用一次改路由断开两本在册判决的"
                          "对照。旧账只登记满数据/低数据两档，中数据档只能靠这个开关点名走另一把尺子")
+    ap.add_argument("--dry-run", action="store_true", dest="dry",
+                    help="只读价签：把开跑前能定的一切（档案名会不会撞、底/锚点格读没读到、流数齐不齐）"
+                         "都验一遍，然后打印**上接/薄阶梯之后**的格数与总训练次数并退出，一次训练都不跑。"
+                         "报价只许用这一支，不许由外部探针重算——第卅八发就是这么少算了一格")
     args = ap.parse_args()
     main(args.dataset, args.width, args.tier, nseeds=args.nseeds, thin=args.thin, t_col=args.t,
-         high=args.ladder_high, arch=args.arch, v4bc=args.v4bc)
+         high=args.ladder_high, arch=args.arch, v4bc=args.v4bc, dry=args.dry)

@@ -1,0 +1,29 @@
+{
+  "subject": "compress_report_v4f_cnn_mid_t6_v5.json",
+  "produced_by": "_cost_stamp.py",
+  "fields_read": {
+    "ladder": [
+      0.0,
+      0.05,
+      0.1,
+      0.2,
+      0.3,
+      0.7
+    ],
+    "seeds_count": 3,
+    "thin_ladder": false,
+    "temps_fixed": 6.0
+  },
+  "price_tag_source": "step4f_alpha_curve.price_tag（与 --dry-run、落盘后的价签对账同一把尺子）",
+  "ce_trainings": 3,
+  "kd_trainings": 15,
+  "identity_gate_trainings": 3,
+  "total_trainings": 21,
+  "api_fee": 0,
+  "enumerated_from_archive": {
+    "arms": 15,
+    "gate_alpha_zero_identity": 3
+  },
+  "enumeration_matches_derivation": true,
+  "note": "零训练补价：这一发实际付了几次训练由运行末那行『[价签对账] 开跑前价签 N 次 → 实际 N 次』作证，本侧车证的是『按这本账自己记的配置，价应该是 N』。历史档案未被改写——本件是新增，不是回填。"
+}

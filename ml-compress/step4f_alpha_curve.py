@@ -1232,6 +1232,22 @@ def check_t(t: float, grid: dict, where: str) -> float:
     return t
 
 
+def price_tag(lad, seeds, thin: bool = False) -> dict:
+    """价签的唯一算法：给定（已被 `--thin`/`--ladder-high` 改过之后的）阶梯、流名单、薄阶梯标志，
+    报这一发要训练几副学生。三个报价口共用它——`--dry-run` 开跑前那一行、落盘后的『价签对账』、
+    以及 _cost_stamp.py 给在册档案补价签（零训练，从档案自己记的 ladder/seeds/thin_ladder 现读）。
+
+    为什么只许有一份：第卅八发那次前置现读是在 LAD 被改过**之前**读的，把 8 格少算成 6 格，
+    那张错价签原样进了交给用户的菜单。同一把尺子写两遍 = 那两个数可以各自漂而没人出声。
+    α=0 是恒等闸不是臂，所以单独一支；薄阶梯的恒等闸只在老 3 条流上跑，那一维也由这里管。"""
+    n_arm = len([a for a in lad if a > 0])
+    n_zero = 1 if 0.0 in lad else 0
+    n_id = n_zero * len([s for s in seeds if not (thin and s not in SEEDS)])
+    n_ce, n_kd = len(seeds), len(seeds) * n_arm
+    return {"ladder_cells": len(lad), "arm_cells": n_arm, "ce_trainings": n_ce,
+            "kd_trainings": n_kd, "identity_gate_trainings": n_id, "total": n_ce + n_kd + n_id}
+
+
 def setup(dataset: str, width: int, tier: str, extra: str = "",
           t_col: float | None = None, nseeds: int = 3,
           v4bc: bool = False) -> dict:
@@ -1383,11 +1399,10 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
     # 第卅八发的前置现读就是在改之前读的 `L["ladder"]`，把两格少算成一格（6 格 48 次 vs 8 格 64 次），
     # 那张错价签直接进了交给用户的菜单。这一支不做任何训练、不落任何文件，只把下面那行
     # 「已存 …（N 次训练）」的同一把尺子在开跑前说一遍；同一份 n_plan 还会在**跑完之后**与实际
-    # 训练次数对账（总训练数不变不等于红字不变那一型的镜像：落账的条数对不上价签=这一发不是那一发）。
-    n_arm = len([a for a in LAD if a > 0])
-    n_zero = 1 if 0.0 in LAD else 0
-    n_id_plan = n_zero * len([s for s in seeds if not (thin and s not in SEEDS)])
-    n_plan = len(seeds) + len(seeds) * n_arm + n_id_plan
+    # 训练次数对账（落账的条数对不上价签=这一发不是那一发）。
+    # 算术本身住在 price_tag——开跑前、落盘后、以及给在册账补价签的 _cost_stamp.py 共用那一份。
+    _tag = price_tag(LAD, seeds, thin)
+    n_arm, n_id_plan, n_plan = (_tag["arm_cells"], _tag["identity_gate_trainings"], _tag["total"])
     if dry:
         print(f"[只读价签] 目标档案 {out.name}"
               f"｜阶梯（{'已上接' if high else '未上接'}{'·薄' if thin else ''}）{LAD} @ T={T:g}"
@@ -1767,8 +1782,19 @@ def main(dataset: str = "mnist", width: int = 128, tier: str = TIER,
                   "不是『与 MNIST 无关』",
                   f"闸格就是锚点格（{src} 账里没有 α=0.3）：只剩恒等闸一条独立于锚点的对账线",
                   f"底是 {src} 该档自己的 own floor（{floor} 张），比 MNIST 两本账借来的 41/37 张宽"])}
-    out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    # 第四十二发 D：档案自己记自己花了多少。这一格就是那行『[价签对账]』的落档版——它此前只住在
+    # stdout 里，跑完就丢，于是"档案名相同而实付不同"在盘上读不出来。计划与实付**分开记**（不相等时
+    # 档案如实留着那个差，而不是只留一个好看的数）；历史那 42 本不回填（产物只能升版、旧版留盘做
+    # 逐字段对账），它们的价由 _cost_stamp.py 产的侧车补。
     n_actual = len(seeds) + len(seeds) * n_arm + len(id_gate)
+    report["cost"] = {"ce_trainings": _tag["ce_trainings"], "kd_trainings": _tag["kd_trainings"],
+                      "identity_gate_planned": n_id_plan, "identity_gate_actual": len(id_gate),
+                      "planned_total": n_plan, "actual_total": n_actual,
+                      "reconciled": n_actual == n_plan, "api_fee": 0,
+                      "price_tag_source": "step4f_alpha_curve.price_tag（与 --dry-run 同一把尺子）",
+                      "note": "计划价签在开跑前定（阶梯已被 --thin/--ladder-high 改过之后），"
+                              "实付按恒等闸真跑了几条落账；两者不等时本档如实记 reconciled=false"}
+    out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\n已存 {out.name}（{len(seeds) + len(seeds) * n_arm}"
           f" + 恒等闸 {len(id_gate)} = 实际训练 {n_actual} 次，10000 张全量测试，纯 CPU，零 API 费）")
     print(f"[价签对账] 开跑前价签 {n_plan} 次 → 实际 {n_actual} 次"

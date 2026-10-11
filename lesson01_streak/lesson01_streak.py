@@ -125,7 +125,7 @@ def section_fresh(days, repeat):
     print("[3/4] 正面写法  def add_day(entry, bucket=None):  if bucket is None: bucket = []")
     print("      同一份数据再跑一遍：")
     for day, _ in days:
-        print("        %s那格 = %d 条   内容 = %s" % (day, len(per_day[day]), head(per_day[day])))
+        print("        %s那格 = %d 条   头两条 = %s" % (day, len(per_day[day]), head(per_day[day])))
     print("      [OK] 三格互不相同（is=%s）：每格只装当天" % same)
     print("      为什么：默认值只在 def 那一行被执行时求值一次；None 是每次调用当场新建一个列表。")
     print()

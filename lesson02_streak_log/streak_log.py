@@ -131,6 +131,23 @@ def first_gap(days, today, lookback=40):
     return None
 
 
+def week_bounds(today):
+    """本周一和本周日的日期对象。口径：ISO，周一是一周的头（不是周日）。"""
+    monday = today - datetime.timedelta(days=today.weekday())
+    return monday, monday + datetime.timedelta(days=6)
+
+
+def week_account(days, monday):
+    """这一周（周一..周日）里：有记录几天、共多少分钟。只读，不动 days。"""
+    n, mins = 0, 0
+    for i in range(7):
+        v = days.get((monday + datetime.timedelta(days=i)).isoformat(), 0)
+        if v > 0:
+            n += 1
+            mins += v
+    return n, mins
+
+
 def save_days(path, days):
     obj = {"version": 1, "app": APP_DIR_NAME, "days": days,
            "updated_at": datetime.datetime.now().isoformat(timespec="seconds")}
@@ -142,6 +159,25 @@ def save_days(path, days):
     return obj
 
 
+def week_lines(days, today, second=None, no_vote="这一档没写盘，所以只有内存里那一份可算（没有第二票）"):
+    """[6/6] 那一节的行。second=刚落盘之后读回来的那份；没有它就打 no_vote 那句（由调用方说清为什么没有）。"""
+    mon, sun = week_bounds(today)
+    prev_mon = mon - datetime.timedelta(days=7)
+    n, mins = week_account(days, mon)
+    out = ["      本周一 %s → 本周日 %s（口径：ISO，周一是一周的头）" % (mon.isoformat(), sun.isoformat()),
+           "      本周有记录：%d 天 / 共 %d 分钟" % (n, mins)]
+    if second is None:
+        out.append("      %s" % no_vote)
+    else:
+        n2, m2 = week_account(second, mon)
+        out.append("      第二票（拿刚读回来的那份重算）：%d 天 / 共 %d 分钟 -> %s"
+                   % (n2, m2, "OK" if (n2, m2) == (n, mins) else "FAIL"))
+    pn, pmins = week_account(days, prev_mon)
+    out.append("      上一周（%s→%s）：%d 天 / 共 %d 分钟"
+               % (prev_mon.isoformat(), (prev_mon + datetime.timedelta(days=6)).isoformat(), pn, pmins))
+    return out
+
+
 def main():
     today = datetime.date.today()
     path = data_path()
@@ -151,7 +187,7 @@ def main():
     print(BAR)
     print()
 
-    print("[1/5] 记录本在哪")
+    print("[1/6] 记录本在哪")
     inside = repo_root_of(path)
     exists = os.path.isfile(path)
     if exists:
@@ -173,7 +209,7 @@ def main():
     print()
 
     days, state, note = load_days(path)
-    print("[2/5] 读回来的历史")
+    print("[2/6] 读回来的历史")
     if state == "corrupt":
         print("      [STOP] 记录本读不出可信内容：%s" % note)
         print("             路径：%s" % path)
@@ -187,23 +223,27 @@ def main():
     print()
 
     minutes, mode, raw = ask_minutes()
-    print("[3/5] 你这次输入")
+    print("[3/6] 你这次输入")
     print("      %s" % mode_sentence(mode, minutes, raw))
     print()
 
     if mode in ("enter", "bad", "no-tty"):
         base = dict(days) if state == "ok" else {}
         shown = consecutive_days(base, today)
-        print("[4/5] 连续天数怎么算（今天没卡，所以只报现状）")
+        print("[4/6] 连续天数怎么算（今天没卡，所以只报现状）")
         print("      今天 %s 有记录：%s" % (today.isoformat(), today.isoformat() in base))
         y = (today - datetime.timedelta(days=1)).isoformat()
         print("      昨天 %s 有记录：%s" % (y, y in base))
         print("      昨天那一串还有 %d 天（今天不卡的话，明天不卡就断在这儿）" % trailing_days(base, today - datetime.timedelta(days=1)))
         print("      连续天数（按「今天必须有记录」这个口径）= %d" % shown)
         print()
-        print("[5/5] 落盘")
+        print("[5/6] 落盘")
         print("      这一档不写文件。盘上那个记录本没动过：字节数 %d → %d，sha 前 12 %s → %s"
               % (size, (os.path.getsize(path) if exists else 0), s12, (sha12(path)[0] if exists else None)))
+        print()
+        print("[6/6] 本周的账（只读这一格，不改文件）")
+        for ln in week_lines(base, today, second=None):
+            print(ln)
         print()
         print(BAR)
         print("结论：今天没记，什么都没写。想记就重跑一次，输入一个数字。")
@@ -216,7 +256,7 @@ def main():
     after_val = before_val + minutes
     base[key] = after_val
 
-    print("[4/5] 连续天数怎么算")
+    print("[4/6] 连续天数怎么算")
     print("      今天 %s 原来有记录：%s（%d 分钟）" % (key, had, before_val))
     print("      今天合计 = 原来的 %d + 这次的 %d = %d 分钟" % (before_val, minutes, after_val))
     want_streak = consecutive_days(base, today)
@@ -227,7 +267,7 @@ def main():
 
     obj = save_days(path, base)
     back, back_state, back_note = load_days(path)
-    print("[5/5] 落盘复核（写完立刻读回来比，不靠我说「应该写进去了」）")
+    print("[5/6] 落盘复核（写完立刻读回来比，不靠我说「应该写进去了」）")
     ok_same = back_state == "ok" and back.get(key) == after_val and len(back) == len(base)
     print("      期望 今天那格 = %d   实测 %s -> %s"
           % (after_val, back.get(key) if isinstance(back, dict) else "读不到", "OK" if ok_same else "FAIL"))
@@ -239,13 +279,22 @@ def main():
     print("      文件：%s" % path)
     print("      字节数 %d → %d   sha 前 12 %s → %s" % (size, new_size, s12, new_s12))
     print()
+    back_ok_shape = isinstance(back, dict)
+    print("[6/6] 本周的账（只读这一格，不改文件）")
+    for ln in week_lines(base, today,
+                         second=(back if back_ok_shape else None),
+                         no_vote="读回来的那份不成形（见 [5/6]），第二票算不出来"):
+        print(ln)
+    mon = week_bounds(today)[0]
+    week_ok = back_ok_shape and week_account(back, mon) == week_account(base, mon)
+    print()
     print(BAR)
-    if ok_same:
+    if ok_same and week_ok:
         print("结论：[OK] 这一天的记录已经在你盘上了。连续 %d 天。" % want_streak)
     else:
-        print("结论：[FAIL] 写进去的和读回来的不一样，把上面 [5/5] 那几行原样贴回来（路径里没有秘密，可以贴）。")
+        print("结论：[FAIL] 写进去的和读回来的不一样，把上面 [5/6] 和 [6/6] 那几行原样贴回来（路径里没有秘密，可以贴）。")
     print("明天再双击一次，输入一个数字就行。")
-    return 0 if ok_same else 1
+    return 0 if (ok_same and week_ok) else 1
 
 
 if __name__ == "__main__":

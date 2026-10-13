@@ -10,12 +10,21 @@
 # 这个驱动把两件事都变成断言：每份日志必须**自带口径行**，且全批的口径行逐字相同；
 # 每份的『模式：』行必须等于传进去的那个串。断言不住在散文里，住在 `--selftest` 的合成样本上。
 #
+# 第四十三发 B 又添一件（还第四十二发新欠⑻）：**冻结票要自己说清"谁动的"**。第卅二发那一轮的
+# 一票冻结只交到"变了 2 件"，"这两件不是我写的"那句是人逐件对内容与钟点对出来的——归因住在脑子里，
+# 每一发都要重做一遍，而只要哪一发忘了做，"别人写过"就会被读成"冻结成立"。现在批前批后各落一份
+# 全跟踪面快照，比对交给 _freeze_census 那个件，回执多印一行归属（我名下／非我／申报未动／申报不在面
+# ／不可核），并由**腿8** 断言：只有申报过、且五列全空、且两个分母相等，才许印"一票冻结成立"。
+# 申报由 --mine 给（**不传本项与传空串是两件事**，前者"没申报"、后者"申报我没动跟踪面上的件"）。
+#
 # 用法（本目录）：
 #   PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -u _red_batch.py --selftest   # 零守卫运行，只验这台驱动有牙
-#   PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -u _red_batch.py --jobs 2     # 整轮：normal + MODES 现读到的每一档
-#   PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -u _red_batch.py --only --drift --floorcut   # 复跑个别档
+#   PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -u _red_batch.py --jobs 2 --mine=   # 整轮：normal + MODES 现读到的每一档
+#   PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -u _red_batch.py --only=--drift,--floorcut   # 复跑个别档
+#   （--only 与 --mine 都必须写成 --项=一整串：写成 `--only --drift` 那个横杠串会被 argparse 当成自己的选项吃掉）
 # 日志与回执落在 --out 指的那个目录（默认 `_red_batch_logs`，可再生产物，不进册）。
 import argparse
+import ast
 import json
 import os
 import re
@@ -23,6 +32,8 @@ import subprocess
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
+
+import _freeze_census as fc
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 GUARD = "_red_v3.py"
@@ -115,6 +126,92 @@ def check_batch(rows):
     return []
 
 
+def check_freeze(fz, roundtrip_ok=True):
+    """批级腿8：冻结票自己说清"谁动的"。判据不住在这里（在 fc.attribute 里），这里只断言它**有没有出声**：
+      未申报 ⇒ 红（读失败与读干净不许打同一行字，第 145 条那一型）；
+      落盘的快照读回来与写下去那份不同形 ⇒ 红（序列化写坏了的快照比什么都"没变"）；
+      五列任一非空、或两个分母不等 ⇒ 红，且**点名到件**。
+    为什么红条要带名单：第卅二发那句"变了 2 件"我就是靠件名才把归属问出来的；计数只能让人再去查一遍。"""
+    reds = []
+    if not roundtrip_ok:
+        reds.append(("腿8", "批前快照落盘再读回，与写下去那份不同形 ⇒ 序列化或行信封坏了，"
+                            "这种快照比出来的『没变』不可引"))
+    if not fz["attributable"]:
+        reds.append(("腿8", "本轮未申报（--mine 这一项没传）⇒ 变了 " + str(fz["changed"])
+                     + " 件无从归因，这一行不是冻结票，更不是『冻结成立』"))
+        return reds
+    if fz["frozen"]:
+        return reds
+    parts = []
+    for k, label in (("mine", "我名下"), ("other", "非我"), ("untouched", "申报未动"),
+                     ("offface", "申报不在跟踪面"), ("unread", "不可核")):
+        if fz[k]:
+            parts.append(label + " " + str(len(fz[k])) + " 件＝" + fc.cap(fz[k]))
+    if fz["before_n"] != fz["after_n"]:
+        parts.append("跟踪面件数 " + str(fz["before_n"]) + "→" + str(fz["after_n"]))
+    if not parts:
+        parts.append("五列都空而 frozen 仍为假（判词与列不平，归因函数自己坏了）")
+    reds.append(("腿8", "不是一票冻结：批中跟踪面变了 " + str(fz["changed"]) + " 件／申报 "
+                 + str(fz["declared_n"]) + " 件 ⇒ " + "｜".join(parts)
+                 + "（整批读的面在这一轮里不是同一个；要么按名单撤掉这一轮的『冻结』措辞，"
+                   "要么把这一批重跑到最后一次改动之后）"))
+    return reds
+
+
+def caliber_line(n_runs, calib_reds, caliber):
+    """『口径（全批 N 份逐字相同 = X）』那一行。判据**只许读 腿5**（check_batch 的返回），不许读并了
+    腿7／腿8 的整袋批级红：第四十三发真批上它印的是 `False`，而第二把尺子实测 42 份口径同一桶——
+    因为那句写的是 `not batch_reds`，而 腿8 那一条"批中被第三方写了 3 件"的红冒充了"口径不一致"。
+    这正是上一发给 腿7 拆掉的那一型（一条红替另一条红说话），这次是我自己把它装回来的。
+    取成纯函数是为了让它能进 `--selftest`：那一行印的字是要被引用的证据，不能只在真批里被验。"""
+    return ("\n口径（全批 " + str(n_runs) + " 份逐字相同 = " + str(not calib_reds) + "）："
+            + (caliber or "（读不到）"))
+
+
+def caliber_wiring(src):
+    """现读『口径那一行』的**接线**（返回 (红条, 读数串)）：生产路径（`selftest` 之外）上每个
+    `caliber_line` 调用点的第二个实参必须就是 `calib_reds`（腿5 那一袋），并且整件里不许再出现
+    `not batch_reds` 这个表达式。
+    为什么函数票不够：函数是哑的——递进去哪袋就照印哪个真值，而第四十三发真批上印错的是**调用点**
+    （那里递的是并了 腿7／腿8 的 `batch_reds`），同一轮里 腿5 与 腿8 各自的票全绿。
+    为什么只扫生产路径：`selftest` 里那几处调用点本来就是拿**合成袋子**喂这个函数（递 []、diff、
+    _l8_only 都是对的），把它们也算进"必须递 calib_reds"会把这一票考成恒红。
+    用 AST 而不是 `src.count(...)`：散文里也要写这句缺陷的名字，数串会把交代本身读成残留（第 169 条那一型）。"""
+    reds, args, not_batch = [], [], 0
+    try:
+        tree = ast.parse(src)
+    except SyntaxError as e:
+        return [("腿9", "接线读不到：源件解析失败 " + str(e)[:48])], "解析失败"
+    excluded = set()
+    for fn in [n for n in ast.walk(tree)
+               if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name == "selftest"]:
+        excluded.update(id(m) for m in ast.walk(fn) if isinstance(m, ast.Call))
+    for n in ast.walk(tree):
+        if isinstance(n, ast.UnaryOp) and isinstance(n.op, ast.Not) \
+           and isinstance(n.operand, ast.Name) and n.operand.id == "batch_reds":
+            not_batch += 1
+        if isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id == "caliber_line" \
+           and id(n) not in excluded:
+            if len(n.args) < 3:
+                reds.append(("腿9", "有一个生产路径的 caliber_line 调用点只交了 " + str(len(n.args))
+                             + " 个实参 ⇒ 形状不对，那一行的真值不由 腿5 决定"))
+                continue
+            args.append(ast.get_source_segment(src, n.args[1]) or "?")
+    if not args:
+        reds.append(("腿9", "生产路径上读不到 caliber_line 的调用点 ⇒ 口径那句不再由这个函数渲染"
+                            "（函数还活着却被绕过去了：这一型只有调用点票拦得住）"))
+    bad = sorted(set(a for a in args if a != "calib_reds"))
+    if bad:
+        reds.append(("腿9", "口径行的判据袋被接成了 " + "、".join(bad)
+                     + " ⇒ 那袋里混着 腿7／腿8 的红，它们会冒充『口径不一致』"))
+    if not_batch:
+        reds.append(("腿9", "整件里仍有 " + str(not_batch) + " 处 `not batch_reds` 当判据"
+                            "（要么是没换干净，要么是把这句又装回来了）"))
+    return reds, ("生产调用点 " + str(len(args)) + " 处＝" + ("、".join(args) or "无")
+                  + "｜selftest 内被排除的调用点 " + str(len(excluded)) + " 处"
+                  + "｜`not batch_reds` 表达式 " + str(not_batch) + " 处")
+
+
 def _bare(mode):
     """档名的"裸形"：只剥**存在的那两个横杠**。
     第四十二发那笔事故就是把这一步写成了 `mode[2:]`（无条件剥两个字符）⇒ 回执上 `normal` 印成了 `rmal`，
@@ -165,6 +262,13 @@ def selftest():
     LF 的夹具永远走不到那一型。现在 腿2 有四票：裸档名／整行缺失／CRLF 同值算绿／CRLF 而档名真错算红。
     为什么要有这一支：守卫的红要在真档案上才算数，而这个驱动的红只需要**它自己能被骗到**——
     把合成样本喂进同一个 `check_one`，就是问"注入这种日志时它点名了吗"。全绿说明它没牙。
+    本发另添 腿8 八票（面未变／未申报／非我／我名下／申报未动／申报不在面／不可核／落盘不同形）。
+    它们的夹具**不是手写的 dict，而是拿 fc.attribute 现算出来的**：手写夹具会让"夹具与生产形状不一致"
+    这一型永远走不到（第 113 条那一型：夹具向被测对象要一个它自己没给的东西）。
+    另有口径行四票（绿样本逐字／腿5 红⇒False／**函数是哑的**：递进 腿8 那袋它也照印 False／全无口径⇒False＋（读不到））
+    与接线票四票（现读自己这份源⇒绿，另三张变异：调用点改递 `batch_reds`、调用点被换名绕过、尾部装回 `not batch_reds`）：
+    这一发真批上那一行印了 `False` 而自测全绿没拦住——因为旧票只验 `check_batch` 红不红，而错在**调用点递了哪一袋**。
+    所以这一组的牙不住在渲染函数里，住在 `caliber_wiring` 对 AST 的现读上（新欠⑺ 的第二例，同一个驱动件里）。
     """
     ok_out = ("口径：" + "python=3.13.13｜-W=（无）｜SyntaxWarning 动作=default\n\n"
               + "模式：" + _NORMAL_PRINT + "\n\n结论：ok\n")
@@ -253,6 +357,100 @@ def selftest():
                   any(l == "腿7" and "段" in m for l, m in _tr3),
                   "红 " + str(len(_tr3)) + " 条"))
 
+    # —— 腿8（冻结归属）：判据住在 fc.attribute，这几票只断言"它出声了吗、红条点名了吗" ——
+    V = ("10", "1700000000", "a" * 40)          # 一件的三票（字节数、钟点、摘要）
+    W = ("11", "1700000001", "b" * 40)          # 另一版：三票都换了
+    U = (fc.UNREAD, "PermissionError", "")      # 摘要根本没取到
+    _f_ok = fc.attribute({"a.py": V}, {"a.py": V}, [])
+    _f_none = fc.attribute({"a.py": V}, {"a.py": W}, None)
+    _f_other = fc.attribute({"a.py": V, "b.py": V}, {"a.py": W, "b.py": V}, [])
+    _f_mine = fc.attribute({"a.py": V}, {"a.py": W}, ["a.py"])
+    _f_stale = fc.attribute({"a.py": V}, {"a.py": V}, ["a.py"])
+    _f_off = fc.attribute({"a.py": V}, {"a.py": W}, ["zz.py"])
+    _f_unread = fc.attribute({"a.py": V}, {"a.py": U}, [])
+
+    def _fz8(fz, rt=True):
+        got = check_freeze(fz, rt)
+        return got, note(["腿8"] if got else [])
+
+    cases.append(("腿8 面未变＋申报为空 ⇒ 绿（判据不许恒红）",
+                  _fz8(_f_ok)[0] == [] and _f_ok["frozen"], fc.verdict_line(_f_ok)[:44]))
+    _g, _ = _fz8(_f_none)
+    cases.append(("腿8 未申报 ⇒ 红（读不到名单不等于名单是空的）",
+                  len(_g) == 1 and "未申报" in _g[0][1], _g[0][1][:40] if _g else "没红"))
+    _g, _ = _fz8(_f_other)
+    cases.append(("腿8 第三方改动 ⇒ 红且点名到件",
+                  len(_g) == 1 and "非我" in _g[0][1] and "a.py" in _g[0][1],
+                  _g[0][1][:40] if _g else "没红"))
+    _g, _ = _fz8(_f_mine)
+    cases.append(("腿8 我名下改动 ⇒ 仍红（归因不是免责，冻结票就是不许印成立）",
+                  len(_g) == 1 and "我名下" in _g[0][1] and _f_mine["frozen"] is False,
+                  _g[0][1][:40] if _g else "没红"))
+    _g, _ = _fz8(_f_stale)
+    cases.append(("腿8 申报了却没动 ⇒ 红（changed=0 那一型，最容易被读成通过）",
+                  len(_g) == 1 and "申报未动" in _g[0][1] and _f_stale["changed"] == 0,
+                  _g[0][1][:44] if _g else "没红"))
+    _g, _ = _fz8(_f_off)
+    cases.append(("腿8 申报的名不在跟踪面 ⇒ 红（名单本身写坏了要出声）",
+                  len(_g) == 1 and "zz.py" in _g[0][1], _g[0][1][:40] if _g else "没红"))
+    _g, _ = _fz8(_f_unread)
+    cases.append(("腿8 摘要取不到 ⇒ 红（不可核不许被读成『没变』）",
+                  len(_g) == 1 and "不可核" in _g[0][1], _g[0][1][:40] if _g else "没红"))
+    _g, _ = _fz8(_f_ok, False)
+    cases.append(("腿8 快照落盘读回不同形 ⇒ 红（序列化坏了的『没变』不可引）",
+                  len(_g) == 1 and "不同形" in _g[0][1], _g[0][1][:40] if _g else "没红"))
+
+    # —— 口径那一行自己：本发把它的判据从"整袋批级红"（含 腿7／腿8）收窄回 腿5，并给**接线**单独装票。
+    # 真批那一轮 腿8 红了一条而那一行印 False，自测 29 项全绿没拦住 ⇒ 票要钉在"调用点递了哪袋"上。
+    _cf = "python=3.11.0｜-W=（无）｜SyntaxWarning 动作=default"
+    _l8_only = check_freeze(_f_other)
+    cases.append(("口径行 绿样本：逐字原样（True ＋ 把口径读出来）",
+                  note([]) or caliber_line(2, [], _cf) == "\n口径（全批 2 份逐字相同 = True）：" + _cf,
+                  caliber_line(2, [], _cf).strip()[:44]))
+    cases.append(("口径行 腿5 红 ⇒ False（这一行该由谁决定）",
+                  note(sorted(l for l, _ in diff)) or "= False）：" in caliber_line(2, diff, _cf),
+                  "点名 " + str([l for l, _ in diff]) + "｜行尾 " + caliber_line(2, diff, _cf).strip()[-30:]))
+    cases.append(("口径行 函数是哑的：递进 腿8 那袋它也照印 False ⇒ 所以真牙在接线票",
+                  note(["腿8"]) or ("= False）：" in caliber_line(2, _l8_only, _cf) and _l8_only[0][0] == "腿8"),
+                  "腿8 " + str(len(_l8_only)) + " 条｜口径行 " + caliber_line(2, _l8_only, _cf).strip()[:26]))
+    cases.append(("口径行 全无口径 ⇒ False ＋ 明写（读不到）（与 腿5 同向，不各说各话）",
+                  note(sorted(l for l, _ in none)) or "= False）：（读不到）" in caliber_line(1, none, None),
+                  caliber_line(1, none, None).strip()[:40]))
+
+    _src_self = open(os.path.join(HERE, "_red_batch.py"), encoding="utf-8").read()
+    _wr, _wr_read = caliber_wiring(_src_self)
+    cases.append(("接线票 现读自己这份源：调用点只递 calib_reds ⇒ 绿（票不是恒红的装饰）",
+                  note([]) or _wr == [] and "def caliber_line" in _src_self, _wr_read))
+    # 变异要打的靶子 = 生产那一句 print。needle 用拼接构造：写成整串的话，**这个字面量自己**就是
+    # selftest 里的第一处命中，replace(...,1) 会改到我这一行上、生产调用点原地不动 ⇒ 变异假绿
+    # （第一版就假绿在这里，靠"生产调用点仍＝calib_reds"那句读数才看出来）。
+    _needle = "print(caliber_" + "line("
+
+    def _patch_line(_src, _old, _new):
+        _ls = _src.split("\n")
+        _hit = [i for i, l in enumerate(_ls) if _needle in l]
+        if len(_hit) != 1:
+            return _src, len(_hit)
+        _ls[_hit[0]] = _ls[_hit[0]].replace(_old, _new, 1)
+        return "\n".join(_ls), 1
+
+    _m1, _h1 = _patch_line(_src_self, "calib_reds", "batch_reds")
+    _w1, _r1 = caliber_wiring(_m1)
+    cases.append(("接线票 变异① 调用点改递 batch_reds ⇒ 腿9 红（本发那一型当场复发）",
+                  note(["腿9"]) or (_h1 == 1 and _m1 != _src_self and len(_w1) == 1 and _w1[0][0] == "腿9"
+                  and "batch_reds" in _w1[0][1]),
+                  "靶子 " + str(_h1) + " 行｜" + _r1[:44]))
+    _m2, _h2 = _patch_line(_src_self, "caliber_" + "line(", "caliber_" + "line_bypass(")
+    _w2, _r2 = caliber_wiring(_m2)
+    cases.append(("接线票 变异② 调用点被绕过（换名，函数定义还活着） ⇒ 腿9 红『读不到调用点』",
+                  note(["腿9"]) or (_h2 == 1 and _m2 != _src_self and any("调用点" in m for l, m in _w2 if l == "腿9")),
+                  "靶子 " + str(_h2) + " 行｜" + _r2[:44]))
+    _m3 = _src_self + "\ndef _zx_after_selftest():\n    return not batch_reds\n"
+    _w3, _r3 = caliber_wiring(_m3)
+    cases.append(("接线票 变异③ 尾部装回 `not batch_reds` ⇒ 腿9 红（数串会被散文骗，AST 不会）",
+                  note(["腿9"]) or (any("当判据" in m for l, m in _w3) and len(_w3) == 1),
+                  _r3[-24:]))
+
     bad = [c for c in cases if not c[1]]
     print("[驱动自测] 共 " + str(len(cases)) + " 项：")
     for name, ok, detail in cases:
@@ -279,6 +477,12 @@ def main():
                          "回一句 expected one argument——传进去的档名以两个横杠开头这件事没法用参数形状绕开")
     ap.add_argument("--selftest", action="store_true",
                     help="零守卫运行：拿合成日志验这各条腿各自点名，跑不到真批")
+    ap.add_argument("--mine", default=None, metavar="PATH,PATH",
+                    help="本轮我写过的件（**仓根相对名**，逗号分隔，写成 --mine=a,b 一整串）。"
+                         "两格必须分开：不传本项 = 未申报 ⇒ 腿8 红，这一轮只交得出『变了多少件』、"
+                         "交不出冻结票；传空串（--mine=）= 申报『我没动跟踪面上的任何一件』"
+                         "⇒ 此后任何变更都归『非我』并点名。把『未申报』当『空申报』用，"
+                         "就等于别人写的件全算在我名下")
     args = ap.parse_args()
 
     if args.selftest:
@@ -300,6 +504,13 @@ def main():
                          "回执上的份数就不是跑过的份数")
     out_dir = os.path.join(HERE, args.out)
     os.makedirs(out_dir, exist_ok=True)
+    # 腿8 的两份快照：**批前那份必须在起第一个子进程之前落盘**，否则我自己在同一段时间里写的件
+    # 就落在射程之外，归因会把它读成"没变"。读回的那两份才是比对的输入（盘上原件，不是内存 dict）。
+    _fzb = os.path.join(out_dir, "freeze_before.txt")
+    _fza = os.path.join(out_dir, "freeze_after.txt")
+    _mem_b = fc.write_snap(_fzb)
+    declared = (None if args.mine is None
+                else [x.strip() for x in args.mine.replace("，", ",").split(",") if x.strip()])
     scope = ("整轮：normal + MODES 全部" if not args.only else "点名补跑：" + str(len(registered)) + " 档在册")
     print("[跑批] " + str(len(modes)) + " 份（" + scope + "）｜jobs=" + str(args.jobs)
           + "｜解释器 " + sys.version.split()[0])
@@ -307,10 +518,15 @@ def main():
     with ThreadPoolExecutor(max_workers=args.jobs) as ex:
         rows = list(ex.map(lambda m: run_one(m, out_dir), modes))
     wall = time.time() - t0
+    fc.write_snap(_fza)
+    _snap_b, _mb = fc.read_snap(_fzb)
+    _snap_a, _ma = fc.read_snap(_fza)
+    fz = fc.attribute(_snap_b, _snap_a, declared)
+    fz_line = fc.verdict_line(fz)
 
     tally, tally_reds = tally_line(rows, modes)
     calib_reds = check_batch(rows)
-    batch_reds = calib_reds + tally_reds
+    batch_reds = calib_reds + tally_reds + check_freeze(fz, _snap_b == _mem_b)
     all_reds = [(r["mode"], leg, msg) for r in rows for leg, msg in r["reds"]] \
                + [("", leg, msg) for leg, msg in batch_reds]
 
@@ -318,20 +534,28 @@ def main():
         print("  " + r["mode"] + "｜rc=" + str(r["rc"]) + "｜红 " + str(r["red_count"])
               + "｜stdout " + str(r["out_bytes"]) + "B｜stderr " + str(r["err_bytes"]) + "B｜"
               + str(r["secs"]) + "s")
-    print("\n口径（全批 " + str(len(modes)) + " 份逐字相同 = " + str(not batch_reds) + "）："
-          + (rows[0]["caliber"] or "（读不到）"))
+    print(caliber_line(len(modes), calib_reds, rows[0]["caliber"]))
     print("机时：并发 " + str(args.jobs) + "，末份落盘于开跑后 " + str(round(wall)) + " 秒（只报读数，不报倍数）")
     print(tally)
+    print("冻结面：跟踪面 " + str(fz["before_n"]) + "→" + str(fz["after_n"]) + " 件"
+          "｜快照钟点 批前 " + _mb["checked_at"] + "／批后 " + _ma["checked_at"])
+    print(fz_line + "｜限度：这一票只覆盖 git 跟踪面，本机一次性件与 --out 那个目录都不在其中")
     with open(os.path.join(out_dir, "manifest.json"), "w", encoding="utf-8") as f:
         json.dump({"caliber": rows[0]["caliber"], "wall_secs": round(wall), "jobs": args.jobs,
-                   "n_runs": len(modes), "rows": rows, "batch_reds": batch_reds}, f,
+                   "n_runs": len(modes), "rows": rows, "batch_reds": batch_reds,
+                   "freeze": {"line": fz_line, "declared_n": fz["declared_n"],
+                              "before": _mb, "after": _ma,
+                              "columns": {k: fz[k] for k in
+                                          ("mine", "other", "untouched", "offface", "unread")},
+                              "changed": fz["changed"], "frozen": fz["frozen"]}}, f,
                   ensure_ascii=False, indent=1)
     if all_reds:
         print(">>> 本轮不合格 " + str(len(all_reds)) + " 条：")
         for m, leg, msg in all_reds:
             print("   [" + (m or "批级") + "][" + leg + "] " + msg)
         raise SystemExit(1)
-    print("结论：每份退码与红数互证、模式行回读一致、stderr 各 0 字节、全批口径逐字相同。")
+    print("结论：每份退码与红数互证、模式行回读一致、stderr 各 0 字节、全批口径逐字相同、"
+          "批中跟踪面一票冻结（归属五列见上行，红过就不在这里）。")
 
 
 if __name__ == "__main__":

@@ -9,8 +9,9 @@
 # 整张表变成恒真冗余——这几种坏法各有只有它拦得住的输入，都由本件的自证逐条验。
 #
 # 用法：
-#   python _census_once.py              盘点并公示四桶 + 保护名单，并跑常驻自证
-#   python _census_once.py --selftest   额外跑两条注入腿（逐项摘名单 ＋ 加一条假条目）
+#   python _census_once.py              盘点并公示四桶 + 保护名单 + 族对账，并跑常驻自证
+#   python _census_once.py --selftest   额外跑七条注入腿（逐项摘名单／加一条假条目／坏写法／同行歧义
+#                                       ／摘一族／塞一个假族／盘面与在册双双喂空）
 # 退出码：0 = 盘点跑通且全部票绿；1 = 有票红（红条逐条印出）。
 import os
 import subprocess
@@ -22,10 +23,13 @@ KEEP_PATH = os.path.join(HERE, "_census_keep.txt")
 SELF = os.path.basename(os.path.abspath(__file__))
 LABEL = {HERE: "./", ROOT: "../"}
 
-# 我造的那些件的前缀族。这一栏**仍是手写的**，与本发要还的那笔债无关——它挡的是"别人的件"，
-# 而"名单承重与否"由下面的自证管。限度写在这里：新造一件若前缀不在这栏里，它压根不进清点面。
-MINE = ("_tmp_r29", "_tmp_r30", "_tmp_r31", "_tmp_r32", "_tmp_r33", "_tmp_r34", "_tmp_r35", "_tmp_r36",
-        "_tmp_r37", "_tmp_r38", "_tmp_r39", "_tmp_r40", "_tmp_r41", "_tmp_red2", "_tmp_oldrule_check",
+# 我造的那些件的前缀族。这一栏**仍是手写的**——它挡的是"别人的件"，而且删除候选面必须永远由手写
+# 的那一栏圈定（形状自动收 = 把爆炸半径交给命名习惯）。第四十四发起它不再是一笔无票的失明：
+# 下面的 family_check 把"盘上现读的族 ⊆ 在册的族"做成常驻两向票，登记处落后一族就当场点名。
+MINE = ("_tmp_r28", "_tmp_r29", "_tmp_r30", "_tmp_r31", "_tmp_r32", "_tmp_r33", "_tmp_r34", "_tmp_r35",
+        "_tmp_r36", "_tmp_r37", "_tmp_r38", "_tmp_r39", "_tmp_r40", "_tmp_r41", "_tmp_r43", "_tmp_r44",
+        "_red_batch_r43", "_red_batch_r44",
+        "_tmp_red2", "_tmp_oldrule_check",
         "_preflight", "_v4l_", "_tmp_b_preflight", "_tmp_e_rot", "_tmp_l_audit", "_tmp_patch_table",
         "_tmp_c_probe")
 NOT_MINE = ("ml-decision", "step0_diagnostic", "multihop_ab_v4_replica50", "models")
@@ -33,6 +37,65 @@ EXPLICIT_NOT_MINE = {"_preflight_c.py", "_tmp_b_preflight.py", "_tmp_e_rot.py", 
                      "_tmp_patch_table.py", "_v4l_fashion_v2_no_legcheck_v1.json",
                      "_v4l_fashion_v2_pricetag234_v1.json", "_v4l_fashion_v2_swallowedkeys_v1.json",
                      "_v4l_handcount_bad_v1.json"}
+
+# 族＝前缀 + 发号（例：本机一次性件、不在库里的 `_tmp_r43_batch2.log` 与 `_red_batch_r43_stop/` 同属
+# `_tmp_r43`／`_red_batch_r43`——clone 到别人机器上查无原件，所以它们只做形状举例，不当凭据引）。
+# 只有这两个前缀参与对账：`_tmp_red2` 那类老 literal 族尾随的不是数字，不参与发号生命周期。
+FAMILY_PREFIXES = ("_tmp_r", "_red_batch_r")
+FAMILY_FLOOR = 3              # 盘上现读的族数少到个位 ⇒ 判"面塌"（第卅九发那一轮在册族 13 个）
+
+
+def _family_of(name):
+    for p in FAMILY_PREFIXES:
+        if name.startswith(p):
+            digits = ""
+            for ch in name[len(p):]:
+                if not ch.isdigit():
+                    break
+                digits += ch
+            if digits:
+                return p + digits
+    return None
+
+
+def families_on_disk(bases=(HERE, ROOT)):
+    out = set()
+    for base in bases:
+        for name in os.listdir(base):
+            if name == SELF or any(k in name for k in NOT_MINE):
+                continue
+            fam = _family_of(name)
+            if fam:
+                out.add(fam)
+    return out
+
+
+def families_in_registry(mine=MINE):
+    return {f for f in (_family_of(x) for x in mine) if f}
+
+
+def family_check(disk=None, reg=None):
+    """常驻两向票。反向（面外新族）钉的是第 42／43 发那笔 ㈧⑴：登记处停在 r41，于是本轮 53 件
+    对四个桶完全隐形，而清点件照样回一张"🟢 0 项、一个文件都没删"的绿票。
+    正向（僵尸族）钉相反那一型：族清完了条目还留着，下一发照名单排除会静默少排一件。
+    两向都不许由被检对象自己算分母；面塌（现读族数为零）单独出一条，免得"空集合减空集合"印成通过。"""
+    disk = families_on_disk() if disk is None else set(disk)
+    reg = families_in_registry() if reg is None else set(reg)
+    fails = []
+    outside = sorted(disk - reg)
+    zombie = sorted(reg - disk)
+    if len(disk) < FAMILY_FLOOR:
+        fails.append(f"族对账（面塌）：盘上现读到的族只有 {len(disk)} 个（下限 {FAMILY_FLOOR}）⇒ "
+                     "这一格不是『没有新族』，是**压根没扫到盘**（cwd 不对、列目录失败、或前缀全换了）；"
+                     "空盘面与干净盘面在这行字上必须长得不一样")
+    if outside:
+        fails.append(f"族对账（面外新族）：盘上有 {'、'.join(outside)} 这些族（前缀 + 发号，是我的形状），"
+                     "而 MINE 那一栏不含它们 ⇒ 四个桶对它们完全失明：既不进删除候选，也不受登记处保护。"
+                     "把族补进 MINE 并当场量它，不许只在这里念一句")
+    if zombie:
+        fails.append(f"族对账（僵尸族）：MINE 登记着 {'、'.join(zombie)}，而盘上一件都没有 ⇒ "
+                     "这一族谁也不保（它只让下一发照名单动手时多排一次空），撤条目或把原件请回来")
+    return fails, {"disk": len(disk), "reg": len(reg), "outside": outside, "zombie": zombie}
 
 
 def _git(args, cwd):
@@ -245,6 +308,42 @@ def selftest(entries, rows, bodies):
     else:
         print("  注入4（同行歧义）·有牙凭据：只喂一条不在清点面上的条目 ⇒ 报的是『名单没生效』而不是"
               "『恒真冗余』（这条红由注入产生，不落进上面的申报）")
+    # 注入5／6／7（族对账三腿）：这三条判据各自的反面凭据都是"喂进去它不红"，所以判法统一取
+    # **相对常驻基线新增的红**——基线此刻可能正红着（MINE 落后盘面），拿绝对条数判就会把注入腿
+    # 读成误报，或者反过来把基线的那条红算成注入的牙。
+    _disk7, _reg7 = families_on_disk(), families_in_registry()
+    _base7, _ = family_check(_disk7, _reg7)
+    _both7 = sorted(_disk7 & _reg7)
+    if not _both7:
+        fails.append("注入5（族·承重）盘上现读族与在册族**没有交集** ⇒ 这一腿压根跑不到：摘谁都摘不动在册"
+                     "那一份，面外新族那条红的承重性没有凭据。先把 MINE 与盘面对齐（看上面族对账那两条红）"
+                     "再回来看这一条")
+    for fam in _both7:
+        _new5 = [x for x in family_check(_disk7, _reg7 - {fam})[0] if x not in _base7]
+        if len(_new5) != 1 or "面外新族" not in _new5[0] or fam not in _new5[0]:
+            fails.append(f"注入5（族·承重）从在册里摘掉在盘上的 {fam} ⇒ 相对基线新增的红是 {_new5}"
+                         f"（要恰好 1 条、且那条点名 {fam}）⇒ 在册少写一族要么不出声，要么出的是别的账，"
+                         f"读不出这一族的债归谁")
+        else:
+            print(f"  注入5（族·承重）·凭据：从在册里摘掉在盘上的 {fam} ⇒ 只新增一条『面外新族』红并点名它"
+                  f"（这条红由注入产生，不落进上面的申报）⇒ 那一族确由在册那一栏单独承重")
+    _fake7 = "_tmp_r99"
+    _new6 = [x for x in family_check(_disk7, _reg7 | {_fake7})[0] if x not in _base7]
+    if len(_new6) != 1 or "僵尸族" not in _new6[0] or _fake7 not in _new6[0]:
+        fails.append(f"注入6（族·有牙）往在册里塞一个盘上没有的族 {_fake7} ⇒ 相对基线新增的红是 {_new6}"
+                     f"（要恰好 1 条『僵尸族』且点名 {_fake7}）⇒ 撤干净的那一栏还赖在名单里时不会出声，"
+                     f"下一发照名单排除就多排一次空")
+    else:
+        print(f"  注入6（族·有牙）·凭据：往在册里塞一个盘上没有的族 {_fake7} ⇒ 只新增一条『僵尸族』红并点名它"
+              "（这条红由注入产生，不落进上面的申报）")
+    _new7 = [x for x in family_check(set(), set())[0] if x not in _base7]
+    if not any("面塌" in x for x in _new7):
+        fails.append(f"注入7（面塌）把盘面与在册双双喂空 ⇒ 相对基线新增的红是 {_new7}（要含一条『面塌』）"
+                     "⇒ 空集合减空集合被印成通过：扫不到盘（cwd 不对、列目录失败、前缀全换了）时这张票"
+                     "会跟着一起失明，而这正是本轮要治的那一型")
+    else:
+        print("  注入7（面塌）·有牙凭据：盘面与在册双双喂空 ⇒ 新增一条『面塌』红而不是 0 红"
+              "（空盘面与干净盘面在这行字上长得不一样）")
     return fails
 
 
@@ -256,6 +355,13 @@ def main():
     rows = census(keep_map, bodies)
     print(report(rows))
     fails = votes(entries, bad, rows, bodies)
+    fam_fails, fam_info = family_check()
+    fails += fam_fails
+    print(f"\n[自证·族对账] 盘上现读族 {fam_info['disk']} 个／在册族 {fam_info['reg']} 个；"
+          f"面外新族 {len(fam_info['outside'])} 个"
+          f"{'（' + '、'.join(fam_info['outside']) + '）' if fam_info['outside'] else ''}；"
+          f"僵尸族 {len(fam_info['zombie'])} 个"
+          f"{'（' + '、'.join(fam_info['zombie']) + '）' if fam_info['zombie'] else ''}")
     if inject:
         fails += selftest(entries, rows, bodies)
     if fails:

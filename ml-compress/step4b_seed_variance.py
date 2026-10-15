@@ -20,6 +20,8 @@
   # 第八发：把这本种子底本身扩到第4课e/f 那批 8 条流（老 3 条先与 compress_report_v4b.json 逐位对账，
   # 档案名带 _n8 与老账并存）——板块一路用 3 个点的极差当闸门，这一发就是还那笔粗估债：
   PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4b_seed_variance.py --nseeds 8
+  # 第四十四发 C：上面每一条**开跑前**都可以先只报价不跑（0 次训练、不落文件、不动任何在册账）：
+  PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/shenh/miniconda3/python.exe step4b_seed_variance.py --arch cnn --tier 满数据8500 --nseeds 16 --dry-run
   # 第二十一发（板块计数）：第十九发之后欠的那条外推轴——换模型族（第八维），
   #   学生从 MLP 换成老师同族的 CNN。下面整段是**开跑前的预登记**，事后不改一个字。
   # 【预登记 · 只写不变量，读数事后现报】
@@ -89,6 +91,7 @@ DATASET = "mnist"                                  # 可被 --dataset 覆盖；�
                                                    # 默认 mnist ⇒ 那 26 本历史账的名字与读数一字不变
 # 三个拆红开关：各自撤掉家族化改造里的一道检查，只用来证明"那道检查真在生效"，不参与任何读数
 BLANK_RUN = BLIND_COMMIT = BLIND_FAMILY = False
+DRY = False                                        # 可被 --dry-run 覆盖：只读价签，一次训练都不跑
 TIER = ""                                          # 可被 --tier 覆盖；空 = 第4课那两档全跑
 # 第4课档案值（committed run）——种子 42 必须逐位复现，否则说明本课改坏了 train_student
 # 低数据档第4课只在 S128 上配对，所以 64 这一副里只有满数据档可查
@@ -190,6 +193,24 @@ def stu_tag() -> str:
     return f"S{WIDTH}" if ARCH == "mlp" else "CNN学生（无宽度旋钮）"
 
 
+def producing_tiers() -> dict:
+    """这一轮**真会产出臂行**的档——唯一一支，开跑前的价签与落盘后的 n_train 都从这里取数。
+
+    「默认跑法只跑第4课配过对的那几档」这条规则原先只长在 main() 的循环体里
+    （`if arch is None and TIER == "": continue`），于是"这一轮烧几次"有两个说法：那一句和
+    落盘前的 `len(seeds) * 2 * len(tiers)`。抽成一支是为了让训练**之前**也报得出次数——
+    CNN 那一族一次 KD 是 25 秒，等到落盘才发现档数算错就是白烧。"""
+    selected = TIERS if TIER == "" else {TIER: DATA_TIERS[TIER]}
+    if TIER == "":
+        selected = {t: n for t, n in selected.items() if committed(t)}
+    return selected
+
+
+def price_tag(seeds, tiers) -> dict:
+    """同一把尺子只许有一份：价签由这**一个**函数算，开跑前（--dry-run）与落盘后共用。"""
+    return {"flows": len(seeds), "tiers": len(tiers), "trainings": len(seeds) * 2 * len(tiers)}
+
+
 def main() -> None:
     if not (MODELS / TEACHER_PT[DATASET]).exists():
         raise SystemExit(f"缺 {TEACHER_PT[DATASET]}（{DATASET} 那副老师的权重）——"
@@ -218,6 +239,21 @@ def main() -> None:
             for s in SEEDS:
                 if f"{tier} 种子{s}" not in ref:
                     raise SystemExit(f"跨脚本闸没有记录可比（{tier} 种子{s}）：空表在 all() 下恒真，那不算测过")
+    if DRY:                                     # 只读价签：上面那些零训练前置闸照走，下面一次训练都不跑
+        _tiers = producing_tiers()
+        _pt = price_tag(seeds, _tiers)
+        print(f"[只读价签] 目标档案 {out_path().name}"
+              f"｜坐标 任务={DATASET} × 学生族={ARCH}"
+              + (f" × S{WIDTH}" if ARCH == "mlp" else "（CNN 无宽度旋钮）")
+              + f"｜--tier {TIER or '默认（第4课两档）'} → 真产出 {len(_tiers)} 档 {list(_tiers)}"
+              f"｜{_pt['flows']} 条流 × (1 副 CE + 1 副 KD) × {len(_tiers)} 档 = **总训练 {_pt['trainings']} 次**"
+              f"｜第4课 committed 锚点 {'有' if any(committed(t) for t in _tiers) else '无（这一本只产种子底，不产复现）'}"
+              + (f"｜跨脚本基准 {v4b_ref.name} {'在盘上' if v4b_ref.exists() else '**不在盘上**'}"
+                 if NSEEDS > 3 else "")
+              + f"｜老师权重 {TEACHER_PT[DATASET]} 在盘上"
+              f"｜**这一趟 0 次训练、不落任何文件**；墙钟看件头实测（MLP CE 2.55s/KD 2.84s、"
+              f"CNN CE 24.94s/KD 25.28s ⇒ 同一次训练在两族差 8.8×，所以价签只报次数不报分钟）")
+        return
     xt_all, yt_all, xte, yte = dataset_loader(DATASET)()
     cut = len(xt_all) - VAL_N
     xv, yv = xt_all[cut:], torch.tensor(yt_all[cut:])
@@ -225,7 +261,7 @@ def main() -> None:
     teacher.load_state_dict(torch.load(MODELS / TEACHER_PT[DATASET], weights_only=True))
     teacher.eval()
 
-    selected = TIERS if TIER == "" else {TIER: DATA_TIERS[TIER]}
+    selected = producing_tiers()
     archivable = any(committed(t) for t in selected)
     print(f"[先立仪器] 学生架构 = {ARCH}"
           + ("（宽度旋钮只对 MLP 学生有定义，CNN 学生那一副没有宽度可言）" if ARCH == "cnn" else f" · S{WIDTH}")
@@ -241,8 +277,8 @@ def main() -> None:
     xcheck: dict[str, str] = {}
     for tier, n_data in selected.items():
         arch = committed(tier)
-        if arch is None and TIER == "":
-            continue        # 默认跑法只跑第4课配过对的那几档，不往合并档案里塞新档
+        # 「默认跑法只跑有档案那几档」由 producing_tiers() 一处过滤（价签与这里共用同一支），
+        # 所以进这个循环的档都已经决定要产出臂行；arch 为 None 只可能是 --tier 单跑。
         if arch is None:
             why = (f"任务换成 {DATASET}：第4课那本 committed 账全是 MNIST × MLP 学生的读数"
                    if DATASET != "mnist" else
@@ -377,7 +413,7 @@ def main() -> None:
             f"{'、'.join(parity_na)} 没有第4课档案可对（任务 {DATASET} × 族 {ARCH} 这一坐标第4课没跑过）："
             f"这一档只产种子底，"
             f"「换随机流还同向吗」这件事对它没有历史判决可复核")
-    n_train = len(seeds) * 2 * len(tiers)
+    n_train = price_tag(seeds, tiers)["trainings"]
     if not tiers:
         raise SystemExit(f"[空账闸] 这一轮没有任何一档产出臂行（tiers 空）→ {out_path().name} 不能落盘。"
                          f"它是「{'--arch cnn 必须带 --tier' if ARCH == 'cnn' else '默认跑法只跑有档案那几档'}」"
@@ -411,10 +447,16 @@ if __name__ == "__main__":
     ap.add_argument("--blindfamily", action="store_true",
                     help="**拆红专用**：把跨脚本对账的基准强行回落到 MLP 那本 ⇒ 老 3 条流"
                          "对不上账，证明基准名真的按家族走而不是恰好都能对上")
+    ap.add_argument("--dry-run", action="store_true", dest="dry",
+                    help="**只读**：开跑前把这一本的价签报出来（目标档案名、真产出的档、流数、"
+                         "总训练次数、有没有第4课锚点、跨脚本基准在不在），**0 次训练、不落任何文件**。"
+                         "第四十四发 C：板块此前只能对**已经在跑的**那一本报价， CNN×满数据×16 流"
+                         "那一格的价签一直读不出")
     args = ap.parse_args()
     ARCH = args.arch
     DATASET = args.dataset
     BLANK_RUN, BLIND_COMMIT, BLIND_FAMILY = args.blankrun, args.blindcommit, args.blindfamily
+    DRY = args.dry
     # 换任务必须逐档单跑：新任务**没有**"第4课两档共本"那段历史，而满数据档的后缀是空串 ⇒
     # 默认跑法会把低数据档的读数记进 `v4b_fashion.json`（那本的名字属于满数据档）。那是撞名，不是合并。
     if DATASET != "mnist" and args.tier == "":

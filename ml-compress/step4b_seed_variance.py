@@ -211,6 +211,44 @@ def price_tag(seeds, tiers) -> dict:
     return {"flows": len(seeds), "tiers": len(tiers), "trainings": len(seeds) * 2 * len(tiers)}
 
 
+# 单价登记处（第四十六发 C·还第四十五发 ㈧⑷）：板块此前只能报"这一发烧几次"，报不出"这一发要多久"。
+# 每一格都是**本机实测**（同一台机器、同一份数据、CPU，跑一次测一次，不是估的）——产地见板块 README
+# 第卅一发 CNN 换族那一格：MLP S128 学生 101,770 参数 / CE 臂 2.55s / KD 臂 2.84s，
+# CNN 学生 105,866 参数 / CE 臂 24.94s / KD 臂 25.28s ⇒ 参数只差 4% 而墙钟差 8.8×，
+# 所以单价**必须按族分开**，共用一个数就等于把 CNN 那一发报快 8.8 倍。
+# 限度两条写死在这里：① 这是**线性外推**、不是测得的墙钟——它不含取数、评估、跨脚本闸，
+# 也不分数据档（档越大每副越慢，按同一单价算 ⇒ 报出来的是下界）；② 新族必须先测再登记，
+# 不许让某一支回落成"拿别的族的数凑"。
+_SEC_PER_RUN = {"mlp": {"ce": 2.55, "kd": 2.84},
+                "cnn": {"ce": 24.94, "kd": 25.28}}
+_ARMS = ("ce", "kd")
+
+
+def _price_minutes(arch, n_ce, n_kd) -> float:
+    """次数 → 分钟，**唯一**的一支：价签那一路只许调它，打印行里手打分钟数会被 闸㉑ 的接线票当场点名。
+    缺族／缺臂／单价不是正数 ⇒ 当场 SystemExit 而不是回 0.0：一个像是数的 0 会被读成"这一族很快"，
+    而它的真意是"这台机器上没测过这一族"（第 145 条那一型：读失败与读干净不许打同一行字）。"""
+    if arch not in _SEC_PER_RUN:
+        raise SystemExit(f"[价签分钟] 单价登记处没有 {arch!r} 这一族 ⇒ 这一族的每臂秒数未测，"
+                         f"价签不报分钟。先在本机测一次 CE/KD 各一副再补进 _SEC_PER_RUN（在册族现读 "
+                         f"{'、'.join(sorted(_SEC_PER_RUN))}）")
+    per = _SEC_PER_RUN[arch]
+    sec = 0.0
+    for arm, cnt in zip(_ARMS, (n_ce, n_kd)):
+        if cnt < 0:
+            raise SystemExit(f"[价签分钟] {arch}×{arm} 的次数是负数 {cnt} ⇒ 上游算错了，不外推")
+        if cnt == 0:
+            continue
+        if arm not in per:
+            raise SystemExit(f"[价签分钟] {arch} 那一族在登记处缺 {arm!r} 这一臂的单价（现读 "
+                             f"{'、'.join(sorted(per))}），而这一臂要跑 {cnt} 次 ⇒ 无法换算，不报分钟")
+        if not isinstance(per[arm], (int, float)) or per[arm] <= 0:
+            raise SystemExit(f"[价签分钟] {arch}×{arm} 的单价现读 {per[arm]!r}（要正数）⇒ "
+                             "0 或负数会被换算成 0 分钟，那是把『没测过』报成『很快』")
+        sec += cnt * per[arm]
+    return sec / 60.0
+
+
 def main() -> None:
     if not (MODELS / TEACHER_PT[DATASET]).exists():
         raise SystemExit(f"缺 {TEACHER_PT[DATASET]}（{DATASET} 那副老师的权重）——"
@@ -242,6 +280,8 @@ def main() -> None:
     if DRY:                                     # 只读价签：上面那些零训练前置闸照走，下面一次训练都不跑
         _tiers = producing_tiers()
         _pt = price_tag(seeds, _tiers)
+        _n_arm = _pt['flows'] * len(_tiers)          # CE 与 KD 各跑这么多副（trainings = 2 × 这个数）
+        _pm = _price_minutes(ARCH, _n_arm, _n_arm)
         print(f"[只读价签] 目标档案 {out_path().name}"
               f"｜坐标 任务={DATASET} × 学生族={ARCH}"
               + (f" × S{WIDTH}" if ARCH == "mlp" else "（CNN 无宽度旋钮）")
@@ -251,8 +291,12 @@ def main() -> None:
               + (f"｜跨脚本基准 {v4b_ref.name} {'在盘上' if v4b_ref.exists() else '**不在盘上**'}"
                  if NSEEDS > 3 else "")
               + f"｜老师权重 {TEACHER_PT[DATASET]} 在盘上"
-              f"｜**这一趟 0 次训练、不落任何文件**；墙钟看件头实测（MLP CE 2.55s/KD 2.84s、"
-              f"CNN CE 24.94s/KD 25.28s ⇒ 同一次训练在两族差 8.8×，所以价签只报次数不报分钟）")
+              + f"｜**约 {_pm:.2f} 分钟**（{_n_arm} 副 CE + {_n_arm} 副 KD × {ARCH} 那一族的每臂实测秒数，"
+                f"由 _price_minutes 从 _SEC_PER_RUN 现读 ⇒ 同一次训练在两族差 8.8×，所以单价按族分开）"
+              f"｜**这一趟 0 次训练、不落任何文件**")
+        print(f"      限度：上面那个分钟数是**线性外推**、不是测得的墙钟（产地 {dict(_SEC_PER_RUN[ARCH])} 秒/副，"
+              f"本机 CPU 测一次记一次）；它不含取数、不含评估、不含跨脚本闸，也不分数据档 ⇒ 报的是**下界**；"
+              f"真要定档期请按这一坐标实测一趟的墙钟，别拿这个数当承诺")
         return
     xt_all, yt_all, xte, yte = dataset_loader(DATASET)()
     cut = len(xt_all) - VAL_N

@@ -400,6 +400,34 @@ def selftest():
     cases.append(("腿8 快照落盘读回不同形 ⇒ 红（序列化坏了的『没变』不可引）",
                   len(_g) == 1 and "不同形" in _g[0][1], _g[0][1][:40] if _g else "没红"))
 
+    # —— 申报对照（fc.declare_precheck·第四十六发 E·结第四十五发新欠⑿）：**不是红腿**——起跑那一行只印
+    # 读数，判红仍归 腿8（本件里 腿9 已被口径接线票占用，再起一个同号腿就是同号两义）。
+    # 这几票断言的是"出声了吗、点到的件名对不对、三格有没有同形" ——
+    X = ("12", "1800000000", "d" * 40)          # 第三版：钟点在窗口**之内**
+    _T9 = 1750000000                             # 窗口起点（合成秒，不与真钟对照）
+    _M9 = {"a.py": V, "b.py": W, "x.md": X}
+    _p_stale = fc.declare_precheck(["a.py"], _M9, _T9)
+    cases.append(("申报对照 窗口前已落盘的申报 ⇒ stale 点名到件，且那句说出『冻结』当场作废",
+                  _p_stale["stale"] == ["a.py"] and "a.py" in _p_stale["pre_line"]
+                  and "当场作废" in _p_stale["pre_line"],
+                  _p_stale["pre_line"][:52]))
+    _p_fresh = fc.declare_precheck(["x.md"], _M9, _T9)
+    cases.append(("申报对照 窗口内新写的申报 ⇒ 不进 stale（这一列不许恒红，否则没人看它）",
+                  _p_fresh["stale"] == [] and _p_fresh["fresh"] == ["x.md"]
+                  and "当场作废" not in _p_fresh["pre_line"], _p_fresh["pre_line"][:52]))
+    _p_none = fc.declare_precheck(None, _M9, _T9)
+    cases.append(("申报对照 未申报 ⇒ attributable=False 且明写『不报过期件数』（不许印成 0 件过期）",
+                  _p_none["attributable"] is False and "不报过期件数" in _p_none["pre_line"]
+                  and "0 件" not in _p_none["pre_line"], _p_none["pre_line"][:52]))
+    _p_off = fc.declare_precheck(["zz.py"], _M9, _T9)
+    cases.append(("申报对照 名字不在跟踪面 ⇒ 归 off_face 并点名，不混进 stale（两种坏法不同判）",
+                  _p_off["off_face"] == ["zz.py"] and _p_off["stale"] == [] and "zz.py" in _p_off["pre_line"],
+                  _p_off["pre_line"][:52]))
+    _p_unread = fc.declare_precheck(["y.py"], {"y.py": U}, _T9)
+    cases.append(("申报对照 摘要取不到 ⇒ 归 unread 且不判过期（钟点那列装的是异常类名）",
+                  _p_unread["unread"] == ["y.py"] and _p_unread["stale"] == []
+                  and _p_unread["fresh"] == [], _p_unread["pre_line"][:52]))
+
     # —— 口径那一行自己：本发把它的判据从"整袋批级红"（含 腿7／腿8）收窄回 腿5，并给**接线**单独装票。
     # 真批那一轮 腿8 红了一条而那一行印 False，自测 29 项全绿没拦住 ⇒ 票要钉在"调用点递了哪袋"上。
     _cf = "python=3.11.0｜-W=（无）｜SyntaxWarning 动作=default"
@@ -514,6 +542,12 @@ def main():
     scope = ("整轮：normal + MODES 全部" if not args.only else "点名补跑：" + str(len(registered)) + " 档在册")
     print("[跑批] " + str(len(modes)) + " 份（" + scope + "）｜jobs=" + str(args.jobs)
           + "｜解释器 " + sys.version.split()[0])
+    # 申报对照印在**开跑之前**（第四十六发 E·结第四十五发新欠⑿）：`--mine` 里若混着窗口之前就已落盘
+    # 的件，批后那句归属必然走『申报未动』那一列、冻结那句作废——这句话原先要等二十几分钟才印得出来。
+    # 吃的是刚写那份快照的内存 map（它与落盘原件是否同一份，由下面 腿8 的 roundtrip 那一票管）。
+    _t_open = time.time()
+    _pre = fc.declare_precheck(declared, _mem_b, _t_open)
+    print(_pre["pre_line"] + "｜来源：批前快照内存 map（" + str(len(_mem_b)) + " 件），印在起第一个子进程之前")
     t0 = time.time()
     with ThreadPoolExecutor(max_workers=args.jobs) as ex:
         rows = list(ex.map(lambda m: run_one(m, out_dir), modes))

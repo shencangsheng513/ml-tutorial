@@ -28,8 +28,8 @@ LABEL = {HERE: "./", ROOT: "../"}
 # 下面的 family_check 把"盘上现读的族 ⊆ 在册的族"做成常驻两向票，登记处落后一族就当场点名。
 MINE = ("_tmp_r28", "_tmp_r29", "_tmp_r30", "_tmp_r31", "_tmp_r32", "_tmp_r33", "_tmp_r34", "_tmp_r35",
         "_tmp_r36", "_tmp_r37", "_tmp_r38", "_tmp_r39", "_tmp_r40", "_tmp_r41", "_tmp_r43", "_tmp_r44",
-        "_tmp_r45",
-        "_red_batch_r43", "_red_batch_r44", "_red_batch_r45",
+        "_tmp_r45", "_tmp_r46",
+        "_red_batch_r43", "_red_batch_r44", "_red_batch_r45", "_red_batch_r46",
         "_tmp_red2", "_tmp_oldrule_check",
         "_preflight", "_v4l_", "_tmp_b_preflight", "_tmp_e_rot", "_tmp_l_audit", "_tmp_patch_table",
         "_tmp_c_probe")

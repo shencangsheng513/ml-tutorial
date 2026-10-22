@@ -191,6 +191,73 @@ def verdict_line(res):
             + str(res["declared_n"]) + " 件）：" + "｜".join(why))
 
 
+def declare_precheck(declared, before_map, window_start=None):
+    """起跑**前**的申报对照（第四十六发 E·结第四十五发新欠⑿）。
+
+    病：`--mine` 的语义原先只由批后那句判词反着教。判据（`frozen` 里那条 `not untouched`）要求
+    "申报了而本轮没再写"那一列是空的，所以只要我把窗口之前就已落盘的件报进名单，那一轮就注定
+    交不出冻结票——可这句话要等跑完二十几分钟才印出来。原因在开跑之前就能算：批前快照里那件的
+    mtime 早于窗口起点 ⇒ 它不是这一轮写的。本函数把它提前印成一行。
+
+    纯函数：只吃 (申报名单, 批前快照 map, 窗口起点秒)，不碰盘、不调 git ⇒ --freezemine 那族拆红腿
+    能拿合成夹具直接喂进来。declared=None（未申报）与 []（申报空名单）照旧分两格，同 attribute。
+
+    判词为什么住在这一件里而不是跑批件里：起跑那一行由 `_red_batch.py` 直接印 res["pre_line"]，
+    守卫的拆红腿对账的是**同一个字符串**；格式若搬到跑批件，守卫就只能拿自己重写的一份去比，
+    那是第 115 条那一型（自己对自己恒真）。
+
+    回的列：attributable／declared_n／on_face／off_face／unread／stale／fresh／checkable／pre_line。
+    """
+    named = None if declared is None else sorted({norm(x) for x in declared if norm(x)})
+    checkable = window_start is not None
+    on_face, off_face, unread, stale, fresh = [], [], [], [], []
+    if named is not None:
+        for p in named:
+            v = before_map.get(p)
+            if v is None:
+                off_face.append(p)
+                continue
+            if _unread(v):
+                unread.append(p)      # 钟点那一列此时装的是异常类名，不可判就不许算进 stale
+                continue
+            (stale if int(v[1]) < int(window_start) else fresh).append(p)
+    res = {"attributable": named is not None, "declared_n": 0 if named is None else len(named),
+           "on_face": sorted(on_face), "off_face": sorted(off_face), "unread": sorted(unread),
+           "stale": sorted(stale), "fresh": sorted(fresh), "checkable": checkable,
+           "window_start": window_start}
+    head = "申报对照："
+    if named is None:
+        res["pre_line"] = (head + "未申报（declared=None）⇒ 这一轮本来就交不出冻结票，"
+                           "所以本行不报过期件数——『没人申报』与『申报了零件』是两件事（㈧⑻ 那一族的同形）")
+    elif not named:
+        res["pre_line"] = (head + "申报 0 件（空名单＝申报『我没动跟踪面上的任何一件』）⇒ 没有要对照的对象，"
+                           "批后那句归属里任何变更都归『非我』并逐件点名")
+    elif not checkable:
+        res["pre_line"] = (head + "申报 " + str(len(named)) + " 件，但没给窗口起点 ⇒ mtime 早不早**不可判**，"
+                           "这一行不是『0 件过期』")
+    else:
+        parts = []
+        if stale:
+            parts.append("窗口之前就已落盘 " + str(len(stale)) + " 件＝" + cap(stale)
+                         + "（若本轮不再写它们，批后它们会落进『申报未动』那一列，而判据要求那一列空"
+                         " ⇒ 『一票冻结』那句当场作废：要么别把它们报进来，要么接受归属写成『不是冻结』）")
+        if fresh:
+            parts.append("窗口之内已写 " + str(len(fresh)) + " 件＝" + cap(fresh)
+                         + "（这一类是真申报，批后应落在『我名下』那一列）")
+        if off_face:
+            parts.append("申报不在跟踪面 " + str(len(off_face)) + " 件＝" + cap(off_face)
+                         + "（名字写错了：写成板块相对名或盘上没这路径，批后归『申报不在面』）")
+        if unread:
+            parts.append("摘要取不到 " + str(len(unread)) + " 件＝" + cap(unread)
+                         + "（钟点那一列装的是异常类名 ⇒ 过期与否对它们不可判）")
+        res["pre_line"] = (head + "申报 " + str(len(named)) + " 件｜窗口起点 "
+                           + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(window_start))
+                           + "｜" + "｜".join(parts)
+                           + "｜限度：『窗口之前就已落盘』是**预测**不是判词——第三方若在批中改写它，"
+                             "批后归因会把它转到『非我』那一列，那一型由 腿8 管，不由这一行管")
+    return res
+
+
 def main():
     ap = argparse.ArgumentParser(description="全跟踪面冻结快照与两向归因")
     ap.add_argument("cmd", choices=["snap", "diff"])
